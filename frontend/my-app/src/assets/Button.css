@@ -1,15 +1,17 @@
 .button {
-  width: 250px;
-  height: 75px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
 
-  border-radius: 10px;
+  border-radius: 5px;
   outline: none;
   border: none;
 
   color: white;
 
-  font-size: 18px;
-
+  font-size: 16px;
+  font-weight: 400;
   transition: transform 0.1s ease;
 }
 
