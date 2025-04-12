@@ -1,0 +1,20 @@
+
+body {background-color: #17153b;}
+.App main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+  
+.buttons-showcase {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+  
+.subcontainer-showcase {
+    width: 100%;
+    height: 500px;
+  
+    background-color: #c8abd6;
+}
