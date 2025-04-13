@@ -32,6 +32,122 @@
     font-weight: 200;
     margin-top:0;
 }
+.parachute1{
+    display: none;
+}
+.parachute2{
+    display: none;
+}
+.parachute3{
+    display: none;
+}
+.parachute4{
+    display: none;
+}
+.cloud1{
+    display:none;
+}
+.cloud2{
+    display:none;
+}
+.cloud3{
+    display:none;
+}
+.cloud4{
+    display:none;
+}
+.cloud5{
+    display:none;
+}
+@media (max-width: 720px){
+    body{
+        background-image: linear-gradient(#17153B,#433D8B);
+        overflow-x: hidden;
+    }
+      .title{
+        font-size: 48px;
+      }
+      .subtitle{
+        font-size: 16px;
+      }
+      .text-container{
+        width: 40vw;
+      }
+      .landing-container{
+        position: relative;
+        height: 70vh;
+      }
+      .gifts-illustration{
+        display: none;
+      }
+      .parachute1{
+        display:list-item;
+        width: 80px;
+        position: absolute;
+        left: 10vw;
+        top: 10vh;
+        transform: rotate(-7deg);
+      }
+      .parachute2{
+        display:list-item;
+        width: 90px;
+        position: absolute;
+        left: 72vw;
+        top: 20vh;
+        transform: rotate(18deg);
+      }
+      .parachute3{
+        display:list-item;
+        width: 90px;
+        position: absolute;
+        left: 10vw;
+        top: 40vh;
+        transform: rotate(-20deg);
+      }
+      .parachute4{
+        display:list-item;
+        width: 95px;
+        position: absolute;
+        left: 60vw;
+        top: 48vh;
+        transform: rotate(1deg);
+      }
+      .cloud1{
+        display:list-item;
+        width: 130px;
+        position: absolute;
+        left: 55vw;
+        top: 15vh;
+      }
+      .cloud2{
+        display:list-item;
+        width: 100px;
+        position: absolute;
+        left: 70vw;
+        top: 42vh;
+      }
+      .cloud3{
+        display:list-item;
+        width: 130px;
+        position: absolute;
+        left: -40px;
+        top: 65vh;
+      }
+      .cloud4{
+        display:list-item;
+        width: 100px;
+        position: absolute;
+        left: 35vw;
+        top: 55vh;
+      }
+      .cloud5{
+        display:list-item;
+        width: 100px;
+        position: absolute;
+        left: 2vw;
+        top: 30vh;
+      }
 
+}
 
   
