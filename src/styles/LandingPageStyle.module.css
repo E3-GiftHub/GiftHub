@@ -1,7 +1,5 @@
 body{
     background-image: url("/backgrounds/background_landing_page.png");
-    margin: 0;
-    padding: 0;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -15,4 +13,10 @@ body{
 
 .empty-space{
     height: 50vh;
+} 
+
+@media (max-width: 720px){
+      .empty-space{
+        height:10vh;
+      }
 }

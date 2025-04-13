@@ -5,7 +5,7 @@ import Container from "../components/ui/Container";
 import ButtonPrimary from "../components/ui/ButtonPrimary";
 import ButtonSecondary from "../components/ui/ButtonSecondary";
 
-export default function HomePage() {
+export default function home() {
   return (
     <>
     <Navbar/>

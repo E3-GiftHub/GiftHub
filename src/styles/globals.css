@@ -1,2 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&family=Jura:wght@300..700&display=swap');
- 
+
+body {
+    background-color: #17153b;
+    margin: 0;
+    font-family: Heebo, 'sans-serif';
+}

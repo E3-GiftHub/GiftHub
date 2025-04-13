@@ -29,3 +29,19 @@
     text-align: center;
     font-size: 0.8rem;
 }
+
+@media (max-width: 720px){
+    .event-card{
+        width:150px;
+        height: 300px;
+    }
+    .event-title{
+        font-size: 0.9rem;;
+    }
+    .event-description{
+        font-size: 0.7rem;
+    }
+    .event-image {
+        width: 90%;
+    }
+}

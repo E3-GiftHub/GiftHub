@@ -34,3 +34,14 @@
 
   box-shadow: inset 0px -5px 1px rgba(0, 0, 0, 0.3);
 }
+
+@media (max-width: 720px){
+  .button{
+    font-size: 12px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    border-radius: 5px;
+  }
+}

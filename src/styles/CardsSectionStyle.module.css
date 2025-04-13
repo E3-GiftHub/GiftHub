@@ -9,3 +9,9 @@
     gap: 35px;
     align-self: center;
 }
+
+@media (max-width: 720px){
+    .cards-container{
+        width: 90vw;
+    }
+}
