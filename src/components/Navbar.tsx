@@ -1,21 +1,47 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { FaHome, FaInbox, FaUser, FaSignOutAlt, FaUserEdit, FaBars } from "react-icons/fa"
+import { useState, useEffect, useRef } from "react"
+import {
+  FaHome,
+  FaInbox,
+  FaUser,
+  FaArrowRight,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaUserEdit,
+  FaBars,
+  FaUserPlus
+} from "react-icons/fa"
 import styles from "./../styles/Navbar.module.css"
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [isLandingPage, setIsLandingPage] = useState(false)
 
+  const profileRef = useRef<HTMLLIElement>(null)
+
+  useEffect(() => {
+    const checkSpecialPage = () => {
+      const isHashPage = window.location.href === "http://localhost:3000/#"
+      setIsLandingPage(isHashPage)
+    }
+  
+    checkSpecialPage()
+    window.addEventListener("hashchange", checkSpecialPage)
+  
+    return () => window.removeEventListener("hashchange", checkSpecialPage)
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
-      if (!target.closest(".nav-links") && !target.closest(".hamburger")) {
+
+      if (!target.closest(`.${styles["nav-links"]}`) && !target.closest(`.${styles["hamburger"]}`)) {
         setMenuOpen(false)
       }
-      if (!target.closest(".profile-dropdown")) {
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false)
       }
     }
@@ -27,49 +53,63 @@ const Navbar = () => {
   }, [])
 
   return (
-    <nav className={styles["navbar"]}>
+    <nav className={`${styles["navbar"]} ${isLandingPage ? styles["special-navbar"] : ""}`}>
       <div className={styles["navbar-left"]}>
         <img src="/logo.png" alt="Gift Hub" className={styles["logo"]} />
       </div>
 
-      <div className={styles["hamburger"]} onClick={() => setMenuOpen(!menuOpen)}>
-        <FaBars />
-      </div>
-
-      {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
-
-      <ul className={`${styles['nav-links']} ${menuOpen ? styles.open : ''}`}>
-        <li>
-          <a href="#">
-            <FaHome /> Home
+      {isLandingPage ? (
+        <div className={styles["login-wrapper"]}>
+          <a href="/login" className={styles["login-button"]}>
+          <FaUser />
+          <FaArrowRight />Login
           </a>
-        </li>
-        <li>
-          <a href="#">
-            <FaInbox /> Inbox
-          </a>
-        </li>
-        <li className={`${styles['profile-dropdown']} ${profileOpen ? styles.open : ''}`}>
-          <a
-            href="#"
-            className={styles["profile-main-button"]}
-            onClick={(e) => {
-              e.preventDefault()
-              setProfileOpen(!profileOpen)
-            }}
-          >
-            <FaUser /> Profile
-          </a>
-          <div className={styles["dropdown-content"]}>
-            <a href="#">
-              <FaUserEdit /> Edit Profile
-            </a>
-            <a href="#">
-              <FaSignOutAlt /> Logout
-            </a>
+        </div>
+      ) : (
+        <>
+          <div className={styles["hamburger"]} onClick={() => setMenuOpen(!menuOpen)}>
+            <FaBars />
           </div>
-        </li>
-      </ul>
+
+          {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
+
+          <ul className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}>
+            <li>
+              <a href="http://localhost:3000/home#">
+                <FaHome /> Home
+              </a>
+            </li>
+            <li>
+              <a href="http://localhost:3000/inbox#">
+                <FaInbox /> Inbox
+              </a>
+            </li>
+            <li
+              ref={profileRef}
+              className={`${styles["profile-dropdown"]} ${profileOpen ? styles.open : ""}`}
+            >
+              <a
+                href="#"
+                className={styles["profile-main-button"]}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setProfileOpen(!profileOpen)
+                }}
+              >
+                <FaUser /> Profile
+              </a>
+              <div className={styles["dropdown-content"]}>
+                <a href="http://localhost:3000/profile#">
+                  <FaUserEdit /> Edit Profile
+                </a>
+                <a href="http://localhost:3000/#">
+                  <FaSignOutAlt /> Logout
+                </a>
+              </div>
+            </li>
+          </ul>
+        </>
+      )}
     </nav>
   )
 }
