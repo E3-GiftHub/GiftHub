@@ -20,18 +20,23 @@ const Navbar = () => {
   const [isLandingPage, setIsLandingPage] = useState(false)
 
   const profileRef = useRef<HTMLLIElement>(null)
+    useEffect(() => {
+      const specialPages = [
+        "http://localhost:3000/#", 
+        "http://localhost:3000/",
+      ];
+    
+      const checkSpecialPage = () => {
+        const isSpecial = specialPages.includes(window.location.href);
+        setIsLandingPage(isSpecial);
+      };
+    
+      checkSpecialPage();
+      window.addEventListener("hashchange", checkSpecialPage);
+    
+      return () => window.removeEventListener("hashchange", checkSpecialPage);
+    }, []);
 
-  useEffect(() => {
-    const checkSpecialPage = () => {
-      const isHashPage = window.location.href === "http://localhost:3000/#"
-      setIsLandingPage(isHashPage)
-    }
-  
-    checkSpecialPage()
-    window.addEventListener("hashchange", checkSpecialPage)
-  
-    return () => window.removeEventListener("hashchange", checkSpecialPage)
-  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
