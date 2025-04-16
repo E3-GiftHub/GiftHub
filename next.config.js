@@ -6,6 +6,7 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 <<<<<<< HEAD
+<<<<<<< HEAD
 const config = {
   reactStrictMode: true,
 
@@ -22,5 +23,8 @@ const config = {
 =======
 const config = {};
 >>>>>>> 3ca2400 (init)
+=======
+const config = {};
+>>>>>>> 1d53804 (switched to app router paradigm)
 
 export default config;

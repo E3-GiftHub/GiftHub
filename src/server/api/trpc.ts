@@ -9,10 +9,13 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 =======
 >>>>>>> 3ca2400 (init)
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -26,6 +29,7 @@ import { db } from "~/server/db";
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
 <<<<<<< HEAD
+<<<<<<< HEAD
  */
 
 interface CreateContextOptions {
@@ -35,34 +39,21 @@ interface CreateContextOptions {
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
  * it from here.
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
  *
- * Examples of things you may need it for:
- * - testing, so we don't have to mock Next.js' req/res
- * - tRPC's `createSSGHelpers`, where we don't have req/res
+ * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
+ * wrap this and provides the required context.
  *
- * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
+ * @see https://trpc.io/docs/server/context
  */
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const session = await auth();
+
   return {
-    session: opts.session,
     db,
-  };
-};
-
-/**
- * This is the actual context you will use in your router. It will be used to process every request
- * that goes through your tRPC endpoint.
- *
- * @see https://trpc.io/docs/context
- */
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
-
-  // Get the session from the server using the getServerSession wrapper function
-  const session = await auth(req, res);
-
-  return createInnerTRPCContext({
     session,
+<<<<<<< HEAD
   });
 =======
  *
@@ -80,6 +71,10 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     ...opts,
   };
 >>>>>>> 3ca2400 (init)
+=======
+    ...opts,
+  };
+>>>>>>> 1d53804 (switched to app router paradigm)
 };
 
 /**
@@ -90,9 +85,12 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * errors on the backend.
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 3ca2400 (init)
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
