@@ -5,6 +5,7 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
+<<<<<<< HEAD
 const config = {
   reactStrictMode: true,
 
@@ -18,5 +19,8 @@ const config = {
     defaultLocale: "en",
   },
 };
+=======
+const config = {};
+>>>>>>> 3ca2400 (init)
 
 export default config;

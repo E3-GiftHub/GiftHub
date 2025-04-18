@@ -8,8 +8,11 @@
  */
 
 import { initTRPC, TRPCError } from "@trpc/server";
+<<<<<<< HEAD
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
+=======
+>>>>>>> 3ca2400 (init)
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -22,6 +25,7 @@ import { db } from "~/server/db";
  * This section defines the "contexts" that are available in the backend API.
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
+<<<<<<< HEAD
  */
 
 interface CreateContextOptions {
@@ -60,6 +64,22 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   return createInnerTRPCContext({
     session,
   });
+=======
+ *
+ * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
+ * wrap this and provides the required context.
+ *
+ * @see https://trpc.io/docs/server/context
+ */
+export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const session = await auth();
+
+  return {
+    db,
+    session,
+    ...opts,
+  };
+>>>>>>> 3ca2400 (init)
 };
 
 /**
@@ -69,7 +89,10 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3ca2400 (init)
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
