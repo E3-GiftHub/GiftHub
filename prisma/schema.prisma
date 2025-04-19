@@ -1,5 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+/**
+ * learn more about it in the docs: https://pris.ly/d/prisma-schema
+ * 1. @relation
+ * 2. `@default(now())` and `@updatedAt`
+ * 3. Prisma has no direct equivalent for the `MEMO` type, so `String?` with `` is used instead to allow for larger text storage.
+ */
 
 generator client {
     provider = "prisma-client-js"
@@ -7,12 +11,17 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // NOTE: When using mysql or sqlserver, uncomment the  annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
+
+/**
+ * default models
+ * ! changed User:pk from id to email
+ */
 
 model Post {
     id        Int      @id @default(autoincrement())
@@ -20,7 +29,7 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [username])
+    createdBy   User   @relation(fields: [createdById], references: [email])
     createdById String
 
     @@index([name])
@@ -33,14 +42,14 @@ model Account {
     type                     String
     provider                 String
     providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
+    refresh_token            String? // 
+    access_token             String? // 
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String? // 
     session_state            String?
-    user                     User    @relation(fields: [userId], references: [username], onDelete: Cascade)
+    user                     User    @relation(fields: [userId], references: [email], onDelete: Cascade)
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
@@ -51,23 +60,7 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [username], onDelete: Cascade)
-}
-
-model User {
-    email          String    @unique
-    username       String    @id @default(cuid()) // related to sessions
-    fname          String?
-    lname          String?
-    password       String?
-    iban           String?
-    profilePicture String?
-    emailVerified  DateTime?
-    accounts       Account[]
-    sessions       Session[]
-    posts          Post[]
-
-    createAt String
+    user         User     @relation(fields: [userId], references: [email], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -76,4 +69,235 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+//! implemented models
+
+model User {
+    email    String @id @unique
+    username String @default(cuid()) /* @id
+    * related to sessions
+    */
+
+    fname          String?
+    lname          String?
+    password       String?
+    iban           String?
+    profilePicture String? //todo: string?
+
+    eventsCreated Event[]
+    invitations   Invitation[]
+
+    /**
+     * contributions Contribution[]
+     * purchases     Purchase[]
+     * mediaItems    MediaItem[]
+     */
+
+    /**
+     * eventReports EventReport[]
+     * userReports  UserReport[]
+     * markedItems  MarkedItem[]
+     */
+
+    // mandatory assets
+    emailVerified DateTime?
+    accounts      Account[]
+    sessions      Session[]
+    posts         Post[]
+
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    Contribution Contribution[]
+    Purchase     Purchase[]
+    MediaItem    MediaItem[]
+    EventReport  EventReport[]
+    UserReport   UserReport[]
+}
+
+model Event {
+    id          BigInt    @id @default(autoincrement())
+    title       String?
+    description String?
+    location    String?
+    date        DateTime?
+    time        DateTime?
+    wishlist    Boolean?
+    gallery     Boolean?
+    createdBy   String
+    user        User      @relation(fields: [createdBy], references: [email])
+
+    invitations   Invitation[]
+    eventItems    EventItem[]
+    contributions Contribution[]
+    purchases     Purchase[]
+    mediaItems    MediaItem[]
+    eventReports  EventReport[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Invitation {
+    id      BigInt @id @default(autoincrement())
+    eventId BigInt
+    event   Event  @relation(fields: [eventId], references: [id])
+
+    guestEmail String
+    user       User   @relation(fields: [guestEmail], references: [email])
+
+    status    Status
+    invitedAt DateTime
+    repliedAt DateTime
+}
+
+model Retailer {
+    id     BigInt          @id @default(autoincrement())
+    name   String?
+    apiUrl String?
+    items  ItemCatalogue[]
+}
+
+model ItemCatalogue {
+    id          BigInt   @id @default(autoincrement())
+    name        String?
+    description String?
+    imagesUrl   String?
+    price       Decimal? // Adjust precision and scale as necessary
+    retailerUrl String?
+    retailerId  BigInt
+    retailer    Retailer @relation(fields: [retailerId], references: [id])
+
+    isCustom      Boolean?
+    eventItems    EventItem[]
+    contributions Contribution[]
+    purchases     Purchase[]
+    markedItems   MarkedItem[]
+
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+}
+
+model EventItem {
+    eventId           BigInt
+    itemId            BigInt
+    quantityRequested Int?
+    quantityFulfilled Int?
+    priority          ItemPriority?
+
+    event Event         @relation(fields: [eventId], references: [id])
+    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+
+    @@id([eventId, itemId])
+}
+
+enum ItemPriority {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+model Contribution {
+    id          BigInt @id @default(autoincrement())
+    eventId     BigInt
+    itemId      BigInt
+    contributor String
+
+    contributedAt DateTime?
+    amount        Decimal?
+    isFulfilled   Boolean?
+
+    user  User          @relation(fields: [contributor], references: [email])
+    event Event         @relation(fields: [eventId], references: [id])
+    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+}
+
+model Purchase {
+    id               BigInt    @id @default(autoincrement())
+    eventId          BigInt
+    itemId           BigInt
+    purchaser        String
+    quantity         Int?
+    timestamp        DateTime?
+    paymentReference String?
+
+    user  User          @relation(fields: [purchaser], references: [email])
+    event Event         @relation(fields: [eventId], references: [id])
+    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+}
+
+model MediaItem {
+    id         BigInt    @id @default(autoincrement())
+    eventId    BigInt
+    uploader   String
+    mediaType  String?
+    url        String?
+    caption    String?
+    status     Status
+    fileType   String?
+    fileSize   Int?
+    uploadedAt DateTime?
+
+    user  User  @relation(fields: [uploader], references: [email])
+    event Event @relation(fields: [eventId], references: [id])
+}
+
+model EventReport {
+    id          BigInt    @id @default(autoincrement())
+    eventId     BigInt
+    reportedBy  String
+    reason      String?
+    description String?
+    reportedAt  DateTime?
+
+    user  User  @relation(fields: [reportedBy], references: [email])
+    event Event @relation(fields: [eventId], references: [id])
+}
+
+model UserReport {
+    id           BigInt    @id @default(autoincrement())
+    reportedUser String
+    reportedBy   String
+    reason       String?
+    description  String?
+    reportedAt   DateTime?
+
+    userBad User @relation(fields: [reportedUser], references: [email])
+    /**
+     * userBad User @relation(fields: [reportedUser], references: [email])
+     * userLad User @relation(fields: [reportedBy], references: [email])
+     */
+}
+
+model MarkedItem {
+    id      BigInt @id @default(autoincrement())
+    marker  String
+    eventId BigInt
+
+    /**
+     * itemId   BigInt    @relation(fields: [itemId], references: [id])
+     * markType String?
+     * markedAt DateTime?
+     * user  User          @relation(fields: [marker], references: [email])
+     * event Event         @relation(fields: [eventId], references: [id])
+     * item  ItemCatalogue @relation(fields: [itemId], references: [id])
+     */
+
+    // what the hell is this
+    ItemCatalogue   ItemCatalogue? @relation(fields: [itemCatalogueId], references: [id])
+    itemCatalogueId BigInt?
+}
+
+enum Status {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+enum Mark {
+    RESERVED
+    CONTRIBUTING_TO
 }
