@@ -1,0 +1,135 @@
+Table Users {
+  email_address string [pk]
+  user_name string
+  fname string
+  lname string
+  password string
+  profile_picture string
+  created_at datetime
+  iban iban
+}
+
+Table Events {
+  event_id uuid [pk]
+  created_by string [ref: > Users.email_address]
+  created_at datetime
+  title string
+  description text
+  event_date date
+  event_time time
+  location string
+  wishlist_enabled boolean
+  gallery_enabled boolean
+}
+
+Table Invitations {
+  invitation_id uuid [pk]
+  event_id uuid [ref: > Events.event_id]
+  guest_email string [ref: > Users.email_address]
+  status status // 'pending', 'accepted', 'declined'
+  invited_at datetime
+  responded_at datetime
+}
+
+Table AffiliateRetailers {
+  retailer_id uuid [pk]
+  name string
+  api_url string
+}
+
+// Shared item catalog
+Table ItemCatalogue {
+  item_id uuid [pk]
+  name string
+  description text
+  image_url string
+  price decimal
+  affiliate_link string
+  retailer_id uuid [ref: > AffiliateRetailers.retailer_id, null]
+  is_custom boolean
+  created_at datetime
+}
+
+// Junction table for event-specific wishlist entry
+Table EventItems {
+  event_id uuid [ref: > Events.event_id]
+  item_id uuid [ref: > ItemCatalogue.item_id]
+  quantity_requested int
+  quantity_fulfilled int
+  priority status // low, medium, high
+  created_at datetime
+
+  Note: "Composite primary key on (event_id, item_id)"
+  indexes {
+    (event_id, item_id) [pk]
+  }
+
+}
+
+Table Contributions {
+  contribution_id uuid [pk]
+  event_id uuid [ref: > Events.event_id]
+  item_id uuid [ref: > ItemCatalogue.item_id]
+  contributor_email string [ref: > Users.email_address]
+  amount decimal
+  contributed_at datetime
+  is_fulfilled boolean
+
+  Note: "References EventItems via (event_id, item_id)"
+}
+
+Table Purchases {
+  purchase_id uuid [pk]
+  event_id uuid [ref: > Events.event_id]
+  item_id uuid [ref: > ItemCatalogue.item_id]
+  purchaser_email string [ref: > Users.email_address]
+  quantity int
+  timestamp datetime
+  payment_reference string
+
+  Note: "References EventItems via (event_id, item_id)"
+}
+
+Table MediaItems {
+  media_id uuid [pk]
+  event_id uuid [ref: > Events.event_id] // Directly linked to the event
+  uploader_email string [ref: > Users.email_address]
+  media_type string // 'image', 'video'
+  url string
+  caption text
+  status status //pending, approved, rejected
+  uploaded_at datetime
+  file_type string
+  file_size int
+}
+
+Table EventReports {
+  report_id uuid [pk]
+  event_id uuid [ref: > Events.event_id]
+  reported_by string [ref: > Users.email_address]
+  reason string
+  description text
+  reported_at datetime
+}
+
+Table UserReports {
+  report_id uuid [pk]
+  reported_user_email string [ref: > Users.email_address]
+  reported_by string [ref: > Users.email_address]
+  reason string
+  description text
+  reported_at datetime
+}
+
+Table MarkedItems {
+  marked_id uuid [pk]
+  user_email string [ref: > Users.email_address]
+  event_id uuid [ref: > Events.event_id]
+  item_id uuid [ref: > ItemCatalogue.item_id]
+  mark_type string // 'reserved', 'contributing'
+  marked_at datetime
+
+  Note: "Indicates a user has marked an item in the context of an event"
+}
+
+Ref: "Contributions"."contribution_id" < "Contributions"."item_id"

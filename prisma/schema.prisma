@@ -20,7 +20,7 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdBy   User   @relation(fields: [createdById], references: [username])
     createdById String
 
     @@index([name])
@@ -40,7 +40,7 @@ model Account {
     scope                    String?
     id_token                 String? // @db.Text
     session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user                     User    @relation(fields: [userId], references: [username], onDelete: Cascade)
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
@@ -51,18 +51,23 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user         User     @relation(fields: [userId], references: [username], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    email          String    @unique
+    username       String    @id @default(cuid()) // related to sessions
+    fname          String?
+    lname          String?
+    password       String?
+    iban           String?
+    profilePicture String?
+    emailVerified  DateTime?
+    accounts       Account[]
+    sessions       Session[]
+    posts          Post[]
+
+    createAt String
 }
 
 model VerificationToken {
