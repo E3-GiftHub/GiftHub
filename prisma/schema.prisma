@@ -283,6 +283,8 @@ enum Status {
 }
 
 enum Mark {
+    PURCHASED
     RESERVED
-    CONTRIBUTING_TO
+    CONTRIBUTED
+    NULL
 }
