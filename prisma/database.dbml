@@ -1,0 +1,144 @@
+// https://dbdiagram.io/d/GiftHub-database-68038bc91ca52373f5920a71
+
+Table User {
+  id string [pk]
+  email string
+  fname string
+  lname string
+  password string
+  iban iban
+  picture string
+
+  emailVerified datetime
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table Event {
+  id uuid [pk]
+  title string
+  description text
+  location string
+  date date
+  time time
+
+  createdBy string [ref: > User.id]
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table Invitation {
+  id uuid [pk]
+  guestId string [ref: > User.id]
+  eventId uuid [ref: > Event.id]
+ 
+  status status // 'pending', 'accepted', 'declined'
+  createdAt datetime
+  repliedAt datetime
+}
+
+Table Media {
+  id uuid [pk]
+  uploaderId string [ref: > User.id]
+  eventId uuid [ref: > Event.id] // Directly linked to the event
+  status status //pending, approved, rejected
+ 
+  url string
+  caption text
+ 
+  mediaType string // 'image', 'video'
+  fileType string
+  fileSize int
+  uploadedAt datetime
+}
+
+// change name to Mark
+Table Mark {
+  id uuid [pk]
+  markerId string [ref: > User.id]
+  eventId uuid [ref: > Event.id]
+  itemId uuid [ref: > ItemCatalogue.id]
+  
+  type string // 'reserved', 'contributing'
+  createdAt datetime
+
+  Note: "Indicates a user has marked an item in the context of an event"
+}
+
+// Junction table for event-specific wishlist entry - represents wishlists
+Table EventItem {
+  eventId uuid [ref: > Event.id]
+  itemId uuid [ref: > ItemCatalogue.id]
+  quantityRequested int
+  quantityFulfilled int
+  priority status // low, medium, high
+  createdAt datetime
+  updatedAt datetime
+
+  Note: "Composite primary key on (eventId, itemId)"
+  indexes {
+    (eventId, itemId) [pk]
+  }
+}
+
+// Shared item catalog
+Table ItemCatalogue {
+  id uuid [pk]
+  name string
+  description text
+  imagesUrl string
+  price decimal
+
+  retailerId uuid [ref: > Retailers.id, null]
+  retailerUrl string
+
+  isCustom boolean
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table Retailer {
+  id uuid [pk]
+  name string
+  apiUrl string
+}
+
+Table Contribution {
+  id uuid [pk]
+  contributorId string [ref: > User.id]
+  eventId uuid [ref: > Event.id]
+  itemId uuid [ref: > ItemCatalogue.id]
+  
+  cashAmount decimal
+  contributedAt datetime
+
+  Note: "References EventItems via (eventId, itemId)"
+}
+
+Table Purchase {
+  id uuid [pk]
+  purchaser string [ref: > User.id]
+  eventId uuid [ref: > Event.id]
+  itemId uuid [ref: > ItemCatalogue.id]
+  purchasedAt datetime
+
+  Note: "References EventItems via (eventId, itemId)"
+}
+
+Table UserReport {
+  id uuid [pk]
+  reportedId string [ref: > User.id]
+  reportedBy string [ref: > User.id]
+  reason string
+  description text
+  reportedAt datetime
+}
+
+Table EventReport {
+  id uuid [pk]
+  reportedId uuid [ref: > Event.id]
+  reportedBy string [ref: > User.id]
+  reason string
+  description text
+  reportedAt datetime
+}

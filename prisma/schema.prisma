@@ -1,10 +1,8 @@
 /**
- * learn more about it in the docs: https://pris.ly/d/prisma-schema
+ * ! documentation
+ * https://pris.ly/d/prisma-schema
  * https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
  * https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
- * 1. @relation
- * 2. `@default(now())` and `@updatedAt`
- * 3. Prisma has no direct equivalent for the `MEMO` type, so `String?` with `` is used instead to allow for larger text storage.
  */
 
 generator client {
@@ -16,6 +14,27 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+//! enum
+
+enum Status {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
+enum PriorityType {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+enum MarkType {
+    PURCHASED
+    RESERVED
+    CONTRIBUTED
+    NULL
+}
+
 //! default models
 
 model Post {
@@ -24,7 +43,7 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [username])
+    createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String
 
     @@index([name])
@@ -32,20 +51,21 @@ model Post {
 
 // Necessary for Next auth
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String? // 
-    access_token             String? // 
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String? // 
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [username], onDelete: Cascade)
-    refresh_token_expires_in Int?
+    id                    String  @id @default(cuid())
+    userId                String
+    type                  String
+    provider              String
+    providerAccountId     String
+    refreshToken          String?
+    accessToken           String?
+    expiresAt             Int?
+    tokenType             String?
+    scope                 String?
+    idToken               String?
+    sessionState          String?
+    refreshTokenExpiresIn Int?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -55,7 +75,8 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [username], onDelete: Cascade)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -69,33 +90,35 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    username String  @id @unique @default(cuid())
+    id       String  @id @unique @default(cuid()) /// id
     email    String? @unique
     fname    String?
     lname    String?
-    password String?
+    password String? // stored with hash obviously
     iban     String?
     picture  String? //todo: string?
 
+    emailVerified DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // relations
     eventsCreated Event[]
     invitations   Invitation[]
 
+    postsMedia    Media[]
+    marks         Mark[]
     contributions Contribution[]
     purchases     Purchase[]
-    mediaItems    MediaItem[]
 
-    eventReports EventReport[]
-    userReports  UserReport[]
-    markedItems  MarkedItem[]
+    reporters     UserReport[]  @relation("reporter")
+    reportedUsers UserReport[]  @relation("reported")
+    eventReports  EventReport[]
 
     // mandatory assets
-    emailVerified DateTime?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    accounts Account[]
+    sessions Session[]
+    posts    Post[]
 }
 
 model Event {
@@ -105,33 +128,102 @@ model Event {
     location    String?
     date        DateTime?
     time        DateTime?
-    wishlist    Boolean?
-    gallery     Boolean?
-    createdBy   String
-    user        User      @relation(fields: [createdBy], references: [username])
 
-    invitations   Invitation[]
-    eventItems    EventItem[]
-    contributions Contribution[]
-    purchases     Purchase[]
-    mediaItems    MediaItem[]
-    eventReports  EventReport[]
-
+    createdBy String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [createdBy], references: [id])
+
+    invitations Invitation[]
+
+    postsMedia    Media[]
+    marks         Mark[]
+    contributions Contribution[]
+    purchases     Purchase[]
+    eventItems    EventItem[]
+    eventReports  EventReport[]
 }
 
 model Invitation {
     id      BigInt @id @default(autoincrement())
+    guestId String
     eventId BigInt
-    event   Event  @relation(fields: [eventId], references: [id])
-
-    guestEmail String
-    user       User   @relation(fields: [guestEmail], references: [username])
 
     status    Status
-    invitedAt DateTime
+    createdAt DateTime
     repliedAt DateTime
+
+    guest User  @relation(fields: [guestId], references: [id])
+    event Event @relation(fields: [eventId], references: [id])
+}
+
+model Media {
+    id         BigInt @id @default(autoincrement())
+    uploaderId String
+    eventId    BigInt
+    status     Status
+
+    url     String?
+    caption String?
+
+    mediaType  String?
+    fileType   String?
+    fileSize   Int?
+    uploadedAt DateTime?
+
+    user  User  @relation(fields: [uploaderId], references: [id])
+    event Event @relation(fields: [eventId], references: [id])
+}
+
+model Mark {
+    id       BigInt @id @default(autoincrement())
+    markerId String /// always a Guest
+    eventId  BigInt
+    itemId   BigInt
+
+    type      MarkType
+    createdAt DateTime @default(now())
+
+    guest User          @relation(fields: [markerId], references: [id])
+    event Event         @relation(fields: [eventId], references: [id])
+    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+}
+
+model EventItem {
+    eventId           BigInt
+    itemId            BigInt
+    quantityRequested Int?
+    quantityFulfilled Int?
+    priority          PriorityType?
+
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+
+    event Event         @relation(fields: [eventId], references: [id])
+    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+
+    @@id([eventId, itemId])
+}
+
+model ItemCatalogue {
+    id          BigInt   @id @default(autoincrement())
+    name        String?
+    description String?
+    imagesUrl   String?
+    price       Decimal?
+
+    retailerId  BigInt?
+    retailerUrl String?
+    retailer    Retailer? @relation(fields: [retailerId], references: [id])
+
+    isCustom  Boolean
+    createdAt DateTime? @default(now())
+    updatedAt DateTime? @updatedAt
+
+    eventOccurences EventItem[]
+    marks           Mark[]
+    contributions   Contribution[]
+    purchases       Purchase[]
 }
 
 model Retailer {
@@ -141,150 +233,57 @@ model Retailer {
     items  ItemCatalogue[]
 }
 
-model ItemCatalogue {
-    id          BigInt   @id @default(autoincrement())
-    name        String?
-    description String?
-    imagesUrl   String?
-    price       Decimal? // Adjust precision and scale as necessary
-    retailerUrl String?
-    retailerId  BigInt
-    retailer    Retailer @relation(fields: [retailerId], references: [id])
+/// refers to a group contribution
+model Contribution {
+    id            BigInt @id @default(autoincrement())
+    contributorId String /// always a Guest
+    eventId       BigInt
+    itemId        BigInt
 
-    isCustom      Boolean?
-    eventItems    EventItem[]
-    contributions Contribution[]
-    purchases     Purchase[]
-    markedItems   MarkedItem[]
+    cashAmount    Decimal?
+    contributedAt DateTime?
 
-    createdAt DateTime? @default(now())
-    updatedAt DateTime? @updatedAt
-}
-
-model EventItem {
-    eventId           BigInt
-    itemId            BigInt
-    quantityRequested Int?
-    quantityFulfilled Int?
-    priority          ItemPriority?
-
+    guest User          @relation(fields: [contributorId], references: [id])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
-
-    createdAt DateTime? @default(now())
-    updatedAt DateTime? @updatedAt
-
-    @@id([eventId, itemId])
 }
 
-enum ItemPriority {
-    LOW
-    MEDIUM
-    HIGH
-}
-
-model Contribution {
-    id          BigInt @id @default(autoincrement())
+//todo should we remove this?
+/// refers to a "single-player" contribution
+model Purchase {
+    id          BigInt    @id @default(autoincrement())
+    purchaserId String /// always a Guest 
     eventId     BigInt
     itemId      BigInt
-    contributor String
+    purchasedAt DateTime?
 
-    contributedAt DateTime?
-    amount        Decimal?
-    isFulfilled   Boolean?
-
-    user  User          @relation(fields: [contributor], references: [username])
+    guest User          @relation(fields: [purchaserId], references: [id])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
 
-model Purchase {
-    id               BigInt    @id @default(autoincrement())
-    eventId          BigInt
-    itemId           BigInt
-    purchaser        String
-    quantity         Int?
-    timestamp        DateTime?
-    paymentReference String?
+//! reports
 
-    user  User          @relation(fields: [purchaser], references: [username])
-    event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
-}
-
-model MediaItem {
-    id         BigInt    @id @default(autoincrement())
-    eventId    BigInt
-    uploader   String
-    mediaType  String?
-    url        String?
-    caption    String?
-    status     Status
-    fileType   String?
-    fileSize   Int?
-    uploadedAt DateTime?
-
-    user  User  @relation(fields: [uploader], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
-}
-
-model EventReport {
+model UserReport {
     id          BigInt    @id @default(autoincrement())
-    eventId     BigInt
+    reportedId  String
     reportedBy  String
     reason      String?
     description String?
     reportedAt  DateTime?
 
-    user  User  @relation(fields: [reportedBy], references: [username])
+    userHell User? @relation("reported", fields: [reportedId], references: [id])
+    userSane User? @relation("reporter", fields: [reportedBy], references: [id])
+}
+
+model EventReport {
+    id          BigInt    @id @default(autoincrement())
+    eventId     BigInt
+    reportedBy  String /// NOT always a Guest
+    reason      String?
+    description String?
+    reportedAt  DateTime?
+
+    user  User  @relation(fields: [reportedBy], references: [id])
     event Event @relation(fields: [eventId], references: [id])
-}
-
-model UserReport {
-    id           BigInt    @id @default(autoincrement())
-    reportedUser String
-    reportedBy   String
-    reason       String?
-    description  String?
-    reportedAt   DateTime?
-
-    userBad User @relation(fields: [reportedUser], references: [username])
-    /**
-     * userBad User @relation(fields: [reportedUser], references: [username])
-     * userLad User @relation(fields: [reportedBy], references: [username])
-     */
-}
-
-model MarkedItem {
-    id      BigInt @id @default(autoincrement())
-    marker  String
-    eventId BigInt
-
-    /**
-     * itemId   BigInt    @relation(fields: [itemId], references: [id])
-     * markType String?
-     * markedAt DateTime?
-     * user  User          @relation(fields: [marker], references: [username])
-     * event Event         @relation(fields: [eventId], references: [id])
-     * item  ItemCatalogue @relation(fields: [itemId], references: [id])
-     */
-
-    // what the hell is this
-    ItemCatalogue   ItemCatalogue? @relation(fields: [itemCatalogueId], references: [id])
-    itemCatalogueId BigInt?
-    User            User?          @relation(fields: [userEmail], references: [username])
-    userEmail       String?
-}
-
-enum Status {
-    PENDING
-    ACCEPTED
-    REJECTED
-}
-
-enum Mark {
-    PURCHASED
-    RESERVED
-    CONTRIBUTED
-    NULL
 }
