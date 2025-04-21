@@ -1,5 +1,7 @@
 /**
  * learn more about it in the docs: https://pris.ly/d/prisma-schema
+ * https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+ * https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
  * 1. @relation
  * 2. `@default(now())` and `@updatedAt`
  * 3. Prisma has no direct equivalent for the `MEMO` type, so `String?` with `` is used instead to allow for larger text storage.
@@ -11,17 +13,10 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    // NOTE: When using mysql or sqlserver, uncomment the  annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
 
-/**
- * default models
- * ! changed User:pk from id to email
- */
+//! default models
 
 model Post {
     id        Int      @id @default(autoincrement())
@@ -29,7 +24,7 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [email])
+    createdBy   User   @relation(fields: [createdById], references: [username])
     createdById String
 
     @@index([name])
@@ -49,7 +44,7 @@ model Account {
     scope                    String?
     id_token                 String? // 
     session_state            String?
-    user                     User    @relation(fields: [userId], references: [email], onDelete: Cascade)
+    user                     User    @relation(fields: [userId], references: [username], onDelete: Cascade)
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
@@ -60,7 +55,7 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [email], onDelete: Cascade)
+    user         User     @relation(fields: [userId], references: [username], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -74,31 +69,24 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    email    String @id @unique
-    username String @default(cuid()) /* @id
-    * related to sessions
-    */
-
-    fname          String?
-    lname          String?
-    password       String?
-    iban           String?
-    profilePicture String? //todo: string?
+    username String  @id @unique @default(cuid())
+    email    String? @unique
+    fname    String?
+    lname    String?
+    password String?
+    iban     String?
+    picture  String? //todo: string?
 
     eventsCreated Event[]
     invitations   Invitation[]
 
-    /**
-     * contributions Contribution[]
-     * purchases     Purchase[]
-     * mediaItems    MediaItem[]
-     */
+    contributions Contribution[]
+    purchases     Purchase[]
+    mediaItems    MediaItem[]
 
-    /**
-     * eventReports EventReport[]
-     * userReports  UserReport[]
-     * markedItems  MarkedItem[]
-     */
+    eventReports EventReport[]
+    userReports  UserReport[]
+    markedItems  MarkedItem[]
 
     // mandatory assets
     emailVerified DateTime?
@@ -106,13 +94,8 @@ model User {
     sessions      Session[]
     posts         Post[]
 
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @updatedAt
-    Contribution Contribution[]
-    Purchase     Purchase[]
-    MediaItem    MediaItem[]
-    EventReport  EventReport[]
-    UserReport   UserReport[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Event {
@@ -125,7 +108,7 @@ model Event {
     wishlist    Boolean?
     gallery     Boolean?
     createdBy   String
-    user        User      @relation(fields: [createdBy], references: [email])
+    user        User      @relation(fields: [createdBy], references: [username])
 
     invitations   Invitation[]
     eventItems    EventItem[]
@@ -144,7 +127,7 @@ model Invitation {
     event   Event  @relation(fields: [eventId], references: [id])
 
     guestEmail String
-    user       User   @relation(fields: [guestEmail], references: [email])
+    user       User   @relation(fields: [guestEmail], references: [username])
 
     status    Status
     invitedAt DateTime
@@ -210,7 +193,7 @@ model Contribution {
     amount        Decimal?
     isFulfilled   Boolean?
 
-    user  User          @relation(fields: [contributor], references: [email])
+    user  User          @relation(fields: [contributor], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
@@ -224,7 +207,7 @@ model Purchase {
     timestamp        DateTime?
     paymentReference String?
 
-    user  User          @relation(fields: [purchaser], references: [email])
+    user  User          @relation(fields: [purchaser], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
@@ -241,7 +224,7 @@ model MediaItem {
     fileSize   Int?
     uploadedAt DateTime?
 
-    user  User  @relation(fields: [uploader], references: [email])
+    user  User  @relation(fields: [uploader], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 }
 
@@ -253,7 +236,7 @@ model EventReport {
     description String?
     reportedAt  DateTime?
 
-    user  User  @relation(fields: [reportedBy], references: [email])
+    user  User  @relation(fields: [reportedBy], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 }
 
@@ -265,10 +248,10 @@ model UserReport {
     description  String?
     reportedAt   DateTime?
 
-    userBad User @relation(fields: [reportedUser], references: [email])
+    userBad User @relation(fields: [reportedUser], references: [username])
     /**
-     * userBad User @relation(fields: [reportedUser], references: [email])
-     * userLad User @relation(fields: [reportedBy], references: [email])
+     * userBad User @relation(fields: [reportedUser], references: [username])
+     * userLad User @relation(fields: [reportedBy], references: [username])
      */
 }
 
@@ -281,7 +264,7 @@ model MarkedItem {
      * itemId   BigInt    @relation(fields: [itemId], references: [id])
      * markType String?
      * markedAt DateTime?
-     * user  User          @relation(fields: [marker], references: [email])
+     * user  User          @relation(fields: [marker], references: [username])
      * event Event         @relation(fields: [eventId], references: [id])
      * item  ItemCatalogue @relation(fields: [itemId], references: [id])
      */
@@ -289,6 +272,8 @@ model MarkedItem {
     // what the hell is this
     ItemCatalogue   ItemCatalogue? @relation(fields: [itemCatalogueId], references: [id])
     itemCatalogueId BigInt?
+    User            User?          @relation(fields: [userEmail], references: [username])
+    userEmail       String?
 }
 
 enum Status {
