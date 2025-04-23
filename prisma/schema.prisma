@@ -32,7 +32,7 @@ enum MarkType {
     PURCHASED
     RESERVED
     CONTRIBUTED
-    NULL
+    // NULL: if the mark is null => delete row
 }
 
 //! default models
@@ -90,13 +90,13 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    id       String  @id @unique @default(cuid()) /// id
+    id       String  @id @unique @default(cuid())
     email    String? @unique
     fname    String?
     lname    String?
     password String? // stored with hash obviously
     iban     String?
-    picture  String? //todo: string?
+    picture  String? // todo: string?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -149,9 +149,9 @@ model Invitation {
     guestId String
     eventId BigInt
 
-    status    Status
-    createdAt DateTime
-    repliedAt DateTime
+    status    Status    @default(PENDING)
+    createdAt DateTime  @default(now())
+    repliedAt DateTime?
 
     guest User  @relation(fields: [guestId], references: [id])
     event Event @relation(fields: [eventId], references: [id])
@@ -166,10 +166,10 @@ model Media {
     url     String?
     caption String?
 
-    mediaType  String?
-    fileType   String?
-    fileSize   Int?
-    uploadedAt DateTime?
+    mediaType String?
+    fileType  String?
+    fileSize  Int?
+    createdAt DateTime @default(now())
 
     user  User  @relation(fields: [uploaderId], references: [id])
     event Event @relation(fields: [eventId], references: [id])
@@ -177,7 +177,7 @@ model Media {
 
 model Mark {
     id       BigInt @id @default(autoincrement())
-    markerId String /// always a Guest
+    markerId String // always a Guest
     eventId  BigInt
     itemId   BigInt
 
@@ -189,6 +189,7 @@ model Mark {
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
 
+/// stores the wishlists from all events and the status of each item
 model EventItem {
     eventId           BigInt
     itemId            BigInt
@@ -196,8 +197,8 @@ model EventItem {
     quantityFulfilled Int?
     priority          PriorityType?
 
-    createdAt DateTime? @default(now())
-    updatedAt DateTime? @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
@@ -216,9 +217,10 @@ model ItemCatalogue {
     retailerUrl String?
     retailer    Retailer? @relation(fields: [retailerId], references: [id])
 
+    // indicates a Planner special request
     isCustom  Boolean
-    createdAt DateTime? @default(now())
-    updatedAt DateTime? @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     eventOccurences EventItem[]
     marks           Mark[]
@@ -236,26 +238,30 @@ model Retailer {
 /// refers to a group contribution
 model Contribution {
     id            BigInt @id @default(autoincrement())
-    contributorId String /// always a Guest
+    contributorId String // always a Guest
     eventId       BigInt
     itemId        BigInt
 
-    cashAmount    Decimal?
-    contributedAt DateTime?
+    cashAmount Decimal?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt // ! users can cancel their contribution
 
     guest User          @relation(fields: [contributorId], references: [id])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
 
-//todo should we remove this?
+//todo should we remove "Purchase"? 
+//todo maybe change the meaning to the final action after all contributions
+//todo see polls 11. enclose purchase
+
 /// refers to a "single-player" contribution
 model Purchase {
-    id          BigInt    @id @default(autoincrement())
-    purchaserId String /// always a Guest 
+    id          BigInt   @id @default(autoincrement())
+    purchaserId String // always a Guest 
     eventId     BigInt
     itemId      BigInt
-    purchasedAt DateTime?
+    createdAt   DateTime @default(now())
 
     guest User          @relation(fields: [purchaserId], references: [id])
     event Event         @relation(fields: [eventId], references: [id])
@@ -265,24 +271,24 @@ model Purchase {
 //! reports
 
 model UserReport {
-    id          BigInt    @id @default(autoincrement())
+    id          BigInt   @id @default(autoincrement())
     reportedId  String
     reportedBy  String
     reason      String?
     description String?
-    reportedAt  DateTime?
+    createdAt   DateTime @default(now())
 
-    userHell User? @relation("reported", fields: [reportedId], references: [id])
-    userSane User? @relation("reporter", fields: [reportedBy], references: [id])
+    userHell User @relation("reported", fields: [reportedId], references: [id])
+    userSane User @relation("reporter", fields: [reportedBy], references: [id])
 }
 
 model EventReport {
-    id          BigInt    @id @default(autoincrement())
+    id          BigInt   @id @default(autoincrement())
     eventId     BigInt
-    reportedBy  String /// NOT always a Guest
+    reportedBy  String // NOT always a Guest
     reason      String?
     description String?
-    reportedAt  DateTime?
+    createdAt   DateTime @default(now())
 
     user  User  @relation(fields: [reportedBy], references: [id])
     event Event @relation(fields: [eventId], references: [id])
