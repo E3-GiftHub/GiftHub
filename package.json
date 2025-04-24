@@ -31,6 +31,7 @@
     "@trpc/server": "^11.0.0",
     "next": "^15.2.3",
     "next-auth": "5.0.0-beta.25",
+    "public": "^0.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
