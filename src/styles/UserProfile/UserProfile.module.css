@@ -3,7 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 60px); /* Account for navbar */
+    min-height: calc(90vh - 60px); /* Account for navbar */
     background-color: #17153b;
     padding: 20px;
 }
@@ -12,9 +12,10 @@
 .profileCard {
     display: flex;
     width: 100%;
-    height: 150%;
+    height: 80vh;
+    min-height: 600px;
     max-height: 1000px;
-    max-width: 1000px;
+    max-width: 1300px;
     background-color: #1d1949; /* Dark purple background */
     background-image: url('public/UserImages/Containers/Container.svg');
     background-size: cover;
@@ -38,52 +39,50 @@
 
 /* Avatar section styling */
 .avatarSection {
-    padding: 100px;
+    padding: 0 7rem 0 7rem;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* aVATAR SECTION */
+.avatarWrapper {
+    position: relative;
+    display: inline-block; /* Makes the wrapper size to content */
+}
+
 .avatarCircle {
-    width: 20em;
-    height: 20em;
+    /* Base size on viewport width with limits */
+    width: clamp(300px, 24vw, 500px); /* 30% of viewport width */
+    height: clamp(300px, 24vw, 500px); /* Same as width */
     border-radius: 50%;
-    background-color: #2e275f; /* Darker purple for avatar background */
+    background-color: #2e275f;
     background-image: url('public/UserImages/default_pfp.svg');
     background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: #000000 0 1px 20px -5px
+    box-shadow: #000000 0 1px 20px -5px;
+    aspect-ratio: 1; /* Maintain perfect circle */
 }
 
-.profileIcon {
-    width: 100px;
-    height: 100px;
-}
-
+/* Updated edit button positioning */
 .editAvatarButton {
     position: absolute;
-    bottom: 120px;
-    right: 125px;
+    bottom: 10%;  /* Percentage-based positioning */
+    right: 15%;   /* Percentage-based positioning */
     width: 3.5em;
     height: 3.5em;
     border-radius: 50%;
-    background-image: url('/public/UserImages/buttons/change_pfp.svg');
+    background-image: url('public/UserImages/buttons/change_pfp.svg');
     background-size: cover;
     border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     cursor: pointer;
-    padding: 0;
+    transform: translate(30%, 30%); /* Fine-tune position */
+    z-index: 1;
 }
-
 /* User info section */
 .userInfo {
     flex: 1;
-    padding: 40px 40px 40px 40px;
+    /*padding: 40px 40px 40px 40px;*/
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -91,13 +90,13 @@
 }
 
 .username {
-    font-size: 24px;
+    font-size: 2.5em;
     font-weight: 500;
     margin: 0 0 5px 0;
 }
 
 .email {
-    font-size: 14px;
+    font-size: 1.2em;
     color: #aaa;
     margin: 0 0 30px 0;
 }
@@ -106,31 +105,61 @@
 .buttonContainer {
     display: flex;
     gap: 16px;
+    /*margin-top: 30px;*/
 }
 
-.deleteButton, .editButton {
-    display: flex;
-    align-items: center;
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
+.button {
+    padding: 1rem 2rem;
+
+    border-radius: 10px;
+    outline: none;
+    border: none;
+
     color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+
+    font-size: 1.3em;
+    font-weight: 400;
+    transition: transform 0.1s ease;
 }
 
-.buttonIcon {
+.button:hover {
+    transform: scale(1.1);
+}
+
+.button:active {
+    transform: scale(1);
+}
+
+.button {
+    background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+
+    /*box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);*/
+}
+
+.icon {
+    /* Prevent layout shift */
+    position: relative;
+    display: inline-block;
+
+    /* Match your design */
     margin-right: 8px;
+    vertical-align: middle;
+
+    /* Optional: Size constraints */
+    min-width: 24px;
+    min-height: 24px;
 }
 
-.deleteButton:hover, .editButton:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
+/*@media (max-width: 920px){*/
+/*    .button{*/
+/*        font-size: 12px;*/
+/*        padding: 0.5rem 1rem;*/
+/*        border-radius: 5px;*/
+/*    }*/
+/*}*/
 
 /* Responsive adjustments */
-@media (max-width: 700px) {
+@media (max-width: 1040px) {
     .profileCard {
         flex-direction: column;
         align-items: center;
@@ -147,8 +176,8 @@
     }
 
     .avatarCircle {
-        width: 150px;
-        height: 150px;
+        width: 250px;
+        height: 250px;
     }
 
     .profileIcon {
@@ -159,5 +188,42 @@
     .editAvatarButton {
         bottom: 30px;
         right: calc(50% - 90px);
+    }
+
+    @media (max-width: 720px) {
+        .profileCard {
+            margin-top: 60px;
+        }
+    }
+    @media (max-width: 500px){
+        .icon{
+            min-width: 1rem;
+            min-height: 1rem;
+        }
+        .buttonContainer {
+            display: flex;
+            flex-direction: column;  /* Stack items vertically */
+            gap: 16px;
+            /* Optional: Add alignment if needed */
+            align-items: center; /* or flex-start */
+        }
+        .username {
+            font-size: 1.8em;
+        }
+        .email {
+            font-size: 1em;
+        }
+    }
+    @media (max-width: 330px) {
+        .avatarCircle {
+            width: 200px;
+            height: 200px;
+        }
+        .username {
+            font-size: 1.5em;
+        }
+        .email {
+            font-size: 0.8em;
+        }
     }
 }
