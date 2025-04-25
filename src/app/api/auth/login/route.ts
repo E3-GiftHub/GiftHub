@@ -12,7 +12,7 @@ export async function POST(request: Request)
         {
           success: false,
           message: "Please fill the form",
-          errors: {
+          fieldErrors: {
             general: 'No Data provided in request body'
           }
         },
@@ -21,36 +21,31 @@ export async function POST(request: Request)
     }
 
     const { email, password } = requestBody;
-
-    const errors: Record<string, string> = {};
+    const fieldErrors: Record<string, string> = {};
 
     if(!email)
     {
-      errors.email = 'Email is required';
-    } else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    {
-      errors.email = 'Email is invalid';
+      fieldErrors.email = 'Email is required';
     }
-
     if(!password)
     {
-      errors.password = 'Password is required';
+      fieldErrors.password = 'Password is required';
     }
 
-    if(Object.keys(errors).length > 0)
+    if(Object.keys(fieldErrors).length > 0)
     {
       return NextResponse.json(
         {
           success: false,
-          message: "Please fill the form",
-          errors
+          message: "Validation error",
+          fieldErrors
         },
         { status: 400 }
       );
     }
 
     const user = await db.user.findUnique({
-      where: { email },
+      where: { email }
     });
 
     if(!user)
@@ -59,7 +54,7 @@ export async function POST(request: Request)
         {
           success: false,
           message: "Failed Authentification",
-          errors: {
+          fieldErrors: {
             email: 'No such account with this email'
           }
         },
@@ -73,7 +68,7 @@ export async function POST(request: Request)
         {
           success: false,
           message: "Failed Authentification",
-          errors: {
+          fieldErrors: {
             password: "Password doesn't match",
           }
         },
@@ -95,7 +90,7 @@ export async function POST(request: Request)
       {
         success: false,
         message: 'Internal Server Error',
-        errors: {
+        fieldErrors: {
           general: 'Unexpected error occurred'
         }
       },
