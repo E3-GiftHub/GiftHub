@@ -6,11 +6,9 @@ import {
   FaInbox,
   FaUser,
   FaArrowRight,
-  FaSignInAlt,
   FaSignOutAlt,
   FaUserEdit,
   FaBars,
-  FaUserPlus
 } from "react-icons/fa"
 import styles from "./../styles/Navbar.module.css"
 
@@ -42,7 +40,7 @@ const Navbar = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
 
-      if (!target.closest(`.${styles["nav-links"]}`) && !target.closest(`.${styles["hamburger"]}`)) {
+      if (!target.closest(`.${styles["nav-links"]}`) && !target.closest(`.${styles.hamburger}`)) {
         setMenuOpen(false)
       }
 
@@ -58,9 +56,9 @@ const Navbar = () => {
   }, [])
 
   return (
-    <nav className={`${styles["navbar"]} ${isLandingPage ? styles["special-navbar"] : ""}`}>
+    <nav className={`${styles.navbar} ${isLandingPage ? styles["special-navbar"] : ""}`}>
       <div className={styles["navbar-left"]}>
-        <img src="/logo.png" alt="Gift Hub" className={styles["logo"]} />
+        <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
       </div>
 
       {isLandingPage ? (
@@ -72,7 +70,7 @@ const Navbar = () => {
         </div>
       ) : (
         <>
-          <div className={styles["hamburger"]} onClick={() => setMenuOpen(!menuOpen)}>
+          <div className={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
             <FaBars />
           </div>
 
