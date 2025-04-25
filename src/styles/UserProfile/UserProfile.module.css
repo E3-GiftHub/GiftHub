@@ -64,6 +64,18 @@
     aspect-ratio: 1; /* Maintain perfect circle */
 }
 
+.avatarPlaceholder {
+    aspect-ratio: 1;
+}
+.placeholderImage {
+    object-fit: contain; /* Changed from scale-down for better control */
+    width: 100%; /* Control image size within circle */
+    height: 100%;
+    max-width: 500px; /* Match avatarCircle's max size */
+    max-height: 500px;
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
 /* Updated edit button positioning */
 .editAvatarButton {
     position: absolute;
@@ -76,13 +88,69 @@
     background-size: cover;
     border: none;
     cursor: pointer;
-    transform: translate(30%, 30%); /* Fine-tune position */
+    transform: translate(30%, 30%);
+    transition: transform 0.2s ease; /* Add transition here instead of hover */
     z-index: 1;
+}
+
+.editAvatarButton:hover {
+    transform: translate(30%, 30%) scale(1.2); /* Combine transforms */
+}
+
+.editAvatarButton:active {
+    transform: translate(30%, 30%) scale(1);
+}
+
+
+/* Loading state animations */
+@keyframes loadingPulse {
+    0% { opacity: 1 }
+    50% { opacity: 0.4 }
+    100% { opacity: 1 }
+}
+
+.loading {
+    animation: loadingPulse 1.5s infinite;
+    background-color: #e0e0e0;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.avatarPlaceholder {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Loading state specific styles */
+.avatarCircle.loading {
+    background-color: #e0e0e0;
+}
+
+.username.loading {
+    width: 200px;
+    height: 28px;
+    border-radius: 4px;
+}
+
+.email.loading {
+    width: 160px;
+    height: 20px;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.button.loading {
+    width: 140px;
+    height: 36px;
+    border-radius: 18px;
 }
 /* User info section */
 .userInfo {
     flex: 1;
-    /*padding: 40px 40px 40px 40px;*/
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -149,14 +217,6 @@
     min-width: 24px;
     min-height: 24px;
 }
-
-/*@media (max-width: 920px){*/
-/*    .button{*/
-/*        font-size: 12px;*/
-/*        padding: 0.5rem 1rem;*/
-/*        border-radius: 5px;*/
-/*    }*/
-/*}*/
 
 /* Responsive adjustments */
 @media (max-width: 1040px) {
