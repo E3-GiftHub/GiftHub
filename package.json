@@ -26,7 +26,6 @@
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.69.0",
     "@trpc/client": "^11.0.0",
-    "@trpc/next": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
     "next": "^15.2.3",
@@ -34,6 +33,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "zod": "^3.24.2"
   },
@@ -56,5 +56,5 @@
   "ct3aMetadata": {
     "initVersion": "7.39.3"
   },
-  "packageManager": "npm@9.2.0"
+  "packageManager": "npm@11.3.0"
 }

@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Container from "../components/ui/Container";
 import ButtonPrimary from "../components/ui/ButtonPrimary";
 import ButtonSecondary from "../components/ui/ButtonSecondary";
+import "./../styles/globals.css"
 
 export default function home() {
   return (
