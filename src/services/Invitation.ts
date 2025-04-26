@@ -1,16 +1,18 @@
 import { db as prisma } from "~/server/db";
-import type { Invitations } from "@prisma/client";
+import type { Invitation } from "@prisma/client";
+import { Status } from "@prisma/client"
+
 
 export class InvitationEntity {
-  private data: Invitations;
+  private data: Invitation;
 
-  constructor(invite: Invitations) {
+  constructor(invite: Invitation) {
     this.data = invite;
   }
 
-  static async getByEvent(eventId: string): Promise<InvitationEntity[]> {
-    const invites = await prisma.invitations.findMany({
-      where: { event_id: eventId },
+  static async getByEvent(eventId: bigint): Promise<InvitationEntity[]> {
+    const invites = await prisma.invitation.findMany({
+      where: { eventId: eventId },
     });
     return invites.map(i => new InvitationEntity(i));
   }
@@ -20,10 +22,10 @@ export class InvitationEntity {
   }
 
   get invitedAt(): Date {
-    return this.data.invited_at;
+    return this.data.createdAt;
   }
 
-  get raw(): Invitations {
+  get raw(): Invitation {
     return this.data;
   }
 }

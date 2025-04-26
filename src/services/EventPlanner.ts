@@ -2,6 +2,8 @@ import { db as prisma } from "~/server/db";
 import { EventEntity } from "./Event";
 import { InvitationEntity } from "./Invitation";
 import { EventManagementException } from "./EventManagementException";
+import { Status } from "@prisma/client"
+
 
 export class EventPlanner {
   async createEvent(data: {
@@ -11,77 +13,68 @@ export class EventPlanner {
     time: Date;
     location: string;
     createdBy: string;
-    wishlistEnabled?: boolean;
-    galleryEnabled?: boolean;
-    moderationEnabled?: boolean;
   }): Promise<EventEntity> {
-    const event = await prisma.events.create({
+    const event = await prisma.event.create({
       data: {
-        event_id: crypto.randomUUID(),
-        created_by: data.createdBy,
-        created_at: new Date(),
         title: data.title,
         description: data.description,
-        event_date: data.date,
-        event_time: data.time,
         location: data.location,
-        wishlist_enabled: data.wishlistEnabled ?? false,
-        gallery_enabled: data.galleryEnabled ?? false,
-        gallery_moderation_enabled: data.moderationEnabled ?? false,
+        date: data.date,
+        time: data.time,
+        createdBy: data.createdBy,
       },
     });
 
     return new EventEntity(event);
   }
 
-  async removeEvent(eventId: string): Promise<void> {
-    await prisma.events.delete({ where: { event_id: eventId } });
+  async removeEvent(eventId: bigint): Promise<void> {
+    await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: string, guestEmail: string): Promise<void> {
-    const exists = await prisma.users.findUnique({ where: { email_address: guestEmail } });
+  async sendInvitation(eventId: bigint, guestId: string): Promise<void> {
+    const exists = await prisma.user.findUnique({ where: { id: guestId } });
     if (!exists) throw new EventManagementException("Guest does not exist");
 
-    await prisma.invitations.create({
+    await prisma.invitation.create({
       data: {
-        invitation_id: crypto.randomUUID(),
-        event_id: eventId,
-        guest_email: guestEmail,
-        invited_at: new Date(),
-        status: "pending",
+        eventId: eventId,
+        guestId: guestId,
+        status: Status.PENDING,
+        createdAt: new Date(),
       },
     });
   }
 
-  async manageWishlist(eventId: string) {
-    const wishlist = await prisma.eventItems.findMany({
-      where: { event_id: eventId },
+  async manageWishlist(eventId: bigint) {
+    const wishlist = await prisma.eventItem.findMany({
+      where: { eventId: eventId },
       include: { item: true },
     });
     return wishlist;
   }
 
-  async viewAnalytics(eventId: string) {
-    const inviteCount = await prisma.invitations.count({ where: { event_id: eventId } });
-    const accepted = await prisma.invitations.count({
-      where: { event_id: eventId, status: "accepted" },
+  async viewAnalytics(eventId: bigint) {
+    const inviteCount = await prisma.invitation.count({ where: { eventId: eventId } });
+    const accepted = await prisma.invitation.count({
+      where: { eventId: eventId, status: Status.ACCEPTED },
     });
-    const declined = await prisma.invitations.count({
-      where: { event_id: eventId, status: "declined" },
+    const declined = await prisma.invitation.count({
+      where: { eventId: eventId, status: Status.REJECTED },
     });
 
     return {
-      totalInvites: inviteCount,
+      inviteCount,
       accepted,
       declined,
     };
   }
 
-  async manageGallery(eventId: string) {
-    return await prisma.mediaItems.findMany({ where: { event_id: eventId } });
+  async manageGallery(eventId: bigint) {
+    return await prisma.media.findMany({ where: { eventId: eventId } });
   }
 
-  async receiveContribution(eventId: string) {
-    return await prisma.contributions.findMany({ where: { event_id: eventId } });
+  async receiveContribution(eventId: bigint) {
+    return await prisma.contribution.findMany({ where: { eventId: eventId } });
   }
 }

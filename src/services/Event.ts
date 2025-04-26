@@ -1,31 +1,32 @@
 import { db as prisma } from "~/server/db";
-import type { Events, Users } from "@prisma/client";
+import type { Event, User } from "@prisma/client";
+import { Status } from "@prisma/client"
 
 export class EventEntity {
-  private data: Events;
+  private data: Event;
 
-  constructor(event: Events) {
+  constructor(event: Event) {
     this.data = event;
   }
 
-  static async publishEvent(eventId: string): Promise<void> {
-    const event = await prisma.events.findUnique({ where: { event_id: eventId } });
+  static async publishEvent(eventId: bigint): Promise<void> {
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) throw new Error("Event not found");
     // Logic to make event visible, if needed
   }
 
-  async addGuest(userEmail: string): Promise<void> {
-    await prisma.invitations.create({
+  async addGuest(guestId: string): Promise<void> {
+    await prisma.invitation.create({
       data: {
-        event_id: this.data.event_id,
-        guest_email: userEmail,
-        status: "pending",
-        invited_at: new Date(),
+        eventId: this.data.id,
+        guestId: guestId,
+        status: Status.PENDING,
+        
       },
     });
   }
 
-  get raw(): Events {
+  get raw(): Event {
     return this.data;
   }
 }
