@@ -70,9 +70,13 @@ const Navbar = () => {
         </div>
       ) : (
         <>
-          <div className={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
+          <button
+            className={styles.hamburger}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation menu"
+          >
             <FaBars />
-          </div>
+          </button>
 
           {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 

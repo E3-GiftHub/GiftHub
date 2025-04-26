@@ -13,7 +13,7 @@
     margin-top: 1rem;
 }
 .event-title{
-    font-family: Jura, 'sans-serif';
+    font-family: Jura, sans-serif;
     color: white;
     margin-right: 1rem;
     margin-left: 1rem;
@@ -22,7 +22,7 @@
 }
 
 .event-description{
-    font-family: Jura, 'sans-serif';
+    font-family: Jura, sans-serif;
     color: #C8ACD6;
     margin-right: 1rem;
     margin-left: 1rem;
@@ -36,7 +36,7 @@
         height: 300px;
     }
     .event-title{
-        font-size: 0.9rem;;
+        font-size: 0.9rem;
     }
     .event-description{
         font-size: 0.7rem;
