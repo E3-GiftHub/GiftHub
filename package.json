@@ -2,7 +2,6 @@
   "name": "gifthub",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
@@ -19,7 +18,7 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",

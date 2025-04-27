@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from "@testing-library/react";
-import CardsSection from "./CardsSection";
+import CardsSection from "../components/CardsSection";
 
  test('renders CardsSection component without crashing', () => {
    render(<CardsSection />);
