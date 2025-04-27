@@ -43,9 +43,18 @@ const config = {
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
-
+    config.module.rules.push({
+      test: /\.module\.css$/,
+      use: {
+        loader: 'css-loader',
+        options: {
+          modules: true,
+        },
+      },
+    });
     return config;
   },
+
 };
 
 export default config;

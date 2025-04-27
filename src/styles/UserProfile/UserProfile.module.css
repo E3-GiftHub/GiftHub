@@ -3,12 +3,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(90vh - 60px); /* Account for navbar */
+    min-height: calc(90vh - 60px);
     background-color: #17153b;
     padding: 20px;
 }
 
-/* Main profile card container */
 .profileCard {
     display: flex;
     width: 100%;
@@ -16,93 +15,65 @@
     min-height: 600px;
     max-height: 1000px;
     max-width: 1300px;
-    background-color: #1d1949; /* Dark purple background */
+    background-color: #1d1949;
     background-image: url('public/UserImages/Containers/Container.svg');
     background-size: cover;
     border-radius: 10px;
     overflow: hidden;
     position: relative;
-    z-index: 0;
 }
 
-/* Background pattern overlay */
-.profileCard::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 1;
-    z-index: -1;
-}
-
-/* Avatar section styling */
 .avatarSection {
-    padding: 0 7rem 0 7rem;
-    position: relative;
+    padding: 0 7rem;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* aVATAR SECTION */
 .avatarWrapper {
     position: relative;
-    display: inline-block; /* Makes the wrapper size to content */
+    display: inline-block;
 }
 
 .avatarCircle {
-    /* Base size on viewport width with limits */
-    width: clamp(300px, 24vw, 500px); /* 30% of viewport width */
-    height: clamp(300px, 24vw, 500px); /* Same as width */
+    width: clamp(300px, 24vw, 500px);
+    height: clamp(300px, 24vw, 500px);
     border-radius: 50%;
-    background-color: #2e275f;
-    background-image: url('public/UserImages/default_pfp.svg');
-    background-size: cover;
+    background: #2e275f url('public/UserImages/default_pfp.svg') center/contain;
     box-shadow: #000000 0 1px 20px -5px;
-    aspect-ratio: 1; /* Maintain perfect circle */
+    position: relative;
 }
 
-.avatarPlaceholder {
-    aspect-ratio: 1;
-}
-.placeholderImage {
-    object-fit: contain; /* Changed from scale-down for better control */
-    width: 100%; /* Control image size within circle */
+.avatarImage {
+    width: 100%;
     height: 100%;
-    max-width: 500px; /* Match avatarCircle's max size */
-    max-height: 500px;
-    transition: width 0.3s ease, height 0.3s ease;
+    object-fit: cover;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
-/* Updated edit button positioning */
 .editAvatarButton {
     position: absolute;
-    bottom: 10%;  /* Percentage-based positioning */
-    right: 15%;   /* Percentage-based positioning */
+    bottom: 10%;
+    right: 15%;
     width: 3.5em;
     height: 3.5em;
     border-radius: 50%;
-    background-image: url('public/UserImages/buttons/change_pfp.svg');
-    background-size: cover;
+    background: url('public/UserImages/buttons/change_pfp.svg') center/contain;
     border: none;
     cursor: pointer;
     transform: translate(30%, 30%);
-    transition: transform 0.2s ease; /* Add transition here instead of hover */
+    transition: transform 0.2s ease;
     z-index: 1;
 }
 
 .editAvatarButton:hover {
-    transform: translate(30%, 30%) scale(1.2); /* Combine transforms */
+    transform: translate(30%, 30%) scale(1.2);
 }
 
-.editAvatarButton:active {
-    transform: translate(30%, 30%) scale(1);
-}
-
-
-/* Loading state animations */
+/* Loading states */
 @keyframes loadingPulse {
     0% { opacity: 1 }
     50% { opacity: 0.4 }
@@ -111,23 +82,13 @@
 
 .loading {
     animation: loadingPulse 1.5s infinite;
-    background-color: #e0e0e0;
+    background-color: #e0e0e0 !important;
     color: transparent !important;
     pointer-events: none;
 }
 
-.avatarPlaceholder {
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-/* Loading state specific styles */
 .avatarCircle.loading {
-    background-color: #e0e0e0;
+    background: #e0e0e0;
 }
 
 .username.loading {
@@ -148,6 +109,7 @@
     height: 36px;
     border-radius: 18px;
 }
+
 /* User info section */
 .userInfo {
     flex: 1;
@@ -155,74 +117,53 @@
     flex-direction: column;
     justify-content: center;
     color: white;
+    padding-right: 2rem;
 }
 
 .username {
     font-size: 2.5em;
     font-weight: 500;
-    margin: 0 0 5px 0;
+    margin: 0 0 5px;
 }
 
 .email {
     font-size: 1.2em;
     color: #aaa;
-    margin: 0 0 30px 0;
+    margin: 0 0 30px;
 }
 
-/* Button styles */
 .buttonContainer {
     display: flex;
     gap: 16px;
-    /*margin-top: 30px;*/
 }
 
 .button {
     padding: 1rem 2rem;
-
     border-radius: 10px;
-    outline: none;
     border: none;
-
     color: white;
-
     font-size: 1.3em;
     font-weight: 400;
     transition: transform 0.1s ease;
+    background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
 }
 
 .button:hover {
     transform: scale(1.1);
 }
 
-.button:active {
-    transform: scale(1);
-}
-
-.button {
-    background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
-
-    /*box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);*/
-}
-
 .icon {
-    /* Prevent layout shift */
-    position: relative;
-    display: inline-block;
-
-    /* Match your design */
     margin-right: 8px;
     vertical-align: middle;
-
-    /* Optional: Size constraints */
-    min-width: 24px;
-    min-height: 24px;
+    width: 22px;
+    height: 22px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 1040px) {
     .profileCard {
         flex-direction: column;
-        align-items: center;
+        height: auto;
     }
 
     .avatarSection {
@@ -230,60 +171,49 @@
     }
 
     .userInfo {
-        padding: 0 30px 30px;
         align-items: center;
         text-align: center;
+        padding: 0 0 30px 0;
     }
 
     .avatarCircle {
         width: 250px;
         height: 250px;
     }
+}
 
-    .profileIcon {
-        width: 80px;
-        height: 80px;
+@media (max-width: 720px) {
+    .profileCard {
+        margin-top: 60px;
+    }
+}
+
+@media (max-width: 500px) {
+    .buttonContainer {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .editAvatarButton {
-        bottom: 30px;
-        right: calc(50% - 90px);
+    .username {
+        font-size: 1.8em;
     }
 
-    @media (max-width: 720px) {
-        .profileCard {
-            margin-top: 60px;
-        }
+    .email {
+        font-size: 1em;
     }
-    @media (max-width: 500px){
-        .icon{
-            min-width: 1rem;
-            min-height: 1rem;
-        }
-        .buttonContainer {
-            display: flex;
-            flex-direction: column;  /* Stack items vertically */
-            gap: 16px;
-            /* Optional: Add alignment if needed */
-            align-items: center; /* or flex-start */
-        }
-        .username {
-            font-size: 1.8em;
-        }
-        .email {
-            font-size: 1em;
-        }
+}
+
+@media (max-width: 330px) {
+    .avatarCircle {
+        width: 200px;
+        height: 200px;
     }
-    @media (max-width: 330px) {
-        .avatarCircle {
-            width: 200px;
-            height: 200px;
-        }
-        .username {
-            font-size: 1.5em;
-        }
-        .email {
-            font-size: 0.8em;
-        }
+
+    .username {
+        font-size: 1.5em;
+    }
+
+    .email {
+        font-size: 0.8em;
     }
 }
