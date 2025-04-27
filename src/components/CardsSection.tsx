@@ -49,7 +49,7 @@ const events = Object.keys(cardInfo)
 
 export default function CardsSection() {
   return (
-    <div className={styles['cards-container']}>
+    <div className={styles['cards-container']} aria-label='cardsSection'>
       {events.map((eventKey) => {
         const { image, title, description } = cardInfo[eventKey as keyof typeof cardInfo]
         return (
@@ -58,6 +58,7 @@ export default function CardsSection() {
             image={image}
             title={title}
             description={description}
+            aria-label='eventCard'
           />
         )
       })}

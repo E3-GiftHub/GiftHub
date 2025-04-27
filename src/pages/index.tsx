@@ -1,3 +1,4 @@
+import React from 'react';
 import styles from "./../styles/LandingPageStyle.module.css"
 import LandingSection from '../components/LandingSection'
 import Navbar from '../components/Navbar'

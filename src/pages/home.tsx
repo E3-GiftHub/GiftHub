@@ -1,5 +1,5 @@
-import React from 'react'
-import styles from './../styles/HomePageStyle.module.css'
+import React from 'react';
+import styles from './../styles/HomePageStyle.module.css';
 import Navbar from '../components/Navbar';
 import Container from "../components/ui/Container";
 import ButtonPrimary from "../components/ui/ButtonPrimary";
