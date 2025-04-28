@@ -1,14 +1,21 @@
 import React from 'react';
 import styles from '../../styles/Container.module.css';
 
-interface ContainerProps {
-  children: React.ReactNode
+enum ContainerBorderStyle {
+  TOP,
+  BOTTOM
 }
 
-const Container: React.FC<ContainerProps> = ({children}) => (
-  <div className={styles.container}>
+interface ContainerProps {
+  children: React.ReactNode
+  borderStyle?: ContainerBorderStyle
+}
+
+const Container: React.FC<ContainerProps> = ({children, borderStyle}) => (
+  <div
+    className={`${styles.container} ${borderStyle === ContainerBorderStyle.TOP ? styles['container-border-top'] : styles['container-border-bottom']}`}>
     {children}
   </div>
 )
 
-export default Container;
+export {Container, ContainerBorderStyle};

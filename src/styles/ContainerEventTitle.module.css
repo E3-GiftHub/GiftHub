@@ -1,0 +1,23 @@
+.container-event-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 8px;
+  color: #c8abd6;
+  font-family: Jura, 'sans-serif';
+  font-size: 2rem;
+
+  justify-content: start;
+  width: 100%;
+}
+
+.event-icon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  transform: rotate(-10deg);
+}
+
+.event-title {
+  font-weight: 500;
+}
