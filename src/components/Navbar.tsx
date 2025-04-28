@@ -63,7 +63,7 @@ const Navbar = () => {
 
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <a href="/login" className={styles["login-button"]}>
+          <a href="http://localhost:3000/login#" className={styles["login-button"]}>
           <FaUser />
           <FaArrowRight />Login
           </a>
