@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
@@ -94,7 +94,7 @@ export default function LoginPage() {
               />
 
               <p></p>
-              <a href="~/login" className="text-purple-400">Forgot password?</a>
+              <a href="/login" className="text-purple-400">Forgot password?</a>
             </div>
             <br/><br/>
             <div>
@@ -108,7 +108,7 @@ export default function LoginPage() {
 
             </div>
             <br/>
-            <p>Don't have an account? <a href="~/login" className="text-purple-400">Sign up</a></p>
+            <p>Don't have an account? <a href="/login" className="text-purple-400">Sign up</a></p>
           </form>
         </div>
       </div>
