@@ -40,14 +40,14 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-                                        username = 'Username Placeholder',
-                                        email = 'user@example.com',
-                                        avatarUrl,
-                                        onDelete,
-                                        onEdit,
-                                        loading = false,
-                                      }: UserProfileProps) {
-  const renderContent = (content: string) => (loading ? '\u00A0' : content);
+  username = "Username Placeholder",
+  email = "user@example.com",
+  avatarUrl,
+  onDelete,
+  onEdit,
+  loading = false,
+}: Readonly<UserProfileProps>) {
+  const renderContent = (content: string) => (loading ? "\u00A0" : content);
 
   return (
     <div className={styles.pageWrapper}>
@@ -55,7 +55,9 @@ export default function UserProfileUI({
         {/* Avatar Section - CSS handles default background */}
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
+            <div
+              className={clsx(styles.avatarCircle, loading && styles.loading)}
+            >
               {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
@@ -67,7 +69,10 @@ export default function UserProfileUI({
               )}
             </div>
             <button
-              className={clsx(styles.editAvatarButton, loading && styles.loading)}
+              className={clsx(
+                styles.editAvatarButton,
+                loading && styles.loading,
+              )}
               onClick={onEdit}
               disabled={loading}
               aria-label="Edit avatar"
@@ -100,7 +105,6 @@ export default function UserProfileUI({
               loading={loading}
               onClick={onEdit}
             >
-              
               Edit info
             </ProfileButton>
           </div>
