@@ -41,7 +41,6 @@ Table Media {
   id uuid [pk]
   uploaderId string [ref: > User.id]
   eventId uuid [ref: > Event.id] // Directly linked to the event
-  status status //pending, approved, rejected
  
   url string
   caption text
@@ -111,16 +110,6 @@ Table Contribution {
   
   cashAmount decimal
   contributedAt datetime
-
-  Note: "References EventItems via (eventId, itemId)"
-}
-
-Table Purchase {
-  id uuid [pk]
-  purchaser string [ref: > User.id]
-  eventId uuid [ref: > Event.id]
-  itemId uuid [ref: > ItemCatalogue.id]
-  purchasedAt datetime
 
   Note: "References EventItems via (eventId, itemId)"
 }

@@ -109,7 +109,6 @@ model User {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
-    purchases     Purchase[]
 
     reporters     UserReport[]  @relation("reporter")
     reportedUsers UserReport[]  @relation("reported")
@@ -139,7 +138,6 @@ model Event {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
-    purchases     Purchase[]
     eventItems    EventItem[]
     eventReports  EventReport[]
 }
@@ -161,7 +159,6 @@ model Media {
     id         BigInt @id @default(autoincrement())
     uploaderId String
     eventId    BigInt
-    status     Status
 
     url     String?
     caption String?
@@ -189,7 +186,7 @@ model Mark {
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
 
-/// stores the wishlists from all events and the status of each item
+/// stores the wishlists from all events and the quantity of each item
 model EventItem {
     eventId           BigInt
     itemId            BigInt
@@ -225,7 +222,6 @@ model ItemCatalogue {
     eventOccurences EventItem[]
     marks           Mark[]
     contributions   Contribution[]
-    purchases       Purchase[]
 }
 
 model Retailer {
@@ -244,26 +240,9 @@ model Contribution {
 
     cashAmount Decimal?
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt // ! users can cancel their contribution
+    updatedAt  DateTime @updatedAt // ! users can withdraw their contribution
 
     guest User          @relation(fields: [contributorId], references: [id])
-    event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
-}
-
-//todo should we remove "Purchase"? 
-//todo maybe change the meaning to the final action after all contributions
-//todo see polls 11. enclose purchase
-
-/// refers to a "single-player" contribution
-model Purchase {
-    id          BigInt   @id @default(autoincrement())
-    purchaserId String // always a Guest 
-    eventId     BigInt
-    itemId      BigInt
-    createdAt   DateTime @default(now())
-
-    guest User          @relation(fields: [purchaserId], references: [id])
     event Event         @relation(fields: [eventId], references: [id])
     item  ItemCatalogue @relation(fields: [itemId], references: [id])
 }
