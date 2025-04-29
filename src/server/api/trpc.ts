@@ -8,6 +8,14 @@
  */
 
 import { initTRPC, TRPCError } from "@trpc/server";
+<<<<<<< HEAD
+<<<<<<< HEAD
+import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type Session } from "next-auth";
+=======
+>>>>>>> 3ca2400 (init)
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -20,6 +28,34 @@ import { db } from "~/server/db";
  * This section defines the "contexts" that are available in the backend API.
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
+<<<<<<< HEAD
+<<<<<<< HEAD
+ */
+
+interface CreateContextOptions {
+  session: Session | null;
+}
+
+/**
+ * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
+ * it from here.
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
+ *
+ * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
+ * wrap this and provides the required context.
+ *
+ * @see https://trpc.io/docs/server/context
+ */
+export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const session = await auth();
+
+  return {
+    db,
+    session,
+<<<<<<< HEAD
+  });
+=======
  *
  * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
  * wrap this and provides the required context.
@@ -34,6 +70,11 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     session,
     ...opts,
   };
+>>>>>>> 3ca2400 (init)
+=======
+    ...opts,
+  };
+>>>>>>> 1d53804 (switched to app router paradigm)
 };
 
 /**
@@ -43,6 +84,13 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+=======
+>>>>>>> 3ca2400 (init)
+=======
+>>>>>>> 1d53804 (switched to app router paradigm)
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
