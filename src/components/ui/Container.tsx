@@ -1,21 +1,22 @@
-import React from 'react';
-import styles from '../../styles/Container.module.css';
+import React from "react";
+import styles from "../../styles/Container.module.css";
 
 enum ContainerBorderStyle {
   TOP,
-  BOTTOM
+  BOTTOM,
 }
 
 interface ContainerProps {
-  children: React.ReactNode
-  borderStyle?: ContainerBorderStyle
+  children: React.ReactNode;
+  borderStyle?: ContainerBorderStyle;
 }
 
-const Container: React.FC<ContainerProps> = ({children, borderStyle}) => (
+const Container: React.FC<ContainerProps> = ({ children, borderStyle }) => (
   <div
-    className={`${styles.container} ${borderStyle === ContainerBorderStyle.TOP ? styles['container-border-top'] : styles['container-border-bottom']}`}>
+    className={`${styles.container} ${borderStyle === ContainerBorderStyle.TOP ? styles["container-border-top"] : styles["container-border-bottom"]}`}
+  >
     {children}
   </div>
-)
+);
 
-export {Container, ContainerBorderStyle};
+export { Container, ContainerBorderStyle };
