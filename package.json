@@ -46,6 +46,7 @@
     "@types/node": "^20.14.10",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
     "identity-obj-proxy": "^3.0.0",
