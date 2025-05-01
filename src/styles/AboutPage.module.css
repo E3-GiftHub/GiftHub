@@ -1,0 +1,117 @@
+.aboutPage {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    background-color: #17153b;
+    color: #cbdcff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.7;
+  }
+ 
+  .aboutPage h1 {
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    color: #c8abd6;
+  }
+  
+  .aboutPage img {
+    display: block;
+    margin: 0 auto 1.5rem auto;
+    border-radius: 50%;
+    background-color: #0b0c2a; /* culoare fundal identică */
+    padding: 0.5rem;
+    box-shadow: 0 4px 10px rgba(108, 160, 246, 0.4);
+  
+  }
+  
+  .intro {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .features,
+  .tech {
+    background-color: #1e1f3f;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .features h2,
+  .tech h2 {
+    color: #c8abd6;
+    margin-bottom: 1rem;
+  }
+  
+  .features ul,
+  .tech ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .features li,
+  .tech li {
+    margin: 0.6rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  
+  .features li::before,
+  .tech li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #6ca0f6;
+  }
+  
+  .tech a {
+    color: #8cbfff;
+    text-decoration: underline;
+  }
+  
+  .teamsHeader {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #c8abd6;
+    margin-top: 3rem;
+  }
+  
+  .teamGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .teamCard {
+    background-color: #1b1d35;
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid #2f3259;
+    transition: transform 0.2s ease;
+  }
+  
+  .teamCard:hover {
+    transform: translateY(-5px);
+  }
+  
+  .teamCard h3 {
+    color: #c8abd6;
+    margin-bottom: 0.5rem;
+  }
+  
+  .teamCard p {
+    font-size: 0.95rem;
+    margin: 0.2rem 0;
+  }
+  
+  .footerNote {
+    text-align: center;
+    margin-top: 3rem;
+    color: #6e84c9;
+    font-size: 0.95rem;
+  }
+  
