@@ -5,6 +5,7 @@ on:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarqube:
     name: SonarQube
@@ -14,19 +15,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enable Corepack and set Yarn version
-        run: |
-          corepack enable
-          corepack prepare yarn@npm:11.3.0 --activate
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
       - name: Install dependencies
-        run: yarn
+        run: npm ci
 
-      - name: Test and coverage
-        run: yarn jest --coverage
+      - name: Run tests with coverage
+        run: npm run test -- --coverage
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
