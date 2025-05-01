@@ -31,6 +31,7 @@
     "next": "^15.2.3",
     "next-auth": "5.0.0-beta.25",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.5.3",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "zod": "^3.24.2"
@@ -46,6 +47,7 @@
     "@types/node": "^20.14.10",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/react-router-dom": "^5.3.3",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
