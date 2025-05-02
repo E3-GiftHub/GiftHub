@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import MyEventsSection from "../components/MyInvitationsSection";
+import MyInvitationsSection from "../components/MyInvitationsSection";
 import shortEventsMockResponse from "../components/mock-data/shortEventsMockResponse";
 
-describe("MyEventsSection", () => {
+describe("MyInvitationsSection", () => {
   beforeEach(() => {
-    render(<MyEventsSection />);
+    render(<MyInvitationsSection />);
   });
 
   it("renders the section title", () => {

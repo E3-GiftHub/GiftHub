@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import CloudsBackground from "~/components/ui/CloudsBackground";
 import "./../styles/globals.css";
 import MyEventsSection from "~/components/MyEventsSection";
-import UpcomingEventsSection from "~/components/UpcomingEventsSection";
+import  MyInvitations from "~/components/MyInvitationsSection";
 
 export default function home() {
   return (
@@ -15,7 +15,7 @@ export default function home() {
       <div className={styles["homepage-content"]}>
         <div className={styles["homepage-containers-wrapper"]}>
           <MyEventsSection />
-          <UpcomingEventsSection />
+          <MyInvitations />
         </div>
        
       </div>

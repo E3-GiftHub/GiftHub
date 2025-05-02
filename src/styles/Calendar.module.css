@@ -1,0 +1,119 @@
+.calendar {
+  margin-top: 0;
+  background: #e1dee5;
+  border-radius: 20px;
+  padding: 10px; /* redus */
+  width: 100%;
+  max-width: 420px; /* puțin mai îngust */
+  min-width: 280px;
+  margin-inline: auto;
+  font-family: 'Jura', sans-serif !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: -9px; /* redus */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: black;
+  font-size: 0.85rem; /* redus */
+  margin-bottom: 4px;
+}
+
+.nav button {
+  margin-left: 5px;
+  padding: 1px 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #504882;
+  color: white;
+  cursor: pointer;
+  font-size: 0.65rem;
+}
+
+.days {
+  background: #504882;
+  color: white;
+  border-radius: 15px;
+  padding: 2px 0;
+  margin-bottom: 2px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.cell {
+  font-size: 0.65rem;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 100%;
+}
+
+.cell span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.65rem;
+}
+
+.selected  {
+  background-color: #504882;
+  color: white;
+}
+
+.disabled {
+  color: #999;
+}
+
+/* 📱 Responsive */
+@media (max-width: 480px) {
+  .calendar {
+    max-width: 95%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+  .header {
+    font-size: 0.75rem;
+  }
+
+  .nav button {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+
+  .days {
+    font-size: 0.6rem;
+  }
+
+  .cell {
+    font-size: 0.6rem;
+    height: 26px;
+  }
+
+  .cell span {
+    width: 18px;
+    height: 18px;
+    font-size: 0.6rem;
+  }
+
+  .selected  {
+    width: 18px;
+    height: 18px;
+    font-size: 0.6rem;
+  }
+}
