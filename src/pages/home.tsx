@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import CloudsBackground from "~/components/ui/CloudsBackground";
 import "./../styles/globals.css";
 import MyEventsSection from "~/components/MyEventsSection";
-import  MyInvitations from "~/components/MyInvitationsSection";
+import  MyInvitations from "~/components/UpcomingEventsSection";
 
 export default function home() {
   return (
