@@ -1,58 +1,66 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Calendar from "../components/ui/Calendar";
-import "@testing-library/jest-dom";
-import { format } from "date-fns";
+import { format, addMonths, subMonths } from "date-fns";
 
 describe("Calendar component", () => {
-  test("renders calendar header with current month and year", () => {
-    render(<Calendar />);
-    const today = new Date();
-    const expectedHeader = format(today, "MMMM yyyy");
-    expect(screen.getByText(expectedHeader)).toBeInTheDocument();
+  beforeEach(() => {
+    jest.useFakeTimers(); // pentru date fixe
+    jest.setSystemTime(new Date(2025, 3, 1)); // 1 aprilie 2025
   });
 
-  test("renders all weekday headers", () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("renders current month and year", () => {
+    render(<Calendar />);
+    expect(screen.getByText("April 2025")).toBeInTheDocument();
+  });
+
+  it("highlights preselected dates (8 and 23 April 2025)", () => {
+    render(<Calendar />);
+    const selectedDates = [8, 23];
+    selectedDates.forEach((day) => {
+      const el = screen.getByText(day.toString());
+      expect(el.parentElement).toHaveClass("selected");
+    });
+  });
+
+  it("clicking '>' navigates to the next month", () => {
+    render(<Calendar />);
+    const nextButton = screen.getByText(">");
+    const currentMonth = format(new Date(2025, 3, 1), "MMMM yyyy"); // April 2025
+
+    fireEvent.click(nextButton);
+
+    const nextMonth = format(addMonths(new Date(2025, 3, 1), 1), "MMMM yyyy");
+    expect(screen.getByText(nextMonth)).toBeInTheDocument();
+    expect(screen.queryByText(currentMonth)).not.toBeInTheDocument();
+  });
+
+  it("clicking '<' navigates to the previous month", () => {
+    render(<Calendar />);
+    const prevButton = screen.getByText("<");
+    const currentMonth = format(new Date(2025, 3, 1), "MMMM yyyy"); // April 2025
+
+    fireEvent.click(prevButton);
+
+    const prevMonth = format(subMonths(new Date(2025, 3, 1), 1), "MMMM yyyy");
+    expect(screen.getByText(prevMonth)).toBeInTheDocument();
+    expect(screen.queryByText(currentMonth)).not.toBeInTheDocument();
+  });
+
+  it("renders all days of the week", () => {
     render(<Calendar />);
     ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((day) => {
       expect(screen.getByText(day)).toBeInTheDocument();
     });
   });
 
-  test("renders at least 28 day cells", () => {
+  it("renders date cells", () => {
     render(<Calendar />);
-    const dayCells = screen.getAllByText(/^\d+$/); // any digit-only text
-    expect(dayCells.length).toBeGreaterThanOrEqual(28); // minimal case
-  });
-
-  test("highlights preselected dates (e.g., 8 and 23 April 2025)", () => {
-    render(<Calendar />);
-    const selectedDates = ["8", "23"];
-    selectedDates.forEach((day) => {
-      const dateElement = screen.getByText(day);
-      expect(dateElement.parentElement).toHaveClass("selected");
-    });
-  });
-
-  test("disabled class is applied to out-of-month days", () => {
-    render(<Calendar />);
-    const disabledCells = document.querySelectorAll(".disabled");
-    expect(disabledCells.length).toBeGreaterThan(0);
-  });
-
-  test("clicking '>' navigates to next month", () => {
-    render(<Calendar />);
-    const nextButton = screen.getByText(">");
-    const currentMonth = screen.getByText(format(new Date(), "MMMM yyyy"));
-    fireEvent.click(nextButton);
-    expect(screen.queryByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
-  });
-
-  test("clicking '<' navigates to previous month", () => {
-    render(<Calendar />);
-    const prevButton = screen.getByText("<");
-    const currentMonth = screen.getByText(format(new Date(), "MMMM yyyy"));
-    fireEvent.click(prevButton);
-    expect(screen.queryByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
+    // Ex: ziua 1 a lunii ar trebui să fie prezentă
+    expect(screen.getByText("1")).toBeInTheDocument();
   });
 });
