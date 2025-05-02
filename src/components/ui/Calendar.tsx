@@ -65,12 +65,10 @@ export default function Calendar() {
 
         days.push(
 <div
-  className={`${styles.cell} ${isDisabled ? styles.disabled : ""}`}
+  className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${isSelected ? styles.selected : ""}`}
   key={cloneDay.toISOString()}
 >
-  <span className={isSelected ? styles.selected : ""}>
-    {format(cloneDay, "d")}
-  </span>
+  <span>{format(cloneDay, "d")}</span>
 </div>
         );
 

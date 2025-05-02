@@ -45,7 +45,7 @@ describe("Calendar component", () => {
     const nextButton = screen.getByText(">");
     const currentMonth = screen.getByText(format(new Date(), "MMMM yyyy"));
     fireEvent.click(nextButton);
-    expect(screen.getByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
+    expect(screen.queryByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
   });
 
   test("clicking '<' navigates to previous month", () => {
@@ -53,6 +53,6 @@ describe("Calendar component", () => {
     const prevButton = screen.getByText("<");
     const currentMonth = screen.getByText(format(new Date(), "MMMM yyyy"));
     fireEvent.click(prevButton);
-    expect(screen.getByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
+    expect(screen.queryByText(currentMonth.textContent ?? "")).not.toBeInTheDocument();
   });
 });

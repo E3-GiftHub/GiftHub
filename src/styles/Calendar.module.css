@@ -2,14 +2,14 @@
   margin-top: 0;
   background: #e1dee5;
   border-radius: 20px;
-  padding: 10px; /* redus */
+  padding: 10px;
   width: 100%;
-  max-width: 420px; /* puțin mai îngust */
+  max-width: 420px; 
   min-width: 280px;
   margin-inline: auto;
   font-family: 'Jura', sans-serif !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: -9px; /* redus */
+  margin-bottom: -9px; 
 }
 
 .header {
@@ -17,7 +17,7 @@
   justify-content: space-between;
   align-items: center;
   color: black;
-  font-size: 0.85rem; /* redus */
+  font-size: 0.85rem; 
   margin-bottom: 4px;
 }
 
@@ -79,7 +79,7 @@
   color: #999;
 }
 
-/* 📱 Responsive */
+/* mob */
 @media (max-width: 480px) {
   .calendar {
     max-width: 95%;
