@@ -12,12 +12,23 @@ const Footer = () => {
 
         <div className={styles.social}>
           <span>Follow us</span>
-          <a href="https://www.linkedin.com/posts/petru-braha_github-petru-brahagifthub-peer-to-peer-activity-7313564023420010497-K73U?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAADSRLEMBPyhS0ijyu0CpHHwZ9IscfXNSvVE" target="_blank" rel="noopener noreferrer">
-    <FaLinkedin size={32} />
-  </a>
-  <a href="https://github.com/E3-GiftHub" target="_blank" rel="noopener noreferrer">
-    <FaGithub size={32} />
-  </a>
+          <a
+  href="https://www.linkedin.com/..."
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="LinkedIn"
+>
+  <FaLinkedin size={32} />
+</a>
+
+<a
+  href="https://github.com/E3-GiftHub"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="GitHub"
+>
+  <FaGithub size={32} />
+</a>
         </div>
       </div>
 

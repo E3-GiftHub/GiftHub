@@ -8,6 +8,7 @@ import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import React from "react";
 import shortEventsMockResponse from "~/components/mock-data/shortEventsMockResponse";
 import type { ShortEventResponse } from "~/models/ShortEventResponse";
+import Calendar from "~/components/ui/Calendar";
 
 const UpcomingEventsSection: React.FC = () => {
   const [eventsData, setEventsData] = React.useState<ShortEventResponse[]>([]);
@@ -31,21 +32,18 @@ const UpcomingEventsSection: React.FC = () => {
   return (
     <Container borderStyle={ContainerBorderStyle.BOTTOM}>
       <ContainerEventTitle title={"My invitations"} />
+
+      {}
       <div
-        style={{
-          backgroundColor: "#b9b1b1",
-          width: "70%",
-          height: "100%",
-          borderRadius: "10px",
-          color: "#000",
-          textAlign: "center",
-        }}
+        style={{  }}
       >
-        Calendar here
+        <Calendar />
       </div>
+
       {eventsData.map((event, index) => (
         <ContainerEventRow key={index} eventData={event} />
       ))}
+
       <SeeMoreButton />
     </Container>
   );

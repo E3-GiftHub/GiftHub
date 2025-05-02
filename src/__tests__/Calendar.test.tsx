@@ -58,9 +58,11 @@ describe("Calendar component", () => {
     });
   });
 
-  it("renders date cells", () => {
+  it("renders all date cells for April 2025", () => {
     render(<Calendar />);
-    // Ex: ziua 1 a lunii ar trebui să fie prezentă
-    expect(screen.getByText("1")).toBeInTheDocument();
+    const daysInApril = 30; // Aprilie are 30 de zile
+    for (let day = 1; day <= daysInApril; day++) {
+      expect(screen.getAllByText(day.toString()).length).toBeGreaterThan(0);
+    }
   });
 });

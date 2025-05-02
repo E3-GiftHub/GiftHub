@@ -9,11 +9,12 @@ describe("UpcomingEventsSection", () => {
   });
 
   it("renders the section title", () => {
-    expect(screen.getByText("Upcoming events")).toBeInTheDocument();
+    expect(screen.getByText("My invitations")).toBeInTheDocument();
   });
 
-  it("renders the calendar placeholder", () => {
-    expect(screen.getByText("Calendar here")).toBeInTheDocument();
+  it("renders the calendar for the current month", () => {
+    render(<UpcomingEventsSection />);
+    expect(screen.getAllByText(/May 2025/i).length).toBeGreaterThan(0);
   });
 
   it("renders 2 event rows", () => {
