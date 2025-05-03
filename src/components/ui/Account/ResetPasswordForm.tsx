@@ -54,7 +54,10 @@ export default function ResetPasswordForm() {
           <button className={styles.primaryButton}>Reset password</button>
 
           <p className={styles.footer}>
-            <button className={styles.secondaryButton}>Go to log in</button>
+            Back to
+            <a href="/login">
+              <button className={styles.secondaryButton}>Log in</button>
+            </a>
           </p>
         </div>
       </div>

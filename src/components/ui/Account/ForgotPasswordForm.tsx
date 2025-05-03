@@ -27,8 +27,12 @@ export default function ForgotPasswordForm() {
           <button className={styles.primaryButton}>Confirm</button>
 
           <p className={styles.footer}>
-            <button className={styles.secondaryButton}>Go back to log in</button>
+            Back to
+            <a href="/login">
+              <button className={styles.secondaryButton}>Log in</button>
+            </a>
           </p>
+
         </div>
       </div>
   );

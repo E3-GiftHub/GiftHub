@@ -66,9 +66,13 @@ export default function SignupForm() {
         <div className={styles.bottom}>
           <button className={styles.primaryButton}>Sign up</button>
 
-          <p className={styles.footer}>Already have an account?
-            <button className={styles.secondaryButton}>Log in</button>
+          <p className={styles.footer}>
+            Already have an account?
+            <a href="/login">
+              <button className={styles.secondaryButton}>Log in</button>
+            </a>
           </p>
+
         </div>
       </div>
   );
