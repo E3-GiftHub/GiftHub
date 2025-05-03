@@ -43,7 +43,7 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdByUsername], references: [username])
+    createdBy         User   @relation(fields: [createdByUsername], references: [username])
     createdByUsername String
 
     @@index([name])
@@ -90,13 +90,13 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    username   String  @id @unique @default(cuid())
-    email      String? @unique
-    fname      String?
-    lname      String?
-    password   String? // stored with hash obviously
-    iban       String?
-    picture    String? // todo: string?
+    username String  @id @unique @default(cuid())
+    email    String? @unique
+    fname    String?
+    lname    String?
+    password String? // stored with hash obviously
+    iban     String?
+    picture  String? // uri to the location of the picture
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -129,9 +129,9 @@ model Event {
     time        DateTime?
 
     createdByUsername String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    user      User     @relation(fields: [createdByUsername], references: [username])
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    user              User     @relation(fields: [createdByUsername], references: [username])
 
     invitations Invitation[]
 
@@ -143,9 +143,9 @@ model Event {
 }
 
 model Invitation {
-    id        Int    @id @default(autoincrement())
+    id            Int    @id @default(autoincrement())
     guestUsername String
-    eventId   Int
+    eventId       Int
 
     status    Status    @default(PENDING)
     createdAt DateTime  @default(now())
@@ -156,9 +156,9 @@ model Invitation {
 }
 
 model Media {
-    id           Int    @id @default(autoincrement())
-    uploaderUsername  String
-    eventId      Int
+    id               Int    @id @default(autoincrement())
+    uploaderUsername String
+    eventId          Int
 
     url     String?
     caption String?
@@ -173,10 +173,10 @@ model Media {
 }
 
 model Mark {
-    id         Int    @id @default(autoincrement())
-    markerUsername  String // always a Guest
-    eventId    Int
-    itemId     Int
+    id             Int    @id @default(autoincrement())
+    markerUsername String // always a Guest
+    eventId        Int
+    itemId         Int
 
     type      MarkType
     createdAt DateTime @default(now())
@@ -225,7 +225,7 @@ model ItemCatalogue {
 }
 
 model Retailer {
-    id     Int            @id @default(autoincrement())
+    id     Int             @id @default(autoincrement())
     name   String?
     apiUrl String?
     items  ItemCatalogue[]
@@ -233,10 +233,10 @@ model Retailer {
 
 /// refers to a group contribution
 model Contribution {
-    id              Int    @id @default(autoincrement())
-    contributorUsername  String // always a Guest
-    eventId         Int
-    itemId          Int
+    id                  Int    @id @default(autoincrement())
+    contributorUsername String // always a Guest
+    eventId             Int
+    itemId              Int
 
     cashAmount Decimal?
     createdAt  DateTime @default(now())
@@ -250,24 +250,24 @@ model Contribution {
 //! reports
 
 model UserReport {
-    id            Int      @id @default(autoincrement())
-    reportedUsername  String
+    id                 Int      @id @default(autoincrement())
+    reportedUsername   String
     reportedByUsername String
-    reason        String?
-    description   String?
-    createdAt     DateTime @default(now())
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
 
     userHell User @relation("reported", fields: [reportedUsername], references: [username])
     userSane User @relation("reporter", fields: [reportedByUsername], references: [username])
 }
 
 model EventReport {
-    id            Int      @id @default(autoincrement())
-    eventId       Int
+    id                 Int      @id @default(autoincrement())
+    eventId            Int
     reportedByUsername String // NOT always a Guest
-    reason        String?
-    description   String?
-    createdAt     DateTime @default(now())
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
 
     user  User  @relation(fields: [reportedByUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
