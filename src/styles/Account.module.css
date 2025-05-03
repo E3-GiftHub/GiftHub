@@ -7,7 +7,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #17153B;
   margin: 0;
   font-family: Heebo, 'sans-serif';
 }
@@ -42,6 +41,11 @@ body {
   margin-left: 1em;
   background: linear-gradient(0deg, rgba(67, 61, 139, 1) 38%, rgba(200, 172, 214, 1) 91%);
   border-radius: 15px;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.visual:hover{
+  box-shadow: 0 0 10px #C6AAD5;
 }
 
 .GiftHubTitle {
@@ -75,44 +79,6 @@ body {
   text-align: center;
 }
 
-.middle {
-  margin-top: -1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-  width: 100%;
-}
-
-.bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-top: auto;
-}
-
-.formContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 100%;
-  max-width: 32em;
-  gap: 1rem;
-}
-
-.signUpForm {
-  gap: 0.5rem;
-}
-
-.formGroup {
-  color: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
 .title {
   color: #FFFFFF;
   font-size: 2.5em;
@@ -131,6 +97,32 @@ body {
   opacity: 50%;
   font-size: 1.1em;
   margin-bottom: -1.5em;
+}
+
+.middle {
+  margin-top: -1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 32em;
+  gap: 1rem;
+}
+
+.formGroup {
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
 }
 
 .inputTitle {
@@ -177,8 +169,35 @@ body {
   width: 30px;
   height: 30px;
   filter: invert(1);
-  opacity: 70%;
+  opacity: 80%;
   cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.passwordIcon:hover{
+  opacity:1;
+}
+
+.forgotPassword{
+  margin-top: -.3em;
+  color: white;
+  text-decoration: none;
+  display:flex;
+  justify-content: flex-end;
+  opacity: 80%;
+  transition: opacity 0.2s ease;
+}
+
+.forgotPassword:hover{
+  opacity:1;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
 }
 
 .primaryButton {
@@ -197,6 +216,7 @@ body {
   overflow: hidden;
   box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .primaryButton:hover {

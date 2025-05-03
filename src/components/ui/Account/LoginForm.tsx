@@ -41,6 +41,13 @@ export default function LoginForm() {
                 />
               </div>
             </div>
+
+            <p className={styles.forgotPassword}>
+              <a href="/forgotpassword" className={styles.forgotPassword}>
+                Forgot password?
+              </a>
+            </p>
+
           </form>
         </div>
 
@@ -48,9 +55,12 @@ export default function LoginForm() {
           <button className={styles.primaryButton}>Log in</button>
 
           <p className={styles.footer}>
-            Already have an account?
-            <button className={styles.secondaryButton}>Sign up</button>
+            Don't have an account?
+            <a href="/signup">
+              <button className={styles.secondaryButton}>Sign up</button>
+            </a>
           </p>
+
         </div>
       </div>
   );
