@@ -138,7 +138,7 @@ model Event {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
-    eventItems    EventItem[]
+    eventArticles EventArticle[]
     eventReports  EventReport[]
 }
 
@@ -176,18 +176,18 @@ model Mark {
     id             Int    @id @default(autoincrement())
     markerUsername String // always a Guest
     eventId        Int
-    itemId         Int
+    articleId      Int
 
     type      MarkType
     createdAt DateTime @default(now())
 
     guest User          @relation(fields: [markerUsername], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+    item  ItemCatalogue @relation(fields: [articleId], references: [id])
 }
 
 /// stores the wishlists from all events and the quantity of each item
-model EventItem {
+model EventArticle {
     eventId           Int
     itemId            Int
     quantityRequested Int?
@@ -219,7 +219,7 @@ model ItemCatalogue {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    eventOccurences EventItem[]
+    eventOccurences EventArticle[]
     marks           Mark[]
     contributions   Contribution[]
 }
@@ -236,7 +236,7 @@ model Contribution {
     id                  Int    @id @default(autoincrement())
     contributorUsername String // always a Guest
     eventId             Int
-    itemId              Int
+    articleId           Int
 
     cashAmount Decimal?
     createdAt  DateTime @default(now())
@@ -244,7 +244,7 @@ model Contribution {
 
     guest User          @relation(fields: [contributorUsername], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+    item  ItemCatalogue @relation(fields: [articleId], references: [id])
 }
 
 //! reports
