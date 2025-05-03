@@ -1,6 +1,6 @@
 import { db as prisma } from "~/server/db";
 import type { Invitation } from "@prisma/client";
-import { Status } from "@prisma/client"
+
 
 
 export class InvitationEntity {

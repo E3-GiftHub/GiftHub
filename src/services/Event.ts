@@ -1,5 +1,5 @@
 import { db as prisma } from "~/server/db";
-import type { Event, User } from "@prisma/client";
+import type { Event } from "@prisma/client";
 import { Status } from "@prisma/client"
 
 export class EventEntity {
