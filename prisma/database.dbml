@@ -51,12 +51,11 @@ Table Media {
   uploadedAt datetime
 }
 
-// change name to Mark
 Table Mark {
   id uuid [pk]
   markerId string [ref: > User.id]
   eventId uuid [ref: > Event.id]
-  itemId uuid [ref: > ItemCatalogue.id]
+  articleId uuid [ref: > ItemCatalogue.id]
   
   type string // 'reserved', 'contributing'
   createdAt datetime
@@ -65,7 +64,7 @@ Table Mark {
 }
 
 // Junction table for event-specific wishlist entry - represents wishlists
-Table EventItem {
+Table EventArticle {
   eventId uuid [ref: > Event.id]
   itemId uuid [ref: > ItemCatalogue.id]
   quantityRequested int
@@ -106,12 +105,12 @@ Table Contribution {
   id uuid [pk]
   contributorId string [ref: > User.id]
   eventId uuid [ref: > Event.id]
-  itemId uuid [ref: > ItemCatalogue.id]
+  articleId uuid [ref: > ItemCatalogue.id]
   
   cashAmount decimal
   contributedAt datetime
 
-  Note: "References EventItems via (eventId, itemId)"
+  Note: "References EventArticles via (eventId, itemId)"
 }
 
 Table UserReport {
