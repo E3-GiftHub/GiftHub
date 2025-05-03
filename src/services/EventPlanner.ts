@@ -1,6 +1,6 @@
 import { db as prisma } from "~/server/db";
-import { EventEntity } from "./Event";
-import { EventManagementException } from "./EventManagementException";
+import { EventEntity } from "~/services/Event";
+import { EventManagementException } from "~/services/EventManagementException";
 import { Status } from "@prisma/client"
 
 

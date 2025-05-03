@@ -1,7 +1,7 @@
 // WishlistService.ts
 
-import { WishlistDTO } from "./WishlistDTO";
-import type { WishlistItemDTO } from "./WishlistDTO";
+import { WishlistDTO } from "~/services/WishlistDTO";
+import type { WishlistItemDTO } from "~/services/WishlistDTO";
 
 export class WishlistService {
   // In a real app, replace with database calls
