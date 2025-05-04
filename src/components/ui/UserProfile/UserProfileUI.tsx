@@ -62,10 +62,10 @@ export default function UserProfileUI({
               {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
-                  alt="User avatar"
                   width={120}
                   height={120}
                   className={styles.avatarImage}
+                  alt={""}
                 />
               )}
             </div>
