@@ -236,6 +236,10 @@
     right: 1rem; 
     transform: translateY(-50%); 
     z-index: 1001;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    outline: inherit;
   }
 
   .nav-links {
@@ -345,7 +349,6 @@ display: none ;
     position: absolute;
     top: -50px;
     right: 0;
-    right: 0;
     width: 100%; 
     min-width: 100%;
     max-width: 100%;
@@ -358,7 +361,6 @@ display: none ;
     gap: 1rem;
     z-index: 999;
     display: none;
-    background-color: none; 
     padding-top: 115px;
   }
 

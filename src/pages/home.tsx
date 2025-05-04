@@ -1,24 +1,25 @@
-import React from 'react'
-import styles from './../styles/HomePageStyle.module.css'
-import Navbar from '../components/Navbar';
-import Container from "../components/ui/Container";
-import ButtonPrimary from "../components/ui/ButtonPrimary";
-import ButtonSecondary from "../components/ui/ButtonSecondary";
+import React from "react";
+import styles from "./../styles/HomePageStyle.module.css";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import CloudsBackground from "~/components/ui/CloudsBackground";
+import "./../styles/globals.css";
+import MyEventsSection from "~/components/MyEventsSection";
+import  MyInvitations from "~/components/UpcomingEventsSection";
 
 export default function home() {
   return (
     <>
-    <Navbar/>
-          <main>
-            <Container>
-              <h1>Title</h1>
-              <div className={styles["subcontainer-showcase"]}></div>
-              <div className={styles["buttons-showcase"]}>
-                <ButtonPrimary/>
-                <ButtonSecondary/>
-              </div>
-            </Container>
-          </main>
+      <Navbar />
+      <CloudsBackground />
+      <div className={styles["homepage-content"]}>
+        <div className={styles["homepage-containers-wrapper"]}>
+          <MyEventsSection />
+          <MyInvitations />
+        </div>
+       
+      </div>
+      <Footer />
     </>
-  )
+  );
 }

@@ -1,14 +1,32 @@
-import React from 'react';
-import styles from '../../styles/Container.module.css';
+import React from "react";
+import styles from "../../styles/Container.module.css";
 
-interface ContainerProps {
-  children: React.ReactNode
+enum ContainerBorderStyle {
+  TOP,
+  BOTTOM,
 }
 
-const Container: React.FC<ContainerProps> = ({children}) => (
-  <div className={styles["container"]}>
+interface SeeMoreButtonProps {
+  url?: string;
+}
+
+const SeeMoreButton: React.FC<SeeMoreButtonProps> = ({ url }) => (
+  <div className={styles["see-more-button"]}>
+    <a href={url}>See more</a>
+  </div>
+);
+
+interface ContainerProps {
+  children: React.ReactNode;
+  borderStyle?: ContainerBorderStyle;
+}
+
+const Container: React.FC<ContainerProps> = ({ children, borderStyle }) => (
+  <div
+    className={`${styles.container} ${borderStyle === ContainerBorderStyle.TOP ? styles["container-border-top"] : styles["container-border-bottom"]}`}
+  >
     {children}
   </div>
-)
+);
 
-export default Container;
+export { Container, SeeMoreButton, ContainerBorderStyle };

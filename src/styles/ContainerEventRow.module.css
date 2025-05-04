@@ -1,0 +1,37 @@
+.thumbnail {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.left-column {
+  display: flex;
+  gap: 30px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-column p {
+  margin: 0;
+}
+
+.event-row-wrapper {
+  width: 100%;
+  background-color: #1a1840;
+  border-radius: 15px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+  padding: 15px;
+
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+}

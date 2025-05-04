@@ -1,19 +1,50 @@
+.homepage-content {
+  width: 100%;
+  height: calc(100vh - 150px);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-bottom: 100px;
+  padding-top: 40px;
+}
 
-.App main {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+.homepage-containers-wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  max-width: 1400px;
+  flex: 1;
+  margin-bottom: 40px;
 }
-  
-.buttons-showcase {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+
+.buttons-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  width: 100%;
 }
-  
-.subcontainer-showcase {
-    width: 100%;
-    height: 500px;
-  
-    background-color: #c8abd6;
+
+@media (max-width: 720px) {
+  .homepage-containers-wrapper {
+    display: flex;           
+    flex-direction: column;
+    align-items: center;   
+    gap: 20px;             
+    padding: 0 16px; 
+  }
+
+  .homepage-content {
+    margin-top: 50px;
+    padding-bottom: 60px;   
+    overflow-x: hidden;
+
+  }
+
+  .buttons-wrapper button {
+    height: 60px;
+    width: 150px;
+    font-size: 1.2rem;
+  }
 }
