@@ -90,13 +90,13 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    username String  @id @unique @default(cuid())
-    email    String? @unique
-    fname    String?
-    lname    String?
-    password String? // stored with hash obviously
-    iban     String?
-    picture  String? // uri to the location of the picture
+    username   String  @id @unique @default(cuid())
+    email      String? @unique
+    fname      String?
+    lname      String?
+    password   String? // stored with hash obviously
+    iban       String?
+    pictureUrl String?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -127,6 +127,7 @@ model Event {
     location    String?
     date        DateTime?
     time        DateTime?
+    pictureUrl  String?
 
     createdByUsername String
     createdAt         DateTime @default(now())

@@ -7,7 +7,7 @@ Table User {
   lname string
   password string
   iban iban
-  picture string
+  pictureUrl string
 
   emailVerified datetime
   createdAt datetime
@@ -21,6 +21,7 @@ Table Event {
   location string
   date date
   time time
+  pictureUrl string
 
   createdBy string [ref: > User.id]
   createdAt datetime
