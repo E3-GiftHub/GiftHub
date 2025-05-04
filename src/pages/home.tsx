@@ -6,6 +6,7 @@ import CloudsBackground from "~/components/ui/CloudsBackground";
 import "./../styles/globals.css";
 import MyEventsSection from "~/components/MyEventsSection";
 import  MyInvitations from "~/components/UpcomingEventsSection";
+import "./../styles/globals.css";
 
 export default function home() {
   return (
