@@ -2,7 +2,33 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import shortEventsMockResponse from "~/components/mock-data/shortEventsMockResponse";
 import UpcomingEventsSection from "~/components/UpcomingEventsSection";
-
+jest.mock("~/trpc/react", () => ({
+  api: {
+    calendar: {
+      getEventsByMonth: {
+        useQuery: () => ({
+          data: [
+            {
+              id: 1,
+              title: "Eveniment 1",
+              description: "descriere test",
+              date: new Date(2025, 4, 1).toISOString(), // 1 mai 2025
+              location: "loc 1",
+            },
+            {
+              id: 2,
+              title: "Eveniment 2",
+              description: "alt test",
+              date: new Date(2025, 4, 5).toISOString(), // 5 mai 2025
+              location: "loc 2",
+            },
+          ],
+          isLoading: false,
+        }),
+      },
+    },
+  },
+}));
 describe("UpcomingEventsSection", () => {
   beforeEach(() => {
     render(<UpcomingEventsSection />);

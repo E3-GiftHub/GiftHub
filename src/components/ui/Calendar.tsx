@@ -12,13 +12,16 @@ import {
   isSameDay,
 } from "date-fns";
 import styles from "../../styles/Calendar.module.css";
+import { api } from "~/trpc/react";
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDates, setSelectedDates] = useState<Date[]>([
-    new Date(2025, 3, 8),
-    new Date(2025, 3, 23),
-  ]);
+
+  const { data: events, isLoading } = api.calendar.getEventsByMonth.useQuery({
+    month: currentDate.getMonth() + 1,
+  });
+
+  const selectedDates = events?.map((event) => new Date(event.date)) ?? [];
 
   const renderHeader = () => (
     <div className={styles.header}>
@@ -64,12 +67,12 @@ export default function Calendar() {
         const isDisabled = !isSameMonth(cloneDay, monthStart);
 
         days.push(
-<div
-  className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${isSelected ? styles.selected : ""}`}
-  key={cloneDay.toISOString()}
->
-  <span>{format(cloneDay, "d")}</span>
-</div>
+          <div
+            className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${isSelected ? styles.selected : ""}`}
+            key={cloneDay.toISOString()}
+          >
+            <span>{format(cloneDay, "d")}</span>
+          </div>
         );
 
         day = addDays(day, 1);
@@ -85,6 +88,10 @@ export default function Calendar() {
 
     return <div className={styles.body}>{rows}</div>;
   };
+
+  if (isLoading) {
+    return <div className={styles.loading}>Loading events...</div>;
+  }
 
   return (
     <div className={styles.calendar}>

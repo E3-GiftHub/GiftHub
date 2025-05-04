@@ -29,6 +29,14 @@
   color: #1b1a2e;
   transform: scale(1.05);
 }
+
+.nav-link-active {
+  background-color: rgba(255, 255, 255, 0.844) !important;
+  color: #1e1646 !important;
+  transform: scale(1.05);
+  font-weight: bold;
+}
+
 @media (max-width: 720px) {
   .special-navbar {
     flex-direction: row;

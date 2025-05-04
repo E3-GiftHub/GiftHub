@@ -2,6 +2,33 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Calendar from "../components/ui/Calendar";
 import { format, addMonths, subMonths } from "date-fns";
+jest.mock("~/trpc/react", () => ({
+  api: {
+    calendar: {
+      getEventsByMonth: {
+        useQuery: () => ({
+          data: [
+            {
+              id: 1,
+              title: "Eveniment 1",
+              date: new Date(2025, 3, 15).toISOString(), // 15 aprilie
+              location: "loc 1",
+              description: "test",
+            },
+            {
+              id: 2,
+              title: "Eveniment 2",
+              date: new Date(2025, 3, 22).toISOString(), // 22 aprilie
+              location: "loc 2",
+              description: "test",
+            },
+          ],
+          isLoading: false,
+        }),
+      },
+    },
+  },
+}));
 
 describe("Calendar component", () => {
   beforeEach(() => {
@@ -18,14 +45,15 @@ describe("Calendar component", () => {
     expect(screen.getByText("April 2025")).toBeInTheDocument();
   });
 
-  it("highlights preselected dates (8 and 23 April 2025)", () => {
+  it("highlights preselected dates (15 and 22 April 2025)", () => {
     render(<Calendar />);
-    const selectedDates = [8, 23];
+    const selectedDates = [15, 22];
     selectedDates.forEach((day) => {
       const el = screen.getByText(day.toString());
       expect(el.parentElement).toHaveClass("selected");
     });
   });
+  
 
   it("clicking '>' navigates to the next month", () => {
     render(<Calendar />);
