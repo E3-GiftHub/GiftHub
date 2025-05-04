@@ -39,13 +39,12 @@ body, html {
     width: 100%;
     height: clamp(50px, 13.7vh, 148px);
     opacity: 0.5;
-    border-radius: 15px;
     background-image: url('../../public/backgrounds/home.png');
     background-size: cover;
     background-position: center ;
     background-repeat: no-repeat;
     margin-top: 0rem;
-    margin-bottom: 3rem;
+    margin-bottom: 5rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,7 +132,7 @@ body, html {
     justify-content: space-between;
     padding-left: 3.8rem;
     padding-right: 1.2rem;
-    gap: 6rem;
+    gap: 5.7rem;
     text-align: center;
     width: clamp(117px, 11.5vw, 222px);
     padding-top: 1rem;
@@ -141,8 +140,8 @@ body, html {
 }
 @media (min-width: 1400px) {
     .pageWrapper .buttons {
-        gap: 8rem;
-        padding-left: 9.8rem;
+        gap: 8.2rem;
+        padding-left: 9.2rem;
     }
 }
 @media (max-width: 600px) {
@@ -152,9 +151,10 @@ body, html {
 
     .pageWrapper .buttons {
         margin-left: 0.3rem;
-        gap: 7rem;
+        gap: 6.7rem;
         padding-left: 2.3rem;
         margin-right: 0.3rem;
         padding-right: 2.3rem;
     }
+
 }

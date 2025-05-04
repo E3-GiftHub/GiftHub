@@ -1,7 +1,7 @@
 "use client"
 
 import styles from "../styles/CreateEditEvent.module.css"
-import Navbar from "./_components/Navbar"
+import Navbar from "../app/_components/Navbar"
 import buttonStyles from "../styles/Button.module.css";
 
 
@@ -39,7 +39,7 @@ export default function Page() {
                             </label>
                             <div className={styles.buttons}>
                                 <button className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}>
-                                    Cancel
+                                    &nbsp;Cancel&nbsp;
                                 </button>
 
                                 <button className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}>
