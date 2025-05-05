@@ -118,3 +118,29 @@
 .footerLanding {
   background-color: #2a236fd8;
 }
+
+
+/*am adaugat pt mobile landscape*/
+@media (max-width: 920px) and (orientation: landscape) {
+  .footer {
+    background-color: #3830963f;
+    color: white;
+    padding: 10px 22px; 
+    font-family: 'Jura', sans-serif !important;
+    width: 100%;
+    font-size: 12px;
+    margin-top: 150px;
+  }
+  .footerLanding {
+    background-color: #2a236fd8;
+    
+  }
+ 
+}
+
+  @media (max-width: 719px) {
+    .footer {
+      background-color: #231d6172; /* sau orice altă culoare vrei pe mobile */
+      color: #f0f0f0; /* opțional, culoare text diferită dacă e nevoie */
+    }
+  }
