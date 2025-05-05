@@ -29,6 +29,14 @@
     color: #1b1a2e;
     transform: scale(1.05);
 }
+
+.nav-link-active {
+    background-color: rgba(255, 255, 255, 0.844) !important;
+    color: #1e1646 !important;
+    transform: scale(1.05);
+    font-weight: bold;
+}
+
 @media (max-width: 720px) {
     .special-navbar {
         flex-direction: row;
@@ -190,20 +198,21 @@
 }
 
 /* -------------------- RESPONSIVE: MOBIL -------------------- */
-@media (max-width: 720px) {
+@media (max-width: 720px), (max-height: 500px) and (orientation: landscape) {
+
     .sidebar-overlay {
-        display: block;
         position: fixed;
         top: 0;
         right: 0;
         width: 40vw;
         min-width: 170px;
-        max-width: 170px;
+        max-width: 250px;
         height: 100%;
-        background-color:   rgba(42, 4, 93, 0.703);
+        background-color:   rgba(42, 4, 93, 0.703)!important;
         backdrop-filter: blur(6px);
         z-index: 999;
         pointer-events: auto;
+        display: block !important;
     }
 
     .navbar {
@@ -236,6 +245,10 @@
         right: 1rem;
         transform: translateY(-50%);
         z-index: 1001;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        outline: inherit;
     }
 
     .nav-links {
@@ -285,7 +298,7 @@
     .dropdown-content {
         width: 120px;
         margin-top: 0.5rem;
-        background-color: rgba(43, 4, 93, 0.597);
+        background-color: rgba(43, 4, 93, 0.597)!important;
         backdrop-filter: blur(6px);
         padding: 0.8rem;
         border-radius: 1rem;
@@ -297,6 +310,7 @@
         top: 100%;
         left: 10%;
         transform: translateX(-10%);
+
     }
 
     .profile-dropdown.open .dropdown-content {
@@ -344,7 +358,6 @@
 
         position: absolute;
         top: -50px;
-        right: 0;
         right: 0;
         width: 100%;
         min-width: 100%;
