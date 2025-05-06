@@ -19,9 +19,14 @@ export default function Calendar() {
 
   const { data: events, isLoading } = api.calendar.getEventsByMonth.useQuery({
     month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
   });
 
-  const selectedDates = events?.map((event) => new Date(event.date)) ?? [];
+
+  const selectedDates =
+    events
+      ?.map((event) => (event.date ? new Date(event.date) : null))
+      .filter((d): d is Date => d !== null) ?? [];
 
   const renderHeader = () => (
     <div className={styles.header}>
@@ -61,14 +66,14 @@ export default function Calendar() {
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
-        const isSelected = selectedDates.some((d) =>
-          isSameDay(d, cloneDay)
-        );
+        const isSelected = selectedDates.some((d) => isSameDay(d, cloneDay));
         const isDisabled = !isSameMonth(cloneDay, monthStart);
 
         days.push(
           <div
-            className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${isSelected ? styles.selected : ""}`}
+            className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${
+              isSelected ? styles.selected : ""
+            }`}
             key={cloneDay.toISOString()}
           >
             <span>{format(cloneDay, "d")}</span>

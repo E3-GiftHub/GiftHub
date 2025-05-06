@@ -41,7 +41,10 @@ const UpcomingEventsSection: React.FC = () => {
       </div>
 
       {eventsData.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
+     <ContainerEventRow
+     key={Number(event.id)}
+     eventData={{ ...event, id: Number(event.id) }}
+   />
       ))}
 
       <SeeMoreButton />
