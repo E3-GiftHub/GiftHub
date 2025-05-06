@@ -3,6 +3,19 @@ import { render, screen } from "@testing-library/react";
 import MyEventsSection from "../components/MyEventsSection";
 import shortEventsMockResponse from "../components/mock-data/shortEventsMockResponse";
 
+jest.mock("~/trpc/react", () => ({
+  api: {
+    eventPreview: {
+      getUpcomingEvents: {
+        useQuery: () => ({
+          data: shortEventsMockResponse,
+          isLoading: false,
+        }),
+      },
+    },
+  },
+}));
+
 describe("MyEventsSection", () => {
   beforeEach(() => {
     render(<MyEventsSection />);
