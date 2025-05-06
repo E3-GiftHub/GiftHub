@@ -5,13 +5,16 @@ import "src/styles/globals.css";
 import { FaCalendar } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import type { ShortEventResponse } from "~/models/ShortEventResponse";
+import type { RouterOutputs } from "~/trpc/react";
+
+type Event = RouterOutputs["eventPreview"]["getUpcomingEvents"][number];
 
 interface ContainerEventRowProps {
-  eventData: ShortEventResponse;
+  eventData: Event;
 }
 
 const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
-  const eventDate: Date = new Date(eventData.date);
+  const eventDate: Date = new Date(); //Update here with actual date
   const formattedDate = eventDate.toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -25,7 +28,7 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
       <div className={styles["left-column"]}>
         <img
           className={styles.thumbnail}
-          src={eventData.imageUrl}
+          src={eventData.photo}
           alt={eventData.title}
         />
         <p className={styles.title}>{eventData.title}</p>

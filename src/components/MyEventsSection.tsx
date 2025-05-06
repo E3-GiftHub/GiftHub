@@ -8,27 +8,22 @@ import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
-import shortEventsMockResponse from "~/components/mock-data/shortEventsMockResponse";
-import type { ShortEventResponse } from "~/models/ShortEventResponse";
+import { api } from "~/trpc/react";
 
 const MyEventsSection: React.FC = () => {
-  const [eventsData, setEventsData] = React.useState<ShortEventResponse[]>([]);
+  const {
+    data: eventsData = [],
+    isLoading,
+    isError,
+  } = api.eventPreview.getUpcomingEvents.useQuery();
 
-  React.useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        //const response = await fetch("/api/getShortEvents");
-        //const data = (await response.json()) as ShortEventResponse[];
-        const data = shortEventsMockResponse;
-        const trimmedData = data.slice(0, 3);
-        setEventsData(trimmedData);
-      } catch (error) {
-        console.error("Failed to fetch events:", error);
-      }
-    };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
-    void fetchEvents();
-  }, []);
+  if (isError) {
+    return <p>Failed to load events.</p>;
+  }
 
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
