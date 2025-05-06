@@ -1,53 +1,68 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { ContributionService } from "../../../services/ContributionService";
-
-const contributionService = new ContributionService();
+import { ContributionService } from "~/services/ContributionService";
 
 export const contributionRouter = createTRPCRouter({
   createContribution: protectedProcedure
     .input(
       z.object({
-        contributionId: z.string().uuid(),
-        guestId: z.string().uuid(),
-        wishlistItemId: z.string().uuid(),
-        amount: z.number().positive(),
-        date: z.date().optional().default(() => new Date()),
-        message: z.string().optional()
+        contributionId: z.string(),
+        eventId: z.string(),
+        articleId: z.string(),
+        amount: z.number(),
+        date: z.date().optional(),
+        message: z.string().optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const senderId = ctx.session.user.id;
-      const result = await contributionService.createContribution(
-        input.contributionId,
-        senderId,
-        input.guestId,
-        input.wishlistItemId,
-        input.amount,
-        input.date,
-        input.message
-      );
-      return { success: true, data: result };
+    .mutation(async ({ ctx, input }) => {
+      const contributionService = new ContributionService();
+      
+      try {
+        const result = await contributionService.createContribution(
+          input.contributionId,
+          ctx.session.user.id,
+          input.eventId,
+          input.articleId,
+          input.amount,
+          input.date,
+          input.message
+        );
+        
+        return { success: true, data: result };
+      } catch (error) {
+        return { 
+          success: false, 
+          error: error instanceof Error ? error.message : "Unknown error" 
+        };
+      }
     }),
 
   processContribution: protectedProcedure
-    .input(z.object({ 
-      contributionId: z.string().uuid(), 
-      wishlistItemId: z.string().uuid() 
-    }))
+    .input(
+      z.object({
+        contributionId: z.string(),
+        articleId: z.string(),
+      })
+    )
     .mutation(async ({ input }) => {
+      const contributionService = new ContributionService();
+      
       return contributionService.processContribution(
         input.contributionId,
-        input.wishlistItemId
+        input.articleId
       );
     }),
 
   manageContribution: protectedProcedure
-    .input(z.object({ 
-      contributionId: z.string().uuid(),
-      action: z.enum(['approve', 'reject', 'refund'])
-    }))
+    .input(
+      z.object({
+        contributionId: z.string(),
+        action: z.enum(['approve', 'reject', 'refund']),
+      })
+    )
     .mutation(async ({ input }) => {
+      const contributionService = new ContributionService();
+      
       return contributionService.manageContribution(
         input.contributionId,
         input.action
@@ -55,9 +70,18 @@ export const contributionRouter = createTRPCRouter({
     }),
 
   getContributionsForItem: protectedProcedure
-    .input(z.object({ itemId: z.string().uuid() }))
+    .input(
+      z.object({
+        articleId: z.string(),
+      })
+    )
     .query(async ({ input }) => {
-      const contributions = await contributionService.getContributionsForItem(input.itemId);
+      const contributionService = new ContributionService();
+      
+      const contributions = await contributionService.getContributionsForItem(
+        input.articleId
+      );
+      
       return { success: true, data: contributions };
-    })
+    }),
 });

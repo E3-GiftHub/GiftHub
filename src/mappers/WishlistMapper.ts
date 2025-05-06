@@ -1,92 +1,97 @@
 import { WishlistItem } from "../models/WishlistItem";
 
 interface Contributor {
-  userId: string;
+  username: string; 
   amount: number;
   timestamp: Date;
   message?: string;
 }
 
 interface DbWishlistItem {
-  itemId: string;
-  partnerId: string;
+  id: number;
   name: string;
   description: string;
-  quantity: number;
-  price: number;
-  eventId: string;
-  fulfilled: boolean;
-  imageUrl?: string;
-  productUrl?: string;
+  retailerId: number | null;
+  eventId: number;
+  price: number | null;
+  imagesUrl: string | null;
+  retailerUrl: string | null;
+  isCustom: boolean;
+  quantityRequested?: number | null;
+  quantityFulfilled?: number | null;
 }
 
 interface DbContribution {
-  contributionId: string;
-  wishlistItemId: string;
-  userId: string;
-  amount: number;
-  timestamp: Date;
+  id: number;
+  contributorUsername: string; 
+  articleId: number;
+  cashAmount: number | null;
+  createdAt: Date;
   message?: string;
 }
 
 export class WishlistMapper {
   static toDomainWishlistItem(dbItem: DbWishlistItem, dbContributions: DbContribution[] = []): WishlistItem {
     const item = new WishlistItem(
-      dbItem.itemId,
-      dbItem.partnerId,
-      dbItem.name,
-      dbItem.description,
-      dbItem.quantity,
-      dbItem.price,
-      dbItem.eventId,
-      dbItem.fulfilled,
-      dbItem.imageUrl,
-      dbItem.productUrl
+      dbItem.id.toString(),
+      dbItem.retailerId?.toString() ?? "", 
+      dbItem.name || "",
+      dbItem.description || "",
+      dbItem.quantityRequested ?? 1,
+      dbItem.price?.valueOf() ?? 0,
+      dbItem.eventId.toString(),
+      (dbItem.quantityFulfilled ?? 0) >= (dbItem.quantityRequested ?? 1),
+      dbItem.imagesUrl ?? undefined,
+      dbItem.retailerUrl ?? undefined,
+      dbItem.isCustom
     );
     
     // add contributions if available
     dbContributions.forEach(contribution => {
-      item.contribute(contribution.userId, contribution.amount, contribution.message);
+      item.contribute(
+        contribution.contributorUsername, 
+        contribution.cashAmount?.valueOf() ?? 0, 
+        contribution.message
+      );
     });
     
     return item;
   }
 
   static toDbWishlistItem(domainItem: WishlistItem): {
-    dbItem: DbWishlistItem,
-    dbContributions: DbContribution[]
+    dbItem: Partial<DbWishlistItem>,
+    dbContributions: Partial<DbContribution>[]
   } {
     const contributors = domainItem.getContributors();
     
-    const dbContributions: DbContribution[] = contributors.map(contributor => ({
-      contributionId: `contribution-${contributor.userId}-${contributor.timestamp.getTime()}`, // Placeholder ID
-      wishlistItemId: domainItem.getItemId(),
-      userId: contributor.userId,
-      amount: contributor.amount,
-      timestamp: contributor.timestamp,
+    const dbContributions: Partial<DbContribution>[] = contributors.map(contributor => ({
+      contributorUsername: contributor.username,
+      articleId: parseInt(domainItem.getItemId()),
+      cashAmount: contributor.amount,
+      createdAt: contributor.timestamp,
       message: contributor.message
     }));
     
     return {
       dbItem: {
-        itemId: domainItem.getItemId(),
-        partnerId: domainItem.getPartnerId(),
+        id: parseInt(domainItem.getItemId()),
+        retailerId: parseInt(domainItem.getRetailerId()) || null,
         name: domainItem.getName(),
         description: domainItem.getDescription(),
-        quantity: domainItem.getQuantity(),
+        quantityRequested: domainItem.getQuantity(),
         price: domainItem.getPrice(),
-        eventId: domainItem.getEventId(),
-        fulfilled: domainItem.isFulfilled(),
-        imageUrl: domainItem.getImageUrl(),
-        productUrl: domainItem.getProductUrl(),
+        eventId: parseInt(domainItem.getEventId()),
+        isCustom: domainItem.isCustomItem(),
+        imagesUrl: domainItem.getImageUrl(),
+        retailerUrl: domainItem.getRetailerUrl(),
       },
       dbContributions
     };
   }
 
-  static toDomainWishlistItems(dbItems: DbWishlistItem[], dbContributionsMap: Record<string, DbContribution[]> = {}): WishlistItem[] {
+  static toDomainWishlistItems(dbItems: DbWishlistItem[], dbContributionsMap: Record<number, DbContribution[]> = {}): WishlistItem[] {
     return dbItems.map(item => {
-      const contributions = dbContributionsMap[item.itemId] || [];
+      const contributions = dbContributionsMap[item.id] || [];
       return this.toDomainWishlistItem(item, contributions);
     });
   }

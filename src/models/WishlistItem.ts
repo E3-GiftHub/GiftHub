@@ -1,5 +1,5 @@
-interface Contributor {
-  userId: string;
+export interface Contributor {
+  username: string;
   amount: number;
   timestamp: Date;
   message?: string;
@@ -7,21 +7,22 @@ interface Contributor {
 
 export class WishlistItem {
   private itemId: string;
-  private partnerId: string;
+  private retailerId: string;
   private name: string;
   private description: string;
   private quantity: number;
   private price: number;
+  private eventId: string;
   private fulfilled: boolean;
-  private totalContributions: number = 0;
+  private imageUrl?: string; 
+  private retailerUrl?: string; 
+  private isCustom: boolean;
   private contributors: Contributor[] = [];
-  private eventId: string; 
-  private imageUrl?: string;
-  private productUrl?: string;
+  private totalContributed: number = 0;
 
   constructor(
     itemId: string,
-    partnerId: string,
+    retailerId: string,
     name: string,
     description: string,
     quantity: number,
@@ -29,134 +30,116 @@ export class WishlistItem {
     eventId: string,
     fulfilled: boolean = false,
     imageUrl?: string,
-    productUrl?: string
+    retailerUrl?: string,
+    isCustom: boolean = false
   ) {
     this.itemId = itemId;
-    this.partnerId = partnerId;
+    this.retailerId = retailerId;
     this.name = name;
     this.description = description;
     this.quantity = quantity;
     this.price = price;
-    this.fulfilled = fulfilled;
     this.eventId = eventId;
+    this.fulfilled = fulfilled;
     this.imageUrl = imageUrl;
-    this.productUrl = productUrl;
+    this.retailerUrl = retailerUrl;
+    this.isCustom = isCustom;
   }
 
-  public reserve(userId: string, expiresAt: Date): void {
-    // todo: reservation logic with expiration to prevent multiple people from purchasing the same item simultaneously
+  // Getters
+  getItemId(): string {
+    return this.itemId;
   }
 
-  public contribute(userId: string, amount: number, message?: string): void {
-    if (amount <= 0) {
-      throw new Error("Contribution amount must be positive");
+  getRetailerId(): string {
+    return this.retailerId;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getDescription(): string {
+    return this.description;
+  }
+
+  getQuantity(): number {
+    return this.quantity;
+  }
+
+  getPrice(): number {
+    return this.price;
+  }
+
+  getEventId(): string {
+    return this.eventId;
+  }
+
+  isFulfilled(): boolean {
+    return this.fulfilled;
+  }
+
+  getImageUrl(): string | undefined {
+    return this.imageUrl;
+  }
+
+  getRetailerUrl(): string | undefined {
+    return this.retailerUrl;
+  }
+
+  isCustomItem(): boolean { 
+    return this.isCustom;
+  }
+
+  getTotalContributed(): number {
+    return this.totalContributed;
+  }
+
+  getRemainingAmount(): number {
+    const totalPrice = this.price * this.quantity;
+    return Math.max(0, totalPrice - this.totalContributed);
+  }
+
+  getContributors(): Contributor[] {
+    return [...this.contributors];
+  }
+
+  // Methods
+  contribute(username: string, amount: number, message?: string): boolean {
+    if (this.fulfilled) {
+      return false;
     }
-    
-    this.totalContributions += amount;
-    
+
+    const remainingAmount = this.getRemainingAmount();
+    if (amount > remainingAmount) {
+      amount = remainingAmount; 
+    }
+
     this.contributors.push({
-      userId,
+      username,
       amount,
       timestamp: new Date(),
       message
     });
-    
-    this.checkFulfillment();
-  }
 
-  private checkFulfillment(): void {
-    if (this.totalContributions >= this.getTotalPrice()) {
+    this.totalContributed += amount;
+
+
+    const totalPrice = this.price * this.quantity;
+    if (this.totalContributed >= totalPrice) {
       this.fulfilled = true;
     }
+
+    return true;
   }
 
-  public getTotalPrice(): number {
-    return this.price * this.quantity;
-  }
-
-  public getPercentageFunded(): number {
-    return Math.min(100, (this.totalContributions / this.getTotalPrice()) * 100);
-  }
-
-  public getAmountRemaining(): number {
-    return Math.max(0, this.getTotalPrice() - this.totalContributions);
-  }
-
-  public getContributors(): Contributor[] {
-    return [...this.contributors];
-  }
-
-  public getItemId(): string {
-    return this.itemId;
-  }
-
-  public getPartnerId(): string {
-    return this.partnerId;
-  }
-
-  public getName(): string {
-    return this.name;
-  }
-
-  public getDescription(): string {
-    return this.description;
-  }
-
-  public getQuantity(): number {
-    return this.quantity;
-  }
-
-  public getPrice(): number {
-    return this.price;
-  }
-
-  public getEventId(): string {
-    return this.eventId;
-  }
-
-  public isFulfilled(): boolean {
-    return this.fulfilled;
-  }
-
-  public getTotalContributions(): number {
-    return this.totalContributions;
-  }
-
-  public getImageUrl(): string | undefined {
-    return this.imageUrl;
-  }
-
-  public getProductUrl(): string | undefined {
-    return this.productUrl;
-  }
-
-  public setName(name: string): void {
-    this.name = name;
-  }
-
-  public setDescription(description: string): void {
-    this.description = description;
-  }
-
-  public setQuantity(quantity: number): void {
-    this.quantity = quantity;
-    this.checkFulfillment();
-  }
-
-  public setPrice(price: number): void {
-    this.price = price;
-    this.checkFulfillment();
-  }
-
-  public setFulfilled(fulfilled: boolean): void {
+  setFulfilled(fulfilled: boolean): void {
     this.fulfilled = fulfilled;
   }
 
-  public setImageUrl(imageUrl?: string): void {
-    this.imageUrl = imageUrl;
-  }
-
-  public setProductUrl(productUrl?: string): void {
-    this.productUrl = productUrl;
+  updateQuantity(quantity: number): boolean {
+    if (quantity < 1) return false;
+    this.quantity = quantity;
+    return true;
   }
 }
