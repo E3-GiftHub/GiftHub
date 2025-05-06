@@ -7,28 +7,11 @@ export const calendarRouter = createTRPCRouter({
         .input(
             z.object({
                 month: z.number().min(1).max(12),
+                year: z.number().min(2000).max(2100).optional().default(() => new Date().getFullYear())
             })
         )
         .query(async ({ ctx, input }) => {
-            const { month } = input;
-
-            // date mock pt testare
-            return [
-                {
-                    id: 1,
-                    title: "eveniment 1",
-                    description: "descriere test",
-                    date: new Date(2025, month - 1, 15),
-                    location: "loc 1"
-                },
-                {
-                    id: 2,
-                    title: "eveniment 2",
-                    description: "descriere",
-                    date: new Date(2025, month - 1, 22),
-                    location: "loc 2"
-                }
-            ];
+            const { month, year } = input;
 
 
             /*
@@ -38,12 +21,36 @@ export const calendarRouter = createTRPCRouter({
                     message: "You must be logged in",
                 });
             }
+                
 
             const currentUser = ctx.session.user;
             const userIdentifier = currentUser.id;
 
-            const startDate = new Date(month - 1, 1);
-            const endDate = new Date(month, 0);
+            */
+
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0);
+
+            // cele mai multe invitații
+            const userInvitationCounts = await ctx.db.invitation.groupBy({
+                by: ['guestUsername'],
+                _count: {
+                    guestUsername: true
+                },
+                orderBy: {
+                    _count: {
+                        guestUsername: 'desc'
+                    }
+                },
+                take: 1
+            });
+
+            if (!userInvitationCounts.length) {
+                return [];
+            }
+            //
+
+            const userIdentifier = userInvitationCounts[0]?.guestUsername || "";
 
             const invitations = await ctx.db.invitation.findMany({
                 where: {
@@ -62,6 +69,5 @@ export const calendarRouter = createTRPCRouter({
 
             const events = invitations.map(invitation => invitation.event);
             return events;
-            */
         }),
 });
