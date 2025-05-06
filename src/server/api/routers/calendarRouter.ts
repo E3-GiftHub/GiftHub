@@ -50,7 +50,7 @@ export const calendarRouter = createTRPCRouter({
             }
             //
 
-            const userIdentifier = userInvitationCounts[0]?.guestUsername || "";
+            const userIdentifier = userInvitationCounts[0]?.guestUsername ?? "";
 
             const invitations = await ctx.db.invitation.findMany({
                 where: {
