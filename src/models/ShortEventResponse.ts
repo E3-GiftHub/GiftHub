@@ -4,4 +4,5 @@ export interface ShortEventResponse {
   date: string;
   location: string;
   photo: string;
+  description: string;
 }
