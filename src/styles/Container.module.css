@@ -2,7 +2,7 @@
   z-index: 1;
   flex: 1;
   max-width: 1200px;
-  height: 100%;
+  height: fit-content;
 
   padding: 25px;
   margin: 25px;
@@ -37,6 +37,7 @@
 .see-more-button a {
   color: #c8abd6;
   text-decoration: underline;
+
 }
 
 .see-more-button {
@@ -45,4 +46,12 @@
   justify-content: start;
   font-family: Jura, sans-serif;
   width: 100%;
+
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .container {
+    width: 80%;
+  }
 }
