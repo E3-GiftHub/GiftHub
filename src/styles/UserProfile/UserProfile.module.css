@@ -159,6 +159,73 @@
     height: 22px;
 }
 
+/* Add these styles to match the edit form fields */
+
+.inputGroup {
+    width: 100%;
+    max-width: 500px;
+}
+
+.inputLabel {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-size: 1.2em;
+    color: #aaa;
+    font-weight: 400;
+}
+
+.inputField {
+    width: 82%;
+    padding: 1rem 1.5rem;
+    background-color: #2e275f;
+    border: 1px solid #3a3468;
+    border-radius: 8px;
+    font-size: 1.1em;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.inputField:focus {
+    outline: none;
+    border-color: #738bf8;
+    box-shadow: 0 0 0 3px rgba(115, 139, 248, 0.2);
+}
+
+.inputField::placeholder {
+    color: #6b6892;
+    opacity: 0.8;
+}
+
+.errorMessage {
+    color: #ff6b6b;
+    font-size: 0.9em;
+    margin-top: 0.8rem;
+    display: block;
+}
+
+/* Add this to create space between form fields and buttons */
+.userInfo {
+    gap: 2rem; /* Creates consistent vertical spacing */
+}
+
+/* Adjust button container spacing */
+.buttonContainer {
+    gap: 1.5rem;
+}
+
+/* Add disabled state styling for the save button */
+.button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #4a4569;
+}
+
+/* Loading state for input fields */
+.inputField.loading {
+    background-color: #3a3468;
+    border-color: #4a4569;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1040px) {
     .profileCard {

@@ -2,6 +2,7 @@ import React from 'react';
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
+import "src/styles/globals.css";
 
 interface UserProfileProps {
   username?: string;
@@ -61,10 +62,10 @@ export default function UserProfileUI({
               {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
-                  alt="User avatar"
                   width={120}
                   height={120}
                   className={styles.avatarImage}
+                  alt={""}
                 />
               )}
             </div>
