@@ -49,6 +49,14 @@
 
   font-size: 0.8rem;
 }
+.see-more-button-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: underline;
+  color: #c8abd6;
+}
 
 @media (max-width: 720px) {
   .container {

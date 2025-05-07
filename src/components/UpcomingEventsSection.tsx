@@ -7,8 +7,15 @@ import ContainerEventTitle from "~/components/ui/ContainerEventTitle";
 import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import Calendar from "~/components/ui/Calendar";
 import { api } from "~/trpc/react";
+import Modal from "~/components/Modal";
+import { useState } from "react";
+
 
 const UpcomingEventsSection: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
    const {
       data: eventsData = [],
       isLoading,
@@ -39,7 +46,14 @@ const UpcomingEventsSection: React.FC = () => {
         <ContainerEventRow key={index} eventData={event} />
       ))}
 
-      <SeeMoreButton />
+    <SeeMoreButton onClick={openModal} />
+
+    <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
+      {eventsData.map((event, index) => (
+        <ContainerEventRow key={index} eventData={event} />
+      ))}
+    </Modal>
+
     </Container>
   );
 };

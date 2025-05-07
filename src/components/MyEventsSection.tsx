@@ -9,8 +9,15 @@ import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
 import { api } from "~/trpc/react";
+import Modal from "~/components/Modal";
+import { useState } from "react";
+
 
 const MyEventsSection: React.FC = () => {
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
   const {
     data: eventsData = [],
     isLoading,
@@ -32,7 +39,14 @@ const MyEventsSection: React.FC = () => {
       {trimmedEvents.map((event, index) => (
         <ContainerEventRow key={index} eventData={event} />
       ))}
-      <SeeMoreButton />
+      <SeeMoreButton onClick={openModal} />
+
+      <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
+        {eventsData.map((event, index) => (
+          <ContainerEventRow key={index} eventData={event} />
+        ))}
+      </Modal>
+
       <div className={styles["buttons-wrapper"]}>
         <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
       </div>
