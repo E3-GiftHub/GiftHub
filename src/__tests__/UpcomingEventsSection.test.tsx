@@ -117,7 +117,7 @@ describe("UpcomingEventsSection", () => {
       fireEvent.click(screen.getByText("See more"));
     });
 
-    expect(screen.getByText("All My Events")).toBeInTheDocument();
+    expect(screen.getByText("All My Invitations")).toBeInTheDocument();
   });
 
   it("closes the modal when the close button is clicked", async () => {
@@ -133,12 +133,12 @@ describe("UpcomingEventsSection", () => {
       fireEvent.click(screen.getByText("See more"));
     });
 
-    expect(screen.getByText("All My Events")).toBeInTheDocument();
+    expect(screen.getByText("All My Invitations")).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(screen.getByText("✕"));
     });
 
-    expect(screen.queryByText("All My Events")).not.toBeInTheDocument();
+    expect(screen.queryByText("All My Invitations")).not.toBeInTheDocument();
   });
 });

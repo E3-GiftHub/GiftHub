@@ -6,9 +6,10 @@ import { useRouter } from "next/router";
 export default function LandingSection() {
   const router = useRouter();
 
-  const handleSignUp = () => {
-    router.push("/signup"); 
-  };
+  const handleSignUp = async () => {
+    await router.push("/signup");
+  }
+  
   return (
     <div className={styles["landing-container"]}>
       <img
