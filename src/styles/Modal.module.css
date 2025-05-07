@@ -1,0 +1,72 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modalContent {
+  background-color: #2E236C;
+  padding: 2rem;
+  border-radius: 15px;
+  max-width: 28rem;
+  width: 100%;
+  margin: 0 1rem;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #d8b4fe;
+}
+
+.modalImage {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.modalItemName {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.modalItemPrice {
+  color: #c8abd6;
+}
+
+.modalItemDescription {
+  color: #c8abd6;
+  margin-top: 0.5rem;
+}
+
+.quantityLabel {
+  display: block;
+  color: #c8abd6;
+  margin-bottom: 0.5rem;
+}
+
+.quantityInput {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: #cbb1dc;
+  color: #1e1e1e;
+  border: none;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+} 
