@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@layer base {
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+.html{
+  background-color: #2f2464;
+  background-size:cover;
 }
