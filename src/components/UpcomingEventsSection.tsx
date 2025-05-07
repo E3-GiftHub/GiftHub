@@ -45,7 +45,7 @@ const UpcomingEventsSection: React.FC = () => {
 
       <SeeMoreButton onClick={openModal} />
 
-      <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
+      <Modal isOpen={showModal} onClose={closeModal} title="All My Invitations">
         {eventsData.map((event, index) => (
           <ContainerEventRow key={index} eventData={event} />
         ))}

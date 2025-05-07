@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import "./../styles/globals.css";
-import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa';
 import styles from "./../styles/Footer.module.css";
 import Link from "next/link";
 
@@ -45,6 +45,15 @@ const Footer = () => {
             aria-label="GitHub"
           >
             <FaGithub size={32} />
+          </a>
+
+          <a
+            href=""
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+          >
+            <FaInstagram size={32} />
           </a>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "../styles/Modal.module.css"; 
+import ReactDOM from "react-dom";
 
 type ModalProps = {
   isOpen: boolean;
@@ -11,14 +12,17 @@ type ModalProps = {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <button onClick={onClose} className={styles.closeButton}>✕</button>
-        {title && <h2>{title}</h2>}
-        <div>{children}</div>
+        {title && <h2 className={styles.eventsSectionTitle}>{title}</h2>}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {children}
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

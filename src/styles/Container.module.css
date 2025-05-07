@@ -43,7 +43,7 @@
 
 .see-more-button {
   display: flex;
-  -ms-flex-direction: row;
+  flex-direction: row;
   justify-content: start;
   font-family: Jura, sans-serif;
   width: 100%;
