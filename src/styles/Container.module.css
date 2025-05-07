@@ -3,6 +3,7 @@
   flex: 1;
   max-width: 1200px;
   height: fit-content;
+  min-height: 35rem;
 
   padding: 25px;
   margin: 25px;
@@ -49,6 +50,7 @@
 
   font-size: 0.8rem;
 }
+
 .see-more-button-button {
   background: none;
   border: none;

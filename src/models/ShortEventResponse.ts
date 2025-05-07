@@ -1,5 +1,5 @@
 export interface ShortEventResponse {
-  id: string;
+  id: number;
   title: string;
   date: string;
   location: string;

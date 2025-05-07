@@ -1,40 +1,63 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import MyEventsSection from "../components/MyEventsSection";
+import { render, screen, act, fireEvent } from "@testing-library/react";
+import UpcomingEventsSection from "../components/UpcomingEventsSection";
 import shortEventsMockResponse from "../components/mock-data/shortEventsMockResponse";
 import { api } from "~/trpc/react";
-import { act } from "react";
 
 jest.mock("~/trpc/react", () => ({
   api: {
-    eventPreview: {
-      getUpcomingEvents: {
+    invitationPreview: {
+      getRecentInvitations: {
+        useQuery: jest.fn(),
+      },
+    },
+    calendar: {
+      getEventsByMonth: {
         useQuery: jest.fn(),
       },
     },
   },
 }));
 
-const useQueryMock = api.eventPreview.getUpcomingEvents.useQuery as jest.Mock;
+const useQueryMock = api.invitationPreview.getRecentInvitations
+  .useQuery as jest.Mock;
+const calendarQueryMock = api.calendar.getEventsByMonth.useQuery as jest.Mock;
 
-describe("MyEventsSection", () => {
+describe("UpcomingEventsSection", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Set default mock return values
+    useQueryMock.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    });
+
+    calendarQueryMock.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    });
+  });
+
   it("renders the loading state", () => {
     useQueryMock.mockReturnValueOnce({
-      data: undefined,
+      data: [],
       isLoading: true,
       isError: false,
     });
-    render(<MyEventsSection />);
+    render(<UpcomingEventsSection />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("renders the error state", () => {
     useQueryMock.mockReturnValueOnce({
-      data: undefined,
+      data: [],
       isLoading: false,
       isError: true,
     });
-    render(<MyEventsSection />);
+    render(<UpcomingEventsSection />);
     expect(screen.getByText("Failed to load events.")).toBeInTheDocument();
   });
 
@@ -44,18 +67,28 @@ describe("MyEventsSection", () => {
       isLoading: false,
       isError: false,
     });
-    render(<MyEventsSection />);
-    expect(screen.getByText("My events")).toBeInTheDocument();
+    render(<UpcomingEventsSection />);
+    expect(screen.getByText("My invitations")).toBeInTheDocument();
   });
 
-  it("renders up to 3 event rows", () => {
+  it("renders the calendar with mocked events", () => {
+    calendarQueryMock.mockReturnValueOnce({
+      data: [{ date: "2025-05-10" }, { date: "2025-05-15" }],
+      isLoading: false,
+      isError: false,
+    });
+    render(<UpcomingEventsSection />);
+    expect(screen.getByText(/May 2025/i)).toBeInTheDocument();
+  });
+
+  it("renders up to 2 event rows", () => {
     useQueryMock.mockReturnValueOnce({
       data: shortEventsMockResponse,
       isLoading: false,
       isError: false,
     });
-    render(<MyEventsSection />);
-    const displayedEvents = shortEventsMockResponse.slice(0, 3);
+    render(<UpcomingEventsSection />);
+    const displayedEvents = shortEventsMockResponse.slice(0, 2);
     displayedEvents.forEach((event) => {
       expect(screen.getByText(event.title)).toBeInTheDocument();
     });
@@ -67,30 +100,18 @@ describe("MyEventsSection", () => {
       isLoading: false,
       isError: false,
     });
-    render(<MyEventsSection />);
+    render(<UpcomingEventsSection />);
     expect(screen.getByText("See more")).toBeInTheDocument();
   });
 
-  it("renders the 'Add new event' button", () => {
-    useQueryMock.mockReturnValueOnce({
-      data: shortEventsMockResponse,
-      isLoading: false,
-      isError: false,
-    });
-    render(<MyEventsSection />);
-    expect(
-      screen.getByRole("button", { name: /add new event/i }),
-    ).toBeInTheDocument();
-  });
-
-  it("calls openModal when 'See more' is clicked", async () => {
+  it("renders modal when 'See more' is clicked", async () => {
     useQueryMock.mockReturnValue({
       data: shortEventsMockResponse,
       isLoading: false,
       isError: false,
     });
 
-    render(<MyEventsSection />);
+    render(<UpcomingEventsSection />);
 
     await act(async () => {
       fireEvent.click(screen.getByText("See more"));
@@ -98,23 +119,26 @@ describe("MyEventsSection", () => {
 
     expect(screen.getByText("All My Events")).toBeInTheDocument();
   });
-  it("calls openModal and closeModal with valid data", async () => {
+
+  it("closes the modal when the close button is clicked", async () => {
     useQueryMock.mockReturnValue({
       data: shortEventsMockResponse,
       isLoading: false,
       isError: false,
     });
 
-    render(<MyEventsSection />);
+    render(<UpcomingEventsSection />);
 
     await act(async () => {
       fireEvent.click(screen.getByText("See more"));
     });
+
     expect(screen.getByText("All My Events")).toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(screen.getByText("✕"));
     });
+
     expect(screen.queryByText("All My Events")).not.toBeInTheDocument();
   });
 });

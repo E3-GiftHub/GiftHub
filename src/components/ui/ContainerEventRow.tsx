@@ -4,7 +4,6 @@ import styles from "src/styles/ContainerEventRow.module.css";
 import "src/styles/globals.css";
 import { FaCalendar } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
-import type { ShortEventResponse } from "~/models/ShortEventResponse";
 import type { RouterOutputs } from "~/trpc/react";
 
 type Event = RouterOutputs["eventPreview"]["getUpcomingEvents"][number];

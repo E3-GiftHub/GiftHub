@@ -8,37 +8,34 @@ import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import Calendar from "~/components/ui/Calendar";
 import { api } from "~/trpc/react";
 import Modal from "~/components/Modal";
-import { useState } from "react";
-
+import React, { useState } from "react";
 
 const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
-   const {
-      data: eventsData = [],
-      isLoading,
-      isError,
-    } = api.invitationPreview.getRecentInvitations.useQuery();
-    
-    if (isLoading) {
-      return <p>Loading...</p>;
-    }
-  
-    if (isError) {
-      return <p>Failed to load events.</p>;
-    }
+  const {
+    data: eventsData = [],
+    isLoading = false,
+    isError = false,
+  } = api.invitationPreview.getRecentInvitations.useQuery();
 
-    const trimmedEvents = eventsData.slice(0, 2);
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (isError) {
+    return <p>Failed to load events.</p>;
+  }
+
+  const trimmedEvents = eventsData.slice(0, 2);
 
   return (
     <Container borderStyle={ContainerBorderStyle.BOTTOM}>
       <ContainerEventTitle title={"My invitations"} />
 
-      <div
-        style={{  }}
-      >
+      <div style={{}}>
         <Calendar />
       </div>
 
@@ -46,14 +43,13 @@ const UpcomingEventsSection: React.FC = () => {
         <ContainerEventRow key={index} eventData={event} />
       ))}
 
-    <SeeMoreButton onClick={openModal} />
+      <SeeMoreButton onClick={openModal} />
 
-    <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
-      {eventsData.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
-      ))}
-    </Modal>
-
+      <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
+        {eventsData.map((event, index) => (
+          <ContainerEventRow key={index} eventData={event} />
+        ))}
+      </Modal>
     </Container>
   );
 };
