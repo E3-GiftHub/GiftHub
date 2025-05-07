@@ -24,11 +24,12 @@ const MyEventsSection: React.FC = () => {
   if (isError) {
     return <p>Failed to load events.</p>;
   }
+  const trimmedEvents = eventsData.slice(0, 3);
 
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
       <ContainerEventTitle title={"My events"} />
-      {eventsData.map((event, index) => (
+      {trimmedEvents.map((event, index) => (
         <ContainerEventRow key={index} eventData={event} />
       ))}
       <SeeMoreButton />

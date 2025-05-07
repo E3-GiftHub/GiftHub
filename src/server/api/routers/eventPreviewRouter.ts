@@ -15,7 +15,7 @@ export const upcomingEventsRouter = createTRPCRouter({
       },
       {
         id: 202,
-        photo: "https://placekitten.com/401/300",
+        photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE1lhtjix9KC0H4J0XCFqN2G0pjqeQP4Jp1g&s",
         title: "Art Gallery Opening",
         description:
           "Join us for the unveiling of our new modern art exhibition.",
@@ -24,7 +24,34 @@ export const upcomingEventsRouter = createTRPCRouter({
       },
       {
         id: 203,
-        photo: "https://placekitten.com/402/300",
+        photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRju--Tsq4lcquiQwPDBvVFOv9QnSFoE-0B0A&s",
+        title: "Ziua Izabelei",
+        description:
+          "Network with fellow developers and hear the latest in web tech.",
+        location: "Iasi",
+        date: "2025-05-12T14:30:00Z",
+      },
+      {
+        id: 201,
+        photo:
+          "https://media.istockphoto.com/id/1196023167/ro/fotografie/smartphone-%C3%AEn-m%C3%A2n%C4%83-la-un-concert-lumin%C4%83-mov-de-pe-scen%C4%83.webp?s=2048x2048&w=is&k=20&c=vutPOuZGeXZeyPOwLY6Hed7JJ4UCFgELj3NISTBfPlc=",
+        title: "Spring Concert",
+        description: "Enjoy an evening of classical music under the stars.",
+        location: "Iasi",
+        date: "2025-05-12T14:30:00Z",
+      },
+      {
+        id: 202,
+        photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE1lhtjix9KC0H4J0XCFqN2G0pjqeQP4Jp1g&s",
+        title: "Art Gallery Opening",
+        description:
+          "Join us for the unveiling of our new modern art exhibition.",
+        location: "Iasi",
+        date: "2025-05-12T14:30:00Z",
+      },
+      {
+        id: 203,
+        photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRju--Tsq4lcquiQwPDBvVFOv9QnSFoE-0B0A&s",
         title: "Ziua Izabelei",
         description:
           "Network with fellow developers and hear the latest in web tech.",
