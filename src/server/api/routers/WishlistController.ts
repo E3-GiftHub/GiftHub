@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc"; // Adjust path as needed
-import { WishlistService } from "../../../services/WishlistService";
+import { WishlistService } from "~/services/WishlistService";
 
 const wishlistService = new WishlistService();
 

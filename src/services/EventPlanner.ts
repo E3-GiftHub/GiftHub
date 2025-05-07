@@ -20,7 +20,14 @@ export class EventPlanner {
         location: data.location,
         date: data.date,
         time: data.time,
-        createdBy: data.createdBy,
+        //createdByUsername: data.createdBy,
+	user: {
+        //connect: { username: data.createdBy },
+        connectOrCreate: {
+    where: { username: data.createdBy },
+    create: { username: data.createdBy },
+  },
+	},
       },
     });
 
@@ -32,7 +39,7 @@ export class EventPlanner {
   }
 
   async sendInvitation(eventId: bigint, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({ where: { id: guestId } });
+    const exists = await prisma.user.findUnique({ where: { username: guestId } });
     if (!exists) throw new EventManagementException("Guest does not exist");
 
     await prisma.invitation.create({
