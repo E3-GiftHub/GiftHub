@@ -76,7 +76,6 @@
 }
 
 .form label {
-    display: block;
     margin-bottom: 1rem;
     font-size: 0.95rem;
     font-weight: 500;
@@ -84,10 +83,12 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    padding-right: 3rem;
 }
 
 .form input,
 .form textarea {
+    margin-right: 3.5rem;
     width: clamp(262px, 28.5vw, 548px);
     padding: 0.75rem 1rem;
     border: none;
@@ -98,11 +99,32 @@
     font-size: 1rem;
 }
 
+.form textarea {
+    margin-left: 0.3rem;
+}
 
+@media (min-width: 1401px) {
+
+    .pageWrapper .buttons button {
+        flex: 1 1 150px;
+        max-width: 222px;
+        min-width: 117px;
+        text-align: center;
+
+    }
+    .pageWrapper .buttons {
+        display: flex;
+        gap: clamp(1rem, 6.5vw, 9rem);
+        flex-wrap: wrap;
+        margin-left: 3.5rem;
+        margin-right: 2.6rem;
+    }
+}
 
 .form textarea {
     height: clamp(146px, 26.7vh, 289px);
     width: clamp(262px, 28.5vw, 548px);
+    width: 100%;
 }
 
 .dateInputWrapper {
@@ -118,34 +140,41 @@
     pointer-events: none;
 }
 
-.pageWrapper .buttons {
-    display: flex;
-    justify-content: space-between;
-    padding-left: 3.8rem;
-    padding-right: 1.2rem;
-    gap: 5.7rem;
-    text-align: center;
-    width: clamp(117px, 11.5vw, 222px);
-    padding-top: 1rem;
 
-}
-@media (min-width: 1400px) {
-    .pageWrapper .buttons {
-        gap: 8.2rem;
-        padding-left: 9.2rem;
+@media (max-width: 1400px) {
+
+    .pageWrapper .buttons  {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 0.3rem;
+        gap: 5vw;
+        padding-left: 6vw;
+        margin-right: 0.3rem;
+        padding-right: 2.3rem;
+        text-align: center;
+        width: clamp(117px, 11.5vw, 222px);
+        padding-top: 1rem;
+
     }
 }
+
 @media (max-width: 600px) {
     .form label {
         margin-left: 2.5rem;
     }
 
-    .pageWrapper .buttons {
+    .pageWrapper .buttons  {
+        display: flex;
+        justify-content: space-between;
         margin-left: 0.3rem;
         gap: 6.7rem;
         padding-left: 2.3rem;
         margin-right: 0.3rem;
         padding-right: 2.3rem;
+        text-align: center;
+        width: clamp(117px, 11.5vw, 222px);
+        padding-top: 1rem;
+
     }
 
 }
