@@ -1,8 +1,35 @@
 import styles from "./../../../styles/Account.module.css";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
+import {api} from "~/trpc/react";
+
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+
+  const [errors, setErrors] = useState<string | null>(null)
+  const router = useRouter()
+
+  const loginMutation = api.auth.login.login.useMutation({
+    onSuccess: () => {
+      router.push("/home");
+    },
+    onError: (err) => {
+      setErrors(err.message);
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors(null);
+    loginMutation.mutate(formData);
+  }
+
   return (
       <div className={styles.rightPanel}>
         <div className={styles.top}>
@@ -16,8 +43,12 @@ export default function LoginForm() {
               <label className={styles.inputTitle}>Email</label>
               <input
                 type="text"
+                name="email"
                 placeholder="e.g. John99@gmail.com"
                 className={styles.inputField}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
               />
             </div>
 
@@ -28,6 +59,9 @@ export default function LoginForm() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className={styles.inputField}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
                 />
                 <img
                   src={
@@ -52,7 +86,13 @@ export default function LoginForm() {
         </div>
 
         <div className={styles.bottom}>
-          <button className={styles.primaryButton}>Log in</button>
+          <button
+            type="submit"
+            className={styles.primaryButton}
+            onClick={handleSubmit}
+          >
+            {loginMutation.isPending? "Loading...": "Log in"}
+          </button>
 
           <p className={styles.footer}>
             Don't have an account?
