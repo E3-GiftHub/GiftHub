@@ -1,76 +1,59 @@
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { TRPCError } from "@trpc/server";
 
 export const invitationsRouter = createTRPCRouter({
-    getRecentInvitations: publicProcedure
-        .query(async () => {
-            // Mock data for the 3 most recent invitations
-            return [
-              {
-                id: 101,
-                title: "Iz ma birthday",
-                description: "Bring gifts.",
-                photo: "https://m.media-amazon.com/images/I/81DXhu6ONML.jpg",
-                location: "Cluj-Napoca",
-                date: "2025-05-10",
-              },
-              {
-                id: 102,
-                title: "Professional yapping session",
-                description: "Learn to yap from the best.",
-                photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9m2_03gJhMH66iD9uC2rQ9eBgZJ8M9D85rQ&s",
-                location: "Remote",
-                date: "2025-06-15",
-              },
-              {
-                id: 103,
-                title: "Team Offsite Retreat",
-                description: "All-hands no feet planning for annual retreat.",
-                photo: "https://img.freepik.com/free-photo/people-celebrating-party_53876-14410.jpg",
-                location: "Sibiu",
-                date: "2025-07-01",
-              },
-              {
-                id: 101,
-                title: "Iz ma birthday",
-                description: "Bring gifts.",
-                photo: "https://m.media-amazon.com/images/I/81DXhu6ONML.jpg",
-                location: "Cluj-Napoca",
-                date: "2025-05-10",
-              },
-              {
-                id: 102,
-                title: "Professional yapping session",
-                description: "Learn to yap from the best.",
-                photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9m2_03gJhMH66iD9uC2rQ9eBgZJ8M9D85rQ&s",
-                location: "Remote",
-                date: "2025-06-15",
-              },
-              {
-                id: 103,
-                title: "Team Offsite Retreat",
-                description: "All-hands no feet planning for annual retreat.",
-                photo: "https://img.freepik.com/free-photo/people-celebrating-party_53876-14410.jpg",
-                location: "Sibiu",
-                date: "2025-07-01",
-              }
-            ];
+  getRecentInvitations: publicProcedure.query(async ({ ctx }) => {
+    /*
+    // Enable this once session handling is ready
+    if (!ctx.session) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in",
+      });
+    }
+    */
 
-            /*
-            // Real DB logic (when you have access) might look like:
-            if (!ctx.session) {
-              throw new TRPCError({ code: "UNAUTHORIZED", message: "You must be logged in" });
-            }
-            const userId = ctx.session.user.id;
-            const invitations = await ctx.db.invitation.findMany({
-              where: { userId },
-              orderBy: { createdAt: "desc" },
-              take: 3,
-            });
-            return invitations.map(inv => ({
-              id: inv.id,
-              title: inv.eventTitle,
-              description: inv.eventDescription,
-            }));
-            */
-        }),
+    const allUsers = await ctx.db.user.findMany({
+      select: { username: true },
+    });
+
+    if (!allUsers.length) {
+      return [];
+    }
+
+// Alege un utilizator random
+    const randomIndex = Math.floor(Math.random()%allUsers.length);
+    const userIdentifier = allUsers[randomIndex]?.username;
+
+    if (!userIdentifier) {
+      return [];
+    }
+
+    const invitations = await ctx.db.invitation.findMany({
+      where: {
+        guestUsername: userIdentifier,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 3,
+      include: {
+        event: true,
+      },
+    });
+
+    return invitations
+        .filter((inv) => inv.event !== null)
+        .map((inv) => {
+          const event = inv.event;
+          return {
+            id: event.id,
+            title: event.title,
+            description: event.description,
+            photo: event.pictureUrl,
+            location: event.location,
+            date: event.date,
+          };
+        });
+  }),
 });
