@@ -1,9 +1,39 @@
 import React, { useState } from "react";
 import styles from "./../../../styles/Account.module.css";
+import { api } from "~/trpc/react";
+import {useRouter} from "next/router";
+
+
 
 export default function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    password: "",
+    confirmPassword: "",
+    email: ""
+  });
+
+  const [errors, setErrors] = useState<string | null>(null)
+  const router = useRouter()
+
+  const update = api.auth.update.update.useMutation({
+    onSuccess: () => {
+      router.push("/login");
+    },
+    onError: (err) => {
+      setErrors(err.message);
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors(null);
+    update.mutate(formData);
+  };
+
+
   return (
       <div className={styles.rightPanel}>
 
@@ -20,6 +50,9 @@ export default function ResetPasswordForm() {
                   type={showPassword ? "text" : "password"}
                   placeholder={"Enter your password"}
                   className={styles.inputField}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
                 />
                 <img
                   src={showPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
@@ -37,6 +70,9 @@ export default function ResetPasswordForm() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder={"Confirm your password"}
                   className={styles.inputField}
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  required
                 />
                 <img
                   src={showConfirmPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
@@ -51,7 +87,12 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className={styles.bottom}>
-          <button className={styles.primaryButton}>Reset password</button>
+          <button
+            className={styles.primaryButton}
+            onClick={handleSubmit}
+          >
+            {update.isPending? "Loading...": "Reset password"}
+          </button>
 
           <p className={styles.footer}>
             Back to

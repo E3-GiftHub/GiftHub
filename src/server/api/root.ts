@@ -1,6 +1,11 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
+import { signupRouter } from "./routers/userManagement/signup"
+import { loginRouter } from "~/server/api/routers/userManagement/login";
+import { recoveryRouter } from "~/server/api/routers/userManagement/findByEmail";
+import { updatePasswordRouter } from "~/server/api/routers/userManagement/updatePassword";
+
 
 /**
  * This is the primary router for your server.
@@ -10,7 +15,12 @@ import { calendarRouter } from "./routers/calendarRouter";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   calendar: calendarRouter,
-
+  auth: createTRPCRouter({
+    signup: signupRouter,
+    login: loginRouter,
+    recover: recoveryRouter,
+    update: updatePasswordRouter
+  }),
 });
 
 // export type definition of API

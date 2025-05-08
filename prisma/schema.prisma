@@ -94,7 +94,7 @@ model User {
   email    String? @unique
   fname    String?
   lname    String?
-  password String? // stored with hash obviously
+  password String // stored with hash obviously
   iban     String?
   picture  String? // todo: string?
 
