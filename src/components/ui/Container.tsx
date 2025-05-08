@@ -7,12 +7,16 @@ enum ContainerBorderStyle {
 }
 
 interface SeeMoreButtonProps {
-  url?: string;
+  onClick?: () => void;
 }
 
-const SeeMoreButton: React.FC<SeeMoreButtonProps> = ({ url }) => (
+const SeeMoreButton: React.FC<SeeMoreButtonProps> = ({ onClick }) => (
   <div className={styles["see-more-button"]}>
-    <a href={url}>See more</a>
+    
+      <button onClick={onClick} className={styles["see-more-button-button"]}>
+        See more
+      </button>
+  
   </div>
 );
 
