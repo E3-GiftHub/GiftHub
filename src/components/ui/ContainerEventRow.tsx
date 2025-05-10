@@ -20,9 +20,6 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
     timeStyle: "short",
   });
 
-  // Adaugă un URL default pentru imagine când photo este null
-  const imageSrc = eventData.photo || "/databasepic/eventpic.png";
-
   return (
     <Link
       href={`/event-view?id=${eventData.id}`}
@@ -31,8 +28,8 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
       <div className={styles["left-column"]}>
         <img
           className={styles.thumbnail}
-          src={imageSrc}
-          alt={eventData.title || "Event thumbnail"}
+          src={eventData.photo}
+          alt={eventData.title}
         />
         <p className={styles.title}>{eventData.title}</p>
       </div>
