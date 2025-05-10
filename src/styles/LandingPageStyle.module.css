@@ -1,0 +1,23 @@
+
+.landing-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-image: url("/backgrounds/background_landing_page.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.empty-space{
+    height: 50vh;
+} 
+
+@media (max-width: 720px){
+      .landing-page{
+        background-image: linear-gradient(#17153B, #433D8B);
+      }
+      .empty-space{
+        height:10vh;
+      }
+}
