@@ -52,7 +52,14 @@ export default function LoginForm() {
         </div>
 
         <div className={styles.bottom}>
+
+
           <button className={styles.primaryButton}>Log in</button>
+
+          <label className={styles.rememberMe}>
+            <input type="checkbox" />
+            Remember me
+          </label>
 
           <p className={styles.footer}>
             Don't have an account?
