@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styles from "./../../../styles/Account.module.css";
 
-
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -16,47 +15,72 @@ export default function SignupForm() {
         <div className={styles.middle}>
           <form className={styles.formContainer}>
 
+            {/*username input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Username</label>
-              <input type="text" placeholder="e.g. John99" className={styles.inputField}/>
+              <label  htmlFor="username" className={styles.inputTitle}>Username</label>
+              <input
+                id="username"
+                type="text"
+                placeholder="e.g. John99"
+                className={styles.inputField}
+              />
             </div>
 
+            {/*email input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Email</label>
-              <input type="text" placeholder="e.g. John99@gmail.com" className={styles.inputField}/>
+              <label  htmlFor="email" className={styles.inputTitle}>Email</label>
+              <input
+                id="email"
+                type="text"
+                placeholder="e.g. John99@gmail.com"
+                className={styles.inputField}
+              />
             </div>
 
+            {/*password input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Password</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder={"Enter your password"}
+                  placeholder="Enter your password"
                   className={styles.inputField}
                 />
-                <img
-                  src={showPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
-                  alt={"toggle visibility"}
-                  className={styles.passwordIcon}
+                <button
+                  type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                />
+                  className={styles.passwordToggleButton}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <img
+                    src={showPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
+                    alt="password-icon"
+                  />
+                </button>
+
               </div>
             </div>
 
+            {/*confirm password input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Confirm password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Confirm password</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder={"Confirm your password"}
+                  placeholder="Confirm your password"
                   className={styles.inputField}
                 />
-                <img
-                  src={showConfirmPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
-                  alt="toggle visibility"
-                  className={styles.passwordIcon}
+                <button
+                  type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                />
+                  className={styles.passwordToggleButton}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <img
+                    src={showConfirmPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
+                    alt="password-icon"
+                  />
+                </button>
               </div>
             </div>
 
@@ -67,7 +91,7 @@ export default function SignupForm() {
           <button className={styles.primaryButton}>Sign up</button>
 
           <p className={styles.footer}>
-            Already have an account?
+            Already have an account?{' '}
             <a href="/login">
               <button className={styles.secondaryButton}>Log in</button>
             </a>
