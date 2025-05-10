@@ -13,7 +13,8 @@ interface ContainerEventRowProps {
 }
 
 const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
-  const eventDate: Date = new Date(eventData.date); //Update here with actual date
+  const eventDate: Date = eventData.date ? new Date(eventData.date) : new Date();
+  
   const formattedDate = eventDate.toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
