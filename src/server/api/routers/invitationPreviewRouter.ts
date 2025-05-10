@@ -22,7 +22,7 @@ export const invitationsRouter = createTRPCRouter({
     }
 
 // Alege un utilizator random
-    const randomIndex = Math.floor(Math.random()%allUsers.length);
+    const randomIndex = Math.floor(Math.random() * allUsers.length);
     const userIdentifier = allUsers[randomIndex]?.username;
 
     if (!userIdentifier) {

@@ -208,21 +208,3 @@ model EventReport {
   event              Event    @relation(fields: [eventId], references: [id])
   user               User     @relation(fields: [reportedByUsername], references: [username])
 }
-
-
-enum PriorityType {
-  LOW
-  MEDIUM
-  HIGH
-}
-enum Status {
-    PENDING
-    ACCEPTED
-    REJECTED
-}
-enum MarkType {
-    PURCHASED
-    RESERVED
-    CONTRIBUTED
-    // NULL: if the mark is null => delete row
-}

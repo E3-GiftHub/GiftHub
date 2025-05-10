@@ -28,8 +28,8 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
       <div className={styles["left-column"]}>
         <img
           className={styles.thumbnail}
-          src={eventData.photo}
-          alt={eventData.title}
+          src={eventData.photo ?? '/placeholder.jpg'}
+          alt={eventData.title ?? 'event title'}
         />
         <p className={styles.title}>{eventData.title}</p>
       </div>
