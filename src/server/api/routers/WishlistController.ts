@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc"; // Adjust path as needed
+import { createTRPCRouter, publicProcedure } from "../trpc"; 
 import { WishlistService } from "../../../services/WishlistService";
 
 const wishlistService = new WishlistService();
@@ -7,8 +7,8 @@ const wishlistService = new WishlistService();
 export const wishlistRouter = createTRPCRouter({
   createWishlist: publicProcedure
     .input(z.object({ eventIdentifier: z.string() }))
-    .mutation(({ input }) => {
-      const result = wishlistService.createWishlist(input.eventIdentifier);
+    .mutation(async ({ input }) => {
+      const result = await wishlistService.createWishlist(input.eventIdentifier);
       if (!result.success) {
         throw new Error(result.error ?? "Could not create wishlist");
       }
@@ -17,8 +17,8 @@ export const wishlistRouter = createTRPCRouter({
 
   getWishlist: publicProcedure
     .input(z.object({ wishlistIdentifier: z.string() }))
-    .query(({ input }) => {
-      const result = wishlistService.getWishlist(input.wishlistIdentifier);
+    .query(async ({ input }) => {
+      const result = await wishlistService.getWishlist(input.wishlistIdentifier);
       if (!result.success) {
         throw new Error(result.error ?? "Wishlist not found");
       }
@@ -38,8 +38,8 @@ export const wishlistRouter = createTRPCRouter({
         }),
       })
     )
-    .mutation(({ input }) => {
-      const result = wishlistService.addItem(input.wishlistIdentifier, {
+    .mutation(async ({ input }) => {
+      const result = await wishlistService.addItem(input.wishlistIdentifier, {
         ...input.item,
         isReserved: false,
         contributedAmount: 0,
@@ -57,8 +57,8 @@ export const wishlistRouter = createTRPCRouter({
         itemIdentifier: z.string(),
       })
     )
-    .mutation(({ input }) => {
-      const result = wishlistService.removeItem(
+    .mutation(async ({ input }) => {
+      const result = await wishlistService.removeItem(
         input.wishlistIdentifier,
         input.itemIdentifier
       );
@@ -70,8 +70,8 @@ export const wishlistRouter = createTRPCRouter({
 
   deleteWishlist: publicProcedure
     .input(z.object({ wishlistIdentifier: z.string() }))
-    .mutation(({ input }) => {
-      const result = wishlistService.deleteWishlist(input.wishlistIdentifier);
+    .mutation(async ({ input }) => {
+      const result = await wishlistService.deleteWishlist(input.wishlistIdentifier);
       if (!result.success) {
         throw new Error(result.error ?? "Could not delete wishlist");
       }
