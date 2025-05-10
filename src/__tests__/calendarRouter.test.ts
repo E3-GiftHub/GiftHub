@@ -1,7 +1,37 @@
-// filepath: src/tests/calendarRouter.test.ts
 import { calendarRouter } from "../server/api/routers/calendarRouter";
-import { type inferProcedureInput } from "@trpc/server";
-import { createTRPCRouter, publicProcedure } from "../server/api/trpc";
+import type { AppRouter } from "../server/api/root";
+
+// Mock trpc shared types for testing
+type RouterInputs = {
+    calendar: {
+        getEventsByMonth: {
+            month: number;
+            year?: number;
+        };
+    };
+};
+
+type RouterOutputs = {
+    calendar: {
+        getEventsByMonth: any[];
+    };
+};
+
+type CalendarInput = RouterInputs["calendar"]["getEventsByMonth"];
+type CalendarOutput = RouterOutputs["calendar"]["getEventsByMonth"];
+type CalendarContext = {
+    db: {
+        invitation: {
+            groupBy: jest.Mock;
+            findMany: jest.Mock;
+        }
+    }
+};
+type ProcedureParams = {
+    ctx: CalendarContext;
+    input: CalendarInput;
+    type: "query";
+};
 
 // Mock the trpc module
 jest.mock("../server/api/trpc", () => ({
