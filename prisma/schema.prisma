@@ -214,3 +214,15 @@ enum PriorityType {
   MEDIUM
   LOW
 }
+
+enum Status {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
+
+enum MarkType{
+  CONTRIBUTED
+  PURCHASED
+  RESERVED
+}
