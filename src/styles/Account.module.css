@@ -291,6 +291,8 @@ body {
   border-radius: 10px;
 }
 
+/* TEST FOR VERCEL */
+
 @media (max-width: 1000px) {
   .signUpBox {
     min-width: 50em;
