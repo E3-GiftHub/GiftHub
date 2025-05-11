@@ -1,11 +1,8 @@
-:global(body) {
+.fullPageWrapper {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
-  background-color: #17153b;
-  font-family: Heebo, sans-serif;
 }
 
 .signUpBox {
@@ -101,7 +98,7 @@
   color: #FFFFFF;
   opacity: 50%;
   font-size: 1.1em;
-  margin-bottom: -1.5em;
+  margin-top: -.8em;
 }
 
 .middle {
@@ -280,7 +277,7 @@
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-:global(::-webkit-scrollbar) {
+/*:global(::-webkit-scrollbar) {
   width: 5px;
   height: 5px
 }
@@ -293,7 +290,7 @@
 :global(::-webkit-scrollbar-thumb) {
   background: #C7ACD5;
   border-radius: 10px;
-}
+}*/
 
 /* TEST FOR VERCEL */
 
