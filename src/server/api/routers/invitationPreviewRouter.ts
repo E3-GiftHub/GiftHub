@@ -36,7 +36,6 @@ export const invitationsRouter = createTRPCRouter({
       orderBy: {
         createdAt: "desc",
       },
-      take: 3,
       include: {
         event: true,
       },

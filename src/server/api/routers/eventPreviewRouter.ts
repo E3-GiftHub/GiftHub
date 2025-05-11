@@ -61,7 +61,6 @@ if (!ctx.session) {
         date: { gte: today }
       },
       orderBy: { date: "asc" },
-      take: 3,
       select: {
         id: true,
         pictureUrl: true,
