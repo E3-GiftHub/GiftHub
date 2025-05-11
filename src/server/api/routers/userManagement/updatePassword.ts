@@ -31,15 +31,10 @@ export const updatePasswordRouter = createTRPCRouter({
       const updatedUser = await ctx.db.user.update({
         where:{email: input.email},
         data: {password: hashPasswd},
-        select: {
-          fname: true,
-          lname: true,
-          email: true,
-          picture: true,
-          iban: true,
-        }
       });
 
-      return updatedUser;
+      return{
+        success: true,
+      };
     }),
 });

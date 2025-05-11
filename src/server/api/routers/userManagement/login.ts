@@ -2,9 +2,12 @@ import {z} from "zod";
 import {createTRPCRouter, publicProcedure} from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 
+
+//TODO: From the client side error handling from signup and login pages, move them server side
+
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string()
 });
 
 export const loginRouter = createTRPCRouter({
@@ -15,7 +18,7 @@ export const loginRouter = createTRPCRouter({
 
         const user = await ctx.db.user.findFirst({
           where: {
-            email: email,
+            email: input.email,
           },
         });
 
@@ -23,7 +26,7 @@ export const loginRouter = createTRPCRouter({
           throw new Error("User not found");
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password!);
+        const passwordMatch = await bcrypt.compare(password, user.password);
 
         if(!passwordMatch){
           throw new Error("Passwords don't match");

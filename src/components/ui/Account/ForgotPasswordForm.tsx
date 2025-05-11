@@ -14,9 +14,20 @@ export default function ForgotPasswordForm() {
   const [errors, setErrors] = useState<string | null>(null)
   const router = useRouter()
 
-  const recoverMutation = api.auth.recover.findByEmail.useQuery(
-    {email: formData.email},
-  )
+  const recoverMutation = api.auth.recover.findByEmail.useMutation({
+    onSuccess: () => {
+      router.push(`/resetpassword?email=${encodeURIComponent(formData.email)}`);
+    },
+    onError: (err) => {
+      setErrors(err.message);
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors(null);
+    recoverMutation.mutate(formData);
+  }
 
 
 
@@ -48,10 +59,10 @@ export default function ForgotPasswordForm() {
         <div className={styles.bottom}>
           <button
             type="submit"
-            onClick={() => router.push(`/updatepassword?email=${encodeURIComponent(formData.email)}`)}
+            onClick={handleSubmit}
             className={styles.primaryButton}
           >
-            {recoverMutation.isLoading? "Loading...": "Confirm"}
+            {recoverMutation.isPending? "Loading...": "Confirm"}
           </button>
 
           <p className={styles.footer}>

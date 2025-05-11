@@ -3,6 +3,6 @@
     "compilerOptions": {
       "jsx": "react" 
     },
-    "include": ["src/**/*.ts", "src/**/*.tsx", "src/__tests__/**/*.ts", "src/__tests__/**/*.tsx"]
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/__tests__/**/*.ts", "src/__tests__/**/*.tsx", "scr/server/api/routers/**/*.ts"]
   }
   

@@ -12,7 +12,7 @@ export default function LoginForm() {
     password: ""
   });
 
-  const [errors, setErrors] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter()
 
   const loginMutation = api.auth.login.login.useMutation({
@@ -20,14 +20,41 @@ export default function LoginForm() {
       router.push("/home");
     },
     onError: (err) => {
-      setErrors(err.message);
+      if(err.message === "User not found") {
+        setErrors({ server: err.message });
+      }
+      else {
+        setErrors({ server: "An unexpected error occurred" });
+      }
     },
   })
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if(!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    }
+    else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
+      newErrors.email = "Invalid email address";
+    }
+    if(!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    }
+    else if(!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/g.test(formData.password)) {
+      newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors(null);
-    loginMutation.mutate(formData);
+    if(validateForm()){
+      loginMutation.mutate(formData);
+    }
   }
 
   return (
@@ -38,6 +65,9 @@ export default function LoginForm() {
         </div>
 
         <div className={styles.middle}>
+          {errors?.server && (<div className="txt-red-500">
+            {errors.server}
+          </div>)}
           <form className={styles.formContainer}>
             <div className={styles.formGroup}>
               <label className={styles.inputTitle}>Email</label>
@@ -50,6 +80,9 @@ export default function LoginForm() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
               />
+              {errors?.email && (<div className="txt-red-500">
+                {errors.email}
+              </div>)}
             </div>
 
             <div className={styles.formGroup}>
@@ -63,6 +96,9 @@ export default function LoginForm() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
                 />
+                {errors?.password && (<div className="txt-red-500">
+                  {errors.password}
+                </div>)}
                 <img
                   src={
                     showPassword
