@@ -1,84 +1,106 @@
-// WishlistService.ts
+// src/services/WishlistService.ts
 
-import { WishlistDTO } from "~/services/WishlistDTO";
-import type { WishlistItemDTO } from "~/services/WishlistDTO";
+import { db as prisma } from "~/server/db";
+import { WishlistDTO } from "./WishlistDTO";
+import type { WishlistItemDTO } from "./WishlistDTO";
+import { PriorityType } from "@prisma/client";
 
 export class WishlistService {
-  // In a real app, replace with database calls
-  private wishlistStore = new Map<string, WishlistDTO>();
+  /**
+   * Fetch the wishlist (all EventArticle rows) for a given event.
+   */
+  static async getByEvent(eventId: number): Promise<WishlistDTO> {
+    const entries = await prisma.eventArticle.findMany({
+      where: { eventId },
+      include: { item: true },
+    });
 
-  createWishlist(eventIdentifier: string): { success: boolean; data?: WishlistDTO; error?: string } {
-    try {
-      const wishlistIdentifier = crypto.randomUUID();
-      const newWishlist = new WishlistDTO(
-        wishlistIdentifier,
-        eventIdentifier,
-        [],
-        new Date()
-      );
-      this.wishlistStore.set(wishlistIdentifier, newWishlist);
-      return { success: true, data: newWishlist };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { success: false, error: message };
+    interface EventArticleWithItem {
+      itemId: number;
+      quantityRequested: number;
+      quantityFulfilled: number;
+      priority?: PriorityType;
+      item: {
+      name: string | null;
+      description: string | null;
+      price: number | null;
+      };
     }
+
+    const items: WishlistItemDTO[] = entries.map((ea: EventArticleWithItem) => ({
+      itemIdentifier: ea.itemId.toString(),
+      name: ea.item.name ?? "",
+      description: ea.item.description ?? undefined,
+      price: ea.item.price ? Number(ea.item.price) : undefined,
+      quantity: ea.quantityRequested ?? 0,
+      isReserved: ea.quantityRequested === 0 && ea.quantityFulfilled === 0,
+      contributedAmount: ea.quantityFulfilled ?? 0,
+      priority: ea.priority ?? undefined,
+    }));
+
+    return new WishlistDTO(
+      eventId.toString(),
+      eventId.toString(),
+      items,
+      entries[0]?.createdAt ?? new Date(),
+      entries[0]?.updatedAt ?? undefined
+    );
   }
 
-  addItem(
-    wishlistIdentifier: string,
-    newItem: WishlistItemDTO
-  ): { success: boolean; data?: WishlistDTO; error?: string } {
-    try {
-      const wishlist = this.wishlistStore.get(wishlistIdentifier);
-      if (!wishlist) {
-        return { success: false, error: "Wishlist not found." };
-      }
-      wishlist.items.push(newItem);
-      wishlist.updatedAt = new Date();
-      return { success: true, data: wishlist };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { success: false, error: message };
-    }
+  /**
+   * Add a new item to the wishlist (creates an EventArticle row).
+   */
+  static async addItem(params: {
+    eventId: number;
+    itemId: number;
+    quantityRequested: number;
+    priority?: PriorityType;
+  }): Promise<WishlistItemDTO> {
+    const record = await prisma.eventArticle.create({
+      data: {
+        eventId: params.eventId,
+        itemId: params.itemId,
+        quantityRequested: params.quantityRequested,
+        quantityFulfilled: 0,
+        priority: params.priority ?? PriorityType.LOW,
+      },
+    });
+
+    return {
+      itemIdentifier: record.itemId.toString(),
+      name: "", // you may fetch item details separately if needed
+      description: undefined,
+      price: undefined,
+      quantity: record.quantityRequested ?? 0,
+      isReserved: false,
+      contributedAmount: 0,
+      priority: record.priority ?? undefined,
+    };
   }
 
-  removeItem(
-    wishlistIdentifier: string,
-    itemIdentifier: string
-  ): { success: boolean; data?: WishlistDTO; error?: string } {
-    try {
-      const wishlist = this.wishlistStore.get(wishlistIdentifier);
-      if (!wishlist) {
-        return { success: false, error: "Wishlist not found." };
-      }
-      wishlist.items = wishlist.items.filter(
-        (it) => it.itemIdentifier !== itemIdentifier
-      );
-      wishlist.updatedAt = new Date();
-      return { success: true, data: wishlist };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { success: false, error: message };
-    }
+  /**
+   * Remove a specific item from the wishlist.
+   */
+  static async removeItem(params: {
+    eventId: number;
+    itemId: number;
+  }): Promise<void> {
+    await prisma.eventArticle.delete({
+      where: {
+        eventId_itemId: {
+          eventId: params.eventId,
+          itemId: params.itemId,
+        },
+      },
+    });
   }
 
-  getWishlist(
-    wishlistIdentifier: string
-  ): { success: boolean; data?: WishlistDTO; error?: string } {
-    const wishlist = this.wishlistStore.get(wishlistIdentifier);
-    if (!wishlist) {
-      return { success: false, error: "Wishlist not found." };
-    }
-    return { success: true, data: wishlist };
-  }
-
-  deleteWishlist(
-    wishlistIdentifier: string
-  ): { success: boolean; error?: string } {
-    if (!this.wishlistStore.has(wishlistIdentifier)) {
-      return { success: false, error: "Wishlist not found." };
-    }
-    this.wishlistStore.delete(wishlistIdentifier);
-    return { success: true };
+  /**
+   * Delete the entire wishlist for an event.
+   */
+  static async deleteWishlist(eventId: number): Promise<void> {
+    await prisma.eventArticle.deleteMany({
+      where: { eventId },
+    });
   }
 }

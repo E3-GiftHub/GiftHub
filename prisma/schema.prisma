@@ -43,8 +43,8 @@ model Post {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+    createdBy         User   @relation(fields: [createdByUsername], references: [username])
+    createdByUsername String
 
     @@index([name])
 }
@@ -52,7 +52,7 @@ model Post {
 // Necessary for Next auth
 model Account {
     id                    String  @id @default(cuid())
-    userId                String
+    userUsername          String
     type                  String
     provider              String
     providerAccountId     String
@@ -65,7 +65,7 @@ model Account {
     sessionState          String?
     refreshTokenExpiresIn Int?
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userUsername], references: [username], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -73,10 +73,10 @@ model Account {
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
-    userId       String
+    userUsername String
     expires      DateTime
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userUsername], references: [username], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -90,13 +90,13 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    id       String  @id @unique @default(cuid())
-    email    String? @unique
-    fname    String?
-    lname    String?
-    password String? // stored with hash obviously
-    iban     String?
-    picture  String? // todo: string?
+    username   String  @id @unique @default(cuid())
+    email      String? @unique
+    fname      String?
+    lname      String?
+    password   String? // stored with hash obviously
+    iban       String?
+    pictureUrl String?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -109,7 +109,6 @@ model User {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
-    purchases     Purchase[]
 
     reporters     UserReport[]  @relation("reporter")
     reportedUsers UserReport[]  @relation("reported")
@@ -122,46 +121,45 @@ model User {
 }
 
 model Event {
-    id          BigInt    @id @default(autoincrement())
+    id          Int       @id @default(autoincrement())
     title       String?
     description String?
     location    String?
     date        DateTime?
     time        DateTime?
+    pictureUrl  String?
 
-    createdBy String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    user      User     @relation(fields: [createdBy], references: [id])
+    createdByUsername String
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    user              User     @relation(fields: [createdByUsername], references: [username])
 
     invitations Invitation[]
 
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
-    purchases     Purchase[]
-    eventItems    EventItem[]
+    eventArticles EventArticle[]
     eventReports  EventReport[]
 }
 
 model Invitation {
-    id      BigInt @id @default(autoincrement())
-    guestId String
-    eventId BigInt
+    id            Int    @id @default(autoincrement())
+    guestUsername String
+    eventId       Int
 
     status    Status    @default(PENDING)
     createdAt DateTime  @default(now())
     repliedAt DateTime?
 
-    guest User  @relation(fields: [guestId], references: [id])
+    guest User  @relation(fields: [guestUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 }
 
 model Media {
-    id         BigInt @id @default(autoincrement())
-    uploaderId String
-    eventId    BigInt
-    status     Status
+    id               Int    @id @default(autoincrement())
+    uploaderUsername String
+    eventId          Int
 
     url     String?
     caption String?
@@ -171,28 +169,28 @@ model Media {
     fileSize  Int?
     createdAt DateTime @default(now())
 
-    user  User  @relation(fields: [uploaderId], references: [id])
+    user  User  @relation(fields: [uploaderUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 }
 
 model Mark {
-    id       BigInt @id @default(autoincrement())
-    markerId String // always a Guest
-    eventId  BigInt
-    itemId   BigInt
+    id             Int    @id @default(autoincrement())
+    markerUsername String // always a Guest
+    eventId        Int
+    articleId      Int
 
     type      MarkType
     createdAt DateTime @default(now())
 
-    guest User          @relation(fields: [markerId], references: [id])
+    guest User          @relation(fields: [markerUsername], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+    item  ItemCatalogue @relation(fields: [articleId], references: [id])
 }
 
-/// stores the wishlists from all events and the status of each item
-model EventItem {
-    eventId           BigInt
-    itemId            BigInt
+/// stores the wishlists from all events and the quantity of each item
+model EventArticle {
+    eventId           Int
+    itemId            Int
     quantityRequested Int?
     quantityFulfilled Int?
     priority          PriorityType?
@@ -207,13 +205,13 @@ model EventItem {
 }
 
 model ItemCatalogue {
-    id          BigInt   @id @default(autoincrement())
+    id          Int      @id @default(autoincrement())
     name        String?
     description String?
     imagesUrl   String?
     price       Decimal?
 
-    retailerId  BigInt?
+    retailerId  Int?
     retailerUrl String?
     retailer    Retailer? @relation(fields: [retailerId], references: [id])
 
@@ -222,14 +220,13 @@ model ItemCatalogue {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    eventOccurences EventItem[]
+    eventOccurences EventArticle[]
     marks           Mark[]
     contributions   Contribution[]
-    purchases       Purchase[]
 }
 
 model Retailer {
-    id     BigInt          @id @default(autoincrement())
+    id     Int             @id @default(autoincrement())
     name   String?
     apiUrl String?
     items  ItemCatalogue[]
@@ -237,59 +234,42 @@ model Retailer {
 
 /// refers to a group contribution
 model Contribution {
-    id            BigInt @id @default(autoincrement())
-    contributorId String // always a Guest
-    eventId       BigInt
-    itemId        BigInt
+    id                  Int    @id @default(autoincrement())
+    contributorUsername String // always a Guest
+    eventId             Int
+    articleId           Int
 
     cashAmount Decimal?
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt // ! users can cancel their contribution
+    updatedAt  DateTime @updatedAt // ! users can withdraw their contribution
 
-    guest User          @relation(fields: [contributorId], references: [id])
+    guest User          @relation(fields: [contributorUsername], references: [username])
     event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
-}
-
-//todo should we remove "Purchase"? 
-//todo maybe change the meaning to the final action after all contributions
-//todo see polls 11. enclose purchase
-
-/// refers to a "single-player" contribution
-model Purchase {
-    id          BigInt   @id @default(autoincrement())
-    purchaserId String // always a Guest 
-    eventId     BigInt
-    itemId      BigInt
-    createdAt   DateTime @default(now())
-
-    guest User          @relation(fields: [purchaserId], references: [id])
-    event Event         @relation(fields: [eventId], references: [id])
-    item  ItemCatalogue @relation(fields: [itemId], references: [id])
+    item  ItemCatalogue @relation(fields: [articleId], references: [id])
 }
 
 //! reports
 
 model UserReport {
-    id          BigInt   @id @default(autoincrement())
-    reportedId  String
-    reportedBy  String
-    reason      String?
-    description String?
-    createdAt   DateTime @default(now())
+    id                 Int      @id @default(autoincrement())
+    reportedUsername   String
+    reportedByUsername String
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
 
-    userHell User @relation("reported", fields: [reportedId], references: [id])
-    userSane User @relation("reporter", fields: [reportedBy], references: [id])
+    userHell User @relation("reported", fields: [reportedUsername], references: [username])
+    userSane User @relation("reporter", fields: [reportedByUsername], references: [username])
 }
 
 model EventReport {
-    id          BigInt   @id @default(autoincrement())
-    eventId     BigInt
-    reportedBy  String // NOT always a Guest
-    reason      String?
-    description String?
-    createdAt   DateTime @default(now())
+    id                 Int      @id @default(autoincrement())
+    eventId            Int
+    reportedByUsername String // NOT always a Guest
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
 
-    user  User  @relation(fields: [reportedBy], references: [id])
+    user  User  @relation(fields: [reportedByUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 }
