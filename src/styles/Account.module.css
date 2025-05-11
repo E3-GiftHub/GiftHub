@@ -1,4 +1,4 @@
-body {
+:global(body) {
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -119,7 +119,11 @@ body {
   align-items: stretch;
   width: 100%;
   max-width: 32em;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.signupPage .formContainer {
+  gap: 0;
 }
 
 .formGroup {
@@ -276,17 +280,17 @@ body {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-::-webkit-scrollbar {
+:global(::-webkit-scrollbar) {
   width: 5px;
   height: 5px
 }
 
-::-webkit-scrollbar-track {
+:global(::-webkit-scrollbar-track) {
   box-shadow: inset 0 0 5px grey;
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+:global(::-webkit-scrollbar-thumb) {
   background: #C7ACD5;
   border-radius: 10px;
 }
@@ -326,6 +330,7 @@ body {
 
 @media (max-width: 850px) {
   .signUpBox {
+    height: 85vh;
     min-width: 0;
     width: 90vw;
   }

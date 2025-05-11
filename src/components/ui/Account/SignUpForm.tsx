@@ -5,7 +5,7 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
-      <div className={styles.rightPanel}>
+      <div className={`${styles.rightPanel} ${styles.signupPage}`}>
 
         <div className={styles.top}>
           <h3 className={styles.aboveTitle}>Welcome to GiftHub!</h3>
