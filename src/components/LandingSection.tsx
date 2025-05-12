@@ -59,7 +59,7 @@ export default function LandingSection() {
       />
 
       <img
-        src={"/illustrations/parachute_illustration.png"}
+        src={"/illustrations/parachuteIllustration.png"}
         className={styles["gifts-illustration"]}
         alt="gift-illustration"
       />
