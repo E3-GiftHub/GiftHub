@@ -23,6 +23,9 @@ export default function LoginForm() {
       if(err.message === "User not found") {
         setErrors({ server: err.message });
       }
+      else if(err.message === "Passwords don't match") {
+        setErrors({ password: err.message });
+      }
       else {
         setErrors({ server: "An unexpected error occurred" });
       }
@@ -40,9 +43,6 @@ export default function LoginForm() {
     }
     if(!formData.password.trim()) {
       newErrors.password = "Password is required";
-    }
-    else if(!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/g.test(formData.password)) {
-      newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
