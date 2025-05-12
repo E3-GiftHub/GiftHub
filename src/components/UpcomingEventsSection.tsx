@@ -14,12 +14,16 @@ const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const {
     data: eventsData = [],
     isLoading = false,
     isError = false,
-  } = api.invitationPreview.getRecentInvitations.useQuery();
+  } = api.invitationPreview.getRecentInvitations.useQuery({
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
+  });
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -36,7 +40,7 @@ const UpcomingEventsSection: React.FC = () => {
       <ContainerEventTitle title={"My invitations"} />
 
       <div style={{}}>
-        <Calendar />
+         <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </div>
 
       {trimmedEvents.map((event, index) => (

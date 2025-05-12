@@ -1,8 +1,15 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 export const invitationsRouter = createTRPCRouter({
-  getRecentInvitations: publicProcedure.query(async ({ ctx }) => {
+  getRecentInvitations: publicProcedure.input(
+      z.object({
+        month: z.number().min(1).max(12),
+        year: z.number().min(1900),
+      })
+    ).query(async ({ ctx, input }) => {
+      const { month, year } = input;
     /*
     // Enable this once session handling is ready
     if (!ctx.session) {
@@ -29,13 +36,24 @@ export const invitationsRouter = createTRPCRouter({
       return [];
     }
 
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
     const invitations = await ctx.db.invitation.findMany({
       where: {
         guestUsername: userIdentifier,
+        event: {
+            date: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
       },
       orderBy: {
-        createdAt: "desc",
-      },
+        event: {
+        date: "asc",
+        },
+     },
       include: {
         event: true,
       },
