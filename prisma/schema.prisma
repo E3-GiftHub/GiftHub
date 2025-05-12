@@ -92,6 +92,7 @@ model VerificationToken {
 model User {
     username   String  @id @unique @default(cuid())
     email      String? @unique
+    id         String? @unique
     fname      String?
     lname      String?
     password   String? // stored with hash obviously
