@@ -28,6 +28,9 @@ export default function SignupForm() {
       if(err.message === "User already exists") {
         setErrors({ server: err.message });
       }
+      else if(err.message === "Passwords don't match") {
+        setErrors({ confirmPassword: err.message });
+      }
       else {
         setErrors({ server: "An unexpected error occurred" });
       }
@@ -70,9 +73,6 @@ export default function SignupForm() {
     //confirm password validation
     if(!formData.confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
-    }
-    else if(formData.confirmPassword !== formData.password) {
-      newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
