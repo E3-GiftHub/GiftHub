@@ -7,7 +7,7 @@ Say goodbye to awkward gift planning - this platform makes it easy to give and r
 - **Frontend**: Next.js
 - **Backend**: Node.js
 - **Database**: SqlLite using Prisma
-- **Payment**: Stripe Connect  
+- **Payment**: Stripe Connect
 - **Cloud**: Vercel
 
 ## 🤝 Contributing
