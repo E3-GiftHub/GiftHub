@@ -5,7 +5,7 @@ import * as bcrypt from "bcrypt";
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string()
+  password: z.string().min(1, "Password must not be empty!")
 });
 
 export const loginRouter = createTRPCRouter({
@@ -24,7 +24,11 @@ export const loginRouter = createTRPCRouter({
           throw new Error("User not found");
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password!);
+        if(!user.password){
+          throw new Error("User has no password");
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
 
         if(!passwordMatch){
           throw new Error("Passwords don't match");
