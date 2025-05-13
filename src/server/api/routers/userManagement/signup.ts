@@ -44,7 +44,7 @@ export const signupRouter = createTRPCRouter({
           fname: null,
           lname: null,
           iban: null,
-          picture: null,
+          pictureUrl: null,
         },
       });
 
