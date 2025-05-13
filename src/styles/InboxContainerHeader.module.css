@@ -1,0 +1,121 @@
+
+.wrapper {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.headerWrapper {
+  background-color: #0f1729;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-self: stretch;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.title {
+  color: #c8abd6;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+
+.markRead {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.9rem;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-top: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #c8abd6;
+  font-size: 0.95rem;
+  position: relative;
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+
+.tab:hover {
+  color: #ffffff;
+}
+
+.active {
+  color: #c8abd6;
+  border-bottom: 2px solid #6366f1;
+}
+
+.badge {
+  background-color: #6366f1;
+  color: #c8abd6;
+  font-size: 0.7rem;
+  border-radius: 999px;
+  padding: 0 6px;
+  margin-left: 6px;
+}
+
+
+@media screen and (max-width: 390px) {
+  
+  .mobileHeader {
+    background-color: #0f1729;
+    padding: 2rem;
+  }
+
+  .headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+
+  .mobileActions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .filterButton {
+    background: none;
+    border: none;
+    color: #c8abd6;
+    padding: 0;
+    cursor: pointer;
+    margin-top: 0.3rem;
+  }
+
+  .markReadMobile {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #2e6fe8;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+}
