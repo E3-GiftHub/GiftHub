@@ -9,6 +9,16 @@ export class WishlistService {
   /**
    * Fetch the wishlist (all EventArticle rows) for a given event.
    */
+
+  async createWishlist(eventIdentifier: string) {
+    return { success: true, data: { wishlistIdentifier: eventIdentifier } };
+  }
+
+   async getWishlist(wishlistIdentifier: string) {
+    // Implement your wishlist retrieval logic here
+    return { success: true, data: { wishlistIdentifier } };
+  }
+
   static async getByEvent(eventId: number): Promise<WishlistDTO> {
     const entries = await prisma.eventArticle.findMany({
       where: { eventId },
