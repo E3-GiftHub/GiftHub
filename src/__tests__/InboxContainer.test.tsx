@@ -2,28 +2,44 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import InboxContainer from "../components/ui/InboxContainer";
 
+// Mock pentru stiluri CSS
 jest.mock("../../styles/InboxContainer.module.css", () => ({
   separator: "separator",
   notificationList: "notificationList",
 }));
 
+// Mock CustomContainer
+const MockCustomContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
+MockCustomContainer.displayName = "MockCustomContainer";
+jest.mock("../components/ui/CustomContainer", () => MockCustomContainer);
 
-jest.mock("../components/ui/CustomContainer", () => ({ children }: any) => <div>{children}</div>);
+// Tipuri pentru InboxContainerHeader props
+type InboxContainerHeaderProps = {
+  onTabChange: (tab: string) => void;
+  onMarkAllAsRead: () => void;
+  onOpenMobileFilter: () => void;
+};
 
-jest.mock("../components/ui/InboxContainerHeader", () => (props: any) => (
+// Mock InboxContainerHeader
+const MockInboxContainerHeader = (props: InboxContainerHeaderProps) => (
   <div>
     <p>Header</p>
     <button onClick={() => props.onTabChange("Invitations")}>Go to Invitations</button>
     <button onClick={props.onMarkAllAsRead}>Mark all</button>
     <button onClick={props.onOpenMobileFilter}>Open Filter</button>
   </div>
-));
-
-jest.mock("../components/ui/MobileFilterMenu", () => (props: any) =>
-  props.visible ? <div>Mobile Menu Visible</div> : null
 );
+MockInboxContainerHeader.displayName = "MockInboxContainerHeader";
+jest.mock("../components/ui/InboxContainerHeader", () => MockInboxContainerHeader);
 
+// Mock MobileFilterMenu
+type MobileFilterMenuProps = { visible: boolean };
+const MockMobileFilterMenu = (props: MobileFilterMenuProps) =>
+  props.visible ? <div>Mobile Menu Visible</div> : null;
+MockMobileFilterMenu.displayName = "MockMobileFilterMenu";
+jest.mock("../components/ui/MobileFilterMenu", () => MockMobileFilterMenu);
 
+// Testele propriu-zise
 describe("InboxContainer", () => {
   it("renders all notifications initially", () => {
     render(<InboxContainer />);
@@ -35,7 +51,7 @@ describe("InboxContainer", () => {
     render(<InboxContainer />);
     fireEvent.click(screen.getByText("Go to Invitations"));
     expect(screen.getByText(/John's Birthday/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Alex contributed/i)).not.toBeInTheDocument(); // event hidden
+    expect(screen.queryByText(/Alex contributed/i)).not.toBeInTheDocument();
   });
 
   it("marks all notifications as read", () => {
