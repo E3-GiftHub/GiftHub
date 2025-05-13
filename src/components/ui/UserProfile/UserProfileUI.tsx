@@ -6,7 +6,10 @@ import "src/styles/globals.css";
 
 interface UserProfileProps {
   username?: string;
+  fname?: string;
+  lname?: string;
   email?: string;
+  iban?: string;
   avatarUrl?: string;
   onDelete?: () => void;
   onEdit?: () => void;
@@ -41,19 +44,21 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-  username = "Username Placeholder",
-  email = "user@example.com",
-  avatarUrl,
-  onDelete,
-  onEdit,
-  loading = false,
-}: Readonly<UserProfileProps>) {
+                                        username = "Username Placeholder",
+                                        fname = "First Name Placeholder",
+                                        lname = "Last Name Placeholder",
+                                        email = "user@example.com",
+                                        iban = "IBAN Placeholder",
+                                        avatarUrl,
+                                        onDelete,
+                                        onEdit,
+                                        loading = false,
+                                      }: Readonly<UserProfileProps>) {
   const renderContent = (content: string) => (loading ? "\u00A0" : content);
 
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
-        {/* Avatar Section - CSS handles default background */}
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
             <div
@@ -81,13 +86,23 @@ export default function UserProfileUI({
           </div>
         </div>
 
-        {/* User Info Section */}
         <div className={styles.userInfo}>
           <h2 className={clsx(styles.username, loading && styles.loading)}>
             {renderContent(username)}
           </h2>
+          <div className={styles.nameContainer}>
+            <p className={clsx(styles.nameField, loading && styles.loading)}>
+              {renderContent(fname)}
+            </p>
+            <p className={clsx(styles.nameField, loading && styles.loading)}>
+              {renderContent(lname)}
+            </p>
+          </div>
           <p className={clsx(styles.email, loading && styles.loading)}>
             {renderContent(email)}
+          </p>
+          <p className={clsx(styles.iban, loading && styles.loading)}>
+            {renderContent(iban)}
           </p>
 
           <div className={styles.buttonContainer}>
