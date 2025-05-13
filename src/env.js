@@ -35,10 +35,10 @@ export const env = createEnv({
    */
 
   runtimeEnv: {
-    AUTH_SECRET: process.env.AUTH_SECRET,
-    AUTH_DISCORD_ID: process.env.AUTH_DISCORD_ID,
-    AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET,
-    DATABASE_URL: process.env.DATABASE_URL,
+    AUTH_SECRET: "wr7qF5PHAg3qRF/KgCjzcOnB9eCUjvlbAtAdS5Lep4c=" ,
+    AUTH_DISCORD_ID: "1359046146605191308",
+    AUTH_DISCORD_SECRET: "MwuED9okZBSkF632iCGiqm4lF5bFrWup",
+    DATABASE_URL: "file:./db.sqlite",
     NODE_ENV: process.env.NODE_ENV,
   },
   /**
