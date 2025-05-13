@@ -132,7 +132,7 @@ const config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  testEnvironment: "node",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -186,7 +186,7 @@ const config = {
     "\\.(css|less|sass|scss)$": "identity-obj-proxy",
     "^~/(.*)$": "<rootDir>/src/$1",
   },
-  setupFilesAfterEnv: ["<rootDir>/setupTests.ts"],
+  setupFilesAfterEnv: ["<rootDir>/tsconfig.test.js"],
 };
 
 module.exports = config;
