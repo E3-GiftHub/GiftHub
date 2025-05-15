@@ -14,31 +14,44 @@ jest.mock("../components/ui/CustomContainer", () => ({
   default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+type InboxContainerHeaderProps = {
+  onTabChange: (tab: string) => void;
+  onMarkAllAsRead: () => void;
+  onOpenMobileFilter: () => void;
+};
 
 jest.mock("../components/ui/InboxContainerHeader", () => ({
   __esModule: true,
-  default: ({ onTabChange, onMarkAllAsRead, onOpenMobileFilter }: any) => (
+  default: (props: InboxContainerHeaderProps) => (
     <div>
-      <button onClick={() => onTabChange("Invitations")}>Invitations Tab</button>
-      <button onClick={() => onTabChange("My events")}>Events Tab</button>
-      <button onClick={onMarkAllAsRead}>Mark All as Read</button>
-      <button onClick={onOpenMobileFilter}>Open Filter</button>
+      <button onClick={() => props.onTabChange("Invitations")}>Invitations Tab</button>
+      <button onClick={() => props.onTabChange("My events")}>Events Tab</button>
+      <button onClick={props.onMarkAllAsRead}>Mark All as Read</button>
+      <button onClick={props.onOpenMobileFilter}>Open Filter</button>
     </div>
   ),
 }));
 
+type MobileFilterMenuProps = {
+  visible: boolean;
+  activeTab: string;
+  onSelect: (tab: string) => void;
+  onClose: () => void;
+};
+
 
 jest.mock("../components/ui/MobileFilterMenu", () => ({
   __esModule: true,
-  default: ({ visible, onClose, onSelect }: any) =>
-    visible ? (
+  default: (props: MobileFilterMenuProps) =>
+    props.visible ? (
       <div>
         <p>Mobile Filter Visible</p>
-        <button onClick={() => onSelect("Invitations")}>Select Invitations</button>
-        <button onClick={onClose}>Close Filter</button>
+        <button onClick={() => props.onSelect("Invitations")}>Select Invitations</button>
+        <button onClick={props.onClose}>Close Filter</button>
       </div>
     ) : null,
 }));
+
 
 describe("InboxContainer", () => {
   it("renders all notifications initially", () => {
