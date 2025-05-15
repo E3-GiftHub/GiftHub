@@ -8,7 +8,7 @@
 
 .headerWrapper {
   background-color: #0f1729;
-  padding: 0.5rem 1rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -20,7 +20,7 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 .title {
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0;
+  margin-top: 0.8rem;
 }
 
 
@@ -42,7 +42,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   align-self: flex-end;
-  margin-top: 0;
+  margin-top: 1.5rem;
 }
 
 .tabs {
