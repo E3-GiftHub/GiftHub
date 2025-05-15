@@ -1,7 +1,8 @@
 import React from 'react';
+import {useRouter} from "next/router";
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
-import { clsx } from 'clsx';
+import clsx from 'clsx';
 import "src/styles/globals.css";
 
 interface UserProfileProps {
@@ -15,6 +16,7 @@ interface UserProfileProps {
   onEdit?: () => void;
   loading?: boolean;
 }
+
 
 const ProfileButton = ({
                          iconSrc,
@@ -55,7 +57,15 @@ export default function UserProfileUI({
                                         loading = false,
                                       }: Readonly<UserProfileProps>) {
   const renderContent = (content: string) => (loading ? "\u00A0" : content);
+  const router = useRouter();
 
+  const handleEdit = async () => {
+    if (onEdit) {
+      onEdit();
+    } else {
+      await router.push("/editprofile"); // Default behavior if no onEdit prop provided
+    }
+  };
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
@@ -93,6 +103,7 @@ export default function UserProfileUI({
           <div className={styles.nameContainer}>
             <p className={clsx(styles.nameField, loading && styles.loading)}>
               {renderContent(fname)}
+              &nbsp;&nbsp;&nbsp;&nbsp;|
             </p>
             <p className={clsx(styles.nameField, loading && styles.loading)}>
               {renderContent(lname)}
@@ -119,7 +130,7 @@ export default function UserProfileUI({
               iconSrc="/UserImages/buttons/edit-icon.svg"
               alt="Edit profile"
               loading={loading}
-              onClick={onEdit}
+              onClick={handleEdit}
             >
               Edit info
             </ProfileButton>
