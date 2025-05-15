@@ -45,7 +45,7 @@ describe("MobileFilterMenu", () => {
  it("calls onClose when overlay is clicked", () => {
   render(<MobileFilterMenu {...baseProps} />);
   
- const overlay = document.querySelector(".overlay")! as HTMLElement;
+ const overlay = document.querySelector(".overlay")! ;
   
   fireEvent.click(overlay);
 
