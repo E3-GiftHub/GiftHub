@@ -58,16 +58,25 @@ const InboxContainer = () => {
         onSelect={setActiveTab}
         onClose={() => setShowMobileFilter(false)}
       />
-
       <div className={styles.notificationList}>
         {filtered.map((n) => (
-          <p
-            key={n.id}
-            style={{ opacity: n.read ? 0.6 : 1, cursor: "pointer" }}
-            onClick={() => handleNotificationClick(n.id, n.link)}
-          >
-            {n.text}
-          </p>
+    <button
+  key={n.id}
+  onClick={() => handleNotificationClick(n.id, n.link)}
+  style={{
+    opacity: n.read ? 0.6 : 1,
+    cursor: "pointer",
+    background: "none",
+    border: "none",
+    textAlign: "left",
+    color: "white",      
+    display: "block",    
+    width: "100%",        
+    padding: "0.5rem 0",  
+  }}
+>
+  {n.text}
+</button>
         ))}
       </div>
     </CustomContainer>
