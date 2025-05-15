@@ -2,7 +2,6 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MobileFilterMenu from "../components/ui/MobileFilterMenu";
 
-// ✅ Mock stiluri CSS
 jest.mock("../../styles/MobileFilterMenu.module.css", () => ({
   overlay: "overlay",
   menu: "menu",
@@ -42,13 +41,12 @@ describe("MobileFilterMenu", () => {
     expect(baseProps.onClose).toHaveBeenCalled();
   });
 
-  it("calls onClose when overlay is clicked", () => {
-    render(<MobileFilterMenu {...baseProps} />);
-    fireEvent.click(screen.getByRole("presentation")); // default pentru div fără rol
+ it("calls onClose when overlay is clicked", () => {
+  render(<MobileFilterMenu {...baseProps} />);
+  
+  const overlay = document.querySelector(".overlay") as HTMLElement;
+  fireEvent.click(overlay);
 
-    // dacă nu merge, identifică overlay-ul prin clasă:
-    const overlay = screen.getByText("All").parentElement?.previousSibling as HTMLElement;
-    fireEvent.click(overlay);
-    expect(baseProps.onClose).toHaveBeenCalled();
-  });
+  expect(baseProps.onClose).toHaveBeenCalled();
+});
 });
