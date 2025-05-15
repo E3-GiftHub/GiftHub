@@ -2,13 +2,6 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MobileFilterMenu from "../components/ui/MobileFilterMenu";
 
-type MobileFilterMenuProps = {
-  visible: boolean;
-  activeTab: string;
-  onSelect: (tab: string) => void;
-  onClose: () => void;
-};
-
 
 jest.mock("../../styles/MobileFilterMenu.module.css", () => ({
   overlay: "overlay",
@@ -52,7 +45,8 @@ describe("MobileFilterMenu", () => {
  it("calls onClose when overlay is clicked", () => {
   render(<MobileFilterMenu {...baseProps} />);
   
-  const overlay = document.querySelector(".overlay") as HTMLElement;
+ const overlay = document.querySelector(".overlay")! as HTMLElement;
+  
   fireEvent.click(overlay);
 
   expect(baseProps.onClose).toHaveBeenCalled();
