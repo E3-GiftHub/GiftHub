@@ -1,9 +1,12 @@
+import { PriorityType } from "@prisma/client";
+
+/*
 export enum PriorityType {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH'
 }
-
+*/
 export interface WishlistItemDTO {
   itemIdentifier: string;
   name: string;

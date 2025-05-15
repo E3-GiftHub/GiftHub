@@ -20,32 +20,41 @@ export class EventPlanner {
         location: data.location,
         date: data.date,
         time: data.time,
-        createdBy: data.createdBy,
+        //createdByUsername: data.createdBy,
+	user: {
+        //connect: { username: data.createdBy },
+        connectOrCreate: {
+    where: { username: data.createdBy },
+    create: { username: data.createdBy },
+  },
+	},
       },
     });
 
     return new EventEntity(event);
   }
 
-  async removeEvent(eventId: bigint): Promise<void> {
+  async removeEvent(eventId: number): Promise<void> {
     await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: bigint, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({ where: { id: guestId } });
+  async sendInvitation(eventId: number, guestId: string): Promise<void> {
+    const exists = await prisma.user.findUnique({ where: { username: guestId } });
     if (!exists) throw new EventManagementException("Guest does not exist");
 
     await prisma.invitation.create({
       data: {
         eventId: eventId,
-        guestId: guestId,
+        guestUsername: guestId,
         status: Status.PENDING,
         createdAt: new Date(),
+	//guest:{ connect: { username: guestId }},
+	//event:{ connect: { id: eventId } },
       },
     });
   }
-
-  async manageWishlist(eventId: bigint) {
+/*
+  async manageWishlist(eventId: number) {
     const wishlist = await prisma.eventItem.findMany({
       where: { eventId: eventId },
       include: { item: true },
@@ -53,7 +62,7 @@ export class EventPlanner {
     return wishlist;
   }
 
-  async viewAnalytics(eventId: bigint) {
+  async viewAnalytics(eventId: number) {
     const inviteCount = await prisma.invitation.count({ where: { eventId: eventId } });
     const accepted = await prisma.invitation.count({
       where: { eventId: eventId, status: Status.ACCEPTED },
@@ -68,12 +77,12 @@ export class EventPlanner {
       declined,
     };
   }
-
-  async manageGallery(eventId: bigint) {
+*/
+  async manageGallery(eventId: number) {
     return await prisma.media.findMany({ where: { eventId: eventId } });
   }
 
-  async receiveContribution(eventId: bigint) {
+  async receiveContribution(eventId: number) {
     return await prisma.contribution.findMany({ where: { eventId: eventId } });
   }
 }

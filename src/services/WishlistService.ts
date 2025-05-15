@@ -27,16 +27,16 @@ export class WishlistService {
 
     interface EventArticleWithItem {
       itemId: number;
-      quantityRequested: number;
-      quantityFulfilled: number;
-      priority?: PriorityType;
+      quantityRequested: number | null;
+      quantityFulfilled: number | null;
+      priority?: PriorityType | null;
       item: {
       name: string | null;
       description: string | null;
       price: number | null;
       };
     }
-
+/*  Old version
     const items: WishlistItemDTO[] = entries.map((ea: EventArticleWithItem) => ({
       itemIdentifier: ea.itemId.toString(),
       name: ea.item.name ?? "",
@@ -47,6 +47,19 @@ export class WishlistService {
       contributedAmount: ea.quantityFulfilled ?? 0,
       priority: ea.priority ?? undefined,
     }));
+*/
+
+    const items: WishlistItemDTO[] = entries.map((ea) => ({
+	  itemIdentifier: ea.itemId.toString(),
+	  name: ea.item.name ?? "",
+	  description: ea.item.description ?? undefined,
+	  price: ea.item.price ? ea.item.price.toNumber() : undefined,
+	  quantity: ea.quantityRequested ?? 0,
+	  isReserved: (ea.quantityRequested ?? 0) === 0 && (ea.quantityFulfilled ?? 0) === 0,
+	  contributedAmount: ea.quantityFulfilled ?? 0,
+	  priority: ea.priority ?? undefined,
+}));
+
 
     return new WishlistDTO(
       eventId.toString(),

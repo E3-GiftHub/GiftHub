@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc"; 
 import { WishlistService } from "../../../services/WishlistService";
 
 const wishlistService = new WishlistService();
@@ -28,44 +28,53 @@ export const wishlistRouter = createTRPCRouter({
   addItem: publicProcedure
     .input(
       z.object({
-        eventId: z.number(), // update to match the expected param in `addItem`
+        wishlistIdentifier: z.string(),
         item: z.object({
-          itemId: z.number(),
+          itemIdentifier: z.string(),
+          name: z.string(),
+          description: z.string().optional(),
+          price: z.number().optional(),
           quantity: z.number().min(1),
-          priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
         }),
       })
     )
     .mutation(async ({ input }) => {
-      const result = await WishlistService.addItem({
-        eventId: input.eventId,
-        itemId: input.item.itemId,
-        quantityRequested: input.item.quantity,
-        priority: input.item.priority,
+      const result = await WishlistService.addItem(input.wishlistIdentifier, {
+        ...input.item,
+        isReserved: false,
+        contributedAmount: 0,
       });
-
-      return { success: true, data: result };
+      if (!result.success) {
+        throw new Error("Could not add item");
+      }
+      return { success: true, data: result.data };
     }),
 
   removeItem: publicProcedure
     .input(
       z.object({
-        eventId: z.number(),
-        itemId: z.number(),
+        wishlistIdentifier: z.string(),
+        itemIdentifier: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      await WishlistService.removeItem({
-        eventId: input.eventId,
-        itemId: input.itemId,
-      });
-      return { success: true };
+      const result = await WishlistService.removeItem(
+        input.wishlistIdentifier,
+        input.itemIdentifier
+      );
+      if (!result.success) {
+        throw new Error("Could not remove item");
+      }
+      return { success: true, data: result.data };
     }),
 
   deleteWishlist: publicProcedure
-    .input(z.object({ eventId: z.number() }))
+    .input(z.object({ wishlistIdentifier: z.string() }))
     .mutation(async ({ input }) => {
-      await WishlistService.deleteWishlist(input.eventId);
+      const result = await WishlistService.deleteWishlist(input.wishlistIdentifier);
+      if (!result.success) {
+        throw new Error("Could not delete wishlist");
+      }
       return { success: true };
     }),
 });

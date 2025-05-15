@@ -10,7 +10,7 @@ export class InvitationEntity {
     this.data = invite;
   }
 
-  static async getByEvent(eventId: bigint): Promise<InvitationEntity[]> {
+  static async getByEvent(eventId: number): Promise<InvitationEntity[]> {
     const invites = await prisma.invitation.findMany({
       where: { eventId: eventId },
     });
