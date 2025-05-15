@@ -1,8 +1,15 @@
 import React from "react";
 import styles from "./../styles/LandingSectionStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
+import { useRouter } from "next/router";
 
 export default function LandingSection() {
+  const router = useRouter();
+
+  const handleSignUp = async () => {
+    await router.push("/signup");
+  }
+  
   return (
     <div className={styles["landing-container"]}>
       <img
@@ -52,7 +59,7 @@ export default function LandingSection() {
       />
 
       <img
-        src={"/illustrations/parachute_illustration.png"}
+        src={"/illustrations/parachuteIllustration.png"}
         className={styles["gifts-illustration"]}
         alt="gift-illustration"
       />
@@ -62,7 +69,11 @@ export default function LandingSection() {
           Your All-in-One Gifting Solution. <br />
           Gift Together. Celebrate Better.
         </p>
-        <ButtonComponent text={"SIGN IN"} style={ButtonStyle.PRIMARY} />
+        <ButtonComponent
+          text={"SIGN UP"}
+          style={ButtonStyle.PRIMARY}
+          onClick={handleSignUp}
+        />
       </div>
     </div>
   );

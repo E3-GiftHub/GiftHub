@@ -1,15 +1,19 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import LandingSection from "../components/LandingSection";
-import { MemoryRouter } from "react-router-dom"; 
+import { useRouter } from "next/router";
+
+jest.mock("next/router", () => ({
+  useRouter: jest.fn(),
+}));
 
 describe("LandingSection component", () => {
   beforeEach(() => {
-    render(
-      <MemoryRouter>
-        <LandingSection />
-      </MemoryRouter>
-    );
+    (useRouter as jest.Mock).mockReturnValue({
+      push: jest.fn(),
+    });
+
+    render(<LandingSection />);
   });
 
   test("renders the GiftHub title and subtitle", () => {
@@ -22,14 +26,14 @@ describe("LandingSection component", () => {
     ).toBeInTheDocument();
   });
 
-  test("renders the SIGN IN button", () => {
-    const button = screen.getByRole("button", { name: /sign in/i });
+  test("renders the SIGN UP button", () => {
+    const button = screen.getByRole("button", { name: /sign up/i });
     expect(button).toBeInTheDocument();
   });
 
   test("renders parachute images", () => {
     const parachutes = screen.getAllByAltText("parachute gift");
-    expect(parachutes.length).toBe(4 + 5); // 4 parachutes + 5 clouds
+    expect(parachutes.length).toBe(9); 
   });
 
   test("renders main gift illustration", () => {
