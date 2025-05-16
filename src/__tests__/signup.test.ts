@@ -1,161 +1,147 @@
-//import { renderHook } from '@testing-library/react-hooks';
-import { initTRPC } from '@trpc/server';
-//import { z } from 'zod';
+import { appRouter } from '~/server/api/root';
+import { createTRPCMsw } from 'msw-trpc';
+import { setupServer } from 'msw/node';
 import * as bcrypt from 'bcrypt';
-import { signupRouter } from '~/server/api/routers/userManagement/signup';
 
-// Mock the database and bcrypt
-jest.mock('bcrypt');
-const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
-
-// Setup a test tRPC router
-const t = initTRPC.create();
-const testRouter = t.router({
-  signup: signupRouter.signup,
-});
-
-// Helper function to call the procedure
-const caller = testRouter.createCaller({
-  db: {
-    user: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-    },
+// Mock the database methods
+const mockDb = {
+  user: {
+    findFirst: jest.fn(),
+    create: jest.fn(),
   },
-});
+};
+
+// Mock bcrypt.hash
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockResolvedValue('hashedPassword123'),
+}));
 
 describe('signupRouter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedBcrypt.hash.mockResolvedValue('hashed_password' as never);
   });
 
+  const createCaller = () => {
+    return appRouter.createCaller({
+      db: mockDb,
+      session: null,
+    });
+  };
+
   describe('input validation', () => {
-    it('should reject if username is too short', async () => {
-      await expect(
-        caller.signup({
-          username: 'ab',
-          email: 'test@example.com',
-          password: 'password123',
-          confirmPassword: 'password123',
-        })
-      ).rejects.toThrow();
+    it('should reject when passwords do not match', async () => {
+      const caller = createCaller();
+
+      const input = {
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password123',
+        confirmPassword: 'differentpassword',
+      };
+
+      await expect(caller.auth.signup.signup(input)).rejects.toThrow(
+        "Passwords don't match"
+      );
     });
 
-    it('should reject if email is invalid', async () => {
-      await expect(
-        caller.signup({
-          username: 'testuser',
-          email: 'not-an-email',
-          password: 'password123',
-          confirmPassword: 'password123',
-        })
-      ).rejects.toThrow();
+    it('should reject when password is too short', async () => {
+      const caller = createCaller();
+
+      const input = {
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'short',
+        confirmPassword: 'short',
+      };
+
+      await expect(caller.auth.signup.signup(input)).rejects.toThrow();
     });
 
-    it('should reject if password is too short', async () => {
-      await expect(
-        caller.signup({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'short',
-          confirmPassword: 'short',
-        })
-      ).rejects.toThrow();
+    it('should reject when email is invalid', async () => {
+      const caller = createCaller();
+
+      const input = {
+        username: 'testuser',
+        email: 'not-an-email',
+        password: 'password123',
+        confirmPassword: 'password123',
+      };
+
+      await expect(caller.auth.signup.signup(input)).rejects.toThrow();
     });
 
-    it('should reject if passwords do not match', async () => {
-      await expect(
-        caller.signup({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'password123',
-          confirmPassword: 'different123',
-        })
-      ).rejects.toThrow("Passwords don't match");
+    it('should reject when username is too short', async () => {
+      const caller = createCaller();
+
+      const input = {
+        username: 'ab',
+        email: 'test@example.com',
+        password: 'password123',
+        confirmPassword: 'password123',
+      };
+
+      await expect(caller.auth.signup.signup(input)).rejects.toThrow();
     });
   });
 
   describe('user creation', () => {
-    it('should reject if user already exists', async () => {
-      // Mock that user exists
-      (caller as any).ctx.db.user.findFirst.mockResolvedValueOnce({
-        email: 'test@example.com',
-      });
-
-      await expect(
-        caller.signup({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'password123',
-          confirmPassword: 'password123',
-        })
-      ).rejects.toThrow('User already exists');
-    });
-
-    it('should hash the password before storing', async () => {
-      (caller as any).ctx.db.user.findFirst.mockResolvedValueOnce(null);
-      (caller as any).ctx.db.user.create.mockResolvedValueOnce({
-        email: 'test@example.com',
-        password: 'hashed_password',
-      });
-
-      const result = await caller.signup({
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'password123',
-        confirmPassword: 'password123',
-      });
-
-      expect(mockedBcrypt.hash).toHaveBeenCalledWith('password123', 10);
-      expect(result).toEqual({ success: true });
-    });
-
     it('should create a new user with hashed password', async () => {
-      (caller as any).ctx.db.user.findFirst.mockResolvedValueOnce(null);
-      (caller as any).ctx.db.user.create.mockResolvedValueOnce({
+      mockDb.user.findFirst.mockResolvedValue(null);
+      mockDb.user.create.mockResolvedValue({
+        id: 1,
         email: 'test@example.com',
-        password: 'hashed_password',
-        fname: null,
-        lname: null,
-        iban: null,
-        pictureUrl: null,
+        password: 'hashedPassword123',
       });
 
-      const result = await caller.signup({
+      const caller = createCaller();
+
+      const input = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'password123',
         confirmPassword: 'password123',
-      });
+      };
 
-      expect((caller as any).ctx.db.user.create).toHaveBeenCalledWith({
+      const result = await caller.auth.signup.signup(input);
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.user.findFirst).toHaveBeenCalledWith({
+        where: {
+          OR: [{ email: 'test@example.com' }],
+        },
+      });
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
+      expect(mockDb.user.create).toHaveBeenCalledWith({
         data: {
           email: 'test@example.com',
-          password: 'hashed_password',
+          password: 'hashedPassword123',
           fname: null,
           lname: null,
           iban: null,
           pictureUrl: null,
         },
       });
-      expect(result).toEqual({ success: true });
     });
 
-    it('should handle database errors', async () => {
-      (caller as any).ctx.db.user.findFirst.mockResolvedValueOnce(null);
-      (caller as any).ctx.db.user.create.mockRejectedValueOnce(
-        new Error('Database error')
-      );
+    it('should throw error when user already exists', async () => {
+      mockDb.user.findFirst.mockResolvedValue({
+        id: 1,
+        email: 'test@example.com',
+      });
 
-      await expect(
-        caller.signup({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'password123',
-          confirmPassword: 'password123',
-        })
-      ).rejects.toThrow('Database error');
+      const caller = createCaller();
+
+      const input = {
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password123',
+        confirmPassword: 'password123',
+      };
+
+      await expect(caller.auth.signup.signup(input)).rejects.toThrow(
+        'User already exists'
+      );
+      expect(mockDb.user.create).not.toHaveBeenCalled();
     });
   });
 });
