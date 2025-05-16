@@ -1,5 +1,4 @@
-import React from 'react';
-import {useRouter} from "next/router";
+import React, { useRef, useState, useEffect } from 'react';
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import clsx from 'clsx';
@@ -14,6 +13,7 @@ interface UserProfileProps {
   avatarUrl?: string;
   onDelete?: () => void;
   onEdit?: () => void;
+  onPhotoChange?: (file: File) => void;
   loading?: boolean;
 }
 
@@ -46,18 +46,42 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-                                        username = "Username Placeholder",
-                                        fname = "First Name Placeholder",
-                                        lname = "Last Name Placeholder",
-                                        email = "user@example.com",
-                                        iban = "IBAN Placeholder",
+                                        username = 'Username Placeholder',
+                                        email = 'user@example.com',
                                         avatarUrl,
                                         onDelete,
                                         onEdit,
+                                        onPhotoChange,
                                         loading = false,
                                       }: Readonly<UserProfileProps>) {
-  const renderContent = (content: string) => (loading ? "\u00A0" : content);
-  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
+
+  useEffect(() => {
+    // Update preview if parent updates avatarUrl
+    setPreviewUrl(avatarUrl);
+  }, [avatarUrl]);
+
+  const renderContent = (content: string) => (loading ? '\u00A0' : content);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Show preview locally
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setPreviewUrl(reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // Call parent handler to actually process the file (upload, etc.)
+      if (onPhotoChange) {
+        onPhotoChange(file);
+      }
+    }
+  };
 
   const handleEdit = async () => {
     if (onEdit) {
@@ -71,10 +95,8 @@ export default function UserProfileUI({
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div
-              className={clsx(styles.avatarCircle, loading && styles.loading)}
-            >
-              {!loading && avatarUrl && (
+            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
+              {!loading && previewUrl && (
                 <Image
                   src={avatarUrl}
                   width={120}
@@ -84,14 +106,19 @@ export default function UserProfileUI({
                 />
               )}
             </div>
+
             <button
-              className={clsx(
-                styles.editAvatarButton,
-                loading && styles.loading,
-              )}
-              onClick={onEdit}
+              className={clsx(styles.editAvatarButton, loading && styles.loading)}
+              onClick={() => fileInputRef.current?.click()}
               disabled={loading}
               aria-label="Edit avatar"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
             />
           </div>
         </div>
