@@ -1,4 +1,4 @@
-import { WishlistItem } from "../models/WishlistItem";
+import { WishlistItem } from "../../models/WishlistItem";
 
 interface Contributor {
   username: string; 
