@@ -273,4 +273,6 @@ model EventReport {
 
     user  User  @relation(fields: [reportedByUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
+
 }
+

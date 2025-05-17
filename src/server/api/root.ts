@@ -1,8 +1,11 @@
+import { invitationRouter } from "./routers/InvitationRouter";
+import { wishlistRouter } from "./routers/WishlistController";
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
 import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
+
 
 /**
  * This is the primary router for your server.
@@ -11,6 +14,8 @@ import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter"
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  wishlist: wishlistRouter,
+  invitation: invitationRouter,
   calendar: calendarRouter,
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
@@ -24,6 +29,7 @@ export type AppRouter = typeof appRouter;
  * @example
  * const trpc = createCaller(createContext);
  * const res = await trpc.post.all();
- *       ^? Post[]
+ *       ^? inferred Post[]
  */
-export const createCaller = createCallerFactory(appRouter);
+//export const createCaller = createCallerFactory<AppRouter>(appRouter);
+export const createCaller = appRouter.createCaller;

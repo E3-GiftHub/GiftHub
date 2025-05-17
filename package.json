@@ -35,9 +35,11 @@
     "react-router-dom": "^7.5.3",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
+    "ts-node": "^10.9.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.27.1",
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
     "@testing-library/dom": "^10.4.0",
