@@ -28,6 +28,7 @@ enum PriorityType {
     HIGH
 }
 
+/// we keep this in case of new types of marks
 enum MarkType {
     PURCHASED
     // NULL: if null => delete row
@@ -253,8 +254,8 @@ model Contribution {
 
 model UserReport {
     id                 Int      @id @default(autoincrement())
-    reportedUsername   String
     reportedByUsername String
+    reportedUsername   String
     reason             String?
     description        String?
     createdAt          DateTime @default(now())
@@ -265,14 +266,14 @@ model UserReport {
 
 model EventReport {
     id                 Int      @id @default(autoincrement())
-    eventId            Int
     reportedByUsername String // NOT always a Guest
+    reportedId         Int
     reason             String?
     description        String?
     createdAt          DateTime @default(now())
 
     user  User  @relation(fields: [reportedByUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
+    event Event @relation(fields: [reportedId], references: [id])
 }
 
 //! notification

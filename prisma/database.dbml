@@ -1,4 +1,4 @@
-// https://dbdiagram.io/d/GiftHub-database-68038bc91ca52373f5920a71
+// https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
 
 ENUM StatusType {
   PENDING
@@ -79,6 +79,8 @@ TABLE EventArticle {
   priority PriorityType
   createdAt DATETIME
   updatedAt DATETIME
+
+  Note: "Composite primary key on (eventId, itemId)"
 }
 
 TABLE Item {
@@ -125,8 +127,8 @@ TABLE Contribution {
 
 TABLE UserReport {
   id INTEGER pk
-  reportedId STRING [ref: > User.username]
-  reportedBy STRING [ref: > User.username]
+  reportedByUsername STRING [ref: > User.username]
+  reportedUsername STRING [ref: > User.username]
   reason STRING
   description STRING
   reportedAt DATETIME
@@ -134,8 +136,8 @@ TABLE UserReport {
 
 TABLE EventReport {
   id INTEGER pk
+  reportedByUsername STRING [ref: > User.username]
   reportedId INTEGER [ref: > Event.id]
-  reportedBy STRING [ref: > User.username]
   reason STRING
   description STRING
   reportedAt DATETIME
