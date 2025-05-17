@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import InboxNotification from "../components/ui/InboxNotification";
-import type { NotificationResponse } from "~/components/ui/InboxContainer";
+import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
 
-const mockNotification: NotificationResponse = {
+const mockNotification: InboxNotificationResponse = {
   id: 1,
   text: "Test notification",
   type: "event",
