@@ -1,5 +1,5 @@
-import { PrismaClient, PriorityType, Status, MarkType } from '@prisma/client';
-import type { Retailer, User, Event, ItemCatalogue } from '@prisma/client';
+import { PrismaClient, PriorityType, StatusType, MarkType } from '@prisma/client';
+import type { Retailer, User, Event, Item } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
