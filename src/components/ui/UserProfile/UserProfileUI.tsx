@@ -3,6 +3,7 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import clsx from 'clsx';
 import "src/styles/globals.css";
+import { router } from "next/client";
 
 interface UserProfileProps {
   username?: string;
@@ -96,7 +97,7 @@ export default function UserProfileUI({
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
             <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
-              {!loading && previewUrl && (
+              {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
                   width={120}
