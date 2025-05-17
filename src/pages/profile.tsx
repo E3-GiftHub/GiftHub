@@ -1,7 +1,8 @@
-import type { GetServerSideProps } from "next";
 import styles from "~/styles/UserProfile/UserProfile.module.css";
 import Navbar from "~/components/Navbar";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
+import { mockUser } from "~/components/ui/UserProfile/mockUser";
+import type { GetServerSideProps } from "next";
 
 // Define the expected structure for the user object
 interface User {
@@ -10,29 +11,29 @@ interface User {
   picture?: string;
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  try {
-    const username = "john_doe"; // Replace with actual username
-    console.log("Fetching user with username:", username);
-    const res = await fetch(`http://localhost:3000/api/user/get?username=${username}`);
-
-    if (!res.ok) throw new Error("Failed to fetch user");
-
-    // Explicitly type the response as User
-    const user = (await res.json()) as User; // Ensure the response matches the User type
-
-    console.log("Fetched user data:", user); // Debugging log
-
-    return {
-      props: { user },
-    };
-  } catch (err) {
-    console.error("Error loading user:", err);
-    return {
-      notFound: true,
-    };
-  }
-};
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   try {
+//     const username = "john_doe"; // Replace with actual username
+//     console.log("Fetching user with username:", username);
+//     const res = await fetch(`http://localhost:3000/api/user/get?username=${username}`);
+//
+//     if (!res.ok) throw new Error("Failed to fetch user");
+//
+//     // Explicitly type the response as User
+//     const user = (await res.json()) as User; // Ensure the response matches the User type
+//
+//     console.log("Fetched user data:", user); // Debugging log
+//
+//     return {
+//       props: { user },
+//     };
+//   } catch (err) {
+//     console.error("Error loading user:", err);
+//     return {
+//       notFound: true,
+//     };
+//   }
+// };
 
 export default function UserProfile({ user }: { user: User }) {
   const handleDelete = async () => {
@@ -63,20 +64,22 @@ export default function UserProfile({ user }: { user: User }) {
     }
   };
 
-  const handleEditPhoto = async () => {
-    // You can implement this function to edit the user's avatar
-    alert("Edit photo functionality is not yet implemented.");
-  };
+  // const handleEditPhoto = async () => {
+  //   // You can implement this function to edit the user's avatar
+  //   alert("Edit photo functionality is not yet implemented.");
+  // };
 
   return (
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        username={user.username}
-        email={user.email ?? "No email provided"}
-        avatarUrl={user.picture ?? "/default-avatar.png"}
-        onDelete={handleDelete}
-        onEdit={handleEditPhoto} // Connect the edit functionality here
+        key={mockUser.id}
+        username={mockUser.username}
+        fname={mockUser.fname}
+        lname={mockUser.lname}
+        email={mockUser.email}
+        iban={mockUser.iban}
+        avatarUrl={mockUser.picture}
       />
       <div className={styles["empty-space"]}></div>
     </div>
