@@ -2,16 +2,16 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import InboxContainer from "../components/ui/InboxContainer";
 
-
 jest.mock("../../styles/InboxContainer.module.css", () => ({
   separator: "separator",
   notificationList: "notificationList",
 }));
 
-
 jest.mock("../components/ui/CustomContainer", () => ({
   __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 type InboxContainerHeaderProps = {
@@ -24,7 +24,9 @@ jest.mock("../components/ui/InboxContainerHeader", () => ({
   __esModule: true,
   default: (props: InboxContainerHeaderProps) => (
     <div>
-      <button onClick={() => props.onTabChange("Invitations")}>Invitations Tab</button>
+      <button onClick={() => props.onTabChange("Invitations")}>
+        Invitations Tab
+      </button>
       <button onClick={() => props.onTabChange("My events")}>Events Tab</button>
       <button onClick={props.onMarkAllAsRead}>Mark All as Read</button>
       <button onClick={props.onOpenMobileFilter}>Open Filter</button>
@@ -39,19 +41,19 @@ type MobileFilterMenuProps = {
   onClose: () => void;
 };
 
-
 jest.mock("../components/ui/MobileFilterMenu", () => ({
   __esModule: true,
   default: (props: MobileFilterMenuProps) =>
     props.visible ? (
       <div>
         <p>Mobile Filter Visible</p>
-        <button onClick={() => props.onSelect("Invitations")}>Select Invitations</button>
+        <button onClick={() => props.onSelect("Invitations")}>
+          Select Invitations
+        </button>
         <button onClick={props.onClose}>Close Filter</button>
       </div>
     ) : null,
 }));
-
 
 describe("InboxContainer", () => {
   it("renders all notifications initially", () => {
@@ -76,11 +78,12 @@ describe("InboxContainer", () => {
 
   it("marks all notifications as read", () => {
     render(<InboxContainer />);
-    const p = screen.getByText(/John's Birthday/i);
-    expect(p).toHaveStyle({ opacity: "1" });
+    const notifications = screen.getAllByTestId("notification-container");
 
     fireEvent.click(screen.getByText("Mark All as Read"));
-    expect(p).toHaveStyle({ opacity: "0.6" });
+    notifications.forEach((notification) => {
+      expect(notification).toHaveStyle({ opacity: "0.5" });
+    });
   });
 
   it("shows mobile filter when triggered", () => {
@@ -105,15 +108,20 @@ describe("InboxContainer", () => {
   });
 
   it("marks single notification as read on click", () => {
-    Object.defineProperty(window, 'location', {
-    value: { href: '' },
-    writable: true,
-  });
-
     render(<InboxContainer />);
-    const notif = screen.getByText(/Maria's Wedding/i);
-    expect(notif).toHaveStyle({ opacity: "1" });
-    fireEvent.click(notif);
-    expect(notif).toHaveStyle({ opacity: "0.6" });
+    const notification = screen
+      .getByText(/Maria's Wedding/i)
+      .closest("[data-testid='notification-container']");
+    fireEvent.click(notification!);
+    expect(notification).toHaveStyle({ opacity: "0.5" });
+  });
+  it("expands a notification when the options button is clicked", () => {
+    render(<InboxContainer />);
+    const optionsButton = screen.getAllByTestId("options-button")[0];
+    expect(optionsButton).toBeDefined();
+    if (!optionsButton) return;
+    fireEvent.click(optionsButton);
+    expect(screen.getByText("Delete")).toBeInTheDocument();
+    expect(screen.getByText("Mark as read")).toBeInTheDocument();
   });
 });

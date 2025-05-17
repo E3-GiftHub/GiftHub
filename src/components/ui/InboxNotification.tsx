@@ -31,6 +31,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
       key={data.id}
       onClick={onClick}
       className={styles["notification-container"]}
+      data-testid="notification-container"
       style={{ opacity: data.read ? 0.5 : 1 }}
     >
       <div className={styles["notification-info"]}>
@@ -38,6 +39,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
           <img
             src={data.profilePicture}
             className={styles["notification-icon"]}
+            alt={`${data.firstName} ${data.lastName}`}
           />
         ) : (
           <div className={styles["notification-icon"]}>{nameInitials}</div>
@@ -58,6 +60,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
             </button>
           )}
           <button
+            data-testid="options-button"
             className={styles["options-button"]}
             onClick={(e) => {
               e.stopPropagation();
