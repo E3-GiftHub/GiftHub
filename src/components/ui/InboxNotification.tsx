@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "../../styles/InboxNotification.module.css";
-import type { NotificationResponse } from "~/components/ui/InboxContainer";
 import { FaEllipsisH, FaTrash, FaCheck } from "react-icons/fa";
+import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
 
 interface InboxNotificationProps {
-  data: NotificationResponse;
+  data: InboxNotificationResponse;
   onClick: () => void;
   isExpanded: boolean;
   onExpand: () => void;
@@ -27,7 +27,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
   const diffHours = Math.floor(timeDiff / (1000 * 3600));
 
   return (
-    <div
+    <button
       key={data.id}
       onClick={onClick}
       className={styles["notification-container"]}
@@ -71,7 +71,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 

@@ -4,20 +4,9 @@ import InboxContainerHeader from "./InboxContainerHeader";
 import styles from "../../styles/InboxContainer.module.css";
 import MobileFilterMenu from "./MobileFilterMenu";
 import InboxNotification from "~/components/ui/InboxNotification";
+import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
 
-export interface NotificationResponse {
-  id: number;
-  text: string;
-  type: string;
-  read: boolean;
-  link: string;
-  firstName: string;
-  lastName: string;
-  profilePicture: string | undefined;
-  notificationDate: string;
-}
-
-const initialNotifications: NotificationResponse[] = [
+const initialNotifications: InboxNotificationResponse[] = [
   {
     id: 1,
     text: "You are invited to John's Birthday. See more",

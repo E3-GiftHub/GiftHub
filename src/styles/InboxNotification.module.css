@@ -4,9 +4,15 @@
   align-items: center;
   background-color: #1d194a;
   border-bottom: 2px solid #24294d;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  width: 100%;
 
   color: #c8abd6;
   padding: 1rem;
+
+  text-align: left;
 }
 
 .notification-container:hover {
