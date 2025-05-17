@@ -12,14 +12,13 @@ describe("InboxContainerHeader", () => {
   };
 
   beforeAll(() => {
-    // Forțăm dimensiunea pentru modul mobil
     Object.defineProperty(window, "innerWidth", { writable: true, configurable: true, value: 390 });
     window.dispatchEvent(new Event("resize"));
   });
 
   it("renders mobile view when width <= 390", () => {
     render(<InboxContainerHeader {...defaultProps} />);
-    // Caută butonul corect
+
     const filterButton = screen.getAllByRole("button").find(btn =>
       btn.className.includes("filterButton")
     );

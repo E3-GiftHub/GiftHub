@@ -20,7 +20,17 @@ const MobileFilterMenu: React.FC<MobileFilterMenuProps> = ({
 
   return (
     <>
-      <div className={styles.overlay} onClick={onClose}></div>
+      <div
+  className={styles.overlay}
+  onClick={onClose}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      onClose();
+    }
+  }}
+  role="button"
+  tabIndex={0}
+/>
       <div className={styles.menu}>
         {tabs.map((tab) => (
           <button
