@@ -30,7 +30,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2vh;
+    margin-bottom: 1vh;
 }
 
 .header h2 {
@@ -49,13 +49,13 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
-    padding: 2rem 0;
     padding-bottom: 7vh;
 }
 
 .photoBox {
+    margin-top:1rem;
     flex: 0 0 200px;
-    height: 180px;
+    height: 235px;
     background-color: #cbb1dc;
     border-radius: 10px;
     display: flex;
@@ -129,7 +129,7 @@
 }
 
 .guestBoard {
-    flex: 2 1 300px;
+    flex: 1.5 1 300px; /* mai mic */
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -166,10 +166,15 @@
     padding: 2rem;
     text-align: center;
     width: clamp(143px, 18.7vw, 360px);
-    height: clamp(150px, 60vh, 335px);
-    margin-top: 1vh;
-    margin-left: 2.5rem ;
-    margin-right: 2.5rem ;
+    height: auto;
+    margin-top: 0vh;
+}
+
+.photoSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .seeMoreOverride {
@@ -230,5 +235,141 @@
 
     .wishlistBox {
         margin: 0;
+    }
+}
+
+
+
+.mediaGallery {
+    background-color: #43328B;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mediaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.mediaItem {
+    background-color: #cbb1dc;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding: 0.5rem;
+    color: #1e1e1e;
+    font-size: 0.9rem;
+}
+
+.mediaItem img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+
+@media (max-width: 768px) {
+    .mediaGalleryBox {
+        width: 100%;
+    }
+    .photoSection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3.5rem;
+    }
+}
+
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* transparent black */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #43328B;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.modalTitle {
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.label {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .modalTitle {
+        font-size: 1.2rem;
+    }
+
+    .input,
+    .textarea {
+        font-size: 0.95rem;
+    }
+
+    .modal {
+        padding: 16px;
     }
 }
