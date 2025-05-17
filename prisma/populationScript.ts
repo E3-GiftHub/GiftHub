@@ -14,7 +14,7 @@ async function main() {
     const retailers = await createRetailers();
     console.log(`Created ${retailers.length} retailers`);
 
-    const items = await createItemCatalogue(retailers);
+    const items = await createItems(retailers);
     console.log(`Created ${items.length} catalogue items`);
 
     const events = await createEvents(users);
@@ -53,7 +53,7 @@ async function clearDatabase() {
         'EventArticle',
         'Media',
         'Invitation',
-        'ItemCatalogue',
+        'Item',
         'Retailer',
         'Event',
         'User',
@@ -105,8 +105,8 @@ async function createRetailers() {
     ];
     const retailers = [];
 
-    for (let i = 0; i < retailerNames.length; i++) {
-        const name = retailerNames[i];
+    for (const element of retailerNames) {
+        const name = element;
         const retailer = await prisma.retailer.create({
             data: {
                 name,
@@ -120,7 +120,7 @@ async function createRetailers() {
     return retailers;
 }
 
-async function createItemCatalogue(retailers: Retailer[]) {
+async function createItems(retailers: Retailer[]) {
     const items = [];
     const itemsData = [
         { name: 'Smart TV', description: '55" 4K Smart TV', price: 699.99, retailerId: 1 },
@@ -139,14 +139,13 @@ async function createItemCatalogue(retailers: Retailer[]) {
     ];
 
     for (const itemData of itemsData) {
-        const item = await prisma.itemCatalogue.create({
+        const item = await prisma.item.create({
             data: {
                 name: itemData.name,
                 description: itemData.description,
                 price: itemData.price,
                 imagesUrl: `${itemData.name}.jpg`,
-                retailerId: itemData.retailerId,
-                isCustom: itemData.isCustom || false,
+                retailerId: itemData.retailerId
             },
         });
 
@@ -193,15 +192,15 @@ async function createInvitations(users: User[], events: Event[]) {
 
         for (const user of users) {
             if (user.username !== creator!.username) {
-                let status: Status;
+                let status: StatusType;
                 if (Math.random() > 0.3) {
-                    status = Status.ACCEPTED;
+                    status = StatusType.ACCEPTED;
                 } else {
                     const isPending = Math.random() > 0.5;
-                    status = isPending ? Status.PENDING : Status.REJECTED;
+                    status = isPending ? StatusType.PENDING : StatusType.ACCEPTED;
                 }
 
-                const repliedAt = status !== Status.PENDING ? new Date() : null;
+                const repliedAt = status !== StatusType.PENDING ? new Date() : null;
 
                 const invitation = await prisma.invitation.create({
                     data: {
@@ -220,7 +219,7 @@ async function createInvitations(users: User[], events: Event[]) {
     return invitations;
 }
 
-async function createEventArticles(events: Event[], items: ItemCatalogue[]) {
+async function createEventArticles(events: Event[], items: Item[]) {
 
     const eventArticles = [];
 
@@ -229,16 +228,13 @@ async function createEventArticles(events: Event[], items: ItemCatalogue[]) {
         const selectedItems = getRandomItems(items, numItems);
 
         for (const item of selectedItems) {
-            const quantity = 1 + Math.floor(Math.random() * 3);
-            const fulfilled = Math.floor(Math.random() * quantity);
             const priorities = [PriorityType.LOW, PriorityType.MEDIUM, PriorityType.HIGH];
 
             const eventArticle = await prisma.eventArticle.create({
                 data: {
                     eventId: event.id,
                     itemId: item.id,
-                    quantityRequested: quantity,
-                    quantityFulfilled: fulfilled,
+                    userNote: "text",
                     priority: priorities[Math.floor(Math.random() * priorities.length)],
                 },
             });
@@ -250,9 +246,9 @@ async function createEventArticles(events: Event[], items: ItemCatalogue[]) {
     return eventArticles;
 }
 
-async function createMarks(users: User[], events: Event[], items: ItemCatalogue[]) {
+async function createMarks(users: User[], events: Event[], items: Item[]) {
     const marks = [];
-    const markTypes = [MarkType.PURCHASED, MarkType.RESERVED];
+    const markTypes = [MarkType.PURCHASED];
 
     for (const event of events) {
         const eventArticles = await prisma.eventArticle.findMany({
@@ -261,7 +257,7 @@ async function createMarks(users: User[], events: Event[], items: ItemCatalogue[
         });
 
         const invitations = await prisma.invitation.findMany({
-            where: { eventId: event.id, status: Status.ACCEPTED },
+            where: { eventId: event.id, status: StatusType.ACCEPTED },
         });
 
         const invitedUsernames = invitations.map(inv => inv.guestUsername);
@@ -289,12 +285,12 @@ async function createMarks(users: User[], events: Event[], items: ItemCatalogue[
     return marks;
 }
 
-async function createContributions(users: User[], events: Event[], items: ItemCatalogue[]) {
+async function createContributions(users: User[], events: Event[], items: Item[]) {
     const contributions = [];
 
     for (const event of events) {
         const invitations = await prisma.invitation.findMany({
-            where: { eventId: event.id, status: Status.ACCEPTED },
+            where: { eventId: event.id, status: StatusType.ACCEPTED },
         });
 
         const invitedUsernames = invitations.map(inv => inv.guestUsername);
@@ -313,7 +309,9 @@ async function createContributions(users: User[], events: Event[], items: ItemCa
             if (eventArticle.itemId) {
                 itemContributions[eventArticle.itemId.toString()] = {
                     total: 0,
-                    price: Number(eventArticle.item.price) || 0
+                    price: Number(
+                        eventArticle.item ? 
+                            eventArticle.item.price : 5 ) || 0
                 };
             }
         }
@@ -333,13 +331,16 @@ async function createContributions(users: User[], events: Event[], items: ItemCa
             if (Math.random() > 0.6) {
                 const randomEventArticle = eventArticles[Math.floor(Math.random() * eventArticles.length)];
                 const itemId = randomEventArticle!.itemId;
-                const itemPrice = Number(randomEventArticle!.item.price) || 0;
+                const itemPrice = Number(
+                    randomEventArticle ?
+                        (randomEventArticle.item ? 
+                            randomEventArticle.item.price : 5) : 0);
 
                 if (itemPrice > 0 && itemId) {
                     const percentContribution = 0.15 + (Math.random() * 0.35);
                     let amount = Math.round(itemPrice * percentContribution);
 
-                    const currentTotal = itemContributions[itemId.toString()]?.total || 0;
+                    const currentTotal = itemContributions[itemId.toString()]?.total ?? 0;
                     if (currentTotal + amount > itemPrice) {
                         amount = itemPrice - currentTotal;
                     }
@@ -363,7 +364,7 @@ async function createContributions(users: User[], events: Event[], items: ItemCa
                                 markerUsername: user.username,
                                 eventId: event.id,
                                 articleId: itemId,
-                                type: MarkType.CONTRIBUTED,
+                                type: MarkType.PURCHASED,
                             },
                         });
 
@@ -450,8 +451,8 @@ async function createEventReports(users: User[], events: Event[]) {
 
         const report = await prisma.eventReport.create({
             data: {
-                eventId: reportedEvent!.id,
                 reportedByUsername: reportingUser!.username,
+                reportedId: reportedEvent!.id,
                 reason,
                 description: `Event report for ${reason}`,
             },
