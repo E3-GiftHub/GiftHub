@@ -36,18 +36,6 @@ enum MarkType {
 
 //! default models
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy         User   @relation(fields: [createdByUsername], references: [username])
-    createdByUsername String
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                    String  @id @default(cuid())
@@ -117,7 +105,6 @@ model User {
     // mandatory assets
     accounts                 Account[]
     sessions                 Session[]
-    posts                    Post[]
     MediaNotification        MediaNotification[]
     ContributionNotification ContributionNotification[]
 }
