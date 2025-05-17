@@ -10,6 +10,7 @@
   - the money invested for all items
   - the marks left for all items
   - the people involved in the event
+  - all notification types from all participating events
 - `direct contribution`:
   - these are treated as a unique item for every wishlist
   - received by Planner at `instant`
