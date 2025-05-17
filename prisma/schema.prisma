@@ -142,6 +142,7 @@ model Event {
     contributions Contribution[]
     eventArticles EventArticle[]
     eventReports  EventReport[]
+    eventInvitationTokens EventInvitationToken[]
 }
 
 model Invitation {
@@ -276,3 +277,11 @@ model EventReport {
 
 }
 
+model EventInvitationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  event     Event    @relation(fields: [eventId], references: [id])
+}

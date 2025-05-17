@@ -22,11 +22,7 @@ export class EventPlanner {
         time: data.time,
         //createdByUsername: data.createdBy,
 	user: {
-        //connect: { username: data.createdBy },
-        connectOrCreate: {
-    where: { username: data.createdBy },
-    create: { username: data.createdBy },
-  },
+        connect: { username: data.createdBy },
 	},
       },
     });
@@ -53,7 +49,7 @@ export class EventPlanner {
       },
     });
   }
-/*
+/* Depricated
   async manageWishlist(eventId: number) {
     const wishlist = await prisma.eventItem.findMany({
       where: { eventId: eventId },
@@ -77,7 +73,7 @@ export class EventPlanner {
       declined,
     };
   }
-*/
+
   async manageGallery(eventId: number) {
     return await prisma.media.findMany({ where: { eventId: eventId } });
   }
@@ -85,4 +81,6 @@ export class EventPlanner {
   async receiveContribution(eventId: number) {
     return await prisma.contribution.findMany({ where: { eventId: eventId } });
   }
+*/
+
 }
