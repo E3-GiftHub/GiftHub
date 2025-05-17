@@ -3,22 +3,117 @@ import CustomContainer from "./CustomContainer";
 import InboxContainerHeader from "./InboxContainerHeader";
 import styles from "../../styles/InboxContainer.module.css";
 import MobileFilterMenu from "./MobileFilterMenu";
+import InboxNotification from "~/components/ui/InboxNotification";
 
-const initialNotifications = [
-  { id: 1, text: "You are invited to John's Birthday. See more", type: "invitation", read: false, link: "/invite#" },
-  { id: 2, text: "You are invited to Maria's Wedding. See more", type: "invitation", read: false, link: "/invite#" },
-  { id: 3, text: "You are invited to Paul's BBQ. See more", type: "invitation", read: false, link: "/invite#" },
-  { id: 4, text: "You are invited to Summer Party. See more", type: "invitation", read: false, link: "/invite#" },
-  { id: 5, text: "You are invited to Ana's Baby Shower. See more", type: "invitation", read: false, link: "/invite#" },
-  { id: 6, text: "Alex contributed 50 lei to your gift", type: "event", read: false, link: "/event#" },
-  { id: 7, text: "Radu bought an item from your wishlist", type: "event", read: false, link: "/event#" },
-  { id: 8, text: "Ioana added photos to your event", type: "event", read: false, link: "/event#" },
+export interface NotificationResponse {
+  id: number;
+  text: string;
+  type: string;
+  read: boolean;
+  link: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string | undefined;
+  notificationDate: string;
+}
+
+const initialNotifications: NotificationResponse[] = [
+  {
+    id: 1,
+    text: "You are invited to John's Birthday. See more",
+    type: "invitation",
+    read: false,
+    link: "/invite#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: "databasepic/profilepic.png",
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 2,
+    text: "You are invited to Maria's Wedding. See more",
+    type: "invitation",
+    read: false,
+    link: "/invite#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: undefined,
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 3,
+    text: "You are invited to Paul's BBQ. See more",
+    type: "invitation",
+    read: false,
+    link: "/invite#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: "databasepic/profilepic.png",
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 4,
+    text: "You are invited to Summer Party. See more",
+    type: "invitation",
+    read: false,
+    link: "/invite#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: "databasepic/profilepic.png",
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 5,
+    text: "You are invited to Ana's Baby Shower. See more",
+    type: "invitation",
+    read: true,
+    link: "/invite#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: undefined,
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 6,
+    text: "Alex contributed 50 lei to your gift",
+    type: "event",
+    read: true,
+    link: "/event#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: "databasepic/profilepic.png",
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 7,
+    text: "Radu bought an item from your wishlist",
+    type: "event",
+    read: true,
+    link: "/event#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: undefined,
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
+  {
+    id: 8,
+    text: "Ioana added photos to your event",
+    type: "event",
+    read: true,
+    link: "/event#",
+    firstName: "John",
+    lastName: "Johnes",
+    profilePicture: undefined,
+    notificationDate: "2023-09-15T14:30:00Z",
+  },
 ];
-
 const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [expandedNotificationId, setExpandedNotificationId] = useState<
+    number | null
+  >(null);
 
   const filtered = notifications.filter((n) => {
     if (activeTab === "All") return true;
@@ -35,9 +130,13 @@ const InboxContainer = () => {
 
   const handleNotificationClick = (id: number, link: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
     window.location.href = `http://localhost:3000${link}`;
+  };
+
+  const handleExpand = (id: number) => {
+    setExpandedNotificationId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -61,13 +160,13 @@ const InboxContainer = () => {
 
       <div className={styles.notificationList}>
         {filtered.map((n) => (
-          <p
+          <InboxNotification
             key={n.id}
-            style={{ opacity: n.read ? 0.6 : 1, cursor: "pointer" }}
+            data={n}
             onClick={() => handleNotificationClick(n.id, n.link)}
-          >
-            {n.text}
-          </p>
+            isExpanded={expandedNotificationId === n.id}
+            onExpand={() => handleExpand(n.id)}
+          />
         ))}
       </div>
     </CustomContainer>
