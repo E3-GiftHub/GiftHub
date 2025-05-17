@@ -1,133 +1,164 @@
 // https://dbdiagram.io/d/GiftHub-database-68038bc91ca52373f5920a71
 
-Table User {
-  id string [pk]
-  email string
-  fname string
-  lname string
-  password string
-  iban iban
-  pictureUrl string
-
-  emailVerified datetime
-  createdAt datetime
-  updatedAt datetime
+ENUM Status {
+  PENDING
+  ACCEPTED
+  // REJECTED: if rejected => delete row
 }
 
-Table Event {
+ENUM PriorityType {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+ENUM MarkType {
+  PURCHASED
+  RESERVED
+  CONTRIBUTED
+  // NULL: if null => delete row
+}
+
+TABLE User {
+  id STRING [pk]
+  email STRING
+  fname STRING
+  lname STRING
+  password STRING
+  iban iban
+  pictureUrl STRING
+
+  emailVerified DATETIME
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Event {
   id uuid [pk]
-  title string
+  title STRING
   description text
-  location string
+  location STRING
   date date
   time time
-  pictureUrl string
+  pictureUrl STRING
 
-  createdBy string [ref: > User.id]
-  createdAt datetime
-  updatedAt datetime
+  createdBy STRING [ref: > User.id]
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-Table Invitation {
+TABLE Invitation {
   id uuid [pk]
-  guestId string [ref: > User.id]
+  guestId STRING [ref: > User.id]
   eventId uuid [ref: > Event.id]
- 
+
   status status // 'pending', 'accepted', 'declined'
-  createdAt datetime
-  repliedAt datetime
+  createdAt DATETIME
+  repliedAt DATETIME
 }
 
-Table Media {
+TABLE Media {
   id uuid [pk]
-  uploaderId string [ref: > User.id]
+  uploaderId STRING [ref: > User.id]
   eventId uuid [ref: > Event.id] // Directly linked to the event
- 
-  url string
+
+  url STRING
   caption text
- 
-  mediaType string // 'image', 'video'
-  fileType string
+
+  mediaType STRING // 'image', 'video'
+  fileType STRING
   fileSize int
-  uploadedAt datetime
+  uploadedAt DATETIME
 }
 
-Table Mark {
+TABLE Mark {
   id uuid [pk]
-  markerId string [ref: > User.id]
+  markerId STRING [ref: > User.id]
   eventId uuid [ref: > Event.id]
-  articleId uuid [ref: > ItemCatalogue.id]
-  
-  type string // 'reserved', 'contributing'
-  createdAt datetime
+  articleId uuid [ref: > ItemSeller.id]
+
+  type STRING // 'reserved', 'contributing'
+  createdAt DATETIME
 
   Note: "Indicates a user has marked an item in the context of an event"
 }
 
-// Junction table for event-specific wishlist entry - represents wishlists
-Table EventArticle {
+// Junction TABLE for event-specific wishlist entry - represents wishlists
+TABLE EventArticle {
   eventId uuid [ref: > Event.id]
-  itemId uuid [ref: > ItemCatalogue.id]
+  itemId uuid [ref: > ItemSeller.id]
   quantityRequested int
   quantityFulfilled int
   priority status // low, medium, high
-  createdAt datetime
-  updatedAt datetime
+  createdAt DATETIME
+  updatedAt DATETIME
 
   Note: "Composite primary key on (eventId, itemId)"
   indexes {
     (eventId, itemId) [pk]
   }
+
 }
 
-// Shared item catalog
-Table ItemCatalogue {
-  id uuid [pk]
-  name string
-  description text
-  imagesUrl string
-  price decimal
+/// unique for the Event
+TABLE ItemCustom {
+  id INTEGER PK
+  name STRING
+  description STRING
+  imagesUrl STRING
+  price DECIMAL
 
-  retailerId uuid [ref: > Retailers.id, null]
-  retailerUrl string
-
-  isCustom boolean
-  createdAt datetime
-  updatedAt datetime
+  eventId INTEGER [ref: > Event.id]
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-Table Retailer {
-  id uuid [pk]
-  name string
-  apiUrl string
+TABLE ItemSeller {
+  id INGETER PK
+  name STRING
+  description STRING
+  imagesUrl STRING
+  price DECIMAL
+
+  retailerId INTEGER [ref: > Retailer.id, null]
+  retailerUrl STRING
+
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-Table Contribution {
+TABLE Retailer {
   id uuid [pk]
-  contributorId string [ref: > User.id]
+  name STRING
+  apiUrl STRING
+}
+
+TABLE Contribution {
+  id uuid [pk]
+  contributorId STRING [ref: > User.id]
   eventId uuid [ref: > Event.id]
-  articleId uuid [ref: > ItemCatalogue.id]
-  
-  cashAmount decimal
-  contributedAt datetime
+  articleId uuid [ref: > ItemSeller.id]
+
+  cashAmount DECIMAL
+  contributedAt DATETIME
 
   Note: "References EventArticles via (eventId, itemId)"
 }
 
-Table UserReport {
+TABLE UserReport {
   id uuid [pk]
-  reportedId string [ref: > User.id]
-  reportedBy string [ref: > User.id]
-  reason string
+  reportedId STRING [ref: > User.id]
+  reportedBy STRING [ref: > User.id]
+  reason STRING
   description text
-  reportedAt datetime
+  reportedAt DATETIME
 }
 
-Table EventReport {
+TABLE EventReport {
   id uuid [pk]
   reportedId uuid [ref: > Event.id]
-  reportedBy string [ref: > User.id]
-  reason string
+  reportedBy STRING [ref: > User.id]
+  reason STRING
   description text
-  reportedAt datetime
+  reportedAt DATETIME
 }
