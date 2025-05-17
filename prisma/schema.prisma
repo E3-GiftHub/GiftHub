@@ -16,7 +16,7 @@ datasource db {
 
 //! enum
 
-enum Status {
+enum StatusType {
     PENDING
     ACCEPTED
     // REJECTED: if rejected => delete row
@@ -149,8 +149,8 @@ model Invitation {
     guestUsername String
     eventId       Int
 
-    status    Status    @default(PENDING)
-    createdAt DateTime  @default(now())
+    status    StatusType @default(PENDING)
+    createdAt DateTime   @default(now())
     repliedAt DateTime?
 
     guest User  @relation(fields: [guestUsername], references: [username])
@@ -176,7 +176,7 @@ model Media {
     MediaNotification MediaNotification[]
 }
 
-/// stores the wishlists from all events and the quantity of each item
+// junction TABLE for event-specific wishlist entry
 model EventArticle {
     eventId  Int
     itemId   Int
