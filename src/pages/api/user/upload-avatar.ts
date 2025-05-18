@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Update the user's picture with the new image path
     const updatedUser = await prisma.user.update({
       where: { username },
-      data: { picture: relativePath },
+      data: { pictureUrl: relativePath },
     });
 
     // Check the updated user

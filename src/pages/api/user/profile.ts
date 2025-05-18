@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         email: true,
         fname: true,
         lname:true,
-        picture: true,
+        pictureUrl: true,
       },
     });
 
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       email: user.email,
       name: fullName,
-      image: user.picture,
+      image: user.pictureUrl,
     });
   } catch (error) {
     // Handle the error more safely, with type assertion if needed
