@@ -10,6 +10,12 @@ const renderWithRoute = (initialPath: string) => {
     </MemoryRouter>
   );
 };
+const mockHref = (url: string) => {
+  Object.defineProperty(window, "location", {
+    value: new URL(url),
+    writable: true,
+  });
+};
 
 describe("Navbar component", () => {
   test("renders Navbar component without crashing", () => {
@@ -65,4 +71,20 @@ describe("Navbar component", () => {
       expect(profileDropdown).not.toHaveClass("open");
     });
   });
+});
+
+test("highlights Inbox button when on /inbox", () => {
+  mockHref("http://localhost:3000/inbox#");
+  render(<Navbar />);
+  
+  const inboxLink = screen.getByText(/Inbox/i).closest("a");
+  expect(inboxLink).toHaveClass("nav-link-active");
+});
+
+test("highlights Home button when on /home", () => {
+  mockHref("http://localhost:3000/home#");
+  render(<Navbar />);
+  
+  const homeLink = screen.getByText(/Home/i).closest("a");
+  expect(homeLink).toHaveClass("nav-link-active");
 });

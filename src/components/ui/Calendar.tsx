@@ -12,13 +12,23 @@ import {
   isSameDay,
 } from "date-fns";
 import styles from "../../styles/Calendar.module.css";
+import { api } from "~/trpc/react";
 
-export default function Calendar() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDates, setSelectedDates] = useState<Date[]>([
-    new Date(2025, 3, 8),
-    new Date(2025, 3, 23),
-  ]);
+type CalendarProps = {
+  currentDate: Date;
+  setCurrentDate: (date: Date) => void;
+};
+
+export default function Calendar({ currentDate, setCurrentDate }: CalendarProps) {
+  const { data: events, isLoading } = api.calendar.getEventsByMonth.useQuery({
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
+  });
+
+  const selectedDates =
+    events
+      ?.map((event) => (event.date ? new Date(event.date) : null))
+      .filter((d): d is Date => d !== null) ?? [];
 
   const renderHeader = () => (
     <div className={styles.header}>
@@ -58,18 +68,18 @@ export default function Calendar() {
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = day;
-        const isSelected = selectedDates.some((d) =>
-          isSameDay(d, cloneDay)
-        );
+        const isSelected = selectedDates.some((d) => isSameDay(d, cloneDay));
         const isDisabled = !isSameMonth(cloneDay, monthStart);
 
         days.push(
-<div
-  className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${isSelected ? styles.selected : ""}`}
-  key={cloneDay.toISOString()}
->
-  <span>{format(cloneDay, "d")}</span>
-</div>
+          <div
+            className={`${styles.cell} ${isDisabled ? styles.disabled : ""} ${
+              isSelected ? styles.selected : ""
+            }`}
+            key={cloneDay.toISOString()}
+          >
+            <span>{format(cloneDay, "d")}</span>
+          </div>
         );
 
         day = addDays(day, 1);
@@ -85,6 +95,10 @@ export default function Calendar() {
 
     return <div className={styles.body}>{rows}</div>;
   };
+
+  if (isLoading) {
+    return <div className={styles.loading}>Loading events...</div>;
+  }
 
   return (
     <div className={styles.calendar}>

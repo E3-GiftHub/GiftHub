@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FaHome,
   FaInbox,
@@ -16,8 +15,10 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
+  const [activePage, setActivePage] = useState<string | null>(null);
 
   const profileRef = useRef<HTMLLIElement>(null);
+
   useEffect(() => {
     const specialPages = ["http://localhost:3000/#", "http://localhost:3000/"];
 
@@ -26,10 +27,24 @@ const Navbar = () => {
       setIsLandingPage(isSpecial);
     };
 
-    checkSpecialPage();
-    window.addEventListener("hashchange", checkSpecialPage);
+    const detectActivePage = () => {
+      const url = window.location.href;
+      if (url.includes("/home")) setActivePage("home");
+      else if (url.includes("/inbox")) setActivePage("inbox");
+      else setActivePage(null);
+    };
 
-    return () => window.removeEventListener("hashchange", checkSpecialPage);
+    checkSpecialPage();
+    detectActivePage();
+
+    window.addEventListener("hashchange", () => {
+      checkSpecialPage();
+      detectActivePage();
+    });
+
+    return () => {
+      window.removeEventListener("hashchange", checkSpecialPage);
+    };
   }, []);
 
   useEffect(() => {
@@ -56,7 +71,9 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`${styles.navbar} ${isLandingPage ? styles["special-navbar"] : ""}`}
+      className={`${styles.navbar} ${
+        isLandingPage ? styles["special-navbar"] : ""
+      }`}
     >
       <div className={styles["navbar-left"]}>
         <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
@@ -86,21 +103,31 @@ const Navbar = () => {
           {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 
           <ul
-            className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
+            className={`${styles["nav-links"]} ${
+              menuOpen ? styles.open : ""
+            }`}
           >
             <li>
-              <a href="http://localhost:3000/home#">
+              <a
+                href="http://localhost:3000/home#"
+                className={activePage === "home" ? styles["nav-link-active"] : ""}
+              >
                 <FaHome /> Home
               </a>
             </li>
             <li>
-              <a href="http://localhost:3000/inbox#">
+              <a
+                href="http://localhost:3000/inbox#"
+                className={activePage === "inbox" ? styles["nav-link-active"] : ""}
+              >
                 <FaInbox /> Inbox
               </a>
             </li>
             <li
               ref={profileRef}
-              className={`${styles["profile-dropdown"]} ${profileOpen ? styles.open : ""}`}
+              className={`${styles["profile-dropdown"]} ${
+                profileOpen ? styles.open : ""
+              }`}
             >
               <a
                 href="#"

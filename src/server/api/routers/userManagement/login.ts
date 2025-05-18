@@ -3,11 +3,9 @@ import {createTRPCRouter, publicProcedure} from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 
 
-//TODO: From the client side error handling from signup and login pages, move them server side
-
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string()
+  password: z.string().min(1, "Password must not be empty!")
 });
 
 export const loginRouter = createTRPCRouter({
@@ -24,6 +22,10 @@ export const loginRouter = createTRPCRouter({
 
         if(!user){
           throw new Error("User not found");
+        }
+
+        if(!user.password){
+          throw new Error("User has no password");
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);

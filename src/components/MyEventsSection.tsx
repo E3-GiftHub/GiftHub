@@ -8,35 +8,45 @@ import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
-import shortEventsMockResponse from "~/components/mock-data/shortEventsMockResponse";
-import type { ShortEventResponse } from "~/models/ShortEventResponse";
+import { api } from "~/trpc/react";
+import Modal from "~/components/Modal";
+import { useState } from "react";
+
 
 const MyEventsSection: React.FC = () => {
-  const [eventsData, setEventsData] = React.useState<ShortEventResponse[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
-  React.useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        //const response = await fetch("/api/getShortEvents");
-        //const data = (await response.json()) as ShortEventResponse[];
-        const data = shortEventsMockResponse;
-        const trimmedData = data.slice(0, 3);
-        setEventsData(trimmedData);
-      } catch (error) {
-        console.error("Failed to fetch events:", error);
-      }
-    };
+  const {
+    data: eventsData = [],
+    isLoading,
+    isError,
+  } = api.eventPreview.getUpcomingEvents.useQuery();
 
-    void fetchEvents();
-  }, []);
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (isError) {
+    return <p>Failed to load events.</p>;
+  }
+  const trimmedEvents = eventsData.slice(0, 3);
 
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
       <ContainerEventTitle title={"My events"} />
-      {eventsData.map((event, index) => (
+      {trimmedEvents.map((event, index) => (
         <ContainerEventRow key={index} eventData={event} />
       ))}
-      <SeeMoreButton />
+      <SeeMoreButton onClick={openModal} />
+
+      <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
+        {eventsData.map((event, index) => (
+          <ContainerEventRow key={index} eventData={event} />
+        ))}
+      </Modal>
+
       <div className={styles["buttons-wrapper"]}>
         <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
       </div>
