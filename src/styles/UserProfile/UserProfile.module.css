@@ -118,23 +118,40 @@
     justify-content: center;
     color: white;
     padding-right: 2rem;
+    gap: 1.3rem;
+    margin-top: 120px;
+}
+.userInfoedit {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    padding-right: 2rem;
+    gap: 0.8rem;
+    margin-top: 140px;
+}
+
+.namefield{
+    margin: 0;
 }
 
 .username {
     font-size: 2.5em;
     font-weight: 500;
-    margin: 0 0 5px;
+    margin: 0;
 }
 
 .email {
     font-size: 1.2em;
     color: #aaa;
-    margin: 0 0 30px;
+    margin: 0;
 }
 
 .buttonContainer {
     display: flex;
-    gap: 16px;
+    margin-top: 15px;
+    /*gap: 16px;*/
 }
 
 .button {
@@ -155,8 +172,8 @@
 .icon {
     margin-right: 8px;
     vertical-align: middle;
-    width: 22px;
-    height: 22px;
+    width: 21px;
+    height: 21px;
 }
 
 /* Add these styles to match the edit form fields */
@@ -175,8 +192,8 @@
 }
 
 .inputField {
-    width: 82%;
-    padding: 1rem 1.5rem;
+    width: 93%;
+    padding: 0.7rem;
     background-color: #2e275f;
     border: 1px solid #3a3468;
     border-radius: 8px;
@@ -184,6 +201,7 @@
     color: white;
     transition: all 0.3s ease;
 }
+
 
 .inputField:focus {
     outline: none;
@@ -203,14 +221,9 @@
     display: block;
 }
 
-/* Add this to create space between form fields and buttons */
-.userInfo {
-    gap: 2rem; /* Creates consistent vertical spacing */
-}
-
 /* Adjust button container spacing */
 .buttonContainer {
-    gap: 1.5rem;
+    gap: 3.6rem;
 }
 
 /* Add disabled state styling for the save button */
@@ -226,7 +239,59 @@
     border-color: #4a4569;
 }
 
-/* Responsive adjustments */
+/* In UserProfile.module.css */
+.nameContainer {
+    display: flex;
+    gap: 1rem; /* Space between first and last name */
+    width: 80%;
+    margin: 0;
+}
+
+.fname{
+    margin: 0;
+    font-size: 1.2em;
+}
+.lname{
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.nameFieldsContainer {
+    display: flex;
+    gap: 1.5rem;
+    /*width: 82%;*/
+    max-width: 500px;
+}
+
+.iban {
+    font-size: 1.3rem;
+    color: #666;
+    margin: 0;
+    font-family: monospace;
+
+}
+
+.nameFieldsContainer .inputGroup {
+    flex: 1;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+.inputGroup:has(#email) {
+    padding-top: 1rem; /* Adjust this value as needed */
+}
+
+/* IBAN input specific styling */
+#iban {
+    font-family: monospace;
+    letter-spacing: 0.1em;
+}
+
+/* Placeholder styling */
+.inputField::placeholder {
+    color: #6b6892;
+    font-style: italic;
+}
+
 @media (max-width: 1040px) {
     .profileCard {
         flex-direction: column;
@@ -241,13 +306,45 @@
         align-items: center;
         text-align: center;
         padding: 0 0 30px 0;
+        margin-top: 0;
+    }
+    .userInfoedit {
+        align-items: center;
+        text-align: center;
+        padding: 0 0 30px 0;
+        margin-top: 0;
     }
 
+    .nameContainer {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .fname{
+        margin: 0;
+    }
+    .lname{
+        margin: 0;
+    }
     .avatarCircle {
         width: 250px;
         height: 250px;
     }
 }
+
+@media (max-width: 500px) {
+    .nameContainer {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .nameContainer .inputGroup {
+        width: 100%;
+    }
+}
+
+
 
 @media (max-width: 720px) {
     .profileCard {
@@ -259,6 +356,7 @@
     .buttonContainer {
         flex-direction: column;
         align-items: center;
+        gap: 1.8rem;
     }
 
     .username {
@@ -267,6 +365,13 @@
 
     .email {
         font-size: 1em;
+    }
+    .nameContainer {
+        flex-direction: column; /* Stack vertically on mobile */
+        gap: 1rem;
+    }
+    .iban{
+        margin-bottom: 1rem;
     }
 }
 

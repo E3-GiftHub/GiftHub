@@ -3,12 +3,16 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import "src/styles/globals.css";
+import {useRouter} from "next/router";
 
 interface EditUserProfileProps {
   username?: string;
+  fname?: string;
+  lname?: string;
   email?: string;
+  IBAN?: string;
   avatarUrl?: string;
-  onSave?: (newUsername: string, newEmail: string) => void;
+  onSave?: (newFname: string, newLname: string, newUsername: string, newEmail: string, newIban: string) => void;
   onResetPassword?: () => void;
   loading?: boolean;
 }
@@ -45,6 +49,9 @@ const ProfileButton = ({
 export default function EditUserProfileUI({
                                             username = "",
                                             email = "",
+                                            fname = "",
+                                            lname = "",
+                                            IBAN = "",
                                             avatarUrl,
                                             onSave,
                                             onResetPassword,
@@ -52,12 +59,18 @@ export default function EditUserProfileUI({
                                           }: Readonly<EditUserProfileProps>) {
   const [usernameInput, setUsernameInput] = useState(username);
   const [emailInput, setEmailInput] = useState(email);
+  const [fnameInput, setFnameInput] = useState(fname);
+  const [lnameInput, setLnameInput] = useState(lname);
+  const [ibanInput, setIbanInput] = useState(IBAN);
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
     setUsernameInput(username);
     setEmailInput(email);
-  }, [username, email]);
+    setFnameInput(fname);
+    setLnameInput(lname);
+    setIbanInput(IBAN);
+  }, [username, email, fname, lname, IBAN]);
 
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,7 +85,7 @@ export default function EditUserProfileUI({
 
   const handleSave = () => {
     if (onSave && !emailError) {
-      onSave(usernameInput, emailInput);
+      onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
     }
   };
 
@@ -95,7 +108,8 @@ export default function EditUserProfileUI({
           </div>
         </div>
 
-        <div className={styles.userInfo}>
+        <div className={styles.userInfoedit}>
+
           <div className={styles.inputGroup}>
             <label htmlFor="username" className={styles.inputLabel}>
               {/*Username*/}
@@ -105,6 +119,34 @@ export default function EditUserProfileUI({
               type="text"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
+              className={clsx(styles.inputField, loading && styles.loading)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="fname" className={styles.inputLabel}>
+              {/*First Name*/}
+            </label>
+            <input
+              id="fname"
+              type="text"
+              value={fnameInput}
+              onChange={(e) => setFnameInput(e.target.value)}
+              className={clsx(styles.inputField, loading && styles.loading)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="lname" className={styles.inputLabel}>
+              {/*Last Name*/}
+            </label>
+            <input
+              id="lname"
+              type="text"
+              value={lnameInput}
+              onChange={(e) => setLnameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
               disabled={loading}
             />
@@ -125,6 +167,20 @@ export default function EditUserProfileUI({
             {emailError && <div className={styles.errorMessage}>{emailError}</div>}
           </div>
 
+          <div className={styles.inputGroup}>
+            <label htmlFor="iban" className={styles.inputLabel}>
+              {/*IBAN*/}
+            </label>
+            <input
+              id="iban"
+              type="text"
+              value={ibanInput}
+              onChange={(e) => setIbanInput(e.target.value)}
+              className={clsx(styles.inputField, loading && styles.loading)}
+              disabled={loading}
+            />
+          </div>
+
           <div className={styles.buttonContainer}>
             <ProfileButton
               iconSrc="/UserImages/buttons/save-icon.svg"
@@ -137,7 +193,7 @@ export default function EditUserProfileUI({
             </ProfileButton>
 
             <ProfileButton
-              iconSrc="/UserImages/buttons/password-reset-icon.svg"
+              iconSrc="/UserImages/buttons/reset-icon.svg"
               alt=""
               onClick={onResetPassword}
               loading={loading}

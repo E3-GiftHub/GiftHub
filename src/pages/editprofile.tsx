@@ -5,25 +5,22 @@ import Navbar from "~/components/Navbar";
 import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
 import { mockUser } from "~/components/ui/UserProfile/mockUser";
 
-// Add type for API response
 interface UpdateResponse {
   success?: boolean;
   error?: string;
-}
-
-// Add type for mock user
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  picture: string;
 }
 
 export default function EditUserProfile() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = async (newUsername: string, newEmail: string) => {
+  const handleSave = async (
+    newFname: string,
+    newLname: string,
+    newUsername: string,
+    newEmail: string,
+    newIban: string
+  ) => {
     setIsLoading(true);
     try {
       const res = await fetch("/api/user/update", {
@@ -32,13 +29,16 @@ export default function EditUserProfile() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          fname: newFname,
+          lname: newLname,
           username: newUsername,
           email: newEmail,
+          iban: newIban,
         }),
       });
 
-      // Properly type the response
-      const data: UpdateResponse = await res.json() as UpdateResponse;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const data: UpdateResponse = await res.json();
 
       if (!res.ok) {
         alert("Update failed: " + (data.error ?? "Unknown error"));
@@ -59,16 +59,17 @@ export default function EditUserProfile() {
     await router.push("/reset-password");
   };
 
-  // Type assertion for mock user
-  const typedMockUser = mockUser as User;
-
   return (
     <div className={styles['landing-page']}>
       <Navbar />
       <EditUserProfileUI
-        username={typedMockUser.name}
-        email={typedMockUser.email}
-        avatarUrl={typedMockUser.picture}
+        key={mockUser.id}
+        username={mockUser.username}
+        fname={mockUser.fname}
+        lname={mockUser.lname}
+        email={mockUser.email}
+        IBAN={mockUser.iban}
+        avatarUrl={mockUser.picture}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
         loading={isLoading}
