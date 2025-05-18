@@ -8,20 +8,22 @@ const findByEmailSchema = z.object({
 export const recoveryRouter = createTRPCRouter({
   findByEmail: publicProcedure
     .input(findByEmailSchema)
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({input, ctx}) => {
+      const {email} = input;
+
       const user = await ctx.db.user.findUnique({
         where: {
           email: input.email,
-        },
-        select: {
-          email: true,
-        },
+        }
       });
 
-      if(!user){
+      if(!user)
+      {
         throw new Error("User not found");
       }
 
-      return user;
+      return{
+        success: true,
+      }
     })
 })

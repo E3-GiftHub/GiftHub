@@ -7,9 +7,9 @@ import {useRouter} from "next/router";
 
 interface EditUserProfileProps {
   username?: string;
-  email?: string;
   fname?: string;
   lname?: string;
+  email?: string;
   IBAN?: string;
   avatarUrl?: string;
   onSave?: (newFname: string, newLname: string, newUsername: string, newEmail: string, newIban: string) => void;
@@ -108,7 +108,22 @@ export default function EditUserProfileUI({
           </div>
         </div>
 
-        <div className={styles.userInfo}>
+        <div className={styles.userInfoedit}>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="username" className={styles.inputLabel}>
+              {/*Username*/}
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
+              className={clsx(styles.inputField, loading && styles.loading)}
+              disabled={loading}
+            />
+          </div>
+
           <div className={styles.inputGroup}>
             <label htmlFor="fname" className={styles.inputLabel}>
               {/*First Name*/}
@@ -132,20 +147,6 @@ export default function EditUserProfileUI({
               type="text"
               value={lnameInput}
               onChange={(e) => setLnameInput(e.target.value)}
-              className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="username" className={styles.inputLabel}>
-              {/*Username*/}
-            </label>
-            <input
-              id="username"
-              type="text"
-              value={usernameInput}
-              onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
               disabled={loading}
             />
@@ -192,7 +193,7 @@ export default function EditUserProfileUI({
             </ProfileButton>
 
             <ProfileButton
-              iconSrc="/UserImages/buttons/password-reset-icon.svg"
+              iconSrc="/UserImages/buttons/reset-icon.svg"
               alt=""
               onClick={onResetPassword}
               loading={loading}

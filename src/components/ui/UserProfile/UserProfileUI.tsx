@@ -3,6 +3,8 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import clsx from 'clsx';
 import "src/styles/globals.css";
+import { router } from "next/client";
+import { useRouter } from 'next/router'; // Corrected router import
 
 interface UserProfileProps {
   username?: string;
@@ -46,8 +48,11 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-                                        username = 'Username Placeholder',
-                                        email = 'user@example.com',
+                                        username = "",
+                                        fname = "",
+                                        lname = "",
+                                        email = "",
+                                        iban = "",
                                         avatarUrl,
                                         onDelete,
                                         onEdit,
@@ -56,6 +61,7 @@ export default function UserProfileUI({
                                       }: Readonly<UserProfileProps>) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
+  const router = useRouter(); // Properly initialize router
 
   useEffect(() => {
     // Update preview if parent updates avatarUrl
@@ -90,17 +96,28 @@ export default function UserProfileUI({
       await router.push("/editprofile"); // Default behavior if no onEdit prop provided
     }
   };
+
+  const handleDelete = async () => {
+    if (onDelete) {
+      onDelete();
+    } else {
+      await router.push("/"); // Navigate to index page
+    }
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
-              {!loading && previewUrl && (
+            <div
+              className={clsx(styles.avatarCircle, loading && styles.loading)}
+            >
+              {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
-                  width={120}
-                  height={120}
+                  width={200}
+                  height={200}
                   className={styles.avatarImage}
                   alt={""}
                 />
@@ -128,11 +145,12 @@ export default function UserProfileUI({
             {renderContent(username)}
           </h2>
           <div className={styles.nameContainer}>
-            <p className={clsx(styles.nameField, loading && styles.loading)}>
+            <p className={clsx(styles.nameField, styles.fname, loading && styles.loading)}>
               {renderContent(fname)}
               &nbsp;&nbsp;&nbsp;&nbsp;|
             </p>
-            <p className={clsx(styles.nameField, loading && styles.loading)}>
+            <p className={clsx(styles.nameField, styles.lname, loading && styles.loading)}>
+              &nbsp;&nbsp;
               {renderContent(lname)}
             </p>
           </div>
@@ -148,7 +166,7 @@ export default function UserProfileUI({
               iconSrc="/UserImages/buttons/bomb-icon.svg"
               alt="Delete account"
               loading={loading}
-              onClick={onDelete}
+              onClick={handleDelete}
             >
               Delete account
             </ProfileButton>

@@ -10,7 +10,7 @@ const signupSchema = z.object({
   password: z.string().min(8),
   confirmPassword: z.string().min(8),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "PASSWORDS DON'T MATCH",
+  message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
@@ -44,7 +44,7 @@ export const signupRouter = createTRPCRouter({
           fname: null,
           lname: null,
           iban: null,
-          picture: null,
+          pictureUrl: null,
         },
       });
 
