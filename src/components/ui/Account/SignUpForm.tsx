@@ -18,16 +18,46 @@ export default function SignupForm() {
 
         <div className={styles.middle}>
           <form
+            id="signUpForm"
             className={styles.formContainer}
             onSubmit={(e) => {
-              e.preventDefault();
-              console.log("Username:", username);
-              console.log("Email:", email);
-              console.log("Password:", password);
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              /*
+              * rules for email:
+              * ^[^\s@]+ -> at least a non-whitespace, non-@ character before @
+              * @[^\s@]+ -> an @ followed by a non-whitespace character
+              * \.[^\s@]+$ -> a period followed by some non-whitespace character
+              * */
+
+              if(username.length < 6) {
+                alert("Username must be at least 8 character long.");
+                return;
+              }
+
+              if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address.");
+                return;
+              }
+
+              if(password.length < 8) {
+                alert("Password must be at least 8 character long.");
+                return;
+              }
+
+              if(!/\d/.test(password)) {
+                alert("Password must contain at least a digit.");
+                return;
+              }
+
               if (password !== confirmPassword) {
                 alert("Passwords do not match.");
                 return;
               }
+
+              e.preventDefault();
+              console.log("Username:", username);
+              console.log("Email:", email);
+              console.log("Password:", password);
               //TODO: submit data
             }}
           >
@@ -113,7 +143,7 @@ export default function SignupForm() {
         </div>
 
         <div className={styles.bottom}>
-          <button className={styles.primaryButton}>Sign up</button>
+          <button type="submit" form="signUpForm" className={styles.primaryButton}>Sign up</button>
 
           <div className={styles.divider}>
             <span className={styles.dividerText}>OR</span>

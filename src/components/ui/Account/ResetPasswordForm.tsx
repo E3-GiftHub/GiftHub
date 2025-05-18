@@ -4,6 +4,8 @@ import styles from "../../../styles/Account.module.css";
 export default function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   return (
       <div className={`${styles.rightPanel} ${styles.resetPasswordPage}`}>
         <div className={styles.top}>
@@ -11,7 +13,31 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className={styles.middle}>
-          <form className={styles.formContainer}>
+          <form
+            className={styles.formContainer}
+            id="resetPassword"
+
+            onSubmit={(e) => {
+              if(password.length < 8) {
+                alert("Password must be at least 8 character long.");
+                return;
+              }
+
+              if(!/\d/.test(password)) {
+                alert("Password must contain at least a digit.");
+                return;
+              }
+
+              if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+              }
+
+              e.preventDefault();
+              console.log("Password:", password);
+              //TODO: submit data
+            }}
+          >
 
             {/*new password input*/}
             <div className={styles.formGroup}>
@@ -21,6 +47,8 @@ export default function ResetPasswordForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className={styles.inputField}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                     type="button"
@@ -45,6 +73,8 @@ export default function ResetPasswordForm() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
                     className={styles.inputField}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <button
                     type="button"
@@ -64,7 +94,7 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className={styles.bottom}>
-          <button className={styles.primaryButton}>Reset password</button>
+          <button type="submit" form="resetPassword" className={styles.primaryButton}>Reset password</button>
 
           <p className={styles.footer}>
             Back to{' '}

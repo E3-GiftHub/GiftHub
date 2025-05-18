@@ -14,13 +14,14 @@ export default function LogInForm() {
         </div>
         <div className={styles.middle}>
           <form
+            id="logInForm"
             className={styles.formContainer}
             onSubmit={(e) => {
               e.preventDefault();
               console.log("Email:", email);
               console.log("Password:", password);
 
-              //TODO: submit data
+              //TODO: check if account exists
             }}
           >
 
@@ -71,7 +72,7 @@ export default function LogInForm() {
           </form>
         </div>
         <div className={styles.bottom}>
-          <button className={styles.primaryButton}>Log in</button>
+          <button type="submit" form="logInForm" className={styles.primaryButton}>Log in</button>
           <label className={styles.rememberMe}>
             <input type="checkbox" />{' '}
             Remember me

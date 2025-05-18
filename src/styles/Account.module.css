@@ -293,7 +293,6 @@
 }
 
 .discordButton{
-  padding: 0.6em 0.5em;
   background: linear-gradient(90deg,rgba(88, 101, 242, 1) 0%, rgba(65, 78, 237, 1) 50%, rgba(64, 78, 237, 1) 100%);
   width: 13em;
   height: 2.4em;
@@ -322,12 +321,11 @@
   width: 25px;
   display: inline-block;
   vertical-align: middle;
-  padding: 0 9px 3px 0;
+  padding: 2px 10px 0 0;
   background-color: transparent;
 }
 
 .googleButton{
-  padding: 0.6em 0.5em;
   background: white;
   width: 13em;
   height: 2.4em;
@@ -356,7 +354,7 @@
   width: 25px;
   display: inline-block;
   vertical-align: middle;
-  padding: 0 9px 3px 0;
+  padding: 0 10px 0 0;
   background-color: transparent;
 }
 

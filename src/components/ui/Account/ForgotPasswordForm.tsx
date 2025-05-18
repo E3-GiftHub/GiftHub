@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 
 export default function ForgotPasswordForm() {
+  const [email, setEmail] = useState("");
   return (
     <div className={`${styles.rightPanel} ${styles.resetPasswordPage}`}>
     <div className={styles.top}>
@@ -10,7 +11,17 @@ export default function ForgotPasswordForm() {
         </div>
 
         <div className={styles.middle}>
-          <form className={styles.formContainer}>
+          <form
+            className={styles.formContainer}
+            id="forgotPassword"
+            onSubmit={(e) => {
+
+              e.preventDefault();
+              console.log("Email:", email);
+
+              //TODO: check if email exists in database
+            }}
+          >
 
             {/*email input*/}
             <div className={styles.formGroup}>
