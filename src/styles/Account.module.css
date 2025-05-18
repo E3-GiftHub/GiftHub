@@ -1,0 +1,477 @@
+.fullPageWrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signUpBox {
+  display: flex;
+  flex-direction: row;
+  background-color: #2E236B;
+  border-radius: 15px;
+  min-width: 900px;
+  max-width: 72em;
+  width: 75vw;
+  max-height: 49em;
+  height: 75vh;
+  box-sizing: border-box;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+.leftPanel {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 2rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 26em;
+  height: min(43em, 90%);
+  margin-left: 1em;
+  background: linear-gradient(0deg, rgba(67, 61, 139, 1) 38%, rgba(200, 172, 214, 1) 91%);
+  border-radius: 15px;
+  transition: box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.visual:hover{
+  box-shadow: 0 0 10px #C6AAD5;
+}
+
+.GiftHubTitle {
+  position: sticky;
+  top: 0;
+  font-family: Jura, sans-serif;
+  margin-bottom: 0.6em;
+  font-size: 85px;
+  color: white;
+  text-shadow: 3px 5px 5px #917DA8;
+}
+
+.cloudPNG {
+  width: 26em;
+  margin-top: -12em;
+}
+
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+  padding: 1rem 2.5rem 2.5rem;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  color: #FFFFFF;
+  font-size: 2.5em;
+  margin-top: 0;
+}
+
+.resetPasswordPage .title{
+  margin-top:.3em;
+}
+
+.aboveTitle {
+  color: #FFFFFF;
+  opacity: 50%;
+  font-size: 1.1em;
+  margin-bottom: -0.2em;
+}
+
+.belowTitle {
+  color: #FFFFFF;
+  opacity: 50%;
+  font-size: 1.1em;
+  margin-top: -.8em;
+}
+
+.middle {
+  margin-top: -2rem;
+  margin-bottom: -.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 32em;
+  gap: 1rem;
+}
+
+.signupPage .formContainer {
+  gap: 0;
+  margin-top: -1em;
+}
+
+.formGroup {
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.inputTitle {
+  margin-left: 0.5em;
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.inputField{
+  width: 100%;
+  height: 3rem;
+  padding: 0 1rem;
+  font-weight: 500;
+  background-color: #433D8A;
+  border: 3px solid #C7ACD5;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.inputField::placeholder {
+  color: #FFFFFF;
+  font-weight: 500;
+  opacity: 50%;
+  font-size: 15px;
+}
+
+.inputField:focus {
+  outline: none;
+  border: 3px solid white;
+  box-shadow: 0 0 5px rgba(160, 120, 228, 0.5);
+}
+
+.passwordInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordToggleButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  right: 1em;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passwordToggleButton svg {
+  width: 100%;
+  height: 100%;
+  filter: invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.passwordToggleButton:hover svg {
+  opacity: 1;
+}
+
+.forgotPassword{
+  margin-top: -.3em;
+  color: white;
+  text-decoration: none;
+  display:flex;
+  justify-content: flex-end;
+  opacity: 80%;
+  transition: opacity 0.2s ease;
+}
+
+.forgotPassword:hover{
+  opacity:1;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5em;
+  margin-top: 0;
+}
+
+.rememberMe {
+  margin-top:0;
+  display: flex;
+  align-items: center;
+  color: white;
+  opacity: 0.7;
+  font-size: 1em;
+  gap: 0.5em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.primaryButton {
+  margin-bottom: 0;
+  margin-top: 1em;
+  padding: 0.6em 1.2em;
+  background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+  width: 11em;
+  height: 3em;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  color: white;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: transform 0.1s ease;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.primaryButton:hover {
+  transform: scale(1.1);
+}
+
+.primaryButton:active {
+  transform: scale(1);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  width: 20em;
+  margin: 0.5em 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.dividerText {
+  margin: 0 0.6em;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1em;
+  white-space: nowrap;
+}
+
+.alternativeButtons{
+  display:flex;
+  flex-direction: row;
+  gap: 1em;
+}
+
+.discordButton{
+  background: linear-gradient(90deg,rgba(88, 101, 242, 1) 0%, rgba(65, 78, 237, 1) 50%, rgba(64, 78, 237, 1) 100%);
+  width: 13em;
+  height: 2.4em;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  color: white;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: transform 0.5s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.discordButton:hover {
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+}
+
+.discordButton:active {
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+}
+
+.discordIcon {
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 10px 0 0;
+  background-color: transparent;
+}
+
+.googleButton{
+  background: white;
+  width: 13em;
+  height: 2.4em;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  color: #444;
+  font-size: 1.1em;
+  font-weight: 600;
+  transition: transform 0.1s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.googleButton:hover {
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+}
+
+.googleButton:active {
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+}
+
+.googleIcon {
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 10px 0 0;
+  background-color: transparent;
+}
+
+.footer {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.2em;
+  margin-bottom: 0;
+  margin-top: .5em;
+}
+
+.secondaryButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 0.4em;
+  color: #FFFFFF;
+  opacity: 1;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.secondaryButton:hover {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 1250px) {
+  .alternativeButtons{
+    flex-direction: column;
+  }
+
+  .discordButton{
+    width: 16em;
+  }
+
+  .googleButton{
+    width:16em;
+  }
+}
+
+@media (max-width: 1000px) {
+
+  .fullPageWrapper{
+    background-image: linear-gradient(#17153B, #433D8B);
+  }
+  .signUpBox {
+    height: 85vh;
+    min-width: 50em;
+    flex-direction: column;
+    padding: 1em;
+  }
+
+  .leftPanel {
+    display: none;
+  }
+
+  .rightPanel {
+    width: 100%;
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+
+  .formContainer {
+    gap: .5em;
+    margin-top: -.5em;
+  }
+
+  .primaryButton {
+    margin-top: 3em;
+  }
+
+  .alternativeButtons{
+    flex-direction: row;
+  }
+
+  .discordButton{
+    width: 13em;
+  }
+
+  .googleButton{
+    width:13em;
+  }
+
+}
+
+@media (max-width: 850px) {
+  .signUpBox {
+    height: 85vh;
+    min-width: 0;
+    width: 90vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .alternativeButtons{
+    flex-direction: column;
+  }
+
+  .discordButton{
+    width: 16em;
+  }
+
+  .googleButton{
+    width:16em;
+  }
+}
+
+@media (max-width: 500px) {
+  .signUpBox {
+    width: 90vw;
+  }
+
+  .rightPanel {
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+}
