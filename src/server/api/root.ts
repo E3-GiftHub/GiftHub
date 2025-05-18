@@ -22,7 +22,7 @@ export const appRouter = createTRPCRouter({
     login: loginRouter,
     signup: signupRouter,
     findByEmail: recoveryRouter,
-    update: updatePasswordRouter
+    update: updatePasswordRouter,
   })
 });
 

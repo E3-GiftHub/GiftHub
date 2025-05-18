@@ -2,6 +2,7 @@ import styles from "./../../../styles/Account.module.css";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import {api} from "~/trpc/react";
+import { useEffect } from "react";
 
 
 export default function LoginForm() {
@@ -13,7 +14,8 @@ export default function LoginForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
-  const router = useRouter()
+  const router = useRouter();
+
 
   const loginMutation = api.auth.login.login.useMutation({
     onSuccess: () => {

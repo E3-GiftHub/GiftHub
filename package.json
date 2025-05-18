@@ -35,6 +35,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "jest-mock-extended": "^4.0.0-beta1",
+    "jsonwebtoken": "^9.0.2",
     "msw-trpc": "^2.0.0-beta.1",
     "next": "^15.2.3",
     "next-auth": "5.0.0-beta.25",
@@ -44,6 +45,7 @@
     "react-toastify": "^11.0.5",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
+    "uuid": "^11.1.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {
