@@ -27,7 +27,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
       onClick={onClick}
       className={styles["notification-container"]}
       data-testid="notification-container"
-      style={{ opacity: data.read ? 0.5 : 1 }}
+   
     >
       <div className={styles["notification-info"]}>
         {hasProfilePic ? (
