@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../styles/MobileFilterMenu.module.css"; // sau calea corectă
+import styles from "../../styles/MobileFilterMenu.module.css";
 
 interface MobileFilterMenuProps {
   visible: boolean;

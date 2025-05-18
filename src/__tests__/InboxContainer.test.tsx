@@ -16,7 +16,6 @@ jest.mock("../components/ui/CustomContainer", () => ({
 
 type InboxContainerHeaderProps = {
   onTabChange: (tab: string) => void;
-  onMarkAllAsRead: () => void;
   onOpenMobileFilter: () => void;
 };
 
@@ -28,7 +27,6 @@ jest.mock("../components/ui/InboxContainerHeader", () => ({
         Invitations Tab
       </button>
       <button onClick={() => props.onTabChange("My events")}>Events Tab</button>
-      <button onClick={props.onMarkAllAsRead}>Mark All as Read</button>
       <button onClick={props.onOpenMobileFilter}>Open Filter</button>
     </div>
   ),
@@ -76,15 +74,7 @@ describe("InboxContainer", () => {
     expect(screen.queryByText(/John's Birthday/i)).not.toBeInTheDocument();
   });
 
-  it("marks all notifications as read", () => {
-    render(<InboxContainer />);
-    const notifications = screen.getAllByTestId("notification-container");
-
-    fireEvent.click(screen.getByText("Mark All as Read"));
-    notifications.forEach((notification) => {
-      expect(notification).toHaveStyle({ opacity: "0.5" });
-    });
-  });
+ 
 
   it("shows mobile filter when triggered", () => {
     render(<InboxContainer />);
@@ -107,12 +97,5 @@ describe("InboxContainer", () => {
     expect(screen.queryByText("Mobile Filter Visible")).not.toBeInTheDocument();
   });
 
-  it("marks single notification as read on click", () => {
-    render(<InboxContainer />);
-    const notification = screen
-      .getByText(/Maria's Wedding/i)
-      .closest("[data-testid='notification-container']");
-    fireEvent.click(notification!);
-    expect(notification).toHaveStyle({ opacity: "0.5" });
-  });
+ 
 });

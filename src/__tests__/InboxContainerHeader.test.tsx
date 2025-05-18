@@ -7,7 +7,6 @@ describe("InboxContainerHeader", () => {
     activeTab: "All",
     onTabChange: jest.fn(),
     unreadCount: 3,
-    onMarkAllAsRead: jest.fn(),
     onOpenMobileFilter: jest.fn(),
   };
 
