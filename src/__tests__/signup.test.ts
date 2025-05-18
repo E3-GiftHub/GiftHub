@@ -1,15 +1,29 @@
 import { appRouter } from '~/server/api/root';
-import { createTRPCMsw } from 'msw-trpc';
-import { setupServer } from 'msw/node';
 import * as bcrypt from 'bcrypt';
+import type {PrismaClient} from "@prisma/client";
 
 // Mock the database methods
-const mockDb = {
+const mockDb: Partial<PrismaClient> = {
   user: {
     findFirst: jest.fn(),
     create: jest.fn(),
   },
-};
+  $on: jest.fn(),
+  $connect: jest.fn(),
+  $disconnect: jest.fn(),
+  $use: jest.fn(),
+  $transaction: jest.fn(),
+  $executeRaw: jest.fn(),
+  $queryRaw: jest.fn(),
+  $queryRawUnsafe: jest.fn(),
+  $executeRawUnsafe: jest.fn(),
+  $extends: jest.fn(),
+} as unknown as PrismaClient;
+
+interface MockUserModel{
+  findFirst: jest.Mock;
+  create: jest.Mock;
+}
 
 // Mock bcrypt.hash
 jest.mock('bcrypt', () => ({
@@ -23,7 +37,8 @@ describe('signupRouter', () => {
 
   const createCaller = () => {
     return appRouter.createCaller({
-      db: mockDb,
+      db: mockDb as PrismaClient,
+      headers: new Headers(),
       session: null,
     });
   };
@@ -34,7 +49,7 @@ describe('signupRouter', () => {
 
       const input = {
         username: 'testuser',
-        email: 'test@example.com',
+        email: 'test@exampmockDb.user.createle.com',
         password: 'password123',
         confirmPassword: 'differentpassword',
       };
@@ -86,8 +101,9 @@ describe('signupRouter', () => {
 
   describe('user creation', () => {
     it('should create a new user with hashed password', async () => {
-      mockDb.user.findFirst.mockResolvedValue(null);
-      mockDb.user.create.mockResolvedValue({
+      const userMock = mockDb.user as unknown as MockUserModel;
+      userMock.findFirst.mockResolvedValue(null);
+      userMock.create.mockResolvedValue({
         id: 1,
         email: 'test@example.com',
         password: 'hashedPassword123',
@@ -105,13 +121,13 @@ describe('signupRouter', () => {
       const result = await caller.auth.signup.signup(input);
 
       expect(result).toEqual({ success: true });
-      expect(mockDb.user.findFirst).toHaveBeenCalledWith({
+      expect(userMock.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [{ email: 'test@example.com' }],
         },
       });
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-      expect(mockDb.user.create).toHaveBeenCalledWith({
+      expect(userMock.create).toHaveBeenCalledWith({
         data: {
           email: 'test@example.com',
           password: 'hashedPassword123',
@@ -124,7 +140,8 @@ describe('signupRouter', () => {
     });
 
     it('should throw error when user already exists', async () => {
-      mockDb.user.findFirst.mockResolvedValue({
+      const userMock = mockDb.user as unknown as MockUserModel;
+      userMock.findFirst.mockResolvedValue({
         id: 1,
         email: 'test@example.com',
       });
@@ -141,7 +158,7 @@ describe('signupRouter', () => {
       await expect(caller.auth.signup.signup(input)).rejects.toThrow(
         'User already exists'
       );
-      expect(mockDb.user.create).not.toHaveBeenCalled();
+      expect(userMock.create).not.toHaveBeenCalled();
     });
   });
 });

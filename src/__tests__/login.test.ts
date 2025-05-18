@@ -1,6 +1,6 @@
 import { createCaller } from "~/server/api/root";
 import { createTRPCContext } from "~/server/api/trpc";
-import { loginRouter } from "../server/api/routers/userManagement/login";
+import { loginRouter } from "~/server/api/routers/userManagement/login";
 import * as bcrypt from "bcrypt";
 import { mockDeep } from "jest-mock-extended";
 import type { PrismaClient, User } from "@prisma/client";
@@ -36,6 +36,8 @@ describe("loginRouter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    //prismaMock.user.findFirst = jest.fn();
+    //mockedBcrypt.compare = jest.fn();
   });
 
   describe("login", () => {
