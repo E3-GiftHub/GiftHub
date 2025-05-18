@@ -115,13 +115,4 @@ describe("InboxContainer", () => {
     fireEvent.click(notification!);
     expect(notification).toHaveStyle({ opacity: "0.5" });
   });
-  it("expands a notification when the options button is clicked", () => {
-    render(<InboxContainer />);
-    const optionsButton = screen.getAllByTestId("options-button")[0];
-    expect(optionsButton).toBeDefined();
-    if (!optionsButton) return;
-    fireEvent.click(optionsButton);
-    expect(screen.getByText("Delete")).toBeInTheDocument();
-    expect(screen.getByText("Mark as read")).toBeInTheDocument();
-  });
 });

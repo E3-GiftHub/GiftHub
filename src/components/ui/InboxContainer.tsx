@@ -100,9 +100,6 @@ const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [notifications, setNotifications] = useState(initialNotifications);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
-  const [expandedNotificationId, setExpandedNotificationId] = useState<
-    number | null
-  >(null);
 
   const filtered = notifications.filter((n) => {
     if (activeTab === "All") return true;
@@ -122,10 +119,6 @@ const InboxContainer = () => {
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
     window.location.href = `http://localhost:3000${link}`;
-  };
-
-  const handleExpand = (id: number) => {
-    setExpandedNotificationId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -153,8 +146,6 @@ const InboxContainer = () => {
             key={n.id}
             data={n}
             onClick={() => handleNotificationClick(n.id, n.link)}
-            isExpanded={expandedNotificationId === n.id}
-            onExpand={() => handleExpand(n.id)}
           />
         ))}
       </div>

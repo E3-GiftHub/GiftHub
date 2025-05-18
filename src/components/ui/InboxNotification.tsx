@@ -1,20 +1,15 @@
 import React from "react";
 import styles from "../../styles/InboxNotification.module.css";
-import { FaEllipsisH, FaTrash, FaCheck } from "react-icons/fa";
 import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
 
 interface InboxNotificationProps {
   data: InboxNotificationResponse;
   onClick: () => void;
-  isExpanded: boolean;
-  onExpand: () => void;
 }
 
 const InboxNotification: React.FC<InboxNotificationProps> = ({
   data,
   onClick,
-  isExpanded,
-  onExpand,
 }) => {
   const nameInitials =
     data.firstName.charAt(0).toUpperCase() +
@@ -48,28 +43,6 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
       </div>
       <div className={styles["notification-options"]}>
         <p className={styles["notification-options-row"]}>{diffHours}h</p>
-        <div className={styles["notification-options-row"]}>
-          {isExpanded && (
-            <button className={`${styles["option-left"]} ${styles.option}`}>
-              <FaTrash /> Delete
-            </button>
-          )}
-          {isExpanded && (
-            <button className={`${styles["option-right"]} ${styles.option}`}>
-              <FaCheck /> Mark as read
-            </button>
-          )}
-          <button
-            data-testid="options-button"
-            className={styles["options-button"]}
-            onClick={(e) => {
-              e.stopPropagation();
-              onExpand();
-            }}
-          >
-            <FaEllipsisH size={"1.5rem"} />
-          </button>
-        </div>
       </div>
     </div>
   );

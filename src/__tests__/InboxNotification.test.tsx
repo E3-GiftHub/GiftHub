@@ -17,14 +17,7 @@ const mockNotification: InboxNotificationResponse = {
 
 describe("InboxNotification", () => {
   it("renders notification with initials when no profile picture is provided", () => {
-    render(
-      <InboxNotification
-        data={mockNotification}
-        onClick={jest.fn()}
-        isExpanded={false}
-        onExpand={jest.fn()}
-      />,
-    );
+    render(<InboxNotification data={mockNotification} onClick={jest.fn()} />);
 
     expect(screen.getByText("JD")).toBeInTheDocument();
     expect(screen.getByText("Test notification")).toBeInTheDocument();
@@ -36,12 +29,7 @@ describe("InboxNotification", () => {
       profilePicture: "pic.png",
     };
     render(
-      <InboxNotification
-        data={notificationWithPic}
-        onClick={jest.fn()}
-        isExpanded={false}
-        onExpand={jest.fn()}
-      />,
+      <InboxNotification data={notificationWithPic} onClick={jest.fn()} />,
     );
 
     expect(screen.getByRole("img")).toHaveAttribute("src", "pic.png");
@@ -49,45 +37,9 @@ describe("InboxNotification", () => {
 
   it("calls onClick when notification is clicked", () => {
     const onClickMock = jest.fn();
-    render(
-      <InboxNotification
-        data={mockNotification}
-        onClick={onClickMock}
-        isExpanded={false}
-        onExpand={jest.fn()}
-      />,
-    );
+    render(<InboxNotification data={mockNotification} onClick={onClickMock} />);
 
     fireEvent.click(screen.getByText("Test notification"));
     expect(onClickMock).toHaveBeenCalled();
-  });
-
-  it("renders options menu when expanded", () => {
-    render(
-      <InboxNotification
-        data={mockNotification}
-        onClick={jest.fn()}
-        isExpanded={true}
-        onExpand={jest.fn()}
-      />,
-    );
-
-    expect(screen.getByText("Delete")).toBeInTheDocument();
-    expect(screen.getByText("Mark as read")).toBeInTheDocument();
-  });
-
-  it("calls onExpand when options button is clicked", () => {
-    const onExpandMock = jest.fn();
-    render(
-      <InboxNotification
-        data={mockNotification}
-        onClick={jest.fn()}
-        isExpanded={false}
-        onExpand={onExpandMock}
-      />,
-    );
-
-    fireEvent.click(screen.getByTestId("options-button"));
-    expect(onExpandMock).toHaveBeenCalled();
   });
 });
