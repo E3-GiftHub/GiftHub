@@ -18,7 +18,9 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "jest --coverage --config jest.config.js"
+    "test": "jest --coverage --config jest.config.js",
+    "build:seed": "tsc --project tsconfig.seed.json",
+    "seed": "npm run build:seed && node dist/prisma/seed.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
