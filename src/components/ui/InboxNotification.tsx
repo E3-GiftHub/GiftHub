@@ -22,7 +22,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
   const diffHours = Math.floor(timeDiff / (1000 * 3600));
 
   return (
-    <div
+    <button
       key={data.id}
       onClick={onClick}
       className={styles["notification-container"]}
@@ -44,7 +44,7 @@ const InboxNotification: React.FC<InboxNotificationProps> = ({
       <div className={styles["notification-options"]}>
         <p className={styles["notification-options-row"]}>{diffHours}h</p>
       </div>
-    </div>
+    </button>
   );
 };
 
