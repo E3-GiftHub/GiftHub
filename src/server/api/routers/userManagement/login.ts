@@ -2,25 +2,31 @@ import {z} from "zod";
 import {createTRPCRouter, publicProcedure} from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 import {TRPCError} from "@trpc/server";
-import {serialize} from "cookie";
+//import {serialize} from "cookie";
+import {randomUUID} from "crypto"
 
 
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1, "Password must not be empty!")
+  password: z.string().min(1, "Password must not be empty!"),
+  rememberMe: z.boolean().default(false),
 });
 
 export const loginRouter = createTRPCRouter({
-
   login: publicProcedure
     .input(loginSchema)
     .mutation(async ({input, ctx}) => {
-        const {email, password} = input;
+        const {email, password, rememberMe} = input;
 
         const user = await ctx.db.user.findFirst({
           where: {
             email: input.email,
+          },
+          select: {
+            username: true,
+            email: true,
+            password: true,
           },
         });
 
@@ -38,10 +44,6 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
-
-
-
-
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if(!passwordMatch){
@@ -51,22 +53,27 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
-      const session = await ctx.db.session.create({
-        data: {
-          sessionToken: user.email!,
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-          user:{
-            connect:{
-              id: user.id!,
-            }
-          }
-        }
-      })
+     const sessionToken = `${email}:${randomUUID()}`;
+        const expires = new Date(
+          Date.now() + (rememberMe
+            ? 1000 * 60 * 60 * 24 * 30
+            : 0)
+        );
 
-      const { password:_, ...userWithoutPassword } = user;
+
+
+      await ctx.db.session.create({
+        data:{
+          sessionToken,
+          expires,
+          user: {connect: {username: user.username}},
+        },
+      });
+
       return {
-        user: userWithoutPassword,
-        sessionToken: session.sessionToken,
+        success: true,
+        sessionToken: email,
+        expires: expires.toISOString(),
       };
-    })
+    }),
 })

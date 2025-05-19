@@ -37,14 +37,14 @@ export const signupRouter = createTRPCRouter({
 
       const hashPasswd = await bcrypt.hash(password, 10);
 
-      const newUser = await ctx.db.user.create({
+      await ctx.db.user.create({
         data:{
           email,
           password: hashPasswd,
           fname: null,
           lname: null,
           iban: null,
-          pictureUrl: null,
+          pictureUrl: "/public/databasepic/profilepic.png",
         },
       });
 
