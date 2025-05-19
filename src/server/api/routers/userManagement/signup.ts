@@ -44,7 +44,7 @@ export const signupRouter = createTRPCRouter({
           fname: null,
           lname: null,
           iban: null,
-          pictureUrl: "/public/databasepic/profilepic.png",
+          pictureUrl: "/UserImages/default_pgp.svg",
         },
       });
 
