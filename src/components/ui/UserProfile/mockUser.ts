@@ -17,5 +17,5 @@ export const mockUser: User = {
   username: "aragazcubuteliee",
   email: "aragazul@example.com",
   iban: "INGB0002819713291",
-  picture: "/aragazul_pfp.jpg",
+  picture: "/UserImages/aragazul_pfp.jpg",
 };
