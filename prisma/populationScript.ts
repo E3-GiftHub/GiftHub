@@ -185,8 +185,8 @@ async function createEvents(users: User[]) {
 }
 
 async function createInvitations(users: User[], events: Event[]) {
-    const invitations = [];
 
+    const invitations = [];
     for (const event of events) {
         const creator = users.find(user => user.username === event.createdByUsername);
 
