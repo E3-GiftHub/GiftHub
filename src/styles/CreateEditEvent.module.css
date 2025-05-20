@@ -1,0 +1,200 @@
+:global(html) {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #1a1242;
+}
+:global(body) {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+}
+:global(#__next) {
+    min-height: 100%;
+}
+:global(*),
+:global(*::before),
+:global(*::after) {
+    box-sizing: border-box;
+}
+
+.pageWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1242;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding-bottom: 9vh;
+}
+
+.container {
+    width: clamp(340px, 71.1vw, 1367px);
+    border-radius: 15px;
+    background-color: #2E236C;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+    flex-grow: 1;
+    margin-top: 9vh;
+}
+
+
+.header {
+    position: relative;
+    width: 100%;
+    height: clamp(50px, 13.7vh, 148px);
+    opacity: 0.5;
+    background-image: url('../../public/backgrounds/home.png');
+    background-size: cover;
+    background-position: center ;
+    background-repeat: no-repeat;
+    margin-top: 0rem;
+    margin-bottom: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px #000;
+}
+
+
+.wrapper {
+    color: #fff;
+}
+
+.title {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    color: #d8b4fe;
+}
+
+.form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.left,
+.right {
+    flex: 1;
+    min-width: 300px;
+    margin-bottom: 1.5rem;
+}
+
+.form label {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-left: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-right: 3rem;
+}
+
+.form input,
+.form textarea {
+    margin-right: 3.5rem;
+    width: clamp(262px, 28.5vw, 548px);
+    padding: 0.75rem 1rem;
+    border: none;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+    background-color: #cbb1dc;
+    color: #1e1e1e;
+    font-size: 1rem;
+}
+
+.form textarea {
+    margin-left: 0.3rem;
+}
+
+@media (min-width: 1401px) {
+
+    .pageWrapper .buttons button {
+        flex: 1 1 150px;
+        max-width: 222px;
+        min-width: 117px;
+        text-align: center;
+
+    }
+    .pageWrapper .buttons {
+        display: flex;
+        gap: clamp(1rem, 6.5vw, 9rem);
+        flex-wrap: wrap;
+        margin-left: 3.5rem;
+        margin-right: 2.6rem;
+    }
+}
+
+.form textarea {
+    height: clamp(146px, 26.7vh, 289px);
+    width: clamp(262px, 28.5vw, 548px);
+    width: 100%;
+}
+
+.dateInputWrapper {
+    position: relative;
+}
+
+.icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5c3d90;
+    pointer-events: none;
+}
+
+
+@media (max-width: 1400px) {
+
+    .pageWrapper .buttons  {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 0.3rem;
+        gap: 5vw;
+        padding-left: 6vw;
+        margin-right: 0.3rem;
+        padding-right: 2.3rem;
+        text-align: center;
+        width: clamp(117px, 11.5vw, 222px);
+        padding-top: 1rem;
+
+    }
+}
+
+@media (max-width: 600px) {
+    .form label {
+        margin-left: 2.5rem;
+    }
+
+    .pageWrapper .buttons  {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 0.3rem;
+        gap: 5.9rem;
+        padding-left: 2.3rem;
+        margin-right: 0.3rem;
+        padding-right: 2.3rem;
+        text-align: center;
+        width: clamp(117px, 11.5vw, 222px);
+        padding-top: 1rem;
+
+    }
+
+}

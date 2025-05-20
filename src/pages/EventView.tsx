@@ -1,0 +1,215 @@
+"use client"
+
+import { useState } from "react";
+import Navbar from "../app/_components/Navbar";
+import styles from "../styles/EventView.module.css";
+import buttonStyles from "../styles/Button.module.css";
+import GuestListModal from "../app/_components/GuestListModal";
+import EditMediaModal from "../app/_components/EditMediaModal";
+
+export default function EventView() {
+    const [formData, setFormData] = useState({ date: "", time: "", location: "", description: "" });
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [pendingField, setPendingField] = useState<null | string>(null);
+    const [tempValue, setTempValue] = useState("");
+
+    // Guest list state
+    const [showGuestModal, setShowGuestModal] = useState(false);
+    const [guestList, setGuestList] = useState(
+        Array.from({ length: 24 }, (_, i) => `Guest ${i + 1}`)
+    );
+    const handleRemoveGuest = (idx: number) => setGuestList(prev => prev.filter((_, i) => i !== idx));
+    const handleAddGuest = () => setGuestList(prev => [...prev, `Guest ${prev.length + 1}`]);
+    const handleSaveGuestChanges = () => setShowGuestModal(false);
+
+    // Media list state
+    const [showMediaModal, setShowMediaModal] = useState(false);
+    const [mediaList, setMediaList] = useState(
+        Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`)
+    );
+    const handleRemoveMedia = (idx: number) => setMediaList(prev => prev.filter((_, i) => i !== idx));
+    const handleUploadMedia = () => setMediaList(prev => [...prev, `/placeholder/image${prev.length + 1}.jpg`]);
+    const handleSaveMedia = () => setShowMediaModal(false);
+
+    // inline edit confirmation
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            setPendingField(field);
+            setTempValue(e.currentTarget.value);
+            setShowConfirm(true);
+        }
+    };
+    const handleConfirm = () => {
+        if (!pendingField) return;
+        setFormData(prev => ({ ...prev, [pendingField]: tempValue }));
+        setPendingField(null);
+        setShowConfirm(false);
+    };
+
+    return (
+        <div className={styles.pageWrapper}>
+            <Navbar />
+
+            {showGuestModal && (
+                <GuestListModal
+                    guests={guestList}
+                    onRemoveGuest={handleRemoveGuest}
+                    onAddGuest={handleAddGuest}
+                    onSave={handleSaveGuestChanges}
+                    onClose={() => setShowGuestModal(false)}
+                    onBack={() => setShowGuestModal(false)}
+                />
+            )}
+
+            {showConfirm && (
+                <div className={styles.modalBackdrop}>
+                    <div className={styles.modal}>
+                        <p>
+                            Save changes to <strong>{pendingField}</strong>?
+                        </p>
+                        <div className={styles.modalActions}>
+                            <button
+                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                                onClick={handleConfirm}
+                            >
+                                Yes
+                            </button>
+                            <button
+                                className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+                                onClick={() => setShowConfirm(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showMediaModal && (
+                <EditMediaModal
+                    media={mediaList}
+                    onRemove={handleRemoveMedia}
+                    onUpload={handleUploadMedia}
+                    onSave={handleSaveMedia}
+                    onClose={() => setShowMediaModal(false)}
+                />
+            )}
+
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <h2>Event_1</h2>
+                </div>
+
+                <div className={styles.wrapper}>
+                    {/* Rand: Poză + Data+Locație + Descriere */}
+                    <div className={styles.topSection}>
+                        {/* Poza */}
+                        <div className={styles.photoSection}>
+                         <div className={styles.photoBox}>Event photo here</div>
+                       </div>
+                        {/* Data + Locația */}
+                        <div className={styles.infoBox}>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.label}>Date</label>
+                                <input
+                                    className={styles.input}
+                                    type="date"
+                                    value={formData.date}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, date: e.target.value }))
+                                    }
+                                    onKeyDown={(e) => handleKeyDown(e, "date")}
+                                />
+                            </div>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.label}>Time</label>
+                                <input
+                                    className={styles.input}
+                                    type="time"
+                                    value={formData.time}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, time: e.target.value }))
+                                    }
+                                    onKeyDown={(e) => handleKeyDown(e, "time")}
+                                />
+                            </div>
+                            <div className={styles.fieldGroup}>
+                                <label className={styles.label}>Location</label>
+                                <input
+                                    className={styles.input}
+                                    type="text"
+                                    placeholder="Enter location"
+                                    value={formData.location}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, location: e.target.value }))
+                                    }
+                                    onKeyDown={(e) => handleKeyDown(e, "location")}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Descrierea */}
+                        <div className={styles.descriptionBox}>
+                            <label className={styles.label}>Description</label>
+                            <textarea
+                                className={styles.textarea}
+                                placeholder="Event description..."
+                                value={formData.description}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({ ...prev, description: e.target.value }))
+                                }
+                                onKeyDown={(e) => handleKeyDown(e, "description")}
+                            />
+                        </div>
+                    </div>
+
+
+                    {/* Rand: Lista de invitați + buton + wishlist */}
+                    <div className={styles.bottomRow}>
+                        <div className={styles.guestBoard}>
+                            <label className={styles.label2}>Guest List</label>
+                            <div className={styles.guestList}>
+                                {Array.from({ length: 12 }, (_, i) => (
+                                    <div key={i} className={styles.guestItem}>
+                                        Guest {i + 1}
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
+                                onClick={() => setShowGuestModal(true)}
+                            >
+                                See more
+                            </button>
+                        </div>
+                        <div className={styles.mediaGallery}>
+                            <label className={styles.label2}>Media Gallery</label>
+                            <div className={styles.mediaGrid}>
+                                {Array.from({ length: 20 }, (_, i) => (
+                                    <div key={i} className={styles.mediaItem}>
+                                        <img src={`/placeholder/image${i + 1}.jpg`} alt={`Media ${i + 1}`} />
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}
+                                onClick={() => setShowMediaModal(true)}
+                            >
+                                Edit Media
+                            </button>
+
+                        </div>
+                        <div className={styles.wishlistBox}>
+                            <button
+                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                            >
+                                Create Wishlist
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
