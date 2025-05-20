@@ -75,5 +75,5 @@
     "initVersion": "7.39.3"
   },
   "packageManager": "npm@11.3.0",
-  "type" : "module"
+  "type" :"module"
 }
