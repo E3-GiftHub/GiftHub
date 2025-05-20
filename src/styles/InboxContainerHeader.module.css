@@ -35,15 +35,6 @@
 }
 
 
-.markRead {
-  background: none;
-  border: none;
-  color: #3b82f6;
-  font-size: 0.9rem;
-  cursor: pointer;
-  align-self: flex-end;
-  margin-top: 1.5rem;
-}
 
 .tabs {
   display: flex;
@@ -109,13 +100,6 @@
     margin-top: 0.3rem;
   }
 
-  .markReadMobile {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #2e6fe8;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+
 
 }

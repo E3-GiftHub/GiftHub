@@ -7,17 +7,15 @@ const tabs = ["All", "My events", "Invitations"];
 interface InboxHeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  unreadCount: number;
-  onMarkAllAsRead: () => void;
   onOpenMobileFilter: () => void;
+  totalCount: number;
 }
 
 const InboxContainerHeader: React.FC<InboxHeaderProps> = ({
   activeTab,
   onTabChange,
-  unreadCount,
-  onMarkAllAsRead,
   onOpenMobileFilter,
+  totalCount,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -34,19 +32,12 @@ const InboxContainerHeader: React.FC<InboxHeaderProps> = ({
     return (
       <div className={styles.mobileHeader}>
         <div className={styles.headerRow}>
-        <h3 className={styles.title}>
-  Notifications
-  <button className={styles.filterButton} onClick={onOpenMobileFilter}>
-    < MdFilterList size={22} color="#c8abd6" />
-  </button>
-</h3>
-
-
-          <div className={styles.mobileActions}>
-            <button className={styles.markReadMobile} onClick={onMarkAllAsRead}>
-              Mark all as read
+          <h3 className={styles.title}>
+            Notifications
+            <button className={styles.filterButton} onClick={onOpenMobileFilter}>
+              <MdFilterList size={22} color="#c8abd6" />
             </button>
-          </div>
+          </h3>
         </div>
       </div>
     );
@@ -56,9 +47,6 @@ const InboxContainerHeader: React.FC<InboxHeaderProps> = ({
     <div className={styles.headerWrapper}>
       <div className={styles.topRow}>
         <h3 className={styles.title}>Notifications</h3>
-        <button className={styles.markRead} onClick={onMarkAllAsRead}>
-          Mark all as read
-        </button>
       </div>
 
       <div className={styles.tabs}>
@@ -69,8 +57,8 @@ const InboxContainerHeader: React.FC<InboxHeaderProps> = ({
             onClick={() => onTabChange(tab)}
           >
             {tab}
-            {tab === "All" && unreadCount > 0 && (
-              <span className={styles.badge}>{unreadCount}</span>
+            {tab === "All" && totalCount > 0 && (
+              <span className={styles.badge}>{totalCount}</span>
             )}
           </button>
         ))}

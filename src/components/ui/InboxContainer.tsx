@@ -11,7 +11,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 1,
     text: "You are invited to John's Birthday. See more",
     type: "invitation",
-    read: false,
     link: "/invite#",
     firstName: "John",
     lastName: "Johnes",
@@ -22,7 +21,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 2,
     text: "You are invited to Maria's Wedding. See more",
     type: "invitation",
-    read: false,
     link: "/invite#",
     firstName: "John",
     lastName: "Johnes",
@@ -33,7 +31,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 3,
     text: "You are invited to Paul's BBQ. See more",
     type: "invitation",
-    read: false,
     link: "/invite#",
     firstName: "John",
     lastName: "Johnes",
@@ -44,7 +41,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 4,
     text: "You are invited to Summer Party. See more",
     type: "invitation",
-    read: false,
     link: "/invite#",
     firstName: "John",
     lastName: "Johnes",
@@ -55,7 +51,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 5,
     text: "You are invited to Ana's Baby Shower. See more",
     type: "invitation",
-    read: true,
     link: "/invite#",
     firstName: "John",
     lastName: "Johnes",
@@ -66,7 +61,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 6,
     text: "Alex contributed 50 lei to your gift",
     type: "event",
-    read: true,
     link: "/event#",
     firstName: "John",
     lastName: "Johnes",
@@ -77,7 +71,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 7,
     text: "Radu bought an item from your wishlist",
     type: "event",
-    read: true,
     link: "/event#",
     firstName: "John",
     lastName: "Johnes",
@@ -88,7 +81,6 @@ const initialNotifications: InboxNotificationResponse[] = [
     id: 8,
     text: "Ioana added photos to your event",
     type: "event",
-    read: true,
     link: "/event#",
     firstName: "John",
     lastName: "Johnes",
@@ -96,9 +88,10 @@ const initialNotifications: InboxNotificationResponse[] = [
     notificationDate: "2023-09-15T14:30:00Z",
   },
 ];
+
 const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications] = useState(initialNotifications);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
 
   const filtered = notifications.filter((n) => {
@@ -108,16 +101,9 @@ const InboxContainer = () => {
     return false;
   });
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const totalCount = notifications.length;
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const handleNotificationClick = (id: number, link: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+  const handleNotificationClick = (_id: number, link: string) => {
     window.location.href = `http://localhost:3000${link}`;
   };
 
@@ -126,9 +112,8 @@ const InboxContainer = () => {
       <InboxContainerHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        unreadCount={unreadCount}
-        onMarkAllAsRead={markAllAsRead}
         onOpenMobileFilter={() => setShowMobileFilter(true)}
+        totalCount={totalCount}
       />
 
       <hr className={styles.separator} />
