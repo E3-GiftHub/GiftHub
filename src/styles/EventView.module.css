@@ -1,0 +1,234 @@
+.pageWrapper {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1a1242;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 9vh;
+}
+
+.container {
+    width: clamp(340px, 90%, 1367px);
+    border-radius: 15px;
+    background-color: #2E236C;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    margin: 9vh auto 0;
+    flex-grow: 1;
+    padding-bottom: 2vh;
+}
+
+.header {
+    position: relative;
+    width: 100%;
+    height: clamp(50px, 13.7vh, 148px);
+    opacity: 0.5;
+    background-image: url('../../public/backgrounds/home.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2vh;
+}
+
+.header h2 {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px #000;
+}
+
+.wrapper {
+    color: #fff;
+    padding: 2rem;
+}
+
+.topSection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem 0;
+    padding-bottom: 7vh;
+}
+
+.photoBox {
+    flex: 0 0 200px;
+    height: 180px;
+    background-color: #cbb1dc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+    font-weight: 500;
+}
+
+.infoBox {
+    flex: 1 1 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 240px;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.label2 {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.5rem;
+    text-transform: uppercase;
+}
+
+.input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #cbb1dc;
+    color: #1e1e1e;
+    font-size: 1rem;
+}
+
+.descriptionBox {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+}
+
+.textarea {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #cbb1dc;
+    color: #1e1e1e;
+    font-size: 1rem;
+    resize: none;
+}
+
+.bottomRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
+}
+
+.guestBoard {
+    flex: 2 1 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #43328B;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.guestList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 2rem;
+}
+
+.guestItem {
+    background-color: #cbb1dc;
+    padding: 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    color: #1e1e1e;
+}
+
+.wishlistBox {
+    flex: 1 1 250px;
+    background-image: url('../../public/backgrounds/backgroundW.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    width: clamp(143px, 18.7vw, 360px);
+    height: clamp(150px, 60vh, 335px);
+    margin-top: 1vh;
+    margin-left: 2.5rem ;
+    margin-right: 2.5rem ;
+}
+
+.seeMoreOverride {
+
+    height: clamp(30px, 18.7vh, 40px);
+    padding: 0rem;
+    display: flex;                /* Asigură layout-ul */
+    align-items: center;          /* Centrează pe verticală */
+    justify-content: center;      /* Centrează pe orizontală */
+    text-align: center;           /* Fallback */
+}
+
+/* 🔽 MEDIA QUERIES - Responsive tweaks */
+
+@media (max-width: 768px) {
+    .topSection {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .photoBox,
+    .infoBox,
+    .descriptionBox {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .bottomRow {
+        flex-direction: column;
+    }
+
+    .guestBoard,
+    .wishlistBox {
+        width: 100%;
+    }
+
+    .guestList {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .guestList {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .header h2 {
+        font-size: 1.5rem;
+    }
+
+    .wrapper {
+        padding: 1rem;
+    }
+
+    .topSection {
+        padding: 1rem 0;
+    }
+
+    .wishlistBox {
+        margin: 0;
+    }
+}

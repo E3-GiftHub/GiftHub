@@ -130,12 +130,11 @@ export const eventRouter = createTRPCRouter({
         if (!invitation) {
           throw new Error("Invitation not found");
         }
-	
-	/*
+
         if (invitation.guestUsername !== ctx.session?.user.username) {
           throw new Error("Not authorized to respond to this invitation");
         }
-	*/
+
         await prisma.invitation.update({
           where: { id: input.invitationId },
           data: { status: input.status },
