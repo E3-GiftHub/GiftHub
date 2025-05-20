@@ -6,7 +6,7 @@ const cardInfo = {
   birthday: {
     title: "Birthday Party",
     description: `Individuals can make wishlists with specific gifts they want, making it easier for friends and family to get them something they'll truly appreciate.`,
-    image: "/illustrations/birthday_party.svg",
+    image: "/illustrations/birthdayParty.svg",
   },
   wedding: {
     title: "Wedding",
@@ -16,12 +16,12 @@ const cardInfo = {
   babyShower: {
     title: "Baby Shower",
     description: `Parents-to-be can create a wishlist of baby essentials, from furniture to diapers. Guests can contribute towards big-ticket items like strollers or leave cash gifts to help with expenses.`,
-    image: "/illustrations/baby_shower.svg",
+    image: "/illustrations/babyShower.svg",
   },
   graduation: {
     title: "Graduation Party",
     description: `Graduates can create a wishlist for items they need for college, their first apartment, or career-related gifts. This helps guests provide practical and appreciated gifts.`,
-    image: "/illustrations/graduation_party.svg",
+    image: "/illustrations/graduationParty.svg",
   },
   anniversaries: {
     title: "Anniversaries",
@@ -36,12 +36,12 @@ const cardInfo = {
   housewarming: {
     title: "Housewarming Party",
     description: `New homeowners can create a wishlist to furnish and decorate their space, and guests can help them make their house a home.`,
-    image: "/illustrations/houseworming_party.svg",
+    image: "/illustrations/housewormingParty.svg",
   },
   retirement: {
     title: "Retirement Party",
     description: `Colleagues can pool together to give a retiree a memorable gift, like a travel voucher or hobby-related equipment. The photo gallery can capture memories from their time at the company.`,
-    image: "/illustrations/retirement_party.svg",
+    image: "/illustrations/retirementParty.svg",
   },
 };
 

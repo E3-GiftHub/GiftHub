@@ -31,7 +31,7 @@ export const calendarRouter = createTRPCRouter({
             const startDate = new Date(year, month - 1, 1);
             const endDate = new Date(year, month, 0);
 
-            // cele mai multe invitații
+            /// cele mai multe invitații
             const userInvitationCounts = await ctx.db.invitation.groupBy({
                 by: ['guestUsername'],
                 _count: {
