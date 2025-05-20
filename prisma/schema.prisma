@@ -139,12 +139,11 @@ model Event {
 
     invitations Invitation[]
 
-    postsMedia           Media[]
-    marks                Mark[]
-    contributions        Contribution[]
-    eventArticles        EventArticle[]
-    eventReports         EventReport[]
-    EventInvitationToken EventInvitationToken[]
+    postsMedia    Media[]
+    marks         Mark[]
+    contributions Contribution[]
+    eventArticles EventArticle[]
+    eventReports  EventReport[]
 }
 
 model Invitation {

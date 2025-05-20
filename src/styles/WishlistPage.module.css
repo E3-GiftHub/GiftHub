@@ -1,3 +1,23 @@
+:global(html) {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #1a1242;
+}
+:global(body) {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+:global(#__next) {
+  min-height: 100%;
+}
+:global(*),
+:global(*::before),
+:global(*::after) {
+  box-sizing: border-box;
+}
 .pageWrapper {
   width: 100%;
   min-height: 100vh;
@@ -9,9 +29,9 @@
 }
 
 .container {
-  width: clamp(340px, 90%, 1367px);
+  width: clamp(320px, 95%, 1367px);
   border-radius: 15px;
-  background-color: #2E236C;
+  background-color: #2e236c;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   margin: 9vh auto 0;
   flex-grow: 1;
@@ -19,61 +39,63 @@
 }
 
 .main {
-  padding: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
 }
 
 .title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   text-align: center;
 }
 
 .section {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
 }
 
 .sectionTitle {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
   display: block;
 }
 
 .searchWrapper {
   position: relative;
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .searchInput {
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: clamp(0.6rem, 2vw, 0.8rem) clamp(0.75rem, 2vw, 1rem);
   border-radius: 8px;
   border: 1px solid #4a3f8c;
   background-color: #1a1242;
   color: #fff;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 .buttonGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: clamp(0.75rem, 2vw, 1rem);
+  margin-top: clamp(0.75rem, 2vw, 1rem);
 }
 
 .itemGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-top: clamp(0.75rem, 2vw, 1rem);
 }
 
 .itemCard {
   background-color: #1a1242;
   border-radius: 8px;
-  padding: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
 }
 
 .itemImage {
@@ -83,58 +105,80 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 150px;
 }
 
 .itemContent {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: clamp(0.35rem, 1.5vw, 0.5rem);
 }
 
 .itemTitle {
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
   font-weight: 500;
 }
 
 .itemPrice {
   color: #a8a8a8;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
 @media (max-width: 768px) {
   .container {
-    width: 95%;
+    width: 100%;
     margin: 7vh auto 0;
+    border-radius: 0;
   }
-  
+
   .main {
     padding: 1.5rem;
   }
-  
-  .title {
-    font-size: 1.5rem;
-  }
-  
+
   .itemGrid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    width: 100%;
     margin: 5vh auto 0;
-    border-radius: 0;
   }
-  
+
   .main {
     padding: 1rem;
   }
-  
-  .title {
-    font-size: 1.2rem;
-  }
-  
+
   .buttonGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-} 
+
+  .itemGrid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .itemImage {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 320px) {
+  .container {
+    margin: 4vh auto 0;
+  }
+
+  .main {
+    padding: 0.75rem;
+  }
+
+  .buttonGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .itemImage {
+    min-height: 180px;
+  }
+}
