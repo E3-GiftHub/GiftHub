@@ -1,7 +1,7 @@
 ## documentation
 
 - [first-design](https://dbdiagram.io/d/GiftHub-Schema-67f6f20b4f7afba184035ff9)
-- [second-design](https://dbdiagram.io/d/Copy-of-GiftHub-Schema-68038bc91ca52373f5920a71)
+- [second-design](https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71)
 - [edge-cases](https://docs.google.com/document/d/1BU4pX5BMg0XJOH3EJ8KfPbHHZ8MEFk5l5Ld9XdoG9gc/edit?tab=t.0)
 
 ## functionalities
@@ -10,6 +10,7 @@
   - the money invested for all items
   - the marks left for all items
   - the people involved in the event
+  - all notification types from all participating events
 - `direct contribution`:
   - these are treated as a unique item for every wishlist
   - received by Planner at `instant`
