@@ -20,7 +20,7 @@ export const appRouter = createTRPCRouter({
   invitationPreview: invitationsRouter,
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
-  invitationsNotification: invitesNotificationRouter,
+ invitationsNotification: invitesNotificationRouter, 
 
 });
 

@@ -5,94 +5,60 @@ import styles from "../../styles/InboxContainer.module.css";
 import MobileFilterMenu from "./MobileFilterMenu";
 import InboxNotification from "~/components/ui/InboxNotification";
 import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
-
-const initialNotifications: InboxNotificationResponse[] = [
-  {
-    id: 1,
-    text: "You are invited to John's Birthday. See more",
-    type: "invitation",
-    link: "/invite#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: "databasepic/profilepic.png",
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 2,
-    text: "You are invited to Maria's Wedding. See more",
-    type: "invitation",
-    link: "/invite#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: undefined,
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 3,
-    text: "You are invited to Paul's BBQ. See more",
-    type: "invitation",
-    link: "/invite#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: "databasepic/profilepic.png",
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 4,
-    text: "You are invited to Summer Party. See more",
-    type: "invitation",
-    link: "/invite#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: "databasepic/profilepic.png",
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 5,
-    text: "You are invited to Ana's Baby Shower. See more",
-    type: "invitation",
-    link: "/invite#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: undefined,
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 6,
-    text: "Alex contributed 50 lei to your gift",
-    type: "event",
-    link: "/event#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: "databasepic/profilepic.png",
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 7,
-    text: "Radu bought an item from your wishlist",
-    type: "event",
-    link: "/event#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: undefined,
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-  {
-    id: 8,
-    text: "Ioana added photos to your event",
-    type: "event",
-    link: "/event#",
-    firstName: "John",
-    lastName: "Johnes",
-    profilePicture: undefined,
-    notificationDate: "2023-09-15T14:30:00Z",
-  },
-];
+import { api } from "~/trpc/react";
 
 const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
-  const [notifications] = useState(initialNotifications);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+
+
+  const { data: contributions = [] } =
+    api.contributions.getContributionsForUserEvents.useQuery();
+
+  const { data: purchasedItems = [] } =
+    api.contributions.getPurchasedItemsForUserEvents.useQuery();
+
+  const { data: invitations = [] } =
+    api.invitationsNotification.getUserInvitations.useQuery();
+
+const notifications: InboxNotificationResponse[] = [
+  ...contributions.map((n, idx) => ({
+    id: `contribution-${idx}`,
+    text: n.text,
+    type: n.type as "event" | "invitation",
+    link: n.link,
+    firstName: n.firstName ?? "",
+    lastName: n.lastName ?? "",
+    profilePicture: n.profilePicture ?? "",
+    notificationDate: n.notificationDate ?? new Date().toISOString(),
+  })),
+  ...purchasedItems.map((n, idx) => ({
+    id: `purchase-${idx}`,
+    text: n.text,
+    type: n.type as "event" | "invitation",
+    link: n.link,
+    firstName: n.firstName ?? "",
+    lastName: n.lastName ?? "",
+    profilePicture: n.profilePicture ?? "",
+    notificationDate: n.notificationDate ?? new Date().toISOString(),
+  })),
+  ...invitations.map((n) => ({
+    id: n.id,
+    text: n.description,
+    type: n.type as "event" | "invitation",
+    link: n.link,
+    firstName: n.firstName ?? "",
+    lastName: n.lastName ?? "",
+    profilePicture: n.profilePicture ?? "",
+    notificationDate: n.createdAt
+      ? new Date(n.createdAt).toISOString()
+      : new Date().toISOString(),
+  })),
+].sort(
+    (a, b) =>
+      new Date(b.notificationDate).getTime() -
+      new Date(a.notificationDate).getTime()
+  );
 
   const filtered = notifications.filter((n) => {
     if (activeTab === "All") return true;
@@ -103,7 +69,7 @@ const InboxContainer = () => {
 
   const totalCount = notifications.length;
 
-  const handleNotificationClick = (_id: number, link: string) => {
+  const handleNotificationClick = (_id: string | number, link: string) => {
     window.location.href = `http://localhost:3000${link}`;
   };
 

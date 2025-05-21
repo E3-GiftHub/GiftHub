@@ -1,10 +1,10 @@
 export interface InboxNotificationResponse {
-  id: number;
+  id: string | number;
   text: string;
-  type: string;
+  type: "event" | "invitation";
   link: string;
   firstName: string;
   lastName: string;
-  profilePicture: string | undefined;
+  profilePicture?: string;
   notificationDate: string;
 }
