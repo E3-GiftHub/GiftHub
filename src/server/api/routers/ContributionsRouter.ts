@@ -1,0 +1,47 @@
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+
+export const contributionsRouter = createTRPCRouter({
+    getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
+        /*
+        if (!ctx.session) {
+            throw new TRPCError({
+                code: "UNAUTHORIZED",
+                message: "You must be logged in",
+            });
+        }
+            
+        const currentUser = ctx.session.user;
+        const userIdentifier = currentUser.id;
+        */
+
+        const currentUsername = "user1";
+
+        const contributions = await ctx.db.contribution.findMany({
+            where: {
+                event: {
+                    createdByUsername: currentUsername,
+                },
+            },
+            include: {
+                guest: { select: { fname: true, lname: true, username: true } },
+                event: { select: { title: true, id: true } },
+                item: { select: { name: true } },
+            },
+
+        });
+
+        return contributions.map((contribution) => ({
+            text: `${contribution.guest.fname} contributed ${contribution.cashAmount} lei to your gift`,
+            type: "event",
+            link: `/event${contribution.event.id}#`,
+            firstName: contribution.guest.fname,
+            lastName: contribution.guest.lname,
+            profilePicture: "databasepic/profilepic.png",
+            notificationDate: contribution.createdAt.toISOString(),
+        }));
+    }),
+
+
+});
