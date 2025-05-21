@@ -7,7 +7,12 @@ import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../app/_components/GuestListModal";
 import EditMediaModal from "../app/_components/EditMediaModal";
 
+import { useRouter } from "next/navigation";
+
+
 export default function EventView() {
+
+    const router = useRouter();
     const [formData, setFormData] = useState({ date: "", time: "", location: "", description: "" });
     const [showConfirm, setShowConfirm] = useState(false);
     const [pendingField, setPendingField] = useState<null | string>(null);
@@ -203,6 +208,7 @@ export default function EventView() {
                         <div className={styles.wishlistBox}>
                             <button
                                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                                onClick={() => router.push("/CreateWishlist")}
                             >
                                 Create Wishlist
                             </button>
