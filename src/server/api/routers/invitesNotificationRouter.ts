@@ -37,8 +37,8 @@ export const invitesNotificationRouter = createTRPCRouter({
         // Map creator details for quick lookup
         const creatorMap = creators.reduce((map, creator) => {
             map[creator.username] = {
-                fname: creator.fname || "", // Default to an empty string if null
-                lname: creator.lname || "", // Default to an empty string if null
+                fname: creator.fname ?? "", // Default to an empty string if null
+                lname: creator.lname ?? "", // Default to an empty string if null
             };
             return map;
         }, {} as Record<string, { fname: string; lname: string }>);
@@ -46,12 +46,12 @@ export const invitesNotificationRouter = createTRPCRouter({
         // Format the response
         return invitations.map((inv) => ({
             id: inv.id,
-            description: inv.event?.description || "",
+            description: inv.event?.description ?? "",
             type: "invitation",
             link: `/invite#${inv.id}`,
-            firstName: creatorMap[inv.event?.createdByUsername || ""]?.fname || "",
-            lastName: creatorMap[inv.event?.createdByUsername || ""]?.lname || "",
-            profilePicture: inv.event?.pictureUrl || "",
+            firstName: creatorMap[inv.event?.createdByUsername ?? ""]?.fname ?? "",
+            lastName: creatorMap[inv.event?.createdByUsername ?? ""]?.lname ?? "",
+            profilePicture: inv.event?.pictureUrl ?? "",
             createdAt: inv.createdAt,
         }));
     }),

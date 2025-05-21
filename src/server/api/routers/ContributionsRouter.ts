@@ -2,7 +2,6 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import {MarkType} from "@prisma/client";
-
 export const contributionsRouter = createTRPCRouter({
     getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
         /*
@@ -34,14 +33,16 @@ export const contributionsRouter = createTRPCRouter({
         });
 
         return contributions.map((contribution) => ({
-            text: `${contribution.guest.fname} contributed ${contribution.cashAmount} lei to your gift`,
+            text: contribution.cashAmount
+              ? `${contribution.guest.fname} contributed ${contribution.cashAmount.toString()} lei to your gift`
+              : `${contribution.guest.fname} contributed an unspecified amount to your gift`,
             type: "event",
             link: `/event${contribution.event.id}#`,
             firstName: contribution.guest.fname,
             lastName: contribution.guest.lname,
             profilePicture: "databasepic/profilepic.png",
             notificationDate: contribution.createdAt.toISOString(),
-        }));
+}));
     }),
 
 
