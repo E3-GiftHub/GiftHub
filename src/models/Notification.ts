@@ -16,7 +16,6 @@ export interface NotificationData {
     title?: string;
     message: string;
     createdAt: Date;
-    read: boolean;
     category: NotificationCategory;
     contributionType?: ContributionType;
     sender?: string;
@@ -28,7 +27,6 @@ export class Notification {
     title?: string;
     message: string;
     createdAt: Date;
-    read: boolean;
     category: NotificationCategory;
     contributionType?: ContributionType;
     sender?: string;
@@ -40,16 +38,13 @@ export class Notification {
         this.title = data.title;
         this.message = data.message;
         this.createdAt = data.createdAt || new Date();
-        this.read = data.read || false;
         this.category = data.category;
         this.contributionType = data.contributionType;
         this.sender = data.sender;
         this.reciver = data.reciver;
     }
 
-    markAsRead(): void {
-        this.read = true;
-    }
+
 
     getTimeAgo(): string {
         const now = new Date();
@@ -130,9 +125,6 @@ export class Notification {
         return this.createdAt;
     }
 
-    isRead(): boolean {
-        return this.read;
-    }
 
     toJSON(): NotificationData {
         return {
@@ -140,7 +132,6 @@ export class Notification {
             title: this.title,
             message: this.message,
             createdAt: this.createdAt,
-            read: this.read,
             category: this.category,
             contributionType: this.contributionType,
             sender: this.sender,
