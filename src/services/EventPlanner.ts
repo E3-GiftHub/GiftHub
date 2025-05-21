@@ -2,7 +2,7 @@ import { db as prisma } from "~/server/db";
 import { EventEntity } from "~/services/Event";
 import { EventManagementException } from "~/services/EventManagementException";
 import { Status } from "@prisma/client"
-
+import { nanoid } from "nanoid"
 
 export class EventPlanner {
   async createEvent(data: {
@@ -20,6 +20,7 @@ export class EventPlanner {
         location: data.location,
         date: data.date,
         time: data.time,
+	token: nanoid(12),
         //createdByUsername: data.createdBy,
 	user: {
         //connect: { username: data.createdBy },
@@ -38,7 +39,7 @@ export class EventPlanner {
     await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: bigint, guestId: string): Promise<void> {
+  async sendInvitation(eventId: number, guestId: string): Promise<void> {
     const exists = await prisma.user.findUnique({ where: { username: guestId } });
     if (!exists) throw new EventManagementException("Guest does not exist");
 

@@ -30,19 +30,27 @@ export const eventRouter = createTRPCRouter({
       handle(() =>
         eventPlanner.createEvent({
           ...input,
-          createdBy: ctx.session?.user.username ?? "anonymous",
+          createdBy: ctx.session?.user.username,
         }).then((event) => event.raw)
       )
     ),
 
-  getEvent: publicProcedure
+  getEvent-ID: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .query(({ input }) =>
       handle(() =>
         prisma.event.findUniqueOrThrow({
-          where: { id: input.eventId },
-          include: { invitations: true },
+          where: { id: input.eventId }
         })
+      )
+    ),
+  getEvent-Token: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .query(({ input }) =>
+	handle(() => 
+	  prisma.event.findUniqueOrThrow({
+	   where: { token: input.token }
+	})
       )
     ),
 

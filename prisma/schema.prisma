@@ -131,6 +131,7 @@ model Event {
     date        DateTime?
     time        DateTime?
     pictureUrl  String?
+    token	String?	  @unique
 
     createdByUsername String
     createdAt         DateTime @default(now())
@@ -302,18 +303,6 @@ model ContributionNotification {
 
     user User         @relation(fields: [username], references: [username])
     cash Contribution @relation(fields: [contributionId], references: [id])
-<<<<<<< HEAD
-=======
+
 }
 
-//! huh ?
-
-model EventInvitationToken {
-    id        Int      @id @default(autoincrement())
-    token     String   @unique
-    eventId   Int
-    createdAt DateTime @default(now())
-
-    event Event @relation(fields: [eventId], references: [id])
->>>>>>> 338e7f7f864f6bf5ae93f5e817e7a1f56f42c55a
-}
