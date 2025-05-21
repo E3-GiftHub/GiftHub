@@ -54,8 +54,9 @@ jest.mock("../components/ui/MobileFilterMenu", () => ({
 
 jest.mock("../components/ui/InboxNotification", () => ({
   __esModule: true,
-  default: ({ data }: any) => <div>{data.text}</div>,
+  default: ({ data }: { data: { text: string } }) => <div>{data.text}</div>,
 }));
+
 
 
 jest.mock("~/trpc/react", () => ({
