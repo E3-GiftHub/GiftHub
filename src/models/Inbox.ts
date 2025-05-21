@@ -25,30 +25,6 @@ export class Inbox {
         );
     }
 
-    getUnreadNotifications(): Notification[] {
-        return this.notifications.filter(notification => !notification.isRead());
-    }
-
-    markAllAsRead(): void {
-        this.notifications.forEach(notification => notification.markAsRead());
-    }
-
-    markAsRead(notificationId: string): boolean {
-        const notification = this.notifications.find(n => n.id === notificationId);
-        if (notification) {
-            notification.markAsRead();
-            return true;
-        }
-        return false;
-    }
-
-
-    deleteNotification(notificationId: string): boolean {
-        const initialLength = this.notifications.length;
-        this.notifications = this.notifications.filter(n => n.id !== notificationId);
-        return this.notifications.length < initialLength;
-    }
-
 
     addNotification(notification: Notification | NotificationData): void {
         const notificationObj = notification instanceof Notification
