@@ -4,7 +4,8 @@ import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
 import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
-import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
+// import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
+import {invitesNotificationRouter} from "~/server/api/routers/invitesNotificationRouter";
 
 
 /**
@@ -18,8 +19,8 @@ export const appRouter = createTRPCRouter({
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
   contributions: contributionsRouter,
-  purchasedItems: purchasedItemsRouter,
-
+  purchasedItems: contributionsRouter,
+  invitationsNotification: invitesNotificationRouter,
 
 });
 
