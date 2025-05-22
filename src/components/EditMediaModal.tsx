@@ -1,7 +1,7 @@
 "use client";
 
-import styles from "../../styles/EventView.module.css";
-import buttonStyles from "../../styles/Button.module.css";
+import styles from "../styles/EventView.module.css";
+import buttonStyles from "../styles/Button.module.css";
 import Image from "next/image";
 
 type EditMediaModalProps = {

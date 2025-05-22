@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react";
-import Navbar from "../app/_components/Navbar";
+import Navbar from "../components/Navbar";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
-import GuestListModal from "../app/_components/GuestListModal";
-import EditMediaModal from "../app/_components/EditMediaModal";
+import GuestListModal from "../components/GuestListModal";
+import EditMediaModal from "../components/EditMediaModal";
 
 export default function EventView() {
     const [formData, setFormData] = useState({ date: "", time: "", location: "", description: "" });
