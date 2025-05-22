@@ -18,7 +18,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "jest --coverage --config jest.config.cjs"
+    "test": "jest --coverage --config jest.config.cjs",
+    "test-back": "jest --coverage --config jest.config.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
