@@ -1,0 +1,163 @@
+// https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
+
+ENUM StatusType {
+  PENDING
+  ACCEPTED
+  // REJECTED: if rejected => delete row
+}
+
+ENUM PriorityType {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+ENUM MarkType {
+  PURCHASED
+  RESERVED
+  CONTRIBUTED
+  // NULL: if null => delete row
+}
+
+TABLE User {
+  username STRING pk
+  email STRING
+  id STRING
+  fname STRING
+  lname STRING
+  password STRING
+  iban STRING
+  pictureUrl STRING
+
+  emailVerified DATETIME
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Event {
+  id INTEGER pk
+  title STRING
+  description STRING
+  location STRING
+  date DATETIME
+  time DATETIME
+  pictureUrl STRING
+
+  createdByUsername STRING [ref: > User.username]
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Invitation {
+  id INTEGER pk
+  guestUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+
+  status StatusType
+  createdAt DATETIME
+  repliedAt DATETIME
+}
+
+TABLE Media {
+  id INTEGER pk
+  uploaderUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id] // Directly linked to the event
+  url STRING
+
+  caption STRING
+  mediaType STRING
+  fileType STRING
+  fileSize INTEGER
+  createdAt DATETIME
+}
+
+// junction TABLE for event-specific wishlist entry
+TABLE EventArticle {
+  eventId INTEGER [ref: > Event.id]
+  itemId INTEGER [ref: > Item.id]
+  userNote STRING
+  priority PriorityType
+  createdAt DATETIME
+  updatedAt DATETIME
+
+  Note: "Composite primary key on (eventId, itemId)"
+}
+
+TABLE Item {
+  id INGETER pk
+  name STRING
+  description STRING
+  imagesUrl STRING
+  price DECIMAL
+
+  retailerId INTEGER [ref: > Retailer.id]
+  retailerUrl STRING
+
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Mark {
+  markerUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+  articleId INTEGER [ref: > Item.id]
+
+  type MarkType
+  createdAt DATETIME
+}
+
+TABLE Retailer {
+  id INTEGER pk
+  name STRING
+  apiUrl STRING
+}
+
+TABLE Contribution {
+  id INTEGER pk
+  contributorUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+  articleId INTEGER [ref: > Item.id]
+
+  cashAmount DECIMAL
+  createdAt DATETIME
+  updatedAt DATETIME
+
+  Note: "References EventArticles via (eventId, itemId)"
+}
+
+TABLE UserReport {
+  id INTEGER pk
+  reportedByUsername STRING [ref: > User.username]
+  reportedUsername STRING [ref: > User.username]
+  reason STRING
+  description STRING
+  reportedAt DATETIME
+}
+
+TABLE EventReport {
+  id INTEGER pk
+  reportedByUsername STRING [ref: > User.username]
+  reportedId INTEGER [ref: > Event.id]
+  reason STRING
+  description STRING
+  reportedAt DATETIME
+}
+
+ENUM NotificationAction {
+  READ
+  DELETE
+}
+
+TABLE MediaNotification {
+  id INTEGER pk
+  username STRING [ref: > User.username]
+  mediaId INTEGER [ref: > Media.id]
+  action NotificationAction
+}
+
+TABLE ContributionNotification {
+  id INTEGER pk
+  username STRING [ref: > User.username]
+  contributionId INTEGER [ref: > Contribution.id]
+  action NotificationAction
+}
