@@ -62,7 +62,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   const event = {
-    name: eventRecord.name,
+    name: eventRecord.title,
     description: eventRecord.description,
     date: eventRecord.date.toLocaleString(),
     location: eventRecord.location,

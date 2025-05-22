@@ -35,7 +35,7 @@ export const eventRouter = createTRPCRouter({
       )
     ),
 
-  getEvent-ID: publicProcedure
+  getEventID: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .query(({ input }) =>
       handle(() =>
@@ -44,7 +44,7 @@ export const eventRouter = createTRPCRouter({
         })
       )
     ),
-  getEvent-Token: publicProcedure
+  getEventToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(({ input }) =>
 	handle(() => 
