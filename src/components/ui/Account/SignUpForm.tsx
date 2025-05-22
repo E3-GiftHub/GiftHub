@@ -1,23 +1,23 @@
 import React, { useState } from "react";
-import styles from "./../../../styles/Account.module.css";
-import { api } from "~/trpc/react";
-import {useRouter} from "next/router";
-import { signupRouter } from "~/server/api/routers/userManagement/signup";
-
+import styles from "../../../styles/Account.module.css";
+import { useRouter } from "next/router";
+import {api} from "~/trpc/react";
 
 export default function SignupForm() {
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: ""
-  })
+  });
+
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
+
   const router = useRouter();
 
   const signupMutation = api.auth.signup.signup.useMutation({
@@ -26,7 +26,7 @@ export default function SignupForm() {
     },
     onError: (err) => {
       if(err.message === "User already exists") {
-        setErrors({ server: err.message });
+        setErrors({ username: err.message });
       }
       else if(err.message === "Passwords don't match") {
         setErrors({ confirmPassword: err.message });
@@ -87,104 +87,144 @@ export default function SignupForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+/*  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-
+  }*/
 
   return (
-      <div className={styles.rightPanel}>
-
+      <div className={`${styles.rightPanel} ${styles.signupPage}`}>
         <div className={styles.top}>
           <h3 className={styles.aboveTitle}>Welcome to GiftHub!</h3>
           <h2 className={styles.title}>Create your account</h2>
         </div>
+        {errors?.server}
 
         <div className={styles.middle}>
-          {errors?.server && (<div className="txt-red-500">
-            {errors.server}
-          </div>)}
+          <form
+            id="signUpForm"
+            className={styles.formContainer}
+            onSubmit={(e) => {
+              /*const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              /!*
+              * rules for email:
+              * ^[^\s@]+ -> at least a non-whitespace, non-@ character before @
+              * @[^\s@]+ -> an @ followed by a non-whitespace character
+              * \.[^\s@]+$ -> a period followed by some non-whitespace character
+              * *!/
 
-          <form className={styles.formContainer}>
+              if(formData.username.length < 6) {
+                alert("Username must be at least 8 character long.");
+                return;
+              }
 
+              if (!emailRegex.test(formData.email)) {
+                alert("Please enter a valid email address.");
+                return;
+              }
+
+              if(formData.password.length < 8) {
+                alert("Password must be at least 8 character long.");
+                return;
+              }
+
+              if(!/\d/.test(formData.password)) {
+                alert("Password must contain at least a digit.");
+                return;
+              }
+
+              if (formData.password !== formData.confirmPassword) {
+                alert("Passwords do not match.");
+                return;
+              }*/
+
+              //Cosmin! Your validation forms weren't necessary in the first place!
+
+              e.preventDefault();
+              console.log("Username:", formData.username);
+              console.log("Email:", formData.email);
+              console.log("Password:", formData.password);
+              //TODO: submit data
+
+              //AGAIN! See backend Implementation
+            }}
+          >
+
+            {/*username input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Username</label>
+              <label  htmlFor="username" className={styles.inputTitle}>Username {errors?.username}</label>
               <input
+                id="username"
                 type="text"
-                name="username"
                 placeholder="e.g. John99"
                 className={styles.inputField}
                 value={formData.username}
-                onChange={handleChange}
-                required
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
-              {errors?.username && (<div className="txt-red-500">
-                {errors.username}
-              </div>)}
             </div>
 
+            {/*email input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Email</label>
+              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
               <input
+                id="email"
                 type="text"
                 name="email"
                 placeholder="e.g. John99@gmail.com"
                 className={styles.inputField}
                 value={formData.email}
-                onChange={handleChange}
-                required
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
-              {errors?.email && (<div className="txt-red-500">
-                {errors.email}
-              </div>)}
             </div>
 
+            {/*password input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder={"Enter your password"}
+                  placeholder="Enter your password"
                   className={styles.inputField}
                   value={formData.password}
-                  onChange={handleChange}
-                  required
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
-                {errors?.password && (<div className="txt-red-500">
-                  {errors.password}
-                </div>)}
-                <img
-                  src={showPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
-                  alt={"toggle visibility"}
-                  className={styles.passwordIcon}
+                <button
+                  type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                />
+                  className={styles.passwordToggleButton}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <img
+                    src={showPassword ? "/illustrations/visibilityOff.svg" : "/illustrations/visibility.svg"}
+                    alt="password-icon"
+                  />
+                </button>
+
               </div>
             </div>
 
+            {/*confirm password input*/}
             <div className={styles.formGroup}>
-              <label className={styles.inputTitle}>Confirm password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Confirm password {errors?.confirmPassword}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  placeholder={"Confirm your password"}
+                  placeholder="Confirm your password"
                   className={styles.inputField}
                   value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 />
-                {errors?.confirmPassword && (<div className="txt-red-500">
-                  {errors.confirmPassword}
-                </div>)}
-                <img
-                  src={showConfirmPassword ? "/illustrations/hide_password.png" : "/illustrations/show_password.png"}
-                  alt="toggle visibility"
-                  className={styles.passwordIcon}
+                <button
+                  type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                />
+                  className={styles.passwordToggleButton}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <img
+                      src={showConfirmPassword ? "/illustrations/visibilityOff.svg" : "/illustrations/visibility.svg"}
+                    alt="password-icon"
+                  />
+                </button>
               </div>
             </div>
 
@@ -194,14 +234,36 @@ export default function SignupForm() {
         <div className={styles.bottom}>
           <button
             type="submit"
+            form="signUpForm"
             className={styles.primaryButton}
-            onClick={handleSubmit}
-          >
-            {signupMutation.isPending? "Loading...": "Sign up"}
+            onClick={handleSubmit}>
+            {signupMutation.isPending ? "Signing up..." : "Sign up"}
           </button>
 
+          <div className={styles.divider}>
+            <span className={styles.dividerText}>OR</span>
+          </div>
+
+          <div className={styles.alternativeButtons}>
+            <button className={styles.discordButton}>
+              <img
+                src="/illustrations/discordLogo.svg"
+                className={styles.discordIcon}
+              />
+              <span>Sign up with Discord</span>
+            </button>
+
+            <button className={styles.googleButton}>
+              <img
+                src="/illustrations/googleIcon.svg"
+                className={styles.googleIcon}
+              />
+              <span>Sign up with Google</span>
+            </button>
+          </div>
+
           <p className={styles.footer}>
-            Already have an account?
+            Already have an account?{' '}
             <a href="/login">
               <button className={styles.secondaryButton}>Log in</button>
             </a>

@@ -134,7 +134,7 @@ describe('signupRouter', () => {
           fname: null,
           lname: null,
           iban: null,
-          pictureUrl: null,
+          pictureUrl: "/UserImages/default_pgp.svg",
         },
       });
     });
