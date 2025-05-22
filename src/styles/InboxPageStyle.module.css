@@ -1,0 +1,36 @@
+.inboxpage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-image: url("/backgrounds/background_inboxpage.png");
+  background-repeat: repeat;
+  background-size: cover;
+  background-position: top center;
+}
+
+.content {
+  flex: 1;
+  padding: 0; 
+}
+.pageWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.separator {
+  width: 100%;
+  height: 2px;
+  background: #ffffff;
+  border: none;
+  margin: 0;
+}
+
+@media (max-width: 390px)
+{
+  .pageWrapper {
+  display: flex;
+ padding: 2rem 0 0 0 !important; 
+ justify-content: flex-start !important;
+}
+
+}
