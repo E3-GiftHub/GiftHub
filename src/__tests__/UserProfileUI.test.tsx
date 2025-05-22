@@ -85,9 +85,8 @@ describe('UserProfileUI', () => {
   it('calls onPhotoChange when a file is selected', async () => {
     const onPhotoChange = jest.fn();
     render(<UserProfileUI onPhotoChange={onPhotoChange} />);
-
-    const input = screen.getByLabelText('Edit avatar', { selector: 'button' });
-    // simulate click to open file input
+    screen.getByLabelText('Edit avatar', { selector: 'button' });
+// simulate click to open file input
     const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
     const fileInput = screen.getByTestId('file-input');
 
