@@ -11,6 +11,7 @@ interface AddToWishlistModalProps {
   itemPhoto: string
   itemPrice: string
   itemDescription?: string
+  onAddToWishlist: (item: { name: string; photo: string; price: string; quantity: number }) => void
 }
 
 export default function AddToWishlistModal({
@@ -20,10 +21,20 @@ export default function AddToWishlistModal({
   itemPhoto,
   itemPrice,
   itemDescription,
+  onAddToWishlist,
 }: AddToWishlistModalProps) {
   const [quantity, setQuantity] = useState(1)
 
   if (!isOpen) return null
+
+  const handleAddToWishlist = () => {
+    onAddToWishlist({
+      name: itemName,
+      photo: itemPhoto,
+      price: itemPrice,
+      quantity: quantity
+    });
+  };
 
   return (
     <div className={modalStyles.modalOverlay}>
@@ -60,10 +71,7 @@ export default function AddToWishlistModal({
           </button>
           <button
             className={`${styles.button} ${styles['button-primary']}`}
-            onClick={() => {
-              // Handle add to wishlist
-              onClose()
-            }}
+            onClick={handleAddToWishlist}
           >
             Add to Wishlist
           </button>
