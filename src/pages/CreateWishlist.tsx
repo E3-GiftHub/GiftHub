@@ -67,7 +67,7 @@ export default function CreateWishlist() {
       <div className={styles.container}>
         <main className={styles.main}>
           <div className={styles.titleContainer}>
-            <h1 className={styles.title}>Create Wishlist for {eventId}</h1>
+            <h1 className={styles.title}>Create Wishlist for Event1{eventId}</h1>
           </div>
 
           {/* Search Bar */}
