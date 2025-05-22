@@ -1,22 +1,18 @@
 // formidable.d.ts
 declare module 'formidable' {
-  import * as http from 'http';
+  import type * as http from 'http';
 
-  export interface Fields {
-    [key: string]: string | string[];
-  }
+  export type Fields = Record<string, string | string[]>;
 
   export interface File {
     filepath: string;
     originalFilename?: string;
     mimetype?: string;
     size?: number;
-    [key: string]: any;
+    [key: string]: never;
   }
 
-  export interface Files {
-    [key: string]: File | File[];
-  }
+  export type Files = Record<string, File | File[]>;
 
   export interface IncomingFormOptions {
     uploadDir?: string;
@@ -26,7 +22,7 @@ declare module 'formidable' {
     maxFieldsSize?: number;
     maxFields?: number;
     hash?: boolean | 'md5' | 'sha1';
-    filter?(part: any): boolean;
+    filter?(part: never): boolean;
   }
 
   export class IncomingForm {
