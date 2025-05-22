@@ -9,7 +9,7 @@ import {randomUUID} from "crypto"
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1, "Password must not be empty!"),
+  password: z.string().min(8),
   rememberMe: z.boolean().default(false),
 });
 

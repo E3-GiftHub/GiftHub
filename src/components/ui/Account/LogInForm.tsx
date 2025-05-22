@@ -76,23 +76,29 @@ export default function LogInForm() {
         <div className={styles.top}>
           <h3 className={styles.aboveTitle}>Welcome back!</h3>
           <h2 className={styles.title}>Log in to your account</h2>
+          {errors?.server && (errors.server === "User not found" || errors.server === "Passwords don't match") && (errors.server)}
         </div>
         <div className={styles.middle}>
           <form
             id="logInForm"
             className={styles.formContainer}
             onSubmit={(e) => {
+
               e.preventDefault();
               console.log("Email:", email);
               console.log("Password:", password);
 
               //TODO: check if account exists
+
+              //See Backend Stuff
+
+
             }}
           >
 
             {/*email input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="email" className={styles.inputTitle}>Email</label>
+              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
               <input
                 id="email"
                 type="text"
@@ -103,14 +109,11 @@ export default function LogInForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              {errors?.email && (<div className="txt-red-500">
-                {errors.email}
-              </div>)}
             </div>
 
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -120,9 +123,6 @@ export default function LogInForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                {errors?.password && (<div className="txt-red-500">
-                  {errors.password}
-                </div>)}
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}

@@ -26,7 +26,7 @@ export default function SignupForm() {
     },
     onError: (err) => {
       if(err.message === "User already exists") {
-        setErrors({ server: err.message });
+        setErrors({ username: err.message });
       }
       else if(err.message === "Passwords don't match") {
         setErrors({ confirmPassword: err.message });
@@ -87,10 +87,10 @@ export default function SignupForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+/*  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  }
+  }*/
 
   return (
       <div className={`${styles.rightPanel} ${styles.signupPage}`}>
@@ -98,19 +98,20 @@ export default function SignupForm() {
           <h3 className={styles.aboveTitle}>Welcome to GiftHub!</h3>
           <h2 className={styles.title}>Create your account</h2>
         </div>
+        {errors?.server}
 
         <div className={styles.middle}>
           <form
             id="signUpForm"
             className={styles.formContainer}
             onSubmit={(e) => {
-              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              /*
+              /*const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              /!*
               * rules for email:
               * ^[^\s@]+ -> at least a non-whitespace, non-@ character before @
               * @[^\s@]+ -> an @ followed by a non-whitespace character
               * \.[^\s@]+$ -> a period followed by some non-whitespace character
-              * */
+              * *!/
 
               if(formData.username.length < 6) {
                 alert("Username must be at least 8 character long.");
@@ -135,52 +136,57 @@ export default function SignupForm() {
               if (formData.password !== formData.confirmPassword) {
                 alert("Passwords do not match.");
                 return;
-              }
+              }*/
+
+              //Cosmin! Your validation forms weren't necessary in the first place!
 
               e.preventDefault();
               console.log("Username:", formData.username);
               console.log("Email:", formData.email);
               console.log("Password:", formData.password);
               //TODO: submit data
+
+              //AGAIN! See backend Implementation
             }}
           >
 
             {/*username input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="username" className={styles.inputTitle}>Username</label>
+              <label  htmlFor="username" className={styles.inputTitle}>Username {errors?.username}</label>
               <input
                 id="username"
                 type="text"
                 placeholder="e.g. John99"
                 className={styles.inputField}
                 value={formData.username}
-                onChange={handleChange}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
             </div>
 
             {/*email input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="email" className={styles.inputTitle}>Email</label>
+              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
               <input
                 id="email"
                 type="text"
+                name="email"
                 placeholder="e.g. John99@gmail.com"
                 className={styles.inputField}
                 value={formData.email}
-                onChange={handleChange}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
 
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className={styles.inputField}
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button
                   type="button"
@@ -199,14 +205,14 @@ export default function SignupForm() {
 
             {/*confirm password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Confirm password</label>
+              <label htmlFor="password" className={styles.inputTitle}>Confirm password {errors?.confirmPassword}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   className={styles.inputField}
                   value={formData.confirmPassword}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 />
                 <button
                   type="button"
@@ -226,7 +232,13 @@ export default function SignupForm() {
         </div>
 
         <div className={styles.bottom}>
-          <button type="submit" form="signUpForm" className={styles.primaryButton} onSubmit={handleSubmit}>Sign up</button>
+          <button
+            type="submit"
+            form="signUpForm"
+            className={styles.primaryButton}
+            onClick={handleSubmit}>
+            {signupMutation.isPending ? "Signing up..." : "Sign up"}
+          </button>
 
           <div className={styles.divider}>
             <span className={styles.dividerText}>OR</span>
