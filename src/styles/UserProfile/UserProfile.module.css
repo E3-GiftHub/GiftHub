@@ -227,19 +227,16 @@
     display: block;
 }
 
-/* Adjust button container spacing */
 .buttonContainer {
     gap: 3.6rem;
 }
 
-/* Add disabled state styling for the save button */
 .button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
     background: #4a4569;
 }
 
-/* Loading state for input fields */
 .inputField.loading {
     background-color: #3a3468;
     border-color: #4a4569;
@@ -311,6 +308,8 @@
 }
 
 .modalContent {
+    margin-left: 1em;
+    margin-right: 1em;
     color: white;
     background: #2E236B;
     padding: 24px;
@@ -344,7 +343,7 @@
     margin-bottom: 1em;
 }
 
-.buttonContainer {
+.buttonContainerReport {
     display: flex;
     flex-direction: column;
     align-items: center;

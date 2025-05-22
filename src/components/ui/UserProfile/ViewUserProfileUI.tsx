@@ -165,7 +165,7 @@ export default function ViewUserProfileUI({
                             </>
                         )}
 
-                        <div className={styles.buttonContainer}>
+                        <div className={styles.buttonContainerReport}>
                         <button type="submit" className={styles.buttonSubmitReport}>
                             Submit Report
                         </button>
