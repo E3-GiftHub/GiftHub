@@ -9,7 +9,7 @@ export class EventEntity {
     this.data = event;
   }
 
-  static async publishEvent(eventId: bigint): Promise<void> {
+  static async publishEvent(eventId: number): Promise<void> {
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) throw new Error("Event not found");
     // Logic to make event visible, if needed
