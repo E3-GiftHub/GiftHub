@@ -4,15 +4,18 @@
     height: 100%;
     background-color: #1a1242;
 }
+
 :global(body) {
     margin: 0;
     padding: 0;
     min-height: 100%;
     overflow-x: hidden;
 }
+
 :global(#__next) {
     min-height: 100%;
 }
+
 :global(*),
 :global(*::before),
 :global(*::after) {
@@ -74,9 +77,9 @@
 }
 
 .photoBox {
-    margin-top:1rem;
+    margin-top: 1rem;
     height: 230px;
-    width:200px;
+    width: 200px;
     background-color: #cbb1dc;
     border-radius: 10px;
     display: flex;
@@ -218,10 +221,10 @@
 
     height: clamp(30px, 18.7vh, 40px);
     padding: 0rem;
-    display: flex;                /* Asigură layout-ul */
-    align-items: center;          /* Centrează pe verticală */
-    justify-content: center;      /* Centrează pe orizontală */
-    text-align: center;           /* Fallback */
+    display: flex; /* Asigură layout-ul */
+    align-items: center; /* Centrează pe verticală */
+    justify-content: center; /* Centrează pe orizontală */
+    text-align: center; /* Fallback */
 }
 
 /* 🔽 MEDIA QUERIES - Responsive tweaks */
@@ -276,7 +279,6 @@
 }
 
 
-
 .mediaGallery {
     flex: 1.5 1 300px;
     background-color: #43328B;
@@ -320,7 +322,7 @@
     max-height: 100%;
 }
 
-.mediaButton{
+.mediaButton {
     margin-top: 0.1rem;
     max-height: 2.7rem;
 }
@@ -329,6 +331,7 @@
     .mediaGalleryBox {
         width: 100%;
     }
+
     .photoSection {
         display: flex;
         flex-direction: column;
@@ -336,6 +339,7 @@
         gap: 3.5rem;
     }
 }
+
 .modalBackdrop {
     position: fixed;
     top: 0;
@@ -357,7 +361,7 @@
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 400px;
+    max-width: 900px;
     max-height: 90dvh;
     display: flex;
     flex-direction: column;
@@ -380,7 +384,7 @@
 
 .modalContent {
     flex: 1;
-    min-height: 0;              /* 👈 esențial pentru scroll */
+    min-height: 0; /* 👈 esențial pentru scroll */
     overflow-y: auto;
     padding-right: 0.5rem;
     margin-bottom: 1rem;
