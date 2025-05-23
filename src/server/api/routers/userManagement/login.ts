@@ -54,8 +54,7 @@ export const loginRouter = createTRPCRouter({
 
 
 
-        const sessionToken = `${email}:${user.username}`;
-        //const expiresIn = rememberMe ? "30d" : "1h";
+        const sessionToken = user.username;
         const expires = new Date(Date.now() + (rememberMe ? 30 * 24 * 60 * 60 : 0));
 
         return {
