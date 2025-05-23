@@ -8,6 +8,7 @@ import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 
 import { useRouter } from "next/navigation";
+import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 
 export default function EventView() {
   const router = useRouter();
@@ -199,12 +200,11 @@ export default function EventView() {
                   </div>
                 ))}
               </div>
-              <button
-                className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
+              <ButtonComponent
+                text={"See more"}
                 onClick={() => setShowGuestModal(true)}
-              >
-                See more
-              </button>
+                style={ButtonStyle.PRIMARY}
+              />
             </div>
             <div className={styles.mediaGallery}>
               <label className={styles.label2}>Media Gallery</label>
