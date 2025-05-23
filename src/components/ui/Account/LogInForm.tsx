@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
 import {api} from "~/trpc/react";
-import Link from "next/link";
 
 export default function LogInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,11 +13,15 @@ export default function LogInForm() {
   const router = useRouter();
 
   React.useEffect(() => {
-    const cookie = document.cookie;
+    const cookie = document.cookie.split(';');
+    const hasAuthCookie = cookie.some(cookie => {
+      const [name] = cookie.trim().split('=');
+      return name === 'session_auth1' || name === 'session_auth2';
+      });
 
-    if(cookie)
+    if(hasAuthCookie)
     {
-      void router.push("/home");
+      router.push("/home");
     }
   }, [router]);
 
@@ -37,7 +40,7 @@ export default function LogInForm() {
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
 
-      void router.push("/home");
+      router.push("/home");
     },
     onError: (err) => {
       if(err.message === "User not found") {
@@ -143,9 +146,9 @@ export default function LogInForm() {
               </div>
             </div>
             <p className={styles.forgotPassword}>
-              <Link href="/forgotpassword" className={styles.forgotPassword}>
+              <a href="/forgotpassword" className={styles.forgotPassword}>
                 Forgot password?
-              </Link>
+              </a>
             </p>
 
           </form>
@@ -190,10 +193,10 @@ export default function LogInForm() {
           {/*</div>*/}
 
           <p className={styles.footer}>
-            Don&#39;t have an account?{' '}
-            <Link href="/signup">
+            Don't have an account?{' '}
+            <a href="/signup">
               <button className={styles.secondaryButton}>Sign up</button>
-            </Link>
+            </a>
           </p>
         </div>
       </div>
