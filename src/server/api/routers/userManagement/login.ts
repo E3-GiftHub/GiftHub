@@ -3,8 +3,8 @@ import {createTRPCRouter, publicProcedure} from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 import {TRPCError} from "@trpc/server";
 //import {serialize} from "cookie";
-import {randomUUID} from "crypto"
-import jwt from "jsonwebtoken";
+//import {randomUUID} from "crypto"
+//import jwt from "jsonwebtoken";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -52,22 +52,23 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
+
+
+        const sessionToken = `${email}:${user.username}`;
         const expiresIn = rememberMe ? "30d" : "1h";
-
-        const sessionToken = jwt.sign(
-          {email: user.email},
-          process.env.AUTH_SECRET!,
-          {expiresIn}
-        );
-
-        const expires = new Date();
-        expires.setSeconds(expires.getSeconds() + (rememberMe ? 2592000 : 3600));
+        const expires = new Date(Date.now() + (rememberMe ? 30 * 24 * 60 * 60 : 0));
 
         await ctx.db.session.create({
           data: {
             sessionToken,
             expires,
-            user: {connect: {email: user.email!}}
+            user:
+              {
+                connect:
+                  {
+                    email: user.email!,
+                  }
+              }
           }
         });
 
