@@ -6,6 +6,11 @@ import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../app/_components/GuestListModal";
 import EditMediaModal from "../app/_components/EditMediaModal";
+import EventInfoForm from "../app/_components/EventInfoForm";
+import Guests from "../app/_components/Guests";
+import Media from "../app/_components/Media";
+import ConfirmModal from "../app/_components/ConfirmModal";
+
 
 import { useRouter } from "next/navigation";
 
@@ -59,45 +64,29 @@ export default function EventView() {
             {showGuestModal && (
                 <GuestListModal
                     guests={guestList}
-                    onRemoveGuest={handleRemoveGuest}
-                    onAddGuest={handleAddGuest}
-                    onSave={handleSaveGuestChanges}
+                    onRemoveGuest={(idx) => setGuestList(prev => prev.filter((_, i) => i !== idx))}
+                    onAddGuest={() => setGuestList(prev => [...prev, `Guest ${prev.length + 1}`])}
+                    onSave={() => setShowGuestModal(false)}
                     onClose={() => setShowGuestModal(false)}
                     onBack={() => setShowGuestModal(false)}
                 />
             )}
 
-            {showConfirm && (
-                <div className={styles.modalBackdrop}>
-                    <div className={styles.modal}>
-                        <p>
-                            Save changes to <strong>{pendingField}</strong>?
-                        </p>
-                        <div className={styles.modalActions}>
-                            <button
-                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                                onClick={handleConfirm}
-                            >
-                                Yes
-                            </button>
-                            <button
-                                className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                                onClick={() => setShowConfirm(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {showMediaModal && (
                 <EditMediaModal
                     media={mediaList}
-                    onRemove={handleRemoveMedia}
-                    onUpload={handleUploadMedia}
-                    onSave={handleSaveMedia}
+                    onRemove={(idx) => setMediaList(prev => prev.filter((_, i) => i !== idx))}
+                    onUpload={() => setMediaList(prev => [...prev, `/placeholder/image${mediaList.length + 1}.jpg`])}
+                    onSave={() => setShowMediaModal(false)}
                     onClose={() => setShowMediaModal(false)}
+                />
+            )}
+
+            {showConfirm && (
+                <ConfirmModal
+                    pendingField={pendingField}
+                    onConfirm={handleConfirm}
+                    onCancel={() => setShowConfirm(false)}
                 />
             )}
 
@@ -107,104 +96,27 @@ export default function EventView() {
                 </div>
 
                 <div className={styles.wrapper}>
-                    {/* Rand: Poză + Data+Locație + Descriere */}
                     <div className={styles.topSection}>
-                        {/* Poza */}
                         <div className={styles.photoSection}>
-                         <div className={styles.photoBox}>Event photo here</div>
-                       </div>
-                        {/* Data + Locația */}
-                        <div className={styles.infoBox}>
-                            <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Date</label>
-                                <input
-                                    className={styles.input}
-                                    type="date"
-                                    value={formData.date}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({ ...prev, date: e.target.value }))
-                                    }
-                                    onKeyDown={(e) => handleKeyDown(e, "date")}
-                                />
-                            </div>
-                            <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Time</label>
-                                <input
-                                    className={styles.input}
-                                    type="time"
-                                    value={formData.time}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({ ...prev, time: e.target.value }))
-                                    }
-                                    onKeyDown={(e) => handleKeyDown(e, "time")}
-                                />
-                            </div>
-                            <div className={styles.fieldGroup}>
-                                <label className={styles.label}>Location</label>
-                                <input
-                                    className={styles.input}
-                                    type="text"
-                                    placeholder="Enter location"
-                                    value={formData.location}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({ ...prev, location: e.target.value }))
-                                    }
-                                    onKeyDown={(e) => handleKeyDown(e, "location")}
-                                />
-                            </div>
+                            <div className={styles.photoBox}>Event photo here</div>
                         </div>
 
-                        {/* Descrierea */}
-                        <div className={styles.descriptionBox}>
-                            <label className={styles.label}>Description</label>
-                            <textarea
-                                className={styles.textarea}
-                                placeholder="Event description..."
-                                value={formData.description}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({ ...prev, description: e.target.value }))
-                                }
-                                onKeyDown={(e) => handleKeyDown(e, "description")}
-                            />
-                        </div>
+                        <EventInfoForm
+                            formData={formData}
+                            setFormData={setFormData}
+                            handleKeyDown={handleKeyDown}
+                        />
                     </div>
 
-
-                    {/* Rand: Lista de invitați + buton + wishlist */}
                     <div className={styles.bottomRow}>
-                        <div className={styles.guestBoard}>
-                            <label className={styles.label2}>Guest List</label>
-                            <div className={styles.guestList}>
-                                {Array.from({ length: 12 }, (_, i) => (
-                                    <div key={i} className={styles.guestItem}>
-                                        Guest {i + 1}
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
-                                onClick={() => setShowGuestModal(true)}
-                            >
-                                See more
-                            </button>
-                        </div>
-                        <div className={styles.mediaGallery}>
-                            <label className={styles.label2}>Media Gallery</label>
-                            <div className={styles.mediaGrid}>
-                                {Array.from({ length: 20 }, (_, i) => (
-                                    <div key={i} className={styles.mediaItem}>
-                                        <img src={`/placeholder/image${i + 1}.jpg`} alt={`Media ${i + 1}`} />
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}
-                                onClick={() => setShowMediaModal(true)}
-                            >
-                                Edit Media
-                            </button>
-
-                        </div>
+                        <Guests
+                            guestList={guestList}
+                            onOpenModal={() => setShowGuestModal(true)}
+                        />
+                        <Media
+                            mediaList={mediaList}
+                            onOpenModal={() => setShowMediaModal(true)}
+                        />
                         <div className={styles.wishlistBox}>
                             <button
                                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
@@ -217,5 +129,5 @@ export default function EventView() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -12,8 +12,11 @@ import { api } from "~/trpc/react";
 import Modal from "~/components/Modal";
 import { useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 
 const MyEventsSection: React.FC = () => {
+    const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
@@ -33,6 +36,10 @@ const MyEventsSection: React.FC = () => {
   }
   const trimmedEvents = eventsData.slice(0, 3);
 
+    const handleAddNewEvent = () => {
+        router.push("/CreateEvent");
+    };
+
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
       <ContainerEventTitle title={"My events"} />
@@ -48,7 +55,7 @@ const MyEventsSection: React.FC = () => {
       </Modal>
 
       <div className={styles["buttons-wrapper"]}>
-        <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
+        <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY}  onClick={handleAddNewEvent} />
       </div>
     </Container>
   );

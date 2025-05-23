@@ -4,8 +4,19 @@ import styles from "../styles/CreateEditEvent.module.css"
 import Navbar from "../app/_components/Navbar"
 import buttonStyles from "../styles/Button.module.css";
 
+import { useRouter } from "next/navigation";
+
+
 
 export default function Page() {
+
+    const router = useRouter();
+
+    const handleSaveAndContinue = () => {
+        // poți adăuga aici logică de salvare dacă ai nevoie
+        router.push("/EventView");
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <Navbar />
@@ -26,6 +37,15 @@ export default function Page() {
                                 <input type="date" />
                                 <span className={styles.icon}></span>
                             </label>
+
+                            <label>
+                                Set the time:
+                                <input
+                                    type="time"
+
+                                />
+                            </label>
+
                             <label>
                                 Set the location:
                                 <input type="text" placeholder="Enter location" />
@@ -42,8 +62,12 @@ export default function Page() {
                                     &nbsp;Cancel&nbsp;
                                 </button>
 
-                                <button className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}>
-                                    Save &  <br /> Continue
+                                <button
+                                    type="button"
+                                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                                    onClick={handleSaveAndContinue}
+                                >
+                                    Save & <br /> Continue
                                 </button>
 
                             </div>
