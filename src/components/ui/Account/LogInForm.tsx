@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
 import {api} from "~/trpc/react";
+import Link from "next/link"
 
 export default function LogInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +22,7 @@ export default function LogInForm() {
 
     if(hasAuthCookie)
     {
-      router.push("/home");
+      void router.push("/home");
     }
   }, [router]);
 
@@ -40,7 +41,7 @@ export default function LogInForm() {
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
 
-      router.push("/home");
+      void router.push("/home");
     },
     onError: (err) => {
       if(err.message === "User not found") {
@@ -146,9 +147,9 @@ export default function LogInForm() {
               </div>
             </div>
             <p className={styles.forgotPassword}>
-              <a href="/forgotpassword" className={styles.forgotPassword}>
+              <Link href="/forgotpassword" className={styles.forgotPassword}>
                 Forgot password?
-              </a>
+              </Link>
             </p>
 
           </form>
@@ -193,10 +194,10 @@ export default function LogInForm() {
           {/*</div>*/}
 
           <p className={styles.footer}>
-            Don't have an account?{' '}
-            <a href="/signup">
+            Don&apost have an account?{' '}
+            <Link href="/signup">
               <button className={styles.secondaryButton}>Sign up</button>
-            </a>
+            </Link>
           </p>
         </div>
       </div>
