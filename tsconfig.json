@@ -21,8 +21,8 @@
       "ES2022"
     ],
     "noEmit": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "ESNext",   // Change this to commonjs for ts-node compatibility
+    "moduleResolution": "node",  // Ensure this is set to node for proper resolution of modules
     "jsx": "preserve",
     "plugins": [
       {
