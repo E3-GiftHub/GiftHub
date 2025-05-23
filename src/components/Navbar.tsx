@@ -164,10 +164,10 @@ const Navbar = () => {
                   <FaUserEdit /> Edit Profile
                 </Link>
                 <Link href="/#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLogout();
-                }}>
+                onClick={async (e) => {
+  e.preventDefault();
+  await handleLogout();
+}}>
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>
