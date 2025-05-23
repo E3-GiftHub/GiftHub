@@ -10,7 +10,7 @@ const ContributionPage: React.FC = () => {
   const router = useRouter();
 
   const handleWishlist = () => {
-    void router.push('/wishlistview');
+    void router.push('/wishlist');
   };
 
   const handlePay = () => {
