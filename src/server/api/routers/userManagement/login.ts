@@ -58,25 +58,10 @@ export const loginRouter = createTRPCRouter({
         //const expiresIn = rememberMe ? "30d" : "1h";
         const expires = new Date(Date.now() + (rememberMe ? 30 * 24 * 60 * 60 : 0));
 
-        await ctx.db.session.create({
-          data: {
-            sessionToken,
-            expires,
-            user:
-              {
-                connect:
-                  {
-                    email: user.email!,
-                  }
-              }
-          }
-        });
-
         return {
           success: true,
           sessionToken,
           expires: expires.toISOString(),
         };
     }),
-
 })
