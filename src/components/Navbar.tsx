@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -10,7 +11,6 @@ import {
   FaBars,
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
-import Link from "next/link";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ const Navbar = () => {
   const profileRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    const specialPages = ["/#", "/"];
+    const specialPages = ["http://localhost:3000/#", "http://localhost:3000/"];
 
     const checkSpecialPage = () => {
       const isSpecial = specialPages.includes(window.location.href);
@@ -82,14 +82,14 @@ const Navbar = () => {
 
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <Link
-            href="/login#"
+          <a
+            href="http://localhost:3000/login#"
             className={styles["login-button"]}
           >
             <FaUser />
             <FaArrowRight />
             Login
-          </Link>
+          </a>
         </div>
       ) : (
         <>
@@ -109,20 +109,20 @@ const Navbar = () => {
             }`}
           >
             <li>
-              <Link
-                href="/home#"
+              <a
+                href="http://localhost:3000/home#"
                 className={activePage === "home" ? styles["nav-link-active"] : ""}
               >
                 <FaHome /> Home
-              </Link>
+              </a>
             </li>
             <li>
-              <Link
-                href="/inbox#"
+              <a
+                href="http://localhost:3000/inbox#"
                 className={activePage === "inbox" ? styles["nav-link-active"] : ""}
               >
                 <FaInbox /> Inbox
-              </Link>
+              </a>
             </li>
             <li
               ref={profileRef}
@@ -130,7 +130,7 @@ const Navbar = () => {
                 profileOpen ? styles.open : ""
               }`}
             >
-              <Link
+              <a
                 href="#"
                 className={styles["profile-main-button"]}
                 onClick={(e) => {
@@ -139,14 +139,14 @@ const Navbar = () => {
                 }}
               >
                 <FaUser /> Profile
-              </Link>
+              </a>
               <div className={styles["dropdown-content"]}>
-                <Link href="/profile#">
+                <a href="http://localhost:3000/profile#">
                   <FaUserEdit /> Edit Profile
-                </Link>
-                <Link href="/#">
+                </a>
+                <a href="http://localhost:3000/#">
                   <FaSignOutAlt /> Logout
-                </Link>
+                </a>
               </div>
             </li>
           </ul>
