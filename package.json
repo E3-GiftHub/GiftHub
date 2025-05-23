@@ -29,7 +29,9 @@
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "bcrypt": "^6.0.0",
     "date-fns": "^4.1.0",
+    "formidable": "^3.5.4",
     "next": "^15.2.3",
     "next-auth": "5.0.0-beta.25",
     "react-icons": "^5.5.0",
@@ -44,6 +46,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/date-fns": "^2.5.3",
     "@types/jest": "^29.5.14",
     "@types/mocha": "^10.0.10",
@@ -74,5 +77,5 @@
     "initVersion": "7.39.3"
   },
   "packageManager": "npm@11.3.0",
-  "type" : "module"
+  "type": "module"
 }

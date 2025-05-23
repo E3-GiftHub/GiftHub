@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import styles from "../../../styles/Account.module.css";
+import styles from "../../../styles/Account.module.css"
+import Link from "next/link";
 
 export default function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -98,9 +99,9 @@ export default function ResetPasswordForm() {
 
           <p className={styles.footer}>
             Back to{' '}
-            <a href="/login">
+            <Link href="/login">
               <button className={styles.secondaryButton}>Log in</button>
-            </a>
+            </Link>
           </p>
         </div>
       </div>

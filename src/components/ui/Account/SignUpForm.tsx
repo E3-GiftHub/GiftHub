@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
 import {api} from "~/trpc/react";
+import Link from "next/link";
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,14 +16,13 @@ export default function SignupForm() {
     confirmPassword: ""
   });
 
-
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
 
   const router = useRouter();
 
   const signupMutation = api.auth.signup.signup.useMutation({
     onSuccess: () => {
-      router.push("/login");
+      void router.push("/login");
     },
     onError: (err) => {
       if(err.message === "User already exists") {
@@ -264,9 +264,9 @@ export default function SignupForm() {
 
           <p className={styles.footer}>
             Already have an account?{' '}
-            <a href="/login">
+            <Link href="/login">
               <button className={styles.secondaryButton}>Log in</button>
-            </a>
+            </Link>
           </p>
 
         </div>

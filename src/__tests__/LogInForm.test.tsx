@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import LoginForm from '~/components/ui/Account/LoginForm';
+import LoginForm from '~/components/ui/Account/LogInForm';
 import { useRouter } from 'next/router';
 import { api } from '~/trpc/react';
 
@@ -222,6 +222,7 @@ describe('LoginForm Component', () => {
     render(<LoginForm />);
 
     mockMutate.mockImplementationOnce((data, { onSuccess }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       onSuccess();
     });
 
@@ -241,18 +242,18 @@ describe('LoginForm Component', () => {
   it('toggles password visibility', async () => {
     render(<LoginForm />);
 
-    const passwordInput = screen.getByLabelText('Password') as HTMLInputElement;
+    const passwordInput = screen.getByLabelText('Password');
     const toggleButton = screen.getByRole('img', { name: /toggle visibility/i });
 
     // Default state should be password
-    expect(passwordInput.type).toBe('password');
+    expect((passwordInput as HTMLInputElement).type).toBe('password');
 
     // Click to show password
     fireEvent.click(toggleButton);
-    expect(passwordInput.type).toBe('text');
+    expect((passwordInput as HTMLInputElement).type).toBe('text');
 
     // Click to hide password again
     fireEvent.click(toggleButton);
-    expect(passwordInput.type).toBe('password');
+    expect((passwordInput as HTMLInputElement).type).toBe('password');
   });
 });

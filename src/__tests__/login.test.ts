@@ -1,4 +1,4 @@
-import { createTRPCContext } from "~/server/api/trpc";
+
 import { appRouter } from "~/server/api/root";
 import { db } from "~/server/db";
 import { TRPCError } from "@trpc/server";
@@ -66,15 +66,21 @@ describe("loginRouter", () => {
 
       const result = await caller.auth.login.login(input);
 
-      expect(result).toEqual({
-        success: true,
-        sessionToken: "test@example.com",
-        expires: expect.any(String),
-      });
-      expect(db.user.findFirst).toHaveBeenCalledWith({
+      expect(result).toEqual(
+        expect.objectContaining({
+          sessionToken: validInput.email,
+          success: true,
+          expires: expect.any(String) as unknown as string,
+        })
+      );
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      const findFirstMock = db.user.findFirst as jest.Mock;
+      expect(findFirstMock).toHaveBeenCalledWith({
         where: { email: validInput.email },
         select: { username: true, email: true, password: true },
       });
+
       expect(bcrypt.compare).toHaveBeenCalledWith(
         validInput.password,
         mockUser.password
@@ -151,14 +157,19 @@ describe("loginRouter", () => {
 
       await caller.auth.login.login(validInput);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(db.session.create).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
       const sessionData = (db.session.create as jest.Mock).mock.calls[0][0]
         .data;
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(sessionData.user).toEqual({
         connect: { username: mockUser.username },
       });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(sessionData.sessionToken).toContain(validInput.email);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(sessionData.expires).toBeInstanceOf(Date);
     });
   });

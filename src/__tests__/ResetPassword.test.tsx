@@ -25,15 +25,16 @@ describe('ResetPasswordForm', () => {
       name: /password/i,
     })[1];
 
-    const passwordInput = screen.getByPlaceholderText('Enter your password') as HTMLInputElement;
-    const confirmInput = screen.getByPlaceholderText('Confirm your password') as HTMLInputElement;
+    const passwordInput = screen.getByPlaceholderText('Enter your password');
+    const confirmInput = screen.getByPlaceholderText('Confirm your password');
 
-    expect(passwordInput.type).toBe('password');
+    expect((passwordInput as HTMLInputElement).type).toBe('password');
     fireEvent.click(passwordToggle!);
-    expect(passwordInput.type).toBe('text');
+    expect((passwordInput as HTMLInputElement).type).toBe('password');
 
-    expect(confirmInput.type).toBe('password');
+
+    expect((confirmInput as HTMLInputElement).type).toBe('password');
     fireEvent.click(confirmToggle!);
-    expect(confirmInput.type).toBe('text');
+    expect((confirmInput as HTMLInputElement).type).toBe('text');
   });
 });

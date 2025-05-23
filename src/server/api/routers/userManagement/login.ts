@@ -5,8 +5,6 @@ import {TRPCError} from "@trpc/server";
 //import {serialize} from "cookie";
 import {randomUUID} from "crypto"
 
-
-
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -44,6 +42,7 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if(!passwordMatch){

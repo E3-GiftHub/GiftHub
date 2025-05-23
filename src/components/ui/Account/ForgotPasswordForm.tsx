@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
+import Link from "next/link";
 
 export default function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
+  const [email] = useState("");
   return (
     <div className={`${styles.rightPanel} ${styles.resetPasswordPage}`}>
     <div className={styles.top}>
           <h2 className={styles.title}>Forgot password?</h2>
-          <p className={styles.belowTitle}>We'll send you the instructions shortly.</p>
+          <p className={styles.belowTitle}>We&#39;ll send you the instructions shortly.</p>
         </div>
 
         <div className={styles.middle}>
@@ -41,9 +42,9 @@ export default function ForgotPasswordForm() {
           <button className={styles.primaryButton}>Confirm</button>
           <p className={styles.footer}>
             Back to{' '}
-            <a href="/login">
+            <Link href="/login">
               <button className={styles.secondaryButton}>Log in</button>
-            </a>
+            </Link>
           </p>
 
         </div>
