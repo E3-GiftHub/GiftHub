@@ -1,12 +1,9 @@
 .button {
   padding: 1rem 2rem;
-
   border-radius: 10px;
   outline: none;
   border: none;
-
   color: white;
-
   font-size: 0.8rem;
   font-weight: 400;
   transition: transform 0.1s ease;
@@ -16,19 +13,18 @@
   transform: scale(1.1);
 }
 
+
 .button:active {
   transform: scale(1);
 }
 
 .button-primary {
   background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
-
   box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
 }
 
 .button-secondary {
   background: linear-gradient(0deg, #A287FE 0%, #D4C8FE 100%);
-
   box-shadow: inset 0px -5px 1px rgba(0, 0, 0, 0.3);
 }
 

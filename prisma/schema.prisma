@@ -32,6 +32,7 @@ enum PriorityType {
 /// we keep this in case of new types of marks
 enum MarkType {
     PURCHASED
+    CONTRIBUTING
     // NULL: if null => delete row
 }
 
