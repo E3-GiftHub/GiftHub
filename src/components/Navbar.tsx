@@ -73,7 +73,10 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try{
-      document.cookie = `session_cookie=; path=/; max-age=0; ${
+      document.cookie = `session_auth1=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+      document.cookie = `session_auth2=; path=/; max-age=0; ${
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
       window.location.href = "http://localhost:3000/";

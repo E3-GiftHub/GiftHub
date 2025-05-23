@@ -28,12 +28,12 @@ export default function LogInForm() {
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60);
         //data.expires = expires.toISOString();
 
-        document.cookie = `session_cookie=${data.sessionToken}; path=/; max-age=${expires.toISOString()}; ${
+        document.cookie = `session_auth1=${data.sessionToken}; path=/; max-age=${expires.toISOString()}; ${
           process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
         }`;
       }
 
-      document.cookie = `session_cookie=${data.sessionToken}; path=/; max-age=${data.expires}; ${
+      document.cookie = `session_auth2=${data.sessionToken}; path=/; max-age=${data.expires}; ${
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
 
