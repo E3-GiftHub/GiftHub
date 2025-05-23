@@ -19,7 +19,7 @@ const WishlistPage: React.FC = () => {
         <meta name="description" content="Gift Hub wishlist demonstration page" />
       </Head>
       <Navbar />
-      <main>
+      <main className={styles.mainContent}>
         <WishlistView contribution={handleContribute} />
       </main>
       <Footer />

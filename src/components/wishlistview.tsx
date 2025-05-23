@@ -34,7 +34,11 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution }) => {
   }, [data]);
 
   if(isLoading)
-    return <div>Loading...</div>;
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
   if(isError)
     return <div>Failed to load items.</div>;
 
