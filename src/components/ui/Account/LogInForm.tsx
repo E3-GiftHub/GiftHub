@@ -13,11 +13,14 @@ export default function LogInForm() {
   const router = useRouter();
 
   React.useEffect(() => {
-    const cookie = document.cookie;
+    const cookie = document.cookie.split(';');
+    const hasAuthCookie = cookie.some(cookie => {
+      const [name] = cookie.trim().split('=');
+      return name === 'session_auth1' || name === 'session_auth2';
+      });
 
-    if(cookie)
+    if(hasAuthCookie)
     {
-
       router.push("/home");
     }
   }, [router]);
