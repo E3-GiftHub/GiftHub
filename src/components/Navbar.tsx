@@ -70,6 +70,27 @@ const Navbar = () => {
     };
   }, []);
 
+
+
+
+  const handleLogout = async () => {
+    try{
+      document.cookie = `session_auth1=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+      document.cookie = `session_auth2=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+
+      window.location.href = "http://localhost:3000/";
+
+    }catch(err){
+      console.error("Failure: ", err);
+    }
+  };
+
   return (
     <nav
       className={`${styles.navbar} ${
@@ -144,7 +165,11 @@ const Navbar = () => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link href="/#">
+                <Link href="/#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}>
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>
