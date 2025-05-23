@@ -63,4 +63,13 @@ export const loginRouter = createTRPCRouter({
           expires: expires.toISOString(),
         };
     }),
+
+/*  logout: publicProcedure
+    .mutation(async () => {
+
+      return{
+        success: true,
+        message: "Logged out",
+      };
+    }),*/
 })
