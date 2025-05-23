@@ -20,7 +20,7 @@ const Navbar = () => {
   const profileRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    const specialPages = ["http://localhost:3000/#", "http://localhost:3000/"];
+    const specialPages = ["/#", "/"];
 
     const checkSpecialPage = () => {
       const isSpecial = specialPages.includes(window.location.href);
@@ -82,7 +82,7 @@ const Navbar = () => {
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
           <a
-            href="http://localhost:3000/login#"
+            href="/login#"
             className={styles["login-button"]}
           >
             <FaUser />
@@ -109,7 +109,7 @@ const Navbar = () => {
           >
             <li>
               <a
-                href="http://localhost:3000/home#"
+                href="/home#"
                 className={activePage === "home" ? styles["nav-link-active"] : ""}
               >
                 <FaHome /> Home
@@ -117,7 +117,7 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                href="http://localhost:3000/inbox#"
+                href="/inbox#"
                 className={activePage === "inbox" ? styles["nav-link-active"] : ""}
               >
                 <FaInbox /> Inbox
@@ -140,10 +140,10 @@ const Navbar = () => {
                 <FaUser /> Profile
               </a>
               <div className={styles["dropdown-content"]}>
-                <a href="http://localhost:3000/profile#">
+                <a href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </a>
-                <a href="http://localhost:3000/#">
+                <a href="/#">
                   <FaSignOutAlt /> Logout
                 </a>
               </div>
