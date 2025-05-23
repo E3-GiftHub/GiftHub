@@ -1,13 +1,16 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { nanoid } from "nanoid";
 import { db as prisma } from "~/server/db"
+import { TRPCError } from '@trpc/server';
 
 export const invitationViaLinkRouter = createTRPCRouter({
 
-	createLink: protectedProcedure
+	createLink: publicProcedure
 	.input(z.object({ eventId: z.string() }))
 	.mutation(async ({ ctx, input }) => {
+
+	if (!ctx.session || !ctx.session.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
 
 	const existing = await prisma.eventInvitationToken.findUnique({
 		where: { eventId: input.eventId },

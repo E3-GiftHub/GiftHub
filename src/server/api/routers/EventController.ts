@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { db as prisma } from "~/server/db";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { EventPlanner } from "~/services/EventPlanner";
 import { EventEntity } from "~/services/Event";
 import { Status } from "@prisma/client";
@@ -53,21 +53,21 @@ export const eventRouter = createTRPCRouter({
 	})
       )
     ),
-
+/*  Depricated
   publishEvent: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .mutation(({ input }) =>
       handle(() => EventEntity.publishEvent(input.eventId).then(() => undefined))
     ),
-
+*/
   removeEvent: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .mutation(async ({ input, ctx }) =>
       handle(async () => {
         const event = await prisma.event.findUnique({ where: { id: input.eventId } });
-        //if (!event || event.createdByUsername !== ctx.session?.user.username) {
-        //  throw new Error("Not authorized to remove this event");
-        //}
+        if (!event || event.createdByUsername !== ctx.session?.user.username) {
+          throw new Error("Not authorized to remove this event");
+        }
         await eventPlanner.removeEvent(input.eventId);
       })
     ),
@@ -78,11 +78,16 @@ export const eventRouter = createTRPCRouter({
       handle(() => eventPlanner.sendInvitation(input.eventId, input.guestId))
     ),
 
+/*
+
   getEventAnalytics: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .query(({ input }) =>
       handle(() => eventPlanner.viewAnalytics(input.eventId))
     ),
+
+
+
 
   getEventWishlist: publicProcedure
     .input(z.object({ eventId: z.number() }))
@@ -102,6 +107,8 @@ export const eventRouter = createTRPCRouter({
       handle(() => eventPlanner.receiveContribution(input.eventId))
     ),
 
+*/
+
   getUserEvents: publicProcedure
     .query(({ ctx }) =>
       handle(() =>
@@ -116,7 +123,7 @@ export const eventRouter = createTRPCRouter({
     .query(({ ctx }) =>
       handle(() =>
         prisma.invitation.findMany({
-          where: { guestUsername: ctx.session?.user.username ?? "anonymous" },
+          where: { guestUsername: ctx.session?.user.username },
           include: { event: true },
         })
       )
