@@ -1,16 +1,7 @@
 // ~/components/ui/UserProfile/mockUser.ts
+import type { UserInfo } from "~/models/User";
 
-export interface User {
-  id: string;
-  username: string;
-  fname: string;
-  lname: string;
-  email: string;
-  iban: string;
-  picture: string;
-}
-
-export const mockUser: User = {
+export const mockUser: UserInfo = {
   id: "1",
   fname: "Bogdan",
   lname: "De-LaCluj",
