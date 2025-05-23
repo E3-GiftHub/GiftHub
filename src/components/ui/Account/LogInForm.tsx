@@ -24,11 +24,16 @@ export default function LogInForm() {
 
   const loginMutation = api.auth.login.login.useMutation({
     onSuccess: (data) => {
-      const maxAge = rememberMe
-          ? 30 * 24 * 60 * 60
-          : 0;
+      if(rememberMe) {
+        const expires = new Date(Date.now() + 30 * 24 * 60 * 60);
+        //data.expires = expires.toISOString();
 
-      document.cookie = `session_cookie=${data.sessionToken}; path=/; max-age=${maxAge}; ${
+        document.cookie = `session_cookie=${data.sessionToken}; path=/; max-age=${expires.toISOString()}; ${
+          process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+        }`;
+      }
+
+      document.cookie = `session_cookie=${data.sessionToken}; path=/; max-age=${data.expires}; ${
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
 

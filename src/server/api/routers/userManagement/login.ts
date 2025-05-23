@@ -55,7 +55,8 @@ export const loginRouter = createTRPCRouter({
 
 
         const sessionToken = user.username;
-        const expires = new Date(Date.now() + (rememberMe ? 30 * 24 * 60 * 60 : 0));
+        const expires = new Date(Date.now() + 60 * 60 * 2);
+
 
         return {
           success: true,
