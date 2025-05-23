@@ -9,7 +9,6 @@ export default function LogInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
 
@@ -107,13 +106,14 @@ export default function LogInForm() {
 
             {/*email input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
+              <label  htmlFor="email" className={styles.inputTitle}>
+                Email {errors?.email  && <span className={styles.errorText}>{errors.email}</span>}</label>
               <input
                 id="email"
                 type="text"
                 name="email"
                 placeholder="e.g. John99@gmail.com"
-                className={styles.inputField}
+                className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -122,12 +122,12 @@ export default function LogInForm() {
 
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
+              <label htmlFor="password" className={styles.inputTitle}>              Password {errors?.password && <span className={styles.errorText}>{errors.password}</span>}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={styles.inputField}
+                  className={`${styles.inputField} ${errors?.password ? styles.inputError : ""}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -194,7 +194,7 @@ export default function LogInForm() {
           {/*</div>*/}
 
           <p className={styles.footer}>
-            Don&apost have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/signup">
               <button className={styles.secondaryButton}>Sign up</button>
             </Link>
