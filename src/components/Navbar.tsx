@@ -10,6 +10,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
+import Link from "next/link";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -81,14 +82,14 @@ const Navbar = () => {
 
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <a
+          <Link
             href="/login#"
             className={styles["login-button"]}
           >
             <FaUser />
             <FaArrowRight />
             Login
-          </a>
+          </Link>
         </div>
       ) : (
         <>
@@ -108,20 +109,20 @@ const Navbar = () => {
             }`}
           >
             <li>
-              <a
+              <Link
                 href="/home#"
                 className={activePage === "home" ? styles["nav-link-active"] : ""}
               >
                 <FaHome /> Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="/inbox#"
                 className={activePage === "inbox" ? styles["nav-link-active"] : ""}
               >
                 <FaInbox /> Inbox
-              </a>
+              </Link>
             </li>
             <li
               ref={profileRef}
@@ -129,7 +130,7 @@ const Navbar = () => {
                 profileOpen ? styles.open : ""
               }`}
             >
-              <a
+              <Link
                 href="#"
                 className={styles["profile-main-button"]}
                 onClick={(e) => {
@@ -138,14 +139,14 @@ const Navbar = () => {
                 }}
               >
                 <FaUser /> Profile
-              </a>
+              </Link>
               <div className={styles["dropdown-content"]}>
-                <a href="/profile#">
+                <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
-                </a>
-                <a href="/#">
+                </Link>
+                <Link href="/#">
                   <FaSignOutAlt /> Logout
-                </a>
+                </Link>
               </div>
             </li>
           </ul>
