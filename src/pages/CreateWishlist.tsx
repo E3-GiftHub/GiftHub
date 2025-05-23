@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from 'next/router'
 import { useState } from "react";
 // import { Search } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -7,7 +8,12 @@ import AddToWishlistModal from "../components/add-to-wishlist-modal";
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
+// Mock data for demonstration
+const mockWishlists = new Map<string, { items: Array<{ name: string; photo: string; price: string; quantity: number }> }>();
+
 export default function CreateWishlist() {
+  const router = useRouter()
+  const { eventId } = router.query
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     name: string;
@@ -30,48 +36,54 @@ export default function CreateWishlist() {
     setIsModalOpen(false);
   };
 
+  const handleCancel = () => {
+    router.back()
+  };
+
+  const handleSave = () => {
+    // Create a new wishlist if it doesn't exist
+    if (!mockWishlists.has(eventId as string)) {
+      mockWishlists.set(eventId as string, { items: [] });
+    }
+    router.back()
+  };
+
+  const handleAddToWishlist = (item: { name: string; photo: string; price: string; quantity: number }) => {
+    if (!mockWishlists.has(eventId as string)) {
+      mockWishlists.set(eventId as string, { items: [] });
+    }
+    const wishlist = mockWishlists.get(eventId as string);
+    if (wishlist) {
+      wishlist.items.push(item);
+      console.log('Added item to wishlist:', item);
+      console.log('Current wishlist:', wishlist);
+    }
+    closeModal();
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
-          <h1 className={styles.title}>Create Wishlist for Event1</h1>
+          <div className={styles.titleContainer}>
+            <h1 className={styles.title}>Create Wishlist for Event1{eventId}</h1>
+          </div>
 
           {/* Search Bar */}
           <div className={styles.section}>
-            <label htmlFor="product-search" className={styles.sectionTitle}>
-              Search for a product:
-            </label>
-            <div className={styles.searchWrapper}>
-              <input
-                type="text"
-                id="product-search"
-                className={styles.searchInput}
-                placeholder=""
-              />
-              {/* <Search className={styles.searchIcon} /> */}
-            </div>
-          </div>
-
-          {/* Categories */}
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Search by category:</h2>
-            <div className={styles.buttonGrid}>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}>Sports</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}>Boardgames</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}>Gadgets</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}>See More ...</button>
-            </div>
-          </div>
-
-          {/* Retailers */}
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Search by retailer:</h2>
-            <div className={styles.buttonGrid}>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-secondary']}`}>&nbsp;</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-secondary']}`}>&nbsp;</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-secondary']}`}>&nbsp;</button>
-              <button className={`${buttonStyles.button} ${buttonStyles['button-secondary']}`}>&nbsp;</button>
+            <div className={styles.searchContainer}>
+              <label htmlFor="product-search" className={styles.sectionTitle}>
+                Search for a product:
+              </label>
+              <div className={styles.searchWrapper}>
+                <input
+                  type="text"
+                  id="product-search"
+                  className={styles.searchInput}
+                  placeholder="Search products..."
+                />
+              </div>
             </div>
           </div>
 
@@ -158,6 +170,7 @@ export default function CreateWishlist() {
               itemPhoto={selectedItem.photo}
               itemPrice={selectedItem.price}
               itemDescription={selectedItem.description}
+              onAddToWishlist={handleAddToWishlist}
             />
           )}
         </main>
