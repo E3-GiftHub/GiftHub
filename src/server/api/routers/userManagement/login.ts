@@ -3,7 +3,8 @@ import {createTRPCRouter, publicProcedure} from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 import {TRPCError} from "@trpc/server";
 //import {serialize} from "cookie";
-import {randomUUID} from "crypto"
+//import {randomUUID} from "crypto"
+//import jwt from "jsonwebtoken";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -42,7 +43,6 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if(!passwordMatch){
@@ -52,27 +52,25 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
-     const sessionToken = `${email}:${randomUUID()}`;
-        const expires = new Date(
-          Date.now() + (rememberMe
-            ? 1000 * 60 * 60 * 24 * 30
-            : 0)
-        );
 
 
+        const sessionToken = user.username;
+        const expires = new Date(Date.now() + 60 * 60 * 2);
 
-      await ctx.db.session.create({
-        data:{
+
+        return {
+          success: true,
           sessionToken,
-          expires,
-          user: {connect: {username: user.username}},
-        },
-      });
-
-      return {
-        success: true,
-        sessionToken: email,
-        expires: expires.toISOString(),
-      };
+          expires: expires.toISOString(),
+        };
     }),
+
+/*  logout: publicProcedure
+    .mutation(async () => {
+
+      return{
+        success: true,
+        message: "Logged out",
+      };
+    }),*/
 })

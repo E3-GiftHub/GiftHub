@@ -10,12 +10,14 @@ import {
   FaBars,
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
+import { api } from "~/trpc/react";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
+
 
   const profileRef = useRef<HTMLLIElement>(null);
 
@@ -68,6 +70,21 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleLogout = async () => {
+    try{
+      document.cookie = `session_auth1=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+      document.cookie = `session_auth2=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+      window.location.href = "http://localhost:3000/";
+    }catch(err){
+      console.error("Failure: ", err);
+    }
+  };
+
 
   return (
     <nav
@@ -143,7 +160,13 @@ const Navbar = () => {
                 <a href="http://localhost:3000/profile#">
                   <FaUserEdit /> Edit Profile
                 </a>
-                <a href="http://localhost:3000/#">
+                <a
+                  href="http://localhost:3000/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}
+                >
                   <FaSignOutAlt /> Logout
                 </a>
               </div>
