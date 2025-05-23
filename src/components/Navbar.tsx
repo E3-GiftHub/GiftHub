@@ -21,13 +21,11 @@ const Navbar = () => {
   const profileRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    const specialPages = ["https://gifthub-five.vercel.app/", "/","/#"," http://localhost:3000/#", "http://localhost:3000/"];
-
-    const checkSpecialPage = () => {
-      const isSpecial = specialPages.includes(window.location.href);
-      setIsLandingPage(isSpecial);
-    };
-
+   const checkSpecialPage = () => {
+  const currentPath = `${window.location.pathname}${window.location.hash}`;
+  const specialPaths = ["/", "/#"];
+  setIsLandingPage(specialPaths.includes(currentPath));
+};
     const detectActivePage = () => {
       const url = window.location.href;
       if (url.includes("/home")) setActivePage("home");
@@ -69,6 +67,27 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+
+
+
+  const handleLogout = async () => {
+    try{
+      document.cookie = `session_auth1=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+      document.cookie = `session_auth2=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+
+      window.location.href = "/";
+
+    }catch(err){
+      console.error("Failure: ", err);
+    }
+  };
 
   return (
     <nav
@@ -144,7 +163,11 @@ const Navbar = () => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link href="/#">
+                <Link href="/#"
+                onClick={async (e) => {
+  e.preventDefault();
+  await handleLogout();
+}}>
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>
