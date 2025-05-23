@@ -166,23 +166,23 @@ export default function LogInForm() {
             <span className={styles.dividerText}>OR</span>
           </div>
 
-          <div className={styles.alternativeButtons}>
-          <button className={styles.discordButton}>
-            <img
-                src="/illustrations/discordLogo.svg"
-                className={styles.discordIcon}
-            />
-            <span>Log in with Discord</span>
-          </button>
+          {/*<div className={styles.alternativeButtons}>*/}
+          {/*<button className={styles.discordButton}>*/}
+          {/*  <img*/}
+          {/*      src="/illustrations/discordLogo.svg"*/}
+          {/*      className={styles.discordIcon}*/}
+          {/*  />*/}
+          {/*  <span>Log in with Discord</span>*/}
+          {/*</button>*/}
 
-          <button className={styles.googleButton}>
-            <img
-                src="/illustrations/googleIcon.svg"
-                className={styles.googleIcon}
-            />
-            <span>Log in with Google</span>
-          </button>
-          </div>
+          {/*<button className={styles.googleButton}>*/}
+          {/*  <img*/}
+          {/*      src="/illustrations/googleIcon.svg"*/}
+          {/*      className={styles.googleIcon}*/}
+          {/*  />*/}
+          {/*  <span>Log in with Google</span>*/}
+          {/*</button>*/}
+          {/*</div>*/}
 
           <p className={styles.footer}>
             Don't have an account?{' '}

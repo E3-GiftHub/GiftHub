@@ -240,27 +240,27 @@ export default function SignupForm() {
             {signupMutation.isPending ? "Signing up..." : "Sign up"}
           </button>
 
-          <div className={styles.divider}>
-            <span className={styles.dividerText}>OR</span>
-          </div>
+          {/*<div className={styles.divider}>*/}
+          {/*  <span className={styles.dividerText}>OR</span>*/}
+          {/*</div>*/}
 
-          <div className={styles.alternativeButtons}>
-            <button className={styles.discordButton}>
-              <img
-                src="/illustrations/discordLogo.svg"
-                className={styles.discordIcon}
-              />
-              <span>Sign up with Discord</span>
-            </button>
+          {/*<div className={styles.alternativeButtons}>*/}
+          {/*  <button className={styles.discordButton}>*/}
+          {/*    <img*/}
+          {/*      src="/illustrations/discordLogo.svg"*/}
+          {/*      className={styles.discordIcon}*/}
+          {/*    />*/}
+          {/*    <span>Sign up with Discord</span>*/}
+          {/*  </button>*/}
 
-            <button className={styles.googleButton}>
-              <img
-                src="/illustrations/googleIcon.svg"
-                className={styles.googleIcon}
-              />
-              <span>Sign up with Google</span>
-            </button>
-          </div>
+          {/*  <button className={styles.googleButton}>*/}
+          {/*    <img*/}
+          {/*      src="/illustrations/googleIcon.svg"*/}
+          {/*      className={styles.googleIcon}*/}
+          {/*    />*/}
+          {/*    <span>Sign up with Google</span>*/}
+          {/*  </button>*/}
+          {/*</div>*/}
 
           <p className={styles.footer}>
             Already have an account?{' '}
