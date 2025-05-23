@@ -13,9 +13,10 @@ export default function LogInForm() {
   const router = useRouter();
 
   React.useEffect(() => {
-    const sessionToken = document.cookie
+    const cookie = document.cookie.split(";");
+    const sessionCookie = cookie.find((c) => c.trim().startsWith("session_cookie="));
 
-    if(sessionToken)
+    if(sessionCookie)
     {
 
       router.push("/home");

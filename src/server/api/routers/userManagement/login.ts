@@ -4,8 +4,7 @@ import * as bcrypt from "bcrypt";
 import {TRPCError} from "@trpc/server";
 //import {serialize} from "cookie";
 import {randomUUID} from "crypto"
-
-
+import jwt from "jsonwebtoken";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -53,27 +52,30 @@ export const loginRouter = createTRPCRouter({
           });
         }
 
-     const sessionToken = `${email}:${randomUUID()}`;
-        const expires = new Date(
-          Date.now() + (rememberMe
-            ? 1000 * 60 * 60 * 24 * 30
-            : 0)
+        const expiresIn = rememberMe ? "30d" : "1h";
+
+        const sessionToken = jwt.sign(
+          {email: user.email},
+          process.env.AUTH_SECRET!,
+          {expiresIn}
         );
 
+        const expires = new Date();
+        expires.setSeconds(expires.getSeconds() + (rememberMe ? 2592000 : 3600));
 
+        await ctx.db.session.create({
+          data: {
+            sessionToken,
+            expires,
+            user: {connect: {email: user.email!}}
+          }
+        });
 
-      await ctx.db.session.create({
-        data:{
+        return {
+          success: true,
           sessionToken,
-          expires,
-          user: {connect: {username: user.username}},
-        },
-      });
-
-      return {
-        success: true,
-        sessionToken: email,
-        expires: expires.toISOString(),
-      };
+          expires: expires.toISOString(),
+        };
     }),
+
 })
