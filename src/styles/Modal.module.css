@@ -20,6 +20,63 @@
     position: relative;
     z-index: 1011;
     background-color: #17153b;
+    border-radius: 8px;
+  }
+  
+  .modalImage {
+    display: block;
+    max-width: 100%;
+    width: 150px; /* Adjusted size to prevent scrolling */
+    height: auto; /* Allow height to adjust */
+    object-fit: cover;
+    margin: 0 auto 0.75rem auto; /* Center the image and reduce space below */
+    border-radius: 8px;
+  }
+
+  .modalItemName {
+    font-size: 1.1rem; /* Slightly reduced font size */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.4rem; /* Reduced margin */
+    color: #fff;
+  }
+
+  .modalItemPrice {
+    font-size: 0.95rem; /* Slightly reduced font size */
+    text-align: center;
+    margin-bottom: 0.75rem; /* Reduced margin */
+    color: #a8a8a8;
+  }
+
+  .modalItemDescription {
+    font-size: 0.85rem; /* Slightly reduced font size */
+    text-align: center;
+    margin-bottom: 0.75rem; /* Reduced margin */
+    color: #a8a8a8;
+  }
+
+  .quantityLabel {
+    display: block;
+    margin-bottom: 0.4rem; /* Reduced margin */
+    text-align: center;
+    color: #fff;
+  }
+
+  .quantityInput {
+    display: block;
+    margin: 0 auto 1rem auto; /* Reduced margin */
+    padding: 0.4rem; /* Reduced padding */
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 70px; /* Slightly reduced width */
+    text-align: center;
+  }
+
+  .modalButtons {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem; /* Slightly reduced gap */
+    margin-top: 1rem; /* Reduced margin */
   }
   
   .closeButton {
