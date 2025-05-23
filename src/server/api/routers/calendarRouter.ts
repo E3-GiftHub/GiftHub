@@ -31,43 +31,28 @@ export const calendarRouter = createTRPCRouter({
             const startDate = new Date(year, month - 1, 1);
             const endDate = new Date(year, month, 0);
 
-            /// cele mai multe invitații
-            const userInvitationCounts = await ctx.db.invitation.groupBy({
-                by: ['guestUsername'],
-                _count: {
-                    guestUsername: true
-                },
-                orderBy: {
-                    _count: {
-                        guestUsername: 'desc'
-                    }
-                },
-                take: 1
-            });
-
-            if (!userInvitationCounts.length) {
-                return [];
-            }
-            //
-
-            const userIdentifier = userInvitationCounts[0]?.guestUsername ?? "";
+            const userIdentifier = "user1"; 
 
             const invitations = await ctx.db.invitation.findMany({
-                where: {
-                    guestUsername: userIdentifier,
-                    event: {
-                        date: {
-                            gte: startDate,
-                            lte: endDate,
-                        }
-                    }
-                },
-                include: {
-                    event: true,
-                },
+            where: {
+                guestUsername: userIdentifier,
+                event: {
+                date: {
+                    gte: startDate,
+                    lte: endDate,
+                }
+                }
+            },
+            include: {
+                event: true,
+            },
             });
 
-            const events = invitations.map(invitation => invitation.event);
+            const events = invitations
+            .filter(inv => inv.event !== null)
+            .map(invitation => invitation.event);
+
             return events;
+
         }),
 });

@@ -3,6 +3,10 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
 import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
+import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
+// import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
+import {invitesNotificationRouter} from "~/server/api/routers/invitesNotificationRouter";
+
 
 /**
  * This is the primary router for your server.
@@ -14,6 +18,10 @@ export const appRouter = createTRPCRouter({
   calendar: calendarRouter,
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
+  contributions: contributionsRouter,
+  purchasedItems: contributionsRouter,
+ invitationsNotification: invitesNotificationRouter, 
+
 });
 
 // export type definition of API
