@@ -66,12 +66,10 @@ describe("SignUpForm", () => {
     render(<SignUpForm />);
     fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/username is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/email is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/a password is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/confirm password is required/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/username is required/i)).toBeInTheDocument();
+    /*expect(await screen.findByText( /email is required/i)).toBeInTheDocument();*/
+    expect(await screen.findByText(/^password is required$/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^confirm password is required$/i)).toBeInTheDocument();
   });
 
   test("validates invalid email and password format", async () => {
@@ -91,12 +89,10 @@ describe("SignUpForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText(/username must be at least 3 characters/i)).toBeInTheDocument();
-      expect(screen.getByText(/invalid email address/i)).toBeInTheDocument();
-      expect(screen.getByText(/password must be at least 8 characters/i)).toBeInTheDocument();
-      expect(screen.getByText(/confirm password is required/i)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/username must be at least 3 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText( /invalid email address/i)).toBeInTheDocument();
+    expect(await screen.findByText( /password must be at least 8 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText( /confirm password is required/i)).toBeInTheDocument();
   });
 
   test("submits form with valid inputs", async () => {

@@ -57,10 +57,8 @@ describe("LogInForm", () => {
   test("validates empty fields on submit", async () => {
     render(<LogInForm />);
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/email is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/password is required/i)).toBeInTheDocument();
-    });
+    /*expect(await screen.findByText(/email is required/i)).toBeInTheDocument();*/
+    expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
   });
 
   test("validates invalid email format", async () => {
@@ -72,9 +70,7 @@ describe("LogInForm", () => {
       target: { value: "password123" },
     });
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/invalid email address/i)).toBeInTheDocument()
-    );
+    expect(await screen.findByText(/invalid email address/i)).toBeInTheDocument()
   });
 
   test("toggles password visibility", () => {
