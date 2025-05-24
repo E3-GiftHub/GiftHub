@@ -131,7 +131,7 @@ model Event {
     date        DateTime?
     time        DateTime?
     pictureUrl  String?
-    token	String?	  @unique
+    token       String?   @unique
 
     createdByUsername String
     createdAt         DateTime @default(now())
@@ -303,6 +303,4 @@ model ContributionNotification {
 
     user User         @relation(fields: [username], references: [username])
     cash Contribution @relation(fields: [contributionId], references: [id])
-
 }
-
