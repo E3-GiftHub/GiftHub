@@ -29,8 +29,6 @@ export default function LogInForm() {
     onSuccess: (data) => {
       if(rememberMe) {
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60);
-        //data.expires = expires.toISOString();
-
         document.cookie = `session_auth1=${data.sessionToken}; path=/; max-age=${expires.toISOString()}; ${
           process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
         }`;
@@ -90,20 +88,7 @@ export default function LogInForm() {
           <form
             id="logInForm"
             className={styles.formContainer}
-            onSubmit={(e) => {
-
-              e.preventDefault();
-              console.log("Email:", email);
-              console.log("Password:", password);
-
-              //TODO: check if account exists
-
-              //See Backend Stuff
-
-
-            }}
           >
-
             {/*email input*/}
             <div className={styles.formGroup}>
               <label  htmlFor="email" className={styles.inputTitle}>
@@ -119,10 +104,10 @@ export default function LogInForm() {
                 required
               />
             </div>
-
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>              Password {errors?.password && <span className={styles.errorText}>{errors.password}</span>}</label>
+              <label htmlFor="password" className={styles.inputTitle}>
+                Password {errors?.password && <span className={styles.errorText}>{errors.password}</span>}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -143,7 +128,6 @@ export default function LogInForm() {
                     alt="password-icon"
                   />
                 </button>
-
               </div>
             </div>
             <p className={styles.forgotPassword}>
@@ -151,9 +135,9 @@ export default function LogInForm() {
                 Forgot password?
               </Link>
             </p>
-
           </form>
         </div>
+
         <div className={styles.bottom}>
           <button
               type="submit"
@@ -170,29 +154,9 @@ export default function LogInForm() {
             />{' '}
             Remember me
           </label>
-
           <div className={styles.divider}>
             <span className={styles.dividerText}>OR</span>
           </div>
-
-          {/*<div className={styles.alternativeButtons}>*/}
-          {/*<button className={styles.discordButton}>*/}
-          {/*  <img*/}
-          {/*      src="/illustrations/discordLogo.svg"*/}
-          {/*      className={styles.discordIcon}*/}
-          {/*  />*/}
-          {/*  <span>Log in with Discord</span>*/}
-          {/*</button>*/}
-
-          {/*<button className={styles.googleButton}>*/}
-          {/*  <img*/}
-          {/*      src="/illustrations/googleIcon.svg"*/}
-          {/*      className={styles.googleIcon}*/}
-          {/*  />*/}
-          {/*  <span>Log in with Google</span>*/}
-          {/*</button>*/}
-          {/*</div>*/}
-
           <p className={styles.footer}>
             Don&apos;t have an account?{' '}
             <Link href="/signup">

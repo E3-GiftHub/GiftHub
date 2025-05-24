@@ -7,8 +7,6 @@ import Link from "next/link";
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -17,9 +15,7 @@ export default function SignupForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
-
   const router = useRouter();
-
   const signupMutation = api.auth.signup.signup.useMutation({
     onSuccess: () => {
       void router.push("/login");
@@ -39,8 +35,6 @@ export default function SignupForm() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
-    //username validation
     if(!formData.username.trim()) {
       newErrors.username = "Username is required";
     }
@@ -51,7 +45,6 @@ export default function SignupForm() {
       newErrors.username = "Username must contain only letters and numbers";
     }
 
-    //email validation
     if(!formData.email.trim()) {
       newErrors.email = "Email is required";
     }
@@ -59,7 +52,6 @@ export default function SignupForm() {
       newErrors.email = "Invalid email address";
     }
 
-    //password validation
     if(!formData.password) {
       newErrors.password = "A password is required";
     }
@@ -70,7 +62,6 @@ export default function SignupForm() {
       newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
-    //confirm password validation
     if(!formData.confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
     }
@@ -87,11 +78,6 @@ export default function SignupForm() {
     }
   };
 
-/*  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }*/
-
   return (
       <div className={`${styles.rightPanel} ${styles.signupPage}`}>
         <div className={styles.top}>
@@ -104,50 +90,6 @@ export default function SignupForm() {
           <form
             id="signUpForm"
             className={styles.formContainer}
-            onSubmit={(e) => {
-              /*const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              /!*
-              * rules for email:
-              * ^[^\s@]+ -> at least a non-whitespace, non-@ character before @
-              * @[^\s@]+ -> an @ followed by a non-whitespace character
-              * \.[^\s@]+$ -> a period followed by some non-whitespace character
-              * *!/
-
-              if(formData.username.length < 6) {
-                alert("Username must be at least 8 character long.");
-                return;
-              }
-
-              if (!emailRegex.test(formData.email)) {
-                alert("Please enter a valid email address.");
-                return;
-              }
-
-              if(formData.password.length < 8) {
-                alert("Password must be at least 8 character long.");
-                return;
-              }
-
-              if(!/\d/.test(formData.password)) {
-                alert("Password must contain at least a digit.");
-                return;
-              }
-
-              if (formData.password !== formData.confirmPassword) {
-                alert("Passwords do not match.");
-                return;
-              }*/
-
-              //Cosmin! Your validation forms weren't necessary in the first place!
-
-              e.preventDefault();
-              console.log("Username:", formData.username);
-              console.log("Email:", formData.email);
-              console.log("Password:", formData.password);
-              //TODO: submit data
-
-              //AGAIN! See backend Implementation
-            }}
           >
 
             {/*username input*/}
@@ -239,28 +181,6 @@ export default function SignupForm() {
             onClick={handleSubmit}>
             {signupMutation.isPending ? "Signing up..." : "Sign up"}
           </button>
-
-          {/*<div className={styles.divider}>*/}
-          {/*  <span className={styles.dividerText}>OR</span>*/}
-          {/*</div>*/}
-
-          {/*<div className={styles.alternativeButtons}>*/}
-          {/*  <button className={styles.discordButton}>*/}
-          {/*    <img*/}
-          {/*      src="/illustrations/discordLogo.svg"*/}
-          {/*      className={styles.discordIcon}*/}
-          {/*    />*/}
-          {/*    <span>Sign up with Discord</span>*/}
-          {/*  </button>*/}
-
-          {/*  <button className={styles.googleButton}>*/}
-          {/*    <img*/}
-          {/*      src="/illustrations/googleIcon.svg"*/}
-          {/*      className={styles.googleIcon}*/}
-          {/*    />*/}
-          {/*    <span>Sign up with Google</span>*/}
-          {/*  </button>*/}
-          {/*</div>*/}
 
           <div className={styles.divider}>
             <span className={styles.dividerText}>OR</span>
