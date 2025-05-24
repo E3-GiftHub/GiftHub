@@ -1,133 +1,164 @@
-// https://dbdiagram.io/d/GiftHub-database-68038bc91ca52373f5920a71
 
-Table User {
-  id string [pk]
-  email string
-  fname string
-  lname string
-  password string
-  iban iban
-  pictureUrl string
+// https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
 
-  emailVerified datetime
-  createdAt datetime
-  updatedAt datetime
+ENUM StatusType {
+  PENDING
+  ACCEPTED
+  // REJECTED: if rejected => delete row
 }
 
-Table Event {
-  id uuid [pk]
-  title string
-  description text
-  location string
-  date date
-  time time
-  pictureUrl string
-
-  createdBy string [ref: > User.id]
-  createdAt datetime
-  updatedAt datetime
+ENUM PriorityType {
+  LOW
+  MEDIUM
+  HIGH
 }
 
-Table Invitation {
-  id uuid [pk]
-  guestId string [ref: > User.id]
-  eventId uuid [ref: > Event.id]
- 
-  status status // 'pending', 'accepted', 'declined'
-  createdAt datetime
-  repliedAt datetime
+ENUM MarkType {
+  PURCHASED
+  RESERVED
+  CONTRIBUTED
+  // NULL: if null => delete row
 }
 
-Table Media {
-  id uuid [pk]
-  uploaderId string [ref: > User.id]
-  eventId uuid [ref: > Event.id] // Directly linked to the event
- 
-  url string
-  caption text
- 
-  mediaType string // 'image', 'video'
-  fileType string
-  fileSize int
-  uploadedAt datetime
+TABLE User {
+  username STRING pk
+  email STRING
+  id STRING
+  fname STRING
+  lname STRING
+  password STRING
+  iban STRING
+  pictureUrl STRING
+
+  emailVerified DATETIME
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-Table Mark {
-  id uuid [pk]
-  markerId string [ref: > User.id]
-  eventId uuid [ref: > Event.id]
-  articleId uuid [ref: > ItemCatalogue.id]
-  
-  type string // 'reserved', 'contributing'
-  createdAt datetime
+TABLE Event {
+  id INTEGER pk
+  title STRING
+  description STRING
+  location STRING
+  date DATETIME
+  time DATETIME
+  pictureUrl STRING
 
-  Note: "Indicates a user has marked an item in the context of an event"
+  createdByUsername STRING [ref: > User.username]
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-// Junction table for event-specific wishlist entry - represents wishlists
-Table EventArticle {
-  eventId uuid [ref: > Event.id]
-  itemId uuid [ref: > ItemCatalogue.id]
-  quantityRequested int
-  quantityFulfilled int
-  priority status // low, medium, high
-  createdAt datetime
-  updatedAt datetime
+TABLE Invitation {
+  id INTEGER pk
+  guestUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+
+  status StatusType
+  createdAt DATETIME
+  repliedAt DATETIME
+}
+
+TABLE Media {
+  id INTEGER pk
+  uploaderUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id] // Directly linked to the event
+  url STRING
+
+  caption STRING
+  mediaType STRING
+  fileType STRING
+  fileSize INTEGER
+  createdAt DATETIME
+}
+
+// junction TABLE for event-specific wishlist entry
+TABLE EventArticle {
+  eventId INTEGER [ref: > Event.id]
+  itemId INTEGER [ref: > Item.id]
+  userNote STRING
+  priority PriorityType
+  createdAt DATETIME
+  updatedAt DATETIME
 
   Note: "Composite primary key on (eventId, itemId)"
-  indexes {
-    (eventId, itemId) [pk]
-  }
 }
 
-// Shared item catalog
-Table ItemCatalogue {
-  id uuid [pk]
-  name string
-  description text
-  imagesUrl string
-  price decimal
+TABLE Item {
+  id INGETER pk
+  name STRING
+  description STRING
+  imagesUrl STRING
+  price DECIMAL
 
-  retailerId uuid [ref: > Retailers.id, null]
-  retailerUrl string
+  retailerId INTEGER [ref: > Retailer.id]
+  retailerUrl STRING
 
-  isCustom boolean
-  createdAt datetime
-  updatedAt datetime
+  createdAt DATETIME
+  updatedAt DATETIME
 }
 
-Table Retailer {
-  id uuid [pk]
-  name string
-  apiUrl string
+TABLE Mark {
+  markerUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+  articleId INTEGER [ref: > Item.id]
+
+  type MarkType
+  createdAt DATETIME
 }
 
-Table Contribution {
-  id uuid [pk]
-  contributorId string [ref: > User.id]
-  eventId uuid [ref: > Event.id]
-  articleId uuid [ref: > ItemCatalogue.id]
-  
-  cashAmount decimal
-  contributedAt datetime
+TABLE Retailer {
+  id INTEGER pk
+  name STRING
+  apiUrl STRING
+}
+
+TABLE Contribution {
+  id INTEGER pk
+  contributorUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+  articleId INTEGER [ref: > Item.id]
+
+  cashAmount DECIMAL
+  createdAt DATETIME
+  updatedAt DATETIME
 
   Note: "References EventArticles via (eventId, itemId)"
 }
 
-Table UserReport {
-  id uuid [pk]
-  reportedId string [ref: > User.id]
-  reportedBy string [ref: > User.id]
-  reason string
-  description text
-  reportedAt datetime
+TABLE UserReport {
+  id INTEGER pk
+  reportedByUsername STRING [ref: > User.username]
+  reportedUsername STRING [ref: > User.username]
+  reason STRING
+  description STRING
+  reportedAt DATETIME
 }
 
-Table EventReport {
-  id uuid [pk]
-  reportedId uuid [ref: > Event.id]
-  reportedBy string [ref: > User.id]
-  reason string
-  description text
-  reportedAt datetime
+TABLE EventReport {
+  id INTEGER pk
+  reportedByUsername STRING [ref: > User.username]
+  reportedId INTEGER [ref: > Event.id]
+  reason STRING
+  description STRING
+  reportedAt DATETIME
+}
+
+ENUM NotificationAction {
+  READ
+  DELETE
+}
+
+TABLE MediaNotification {
+  id INTEGER pk
+  username STRING [ref: > User.username]
+  mediaId INTEGER [ref: > Media.id]
+  action NotificationAction
+}
+
+TABLE ContributionNotification {
+  id INTEGER pk
+  username STRING [ref: > User.username]
+  contributionId INTEGER [ref: > Contribution.id]
+  action NotificationAction
 }
