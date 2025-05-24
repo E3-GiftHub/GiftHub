@@ -94,12 +94,13 @@ export default function SignupForm() {
 
             {/*username input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="username" className={styles.inputTitle}>Username {errors?.username}</label>
+              <label  htmlFor="username" className={styles.inputTitle}>
+                Username {errors?.username && <span className={styles.errorText}>{errors.username}</span>}</label>
               <input
                 id="username"
                 type="text"
                 placeholder="e.g. John99"
-                className={styles.inputField}
+                className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
@@ -107,13 +108,14 @@ export default function SignupForm() {
 
             {/*email input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
+              <label  htmlFor="email" className={styles.inputTitle}>
+                Email {errors?.email  && <span className={styles.errorText}>{errors.email}</span>}</label>
               <input
                 id="email"
                 type="text"
                 name="email"
                 placeholder="e.g. John99@gmail.com"
-                className={styles.inputField}
+                className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -121,12 +123,13 @@ export default function SignupForm() {
 
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
+              <label htmlFor="password" className={styles.inputTitle}>
+                Password {errors?.password && <span className={styles.errorText}>{errors.password}</span>}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={styles.inputField}
+                  className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
@@ -147,12 +150,13 @@ export default function SignupForm() {
 
             {/*confirm password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Confirm password {errors?.confirmPassword}</label>
+              <label htmlFor="password" className={styles.inputTitle}>
+                Confirm password {errors?.confirmPassword && <span className={styles.errorText}>{errors.confirmPassword}</span>}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className={styles.inputField}
+                  className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 />

@@ -87,6 +87,7 @@ export default function LogInForm() {
         <div className={styles.middle}>
           <form
             id="logInForm"
+            data-testid="logInForm"
             className={styles.formContainer}
           >
             {/*email input*/}
