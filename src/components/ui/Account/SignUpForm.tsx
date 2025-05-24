@@ -13,7 +13,8 @@ export default function SignupForm() {
     password: "",
     confirmPassword: ""
   });
-  const validationMessages = {
+
+  const getValidationMessages = () => ({
     usernameRequired: "Username is required",
     usernameInvalid: "Username must be at least 3 characters",
     usernameCharacters: "Username must only contain letters and numbers",
@@ -23,7 +24,8 @@ export default function SignupForm() {
     passwordMinLength: "Password must be at least 8 characters",
     passwordStrength: "Password must contain at least one uppercase letter, one lowercase letter, and one number",
     confirmPasswordRequired: "Confirm password is required",
-  };
+  });
+  const validationMessages = getValidationMessages();
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();

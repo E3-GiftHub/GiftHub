@@ -11,11 +11,13 @@ export default function LogInForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
-  const validationMessages = {
+
+  const getValidationMessages = () => ({
     emailRequired: "Email address is required",
     emailInvalid: "Invalid email address",
     passwordRequired: "Password is required",
-  };
+  });
+  const validationMessages = getValidationMessages();
 
   React.useEffect(() => {
     const cookie = document.cookie.split(';');
