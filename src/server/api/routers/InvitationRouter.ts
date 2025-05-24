@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { InvitationService } from "../../../services/InvitationService"; 
+import { InvitationService } from "../../services/InvitationService"; 
 export interface InvitationDTO {
     eventIdentifier: string;
     guestIdentifier: string;

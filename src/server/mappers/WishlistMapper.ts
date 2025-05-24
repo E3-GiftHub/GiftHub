@@ -1,4 +1,4 @@
-import { WishlistItem } from "../../services/WishlistItem";
+import { WishlistItem } from "../services/WishlistItem";
 
 interface Contributor {
   username: string; 

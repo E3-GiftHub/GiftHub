@@ -1,5 +1,5 @@
-import { WishlistService } from "~/services/WishlistService";
-import { WishlistDTO, WishlistItemDTO } from "~/services/WishlistDTO";
+import { WishlistService } from "~/server/services/WishlistService";
+import { WishlistDTO, WishlistItemDTO } from "~/server/services/WishlistDTO";
 
 describe("WishlistService", () => {
   let wishlistService: WishlistService;
