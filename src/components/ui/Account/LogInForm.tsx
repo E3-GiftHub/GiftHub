@@ -11,6 +11,11 @@ export default function LogInForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
+  const validationMessages = {
+    emailRequired: "Email address is required",
+    emailInvalid: "Invalid email address",
+    passwordRequired: "Password is required",
+  };
 
   React.useEffect(() => {
     const cookie = document.cookie.split(';');
@@ -57,13 +62,13 @@ export default function LogInForm() {
     const newErrors: Record<string, string> = {};
 
     if(!email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = validationMessages.emailRequired;
     }
     else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = validationMessages.emailInvalid;
     }
     if(!password.trim()) {
-      newErrors.password = "Password is required";
+      newErrors.password = validationMessages.passwordRequired;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

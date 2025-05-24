@@ -13,6 +13,17 @@ export default function SignupForm() {
     password: "",
     confirmPassword: ""
   });
+  const validationMessages = {
+    usernameRequired: "Username is required",
+    usernameInvalid: "Username must be at least 3 characters",
+    usernameCharacters: "Username must only contain letters and numbers",
+    emailRequired: "Email address is required",
+    emailInvalid: "Invalid email address",
+    passwordRequired: "Password is required",
+    passwordMinLength: "Password must be at least 8 characters",
+    passwordStrength: "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+    confirmPasswordRequired: "Confirm password is required",
+  };
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
@@ -36,34 +47,34 @@ export default function SignupForm() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if(!formData.username.trim()) {
-      newErrors.username = "Username is required";
+      newErrors.username = validationMessages.usernameRequired;
     }
     else if(formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
+      newErrors.username = validationMessages.usernameInvalid;
     }
     else if(!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      newErrors.username = "Username must contain only letters and numbers";
+      newErrors.username = validationMessages.usernameCharacters;
     }
 
     if(!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = validationMessages.emailRequired;
     }
     else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = validationMessages.emailInvalid;
     }
 
     if(!formData.password) {
-      newErrors.password = "A password is required";
+      newErrors.password = validationMessages.passwordRequired;
     }
     else if(formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = validationMessages.passwordMinLength;
     }
     else if(!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/g.test(formData.password)) {
-      newErrors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+      newErrors.password = validationMessages.passwordStrength;
     }
 
     if(!formData.confirmPassword) {
-      newErrors.confirmPassword = "Confirm password is required";
+      newErrors.confirmPassword = validationMessages.confirmPasswordRequired;
     }
 
     setErrors(newErrors);
