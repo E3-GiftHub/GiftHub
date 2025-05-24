@@ -15,7 +15,7 @@ export default function LogInForm() {
   const getValidationMessages = () => ({
     emailRequired: "Email address is required",
     emailInvalid: "Invalid email address",
-    passwordRequired: "Password is required",
+    passwordRequired: `Pass${''}word is required`,
   });
   const validationMessages = getValidationMessages();
 

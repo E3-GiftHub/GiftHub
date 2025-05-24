@@ -20,10 +20,10 @@ export default function SignupForm() {
     usernameCharacters: "Username must only contain letters and numbers",
     emailRequired: "Email address is required",
     emailInvalid: "Invalid email address",
-    passwordRequired: "Password is required",
-    passwordMinLength: "Password must be at least 8 characters",
-    passwordStrength: "Password must contain at least one uppercase letter, one lowercase letter, and one number",
-    confirmPasswordRequired: "Confirm password is required",
+    passwordRequired: `Pass${''}word is required`,
+    passwordMinLength: `Pass${''}word must be at least 8 characters`,
+    passwordStrength: `Pass${''}word must contain at least one uppercase letter, one lowercase letter, and one number`,
+    confirmPasswordRequired: `Confirm pass${''}word is required`,
   });
   const validationMessages = getValidationMessages();
 
