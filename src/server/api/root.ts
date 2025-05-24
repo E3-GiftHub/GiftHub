@@ -1,6 +1,5 @@
 import { invitationRouter } from "./routers/InvitationRouter";
 import { wishlistRouter } from "./routers/WishlistController";
-import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
@@ -17,7 +16,6 @@ import {invitesNotificationRouter} from "~/server/api/routers/invitesNotificatio
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   wishlist: wishlistRouter,
   invitation: invitationRouter,
   calendar: calendarRouter,
