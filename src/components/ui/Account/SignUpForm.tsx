@@ -65,15 +65,17 @@ export default function SignupForm() {
       newErrors.email = validationMessages.emailInvalid;
     }
 
-    if(!formData.password) {
+    if (!formData.password) {
       newErrors.password = validationMessages.passwordRequired;
-    }
-    else if(formData.password.length < 8) {
+    } else if (formData.password.length < 8) {
       newErrors.password = validationMessages.passwordMinLength;
-    }
-    else if(!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/g.test(formData.password)) {
+    } else if (
+      !/\d/.test(formData.password) ||
+      !/[a-z]/.test(formData.password) ||
+      !/[A-Z]/.test(formData.password)
+    ) {
       newErrors.password = validationMessages.passwordStrength;
-    }
+    } //password has to have at least a lowercase letter, an uppercase letter and a digit.
 
     if(!formData.confirmPassword) {
       newErrors.confirmPassword = validationMessages.confirmPasswordRequired;
