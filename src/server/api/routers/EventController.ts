@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { db as prisma } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { EventPlanner } from "~/services/EventPlanner";
-import { EventEntity } from "~/services/Event";
-import { Status } from "@prisma/client";
+import { EventPlanner } from "~/server/services/EventPlanner";
+import { EventEntity } from "~/server/services/Event";
+import { StatusType } from "@prisma/client";
+import type { User } from "@prisma/client";
 
 const eventPlanner = new EventPlanner();
 
@@ -133,7 +134,7 @@ export const eventRouter = createTRPCRouter({
     .input(
       z.object({
         invitationId: z.number(),
-        status: z.nativeEnum(Status),
+        status: z.nativeEnum(StatusType),
       })
     )
     .mutation(async ({ input, ctx }) =>
