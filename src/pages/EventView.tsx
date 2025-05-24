@@ -58,10 +58,10 @@ export default function EventView() {
   );
 
   useEffect(() => {
-    if (eventData) {
+    if (eventData?.date) {
       // Ensure date is formatted as yyyy-mm-dd
       const dateObj = new Date(eventData.date);
-      const date = dateObj.toISOString().split("T")[0];
+      const date = dateObj.toISOString().split("T")[0] ?? "";
       setFormData({
         title: eventData.title ?? "",
         description: eventData.description ?? "",
@@ -178,7 +178,10 @@ export default function EventView() {
           <div className={styles.topSection}>
             {/* Poza */}
             <div className={styles.photoSection}>
-              <div className={styles.photoBox}>Event photo here</div>
+              <img
+                className={styles.photoBox}
+                src={eventData.pictureUrl ?? undefined}
+              />
             </div>
             {/* Data + Locația */}
             <div className={styles.infoBox}>
