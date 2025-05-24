@@ -21,7 +21,7 @@ const Navbar = () => {
   const profileRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    const specialPages = ["/#", "/"];
+    const specialPages = ["https://gifthub-five.vercel.app/", "/","/#"," http://localhost:3000/#", "http://localhost:3000/"];
 
     const checkSpecialPage = () => {
       const isSpecial = specialPages.includes(window.location.href);

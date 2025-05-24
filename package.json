@@ -18,8 +18,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "jest --coverage --config jest.config.js",
-    "test-back": "jest --coverage --config jest.config.ts"
+    "test": "jest --coverage --config jest.config.cjs",
+    "test-back": "jest --coverage --config jest.config.cjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
@@ -40,6 +40,7 @@
     "react-router-dom": "^7.5.3",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
+    "vitest": "^3.1.4",
     "zod": "^3.24.2"
   },
   "devDependencies": {

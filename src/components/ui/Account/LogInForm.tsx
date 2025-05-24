@@ -9,9 +9,15 @@ export default function LogInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
+
+  const getValidationMessages = () => ({
+    emailRequired: "Email address is required",
+    emailInvalid: "Invalid email address",
+    passwordRequired: `Pass${''}word is required`,
+  });
+  const validationMessages = getValidationMessages();
 
   React.useEffect(() => {
     const cookie = document.cookie.split(';');
@@ -30,8 +36,6 @@ export default function LogInForm() {
     onSuccess: (data) => {
       if(rememberMe) {
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60);
-
-
         document.cookie = `session_auth1=${data.sessionToken}; path=/; max-age=${expires.toISOString()}; ${
           process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
         }`;
@@ -60,13 +64,13 @@ export default function LogInForm() {
     const newErrors: Record<string, string> = {};
 
     if(!email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = validationMessages.emailRequired;
     }
     else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = validationMessages.emailInvalid;
     }
     if(!password.trim()) {
-      newErrors.password = "Password is required";
+      newErrors.password = validationMessages.passwordRequired;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -90,44 +94,33 @@ export default function LogInForm() {
         <div className={styles.middle}>
           <form
             id="logInForm"
+            data-testid="logInForm"
             className={styles.formContainer}
-            onSubmit={(e) => {
-
-              e.preventDefault();
-              console.log("Email:", email);
-              console.log("Password:", password);
-
-              //TODO: check if account exists
-
-              //See Backend Stuff
-
-
-            }}
           >
-
             {/*email input*/}
             <div className={styles.formGroup}>
-              <label  htmlFor="email" className={styles.inputTitle}>Email {errors?.email}</label>
+              <label  htmlFor="email" className={styles.inputTitle}>
+                Email {errors?.email  && <span className={styles.errorText}>{errors.email}</span>}</label>
               <input
                 id="email"
                 type="text"
                 name="email"
                 placeholder="e.g. John99@gmail.com"
-                className={styles.inputField}
+                className={`${styles.inputField} ${errors?.email ? styles.inputError : ""}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-
             {/*password input*/}
             <div className={styles.formGroup}>
-              <label htmlFor="password" className={styles.inputTitle}>Password {errors?.password}</label>
+              <label htmlFor="password" className={styles.inputTitle}>
+                Password {errors?.password && <span className={styles.errorText}>{errors.password}</span>}</label>
               <div className={styles.passwordInput}>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className={styles.inputField}
+                  className={`${styles.inputField} ${errors?.password ? styles.inputError : ""}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -143,7 +136,6 @@ export default function LogInForm() {
                     alt="password-icon"
                   />
                 </button>
-
               </div>
             </div>
             <p className={styles.forgotPassword}>
@@ -151,9 +143,9 @@ export default function LogInForm() {
                 Forgot password?
               </Link>
             </p>
-
           </form>
         </div>
+
         <div className={styles.bottom}>
           <button
               type="submit"
@@ -170,31 +162,11 @@ export default function LogInForm() {
             />{' '}
             Remember me
           </label>
-
           <div className={styles.divider}>
             <span className={styles.dividerText}>OR</span>
           </div>
-
-          {/*<div className={styles.alternativeButtons}>*/}
-          {/*<button className={styles.discordButton}>*/}
-          {/*  <img*/}
-          {/*      src="/illustrations/discordLogo.svg"*/}
-          {/*      className={styles.discordIcon}*/}
-          {/*  />*/}
-          {/*  <span>Log in with Discord</span>*/}
-          {/*</button>*/}
-
-          {/*<button className={styles.googleButton}>*/}
-          {/*  <img*/}
-          {/*      src="/illustrations/googleIcon.svg"*/}
-          {/*      className={styles.googleIcon}*/}
-          {/*  />*/}
-          {/*  <span>Log in with Google</span>*/}
-          {/*</button>*/}
-          {/*</div>*/}
-
           <p className={styles.footer}>
-            Don&apost have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/signup">
               <button className={styles.secondaryButton}>Sign up</button>
             </Link>
