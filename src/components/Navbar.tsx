@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
+import { api } from "~/trpc/server";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,8 +22,25 @@ const Navbar = () => {
 
   const profileRef = useRef<HTMLLIElement>(null);
 
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Remove cookies manually on the client
+    document.cookie = "session_auth1=; path=/; max-age=0";
+    document.cookie = "session_auth2=; path=/; max-age=0";
+
+    // Redirect
+    router.push("/login");
+  };
+
   useEffect(() => {
-    const specialPages = ["https://gifthub-five.vercel.app/", "/","/#"," http://localhost:3000/#", "http://localhost:3000/"];
+    const specialPages = [
+      "https://gifthub-five.vercel.app/",
+      "/",
+      "/#",
+      " http://localhost:3000/#",
+      "http://localhost:3000/",
+    ];
 
     const checkSpecialPage = () => {
       const isSpecial = specialPages.includes(window.location.href);
@@ -82,10 +101,7 @@ const Navbar = () => {
 
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <Link
-            href="/login#"
-            className={styles["login-button"]}
-          >
+          <Link href="/login#" className={styles["login-button"]}>
             <FaUser />
             <FaArrowRight />
             Login
@@ -104,14 +120,14 @@ const Navbar = () => {
           {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 
           <ul
-            className={`${styles["nav-links"]} ${
-              menuOpen ? styles.open : ""
-            }`}
+            className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
             <li>
               <Link
                 href="/home#"
-                className={activePage === "home" ? styles["nav-link-active"] : ""}
+                className={
+                  activePage === "home" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaHome /> Home
               </Link>
@@ -119,7 +135,9 @@ const Navbar = () => {
             <li>
               <Link
                 href="/inbox#"
-                className={activePage === "inbox" ? styles["nav-link-active"] : ""}
+                className={
+                  activePage === "inbox" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaInbox /> Inbox
               </Link>
@@ -144,7 +162,7 @@ const Navbar = () => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link href="/#">
+                <Link href="/#" onClick={handleLogout}>
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>

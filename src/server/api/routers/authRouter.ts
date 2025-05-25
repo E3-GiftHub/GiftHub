@@ -6,8 +6,8 @@ import { updatePasswordRouter } from "~/server/api/routers/userManagement/update
 import { createTRPCRouter } from "~/server/api/trpc";
 
 export const authRouter = createTRPCRouter({
-    login: loginRouter,
-    signup: signupRouter,
-    findByEmail: recoveryRouter,
-    update: updatePasswordRouter,
-  })
+  login: loginRouter,
+  signup: signupRouter,
+  findByEmail: recoveryRouter,
+  update: updatePasswordRouter,
+});
