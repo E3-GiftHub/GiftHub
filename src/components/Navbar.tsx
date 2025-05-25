@@ -25,7 +25,7 @@ useEffect(() => {
   const checkPageAndAuth = () => {
   const { pathname, hash } = window.location;
   const isLanding =
-    pathname === "/" && (hash === "" || hash === "#");
+       pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
 
   setIsLandingPage(isLanding);
 
