@@ -17,34 +17,42 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
+const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const profileRef = useRef<HTMLLIElement>(null);
 
-  useEffect(() => {
-   const checkSpecialPage = () => {
-  const currentPath = `${window.location.pathname}${window.location.hash}`;
-  const specialPaths = ["/", "/#"];
-  setIsLandingPage(specialPaths.includes(currentPath));
-};
-    const detectActivePage = () => {
-      const url = window.location.href;
-      if (url.includes("/home")) setActivePage("home");
-      else if (url.includes("/inbox")) setActivePage("inbox");
-      else setActivePage(null);
-    };
+useEffect(() => {
+  const checkPageAndAuth = () => {
+    const currentPath = `${window.location.pathname}${window.location.hash}`;
+    const specialPaths = ["/", "/#"];
+    setIsLandingPage(specialPaths.includes(currentPath));
 
-    checkSpecialPage();
+    const loggedIn =
+      document.cookie.includes("session_auth1") ||
+      document.cookie.includes("session_auth2");
+    setIsLoggedIn(loggedIn);
+  };
+
+  const detectActivePage = () => {
+    const url = window.location.href;
+    if (url.includes("/home")) setActivePage("home");
+    else if (url.includes("/inbox")) setActivePage("inbox");
+    else setActivePage(null);
+  };
+
+  checkPageAndAuth();
+  detectActivePage();
+
+  window.addEventListener("hashchange", () => {
+    checkPageAndAuth();
     detectActivePage();
+  });
 
-    window.addEventListener("hashchange", () => {
-      checkSpecialPage();
-      detectActivePage();
-    });
+  return () => {
+    window.removeEventListener("hashchange", checkPageAndAuth);
+  };
+}, []);
 
-    return () => {
-      window.removeEventListener("hashchange", checkSpecialPage);
-    };
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,6 +108,7 @@ const Navbar = () => {
       </div>
 
       {isLandingPage ? (
+         !isLoggedIn && (
         <div className={styles["login-wrapper"]}>
           <Link
             href="/login#"
@@ -110,6 +119,7 @@ const Navbar = () => {
             Login
           </Link>
         </div>
+         )
       ) : (
         <>
           <button
