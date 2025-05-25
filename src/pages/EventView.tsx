@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
@@ -17,13 +17,29 @@ function parseId(param: string | string[] | undefined): number | null {
   return null; // ignore arrays or undefined
 }
 
+function GuestListPreview(guestNames: string[]) {
+  return (
+    <div className={styles.guestList}>
+      {guestNames.map((guest, index) => (
+        <div className={styles.guestItem} key={index}>
+          {guest}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function EventView() {
   const router = useRouter();
   const { id } = router.query;
 
   const parsedId = parseId(id) ?? 0;
 
-  const { data, isLoading, isError } = api.event.getEventID.useQuery({
+  const { data } = api.event.getEventID.useQuery({
+    eventId: parsedId,
+  });
+
+  const guestsData = api.guest.getGuestsForEvent.useQuery({
     eventId: parsedId,
   });
 
@@ -45,10 +61,24 @@ export default function EventView() {
   const [guestList, setGuestList] = useState(
     Array.from({ length: 24 }, (_, i) => `Guest ${i + 1}`),
   );
-  const handleRemoveGuest = (idx: number) =>
-    setGuestList((prev) => prev.filter((_, i) => i !== idx));
-  const handleAddGuest = () =>
-    setGuestList((prev) => [...prev, `Guest ${prev.length + 1}`]);
+
+  //const removeGuestMutation = api.guest.removeGuestFromEvent.useMutation();
+  const handleRemoveGuest = () => {
+    console.log("Simulate adding guest");
+    // removeGuestMutation.mutate({
+    //   eventId: parsedId,
+    //   guestUsername: "", // Replace with the actual username from the UI
+    // });
+  };
+
+  const addGuestMutation = api.guest.addGuestToEvent.useMutation();
+
+  const handleAddGuest = () => {
+    addGuestMutation.mutate({
+      eventId: parsedId,
+      guestUsername: "", // Replace with the actual username from the UI
+    });
+  };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
 
   // Media list state
@@ -72,6 +102,17 @@ export default function EventView() {
       console.log("date ", date);
     }
   }, [eventData]);
+
+  useEffect(() => {
+    if (guestsData?.data) {
+      const guestNames = guestsData.data.map(
+        (guestElement) => guestElement.guest.username,
+      );
+      if (JSON.stringify(guestNames) !== JSON.stringify(guestList)) {
+        setGuestList(guestNames);
+      }
+    }
+  }, [guestsData, guestList]);
 
   if (eventData === undefined) {
     return (
@@ -249,13 +290,7 @@ export default function EventView() {
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              <div className={styles.guestList}>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <div key={i} className={styles.guestItem}>
-                    Guest {i + 1}
-                  </div>
-                ))}
-              </div>
+              {GuestListPreview(guestList)}
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}

@@ -5,11 +5,11 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
 import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
-import { eventRouter } from "~/server/api/routers/EventController"
+import { eventRouter } from "~/server/api/routers/EventController";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
-import {invitesNotificationRouter} from "~/server/api/routers/invitesNotificationRouter";
-
+import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
+import { guestRouter } from "~/server/api/routers/GuestRouter";
 
 /**
  * This is the primary router for your server.
@@ -25,9 +25,10 @@ export const appRouter = createTRPCRouter({
   invitationPreview: invitationsRouter,
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
- invitationsNotification: invitesNotificationRouter, 
+  invitationsNotification: invitesNotificationRouter,
 
   event: eventRouter,
+  guest: guestRouter,
 });
 
 // export type definition of API
