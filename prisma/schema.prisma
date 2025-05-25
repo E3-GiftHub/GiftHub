@@ -37,7 +37,6 @@ enum MarkType {
 
 //! default models
 
-// Necessary for Next auth
 model Account {
     id                    String  @id @default(cuid())
     userUsername          String
