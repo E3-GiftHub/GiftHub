@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
-import { api } from "~/trpc/server";
 import { useRouter } from "next/router";
 
 const Navbar = () => {
@@ -24,13 +23,13 @@ const Navbar = () => {
 
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Remove cookies manually on the client
     document.cookie = "session_auth1=; path=/; max-age=0";
     document.cookie = "session_auth2=; path=/; max-age=0";
 
     // Redirect
-    router.push("/login");
+    await router.push("/login");
   };
 
   useEffect(() => {
