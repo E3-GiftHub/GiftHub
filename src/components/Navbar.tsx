@@ -24,7 +24,7 @@ const [isLoggedIn, setIsLoggedIn] = useState(false);
 useEffect(() => {
   const checkPageAndAuth = () => {
     const currentPath = `${window.location.pathname}${window.location.hash}`;
-    const specialPaths = ["/", "/#"];
+    const specialPaths = ["/", "#"];
     setIsLandingPage(specialPaths.includes(currentPath));
 
     const loggedIn =
