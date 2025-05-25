@@ -23,15 +23,17 @@ const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 useEffect(() => {
   const checkPageAndAuth = () => {
-    const currentPath = `${window.location.pathname}${window.location.hash}`;
-    const specialPaths = ["/", "#"];
-    setIsLandingPage(specialPaths.includes(currentPath));
+  const { pathname, hash } = window.location;
+  const isLanding =
+    pathname === "/" && (hash === "" || hash === "#");
 
-    const loggedIn =
-      document.cookie.includes("session_auth1") ||
-      document.cookie.includes("session_auth2");
-    setIsLoggedIn(loggedIn);
-  };
+  setIsLandingPage(isLanding);
+
+  const loggedIn =
+    document.cookie.includes("session_auth1") ||
+    document.cookie.includes("session_auth2");
+  setIsLoggedIn(loggedIn);
+};
 
   const detectActivePage = () => {
     const url = window.location.href;
