@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import "./../styles/globals.css";
 
 // Mock data for demonstration
 const mockWishlists = new Map<

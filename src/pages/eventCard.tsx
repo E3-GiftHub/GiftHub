@@ -1,6 +1,7 @@
 import Head from "next/head";
 import EventCard from "~/components/ui/EventCard";
 import styles from "../styles/EventCardPage.module.css";
+import "../styles/globals.css";
 
 export default function EventCardPage() {
   const event = {
@@ -24,11 +25,12 @@ export default function EventCardPage() {
       <div className={styles.giftHubPage}>
         <main>
           <EventCard
-            name={event.name}
+            //name={event.name}
             description={event.description}
-            date={event.date}
-            location={event.location}
+            //date={event.date}
+            //location={event.location}
             image={event.image}
+            title={event.name}
           />
         </main>
       </div>

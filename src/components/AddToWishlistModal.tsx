@@ -1,17 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import styles from "../styles/Button.module.css"
-import modalStyles from "../styles/Modal.module.css"
+import { useState } from "react";
+import styles from "../styles/Button.module.css";
+import modalStyles from "../styles/ModalEventHome.module.css";
 
 interface AddToWishlistModalProps {
-  isOpen: boolean
-  onClose: () => void
-  itemName: string
-  itemPhoto: string
-  itemPrice: string
-  itemDescription?: string
-  onAddToWishlist: (item: { name: string; photo: string; price: string; quantity: number }) => void
+  isOpen: boolean;
+  onClose: () => void;
+  itemName: string;
+  itemPhoto: string;
+  itemPrice: string;
+  itemDescription?: string;
+  onAddToWishlist: (item: {
+    name: string;
+    photo: string;
+    price: string;
+    quantity: number;
+  }) => void;
 }
 
 export default function AddToWishlistModal({
@@ -23,16 +28,16 @@ export default function AddToWishlistModal({
   itemDescription,
   onAddToWishlist,
 }: AddToWishlistModalProps) {
-  const [quantity, setQuantity] = useState(1)
+  const [quantity, setQuantity] = useState(1);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleAddToWishlist = () => {
     onAddToWishlist({
       name: itemName,
       photo: itemPhoto,
       price: itemPrice,
-      quantity: quantity
+      quantity: quantity,
     });
   };
 
@@ -40,12 +45,20 @@ export default function AddToWishlistModal({
     <div className={modalStyles.modalOverlay}>
       <div className={modalStyles.modalContent}>
         <h2 className={modalStyles.modalTitle}>Add to Wishlist</h2>
-        
+
         <div>
-          <img src={itemPhoto} alt={itemName} className={modalStyles.modalImage} />
+          <img
+            src={itemPhoto}
+            alt={itemName}
+            className={modalStyles.modalImage}
+          />
           <h3 className={modalStyles.modalItemName}>{itemName}</h3>
           <p className={modalStyles.modalItemPrice}>{itemPrice}</p>
-          {itemDescription && <p className={modalStyles.modalItemDescription}>{itemDescription}</p>}
+          {itemDescription && (
+            <p className={modalStyles.modalItemDescription}>
+              {itemDescription}
+            </p>
+          )}
         </div>
 
         <div>
@@ -64,13 +77,13 @@ export default function AddToWishlistModal({
 
         <div className={modalStyles.modalButtons}>
           <button
-            className={`${styles.button} ${styles['button-secondary']}`}
+            className={`${styles.button} ${styles["button-secondary"]}`}
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className={`${styles.button} ${styles['button-primary']}`}
+            className={`${styles.button} ${styles["button-primary"]}`}
             onClick={handleAddToWishlist}
           >
             Add to Wishlist
@@ -78,5 +91,5 @@ export default function AddToWishlistModal({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}
