@@ -8,7 +8,7 @@
 .signUpBox {
   display: flex;
   flex-direction: row;
-  background-color: #2E236B;
+  background-color: #2e236b;
   border-radius: 15px;
   min-width: 900px;
   max-width: 72em;
@@ -37,14 +37,18 @@
   width: 26em;
   height: min(43em, 90%);
   margin-left: 1em;
-  background: linear-gradient(0deg, rgba(67, 61, 139, 1) 38%, rgba(200, 172, 214, 1) 91%);
+  background: linear-gradient(
+    0deg,
+    rgba(67, 61, 139, 1) 38%,
+    rgba(200, 172, 214, 1) 91%
+  );
   border-radius: 15px;
   transition: box-shadow 0.2s ease-in-out;
   overflow: hidden;
 }
 
-.visual:hover{
-  box-shadow: 0 0 10px #C6AAD5;
+.visual:hover {
+  box-shadow: 0 0 10px #c6aad5;
 }
 
 .GiftHubTitle {
@@ -54,7 +58,7 @@
   margin-bottom: 0.6em;
   font-size: 85px;
   color: white;
-  text-shadow: 3px 5px 5px #917DA8;
+  text-shadow: 3px 5px 5px #917da8;
 }
 
 .cloudPNG {
@@ -82,27 +86,27 @@
 }
 
 .title {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 2.5em;
   margin-top: 0;
 }
 
-.resetPasswordPage .title{
-  margin-top:.3em;
+.resetPasswordPage .title {
+  margin-top: 0.3em;
 }
 
 .aboveTitle {
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 50%;
   font-size: 1.1em;
   margin-bottom: -0.2em;
 }
 
 .belowTitle {
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 50%;
   font-size: 1.1em;
-  margin-top: -.8em;
+  margin-top: -0.8em;
 }
 
 .middle {
@@ -130,7 +134,7 @@
 }
 
 .formGroup {
-  color: #FFFFFF;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   margin-top: 0.5em;
@@ -143,21 +147,21 @@
   font-size: 17px;
 }
 
-.inputField{
+.inputField {
   width: 100%;
   height: 3rem;
   padding: 0 1rem;
   font-weight: 500;
-  background-color: #433D8A;
-  border: 3px solid #C7ACD5;
+  background-color: #433d8a;
+  border: 3px solid #c7acd5;
   border-radius: 10px;
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 1rem;
   box-sizing: border-box;
 }
 
 .inputField::placeholder {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: 500;
   opacity: 50%;
   font-size: 15px;
@@ -202,30 +206,30 @@
   opacity: 1;
 }
 
-.forgotPassword{
-  margin-top: -.3em;
+.forgotPassword {
+  margin-top: -0.3em;
   color: white;
   text-decoration: none;
-  display:flex;
+  display: flex;
   justify-content: flex-end;
   opacity: 80%;
   transition: opacity 0.2s ease;
 }
 
-.forgotPassword:hover{
-  opacity:1;
+.forgotPassword:hover {
+  opacity: 1;
 }
 
 .bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .5em;
+  gap: 0.5em;
   margin-top: 0;
 }
 
 .rememberMe {
-  margin-top:0;
+  margin-top: 0;
   display: flex;
   align-items: center;
   color: white;
@@ -240,7 +244,12 @@
   margin-bottom: 0;
   margin-top: 0;
   padding: 0.6em 1.2em;
-  background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
   width: 11em;
   height: 3em;
   border-radius: 10px;
@@ -304,7 +313,6 @@
   margin-top: 0.5rem;
   font-size: 0.9rem;
 }
-
 
 /*.alternativeButtons{
   display:flex;
@@ -384,7 +392,7 @@
   color: rgba(255, 255, 255, 0.5);
   font-size: 1.2em;
   margin-bottom: 0;
-  margin-top: .5em;
+  margin-top: 0.5em;
 }
 
 .secondaryButton {
@@ -392,7 +400,7 @@
   border: none;
   padding: 0;
   margin-left: 0.4em;
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 1;
   font-size: 1em;
   cursor: pointer;
@@ -403,23 +411,22 @@
 }
 
 @media (max-width: 1250px) {
-  .alternativeButtons{
+  .alternativeButtons {
     flex-direction: column;
   }
 
-  .discordButton{
+  .discordButton {
     width: 16em;
   }
 
-  .googleButton{
-    width:16em;
+  .googleButton {
+    width: 16em;
   }
 }
 
 @media (max-width: 1000px) {
-
-  .fullPageWrapper{
-    background-image: linear-gradient(#17153B, #433D8B);
+  .fullPageWrapper {
+    background-image: linear-gradient(#17153b, #433d8b);
   }
   .signUpBox {
     height: 85vh;
@@ -439,26 +446,25 @@
   }
 
   .formContainer {
-    gap: .5em;
-    margin-top: -.5em;
+    gap: 0.5em;
+    margin-top: -0.5em;
   }
 
   .primaryButton {
     margin-top: 3em;
   }
 
-  .alternativeButtons{
+  .alternativeButtons {
     flex-direction: row;
   }
 
-  .discordButton{
+  .discordButton {
     width: 13em;
   }
 
-  .googleButton{
-    width:13em;
+  .googleButton {
+    width: 13em;
   }
-
 }
 
 @media (max-width: 850px) {
@@ -470,16 +476,16 @@
 }
 
 @media (max-width: 600px) {
-  .alternativeButtons{
+  .alternativeButtons {
     flex-direction: column;
   }
 
-  .discordButton{
+  .discordButton {
     width: 16em;
   }
 
-  .googleButton{
-    width:16em;
+  .googleButton {
+    width: 16em;
   }
 }
 
