@@ -109,15 +109,12 @@ export class ContributionService {
       throw new EventManagementException("Event item not found");
     }
 
-    const totalPrice =
-      (item.price?.toNumber() || 0) * (eventItem.quantityRequested || 1);
+    // todo change this
+    const totalPrice = (item.price?.toNumber() || 0) * 1;
     const isFulfilled = totalContributed >= totalPrice;
 
     // Update the event item fulfillment status if needed
-    if (
-      isFulfilled &&
-      eventItem.quantityFulfilled !== eventItem.quantityRequested
-    ) {
+    if (isFulfilled) {
       await db.eventArticle.update({
         where: {
           eventId_itemId: {
@@ -125,9 +122,7 @@ export class ContributionService {
             itemId: itemIdInt,
           },
         },
-        data: {
-          quantityFulfilled: eventItem.quantityRequested,
-        },
+        data: {}, // todo change this
       });
     }
 

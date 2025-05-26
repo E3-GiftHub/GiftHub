@@ -49,11 +49,15 @@ export class WishlistService {
     }));
 */
 
+    // todo delete this harcoded values
     const items: WishlistItemDTO[] = entries.map((ea) => ({
       itemIdentifier: ea.itemId.toString(),
-      name: ea?.item?.name ?? undefined,
+      name: ea?.item?.name ?? "",
       description: ea?.item?.description ?? undefined,
       price: ea?.item?.price ? ea.item.price.toNumber() : undefined,
+      quantity: 1, // todo delete this property
+      isReserved: true,
+      contributedAmount: 1,
       priority: ea?.priority ?? undefined,
     }));
 
@@ -91,6 +95,7 @@ export class WishlistService {
       isReserved: false,
       contributedAmount: 0,
       priority: record.priority ?? undefined,
+      quantity: 1, // delete this
     };
   }
 

@@ -12,7 +12,9 @@ const handle = async <T>(fn: () => Promise<T>) => {
   try {
     return { success: true, data: await fn() };
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unexpected error");
+    throw new Error(
+      error instanceof Error ? error.message : "Unexpected error",
+    );
   }
 };
 
@@ -25,15 +27,17 @@ export const eventRouter = createTRPCRouter({
         date: z.date(),
         time: z.date(),
         location: z.string().min(1, "Location is required"),
-      })
+      }),
     )
     .mutation(({ input, ctx }) =>
       handle(() =>
-        eventPlanner.createEvent({
-          ...input,
-          createdBy: ctx.session?.user.username,
-        }).then((event) => event.raw)
-      )
+        eventPlanner
+          .createEvent({
+            ...input,
+            createdBy: ctx.session?.user.id ?? "undefined",
+          })
+          .then((event) => event.raw),
+      ),
     ),
 
   getEventID: publicProcedure
@@ -41,20 +45,20 @@ export const eventRouter = createTRPCRouter({
     .query(({ input }) =>
       handle(() =>
         prisma.event.findUniqueOrThrow({
-          where: { id: input.eventId }
-        })
-      )
+          where: { id: input.eventId },
+        }),
+      ),
     ),
   getEventToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(({ input }) =>
-	handle(() => 
-	  prisma.event.findUniqueOrThrow({
-	   where: { token: input.token }
-	})
-      )
+      handle(() =>
+        prisma.event.findUniqueOrThrow({
+          where: { token: input.token },
+        }),
+      ),
     ),
-/*  Depricated
+  /*  Depricated
   publishEvent: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .mutation(({ input }) =>
@@ -65,21 +69,23 @@ export const eventRouter = createTRPCRouter({
     .input(z.object({ eventId: z.number() }))
     .mutation(async ({ input, ctx }) =>
       handle(async () => {
-        const event = await prisma.event.findUnique({ where: { id: input.eventId } });
-        if (!event || event.createdByUsername !== ctx.session?.user.username) {
+        const event = await prisma.event.findUnique({
+          where: { id: input.eventId },
+        });
+        if (!event || event.createdByUsername !== ctx.session?.user.id) {
           throw new Error("Not authorized to remove this event");
         }
         await eventPlanner.removeEvent(input.eventId);
-      })
+      }),
     ),
 
   sendInvitation: publicProcedure
     .input(z.object({ eventId: z.number(), guestId: z.string() }))
     .mutation(({ input }) =>
-      handle(() => eventPlanner.sendInvitation(input.eventId, input.guestId))
+      handle(() => eventPlanner.sendInvitation(input.eventId, input.guestId)),
     ),
 
-/*
+  /*
 
   getEventAnalytics: publicProcedure
     .input(z.object({ eventId: z.number() }))
@@ -110,32 +116,30 @@ export const eventRouter = createTRPCRouter({
 
 */
 
-  getUserEvents: publicProcedure
-    .query(({ ctx }) =>
-      handle(() =>
-        prisma.event.findMany({
-          where: { createdByUsername: ctx.session?.user.username ?? "anonymous" },
-          orderBy: { date: "asc" },
-        })
-      )
+  getUserEvents: publicProcedure.query(({ ctx }) =>
+    handle(() =>
+      prisma.event.findMany({
+        where: { createdByUsername: ctx.session?.user.id ?? "anonymous" },
+        orderBy: { date: "asc" },
+      }),
     ),
+  ),
 
-  getInvitedEvents: publicProcedure
-    .query(({ ctx }) =>
-      handle(() =>
-        prisma.invitation.findMany({
-          where: { guestUsername: ctx.session?.user.username },
-          include: { event: true },
-        })
-      )
+  getInvitedEvents: publicProcedure.query(({ ctx }) =>
+    handle(() =>
+      prisma.invitation.findMany({
+        where: { guestUsername: ctx.session?.user.id },
+        include: { event: true },
+      }),
     ),
+  ),
 
   respondToInvitation: publicProcedure
     .input(
       z.object({
         invitationId: z.number(),
         status: z.nativeEnum(StatusType),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) =>
       handle(async () => {
@@ -147,7 +151,7 @@ export const eventRouter = createTRPCRouter({
           throw new Error("Invitation not found");
         }
 
-        if (invitation.guestUsername !== ctx.session?.user.username) {
+        if (invitation.guestUsername !== ctx.session?.user.id) {
           throw new Error("Not authorized to respond to this invitation");
         }
 
@@ -155,6 +159,6 @@ export const eventRouter = createTRPCRouter({
           where: { id: input.invitationId },
           data: { status: input.status },
         });
-      })
+      }),
     ),
 });

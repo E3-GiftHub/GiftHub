@@ -1,10 +1,9 @@
 import { db as prisma } from "~/server/db";
 import { EventEntity } from "./Event";
 import { StatusType } from "@prisma/client";
-import { generateToken } from "~/utils/token";
+//import { generateToken } from "~/utils/token";
 import { EventManagementException } from "./EventManagementException";
-import { nanoid } from "nanoid"
-
+import { nanoid } from "nanoid";
 
 export class EventPlanner {
   async createEvent(data: {
@@ -22,15 +21,15 @@ export class EventPlanner {
         location: data.location,
         date: data.date,
         time: data.time,
-	token: nanoid(12),
+        token: nanoid(12),
         //createdByUsername: data.createdBy,
-	user: {
-        //connect: { username: data.createdBy },
-        connectOrCreate: {
-    where: { username: data.createdBy },
-    create: { username: data.createdBy },
-  },
-	},
+        user: {
+          //connect: { username: data.createdBy },
+          connectOrCreate: {
+            where: { username: data.createdBy },
+            create: { username: data.createdBy },
+          },
+        },
       },
     });
 
@@ -42,7 +41,9 @@ export class EventPlanner {
   }
 
   async sendInvitation(eventId: number, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({ where: { username: guestId } });
+    const exists = await prisma.user.findUnique({
+      where: { username: guestId },
+    });
     if (!exists) throw new EventManagementException("Guest does not exist");
 
     await prisma.invitation.create({
@@ -51,12 +52,12 @@ export class EventPlanner {
         guestUsername: guestId,
         status: StatusType.PENDING,
         createdAt: new Date(),
-	//guest:{ connect: { username: guestId }},
-	//event:{ connect: { id: eventId } },
+        //guest:{ connect: { username: guestId }},
+        //event:{ connect: { id: eventId } },
       },
     });
   }
-/* Depricated
+  /* Depricated
   async manageWishlist(eventId: number) {
     const wishlist = await prisma.eventItem.findMany({
       where: { eventId: eventId },
@@ -89,5 +90,4 @@ export class EventPlanner {
     return await prisma.contribution.findMany({ where: { eventId: eventId } });
   }
 */
-
 }

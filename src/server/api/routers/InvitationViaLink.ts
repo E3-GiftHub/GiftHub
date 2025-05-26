@@ -1,37 +1,31 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { nanoid } from "nanoid";
-import { db as prisma } from "~/server/db"
-import { TRPCError } from '@trpc/server';
+import { db as prisma } from "~/server/db";
+import { TRPCError } from "@trpc/server";
 
 export const invitationViaLinkRouter = createTRPCRouter({
+  createLink: publicProcedure
+    .input(z.object({ eventId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.session || !ctx.session.user)
+        throw new TRPCError({ code: "UNAUTHORIZED" });
 
-	createLink: publicProcedure
-	.input(z.object({ eventId: z.string() }))
-	.mutation(async ({ ctx, input }) => {
+      const existing = await prisma.event.findUnique({
+        where: { id: input.eventId },
+        select: { token: true },
+      });
 
-	if (!ctx.session || !ctx.session.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+      if (existing) return existing.token;
 
-	const existing = await prisma.eventInvitationToken.findUnique({
-		where: { eventId: input.eventId },
-		select: { token: true },
-	});
+      const token = nanoid(12);
+      const invitation = await prisma.event.update({
+        where: { id: input.eventId },
+        data: {
+          token: token,
+        },
+      });
 
-	if (existing) return existing.token;	
-
-
-	const token = nanoid(12); 
-	const invitation = await prisma.eventInvitationToken.create({
-		data: {
-		 eventId: input.eventId,
-		 token: token,
-		},
-	});
-
-	return { token };
+      return { token };
     }),
-	
-
-
-
 });
