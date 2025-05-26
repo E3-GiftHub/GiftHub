@@ -1,5 +1,4 @@
-
-/*navbar dashbord*/ 
+/*navbar dashbord*/
 .special-navbar {
   background-color: #1a1840 !important;
   padding: 0.5rem 2rem !important;
@@ -105,7 +104,7 @@
   object-fit: contain;
   transform: scale(3.8) translateX(10px);
   transform-origin: center;
-  padding-right:0.8rem;
+  padding-right: 0.8rem;
 }
 
 .hamburger {
@@ -177,7 +176,7 @@
 }
 
 .dropdown-content a {
-  border: none !important; 
+  border: none !important;
   font-size: 0.85rem;
   width: 100%;
 }
@@ -199,7 +198,6 @@
 
 /* -------------------- RESPONSIVE: MOBIL -------------------- */
 @media (max-width: 720px), (max-height: 500px) and (orientation: landscape) {
-  
   .sidebar-overlay {
     position: fixed;
     top: 0;
@@ -208,7 +206,7 @@
     min-width: 170px;
     max-width: 250px;
     height: 100%;
-    background-color:   rgba(42, 4, 93, 0.703)!important;
+    background-color: rgba(42, 4, 93, 0.703) !important;
     backdrop-filter: blur(6px);
     z-index: 999;
     pointer-events: auto;
@@ -242,8 +240,8 @@
     cursor: pointer;
     position: absolute;
     top: 50%;
-    right: 1rem; 
-    transform: translateY(-50%); 
+    right: 1rem;
+    transform: translateY(-50%);
     z-index: 1001;
     background-color: transparent;
     border: none;
@@ -255,13 +253,13 @@
     position: absolute;
     top: -65px;
     right: 0;
-    width: 170px; 
+    width: 170px;
     min-width: 170px;
     max-width: 170px;
     height: 100vh;
     padding: 120px 0 2rem;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
     gap: 1rem;
     z-index: 1000;
     box-sizing: border-box;
@@ -298,7 +296,7 @@
   .dropdown-content {
     width: 120px;
     margin-top: 0.5rem;
-    background-color: rgba(43, 4, 93, 0.597)!important;
+    background-color: rgba(43, 4, 93, 0.597) !important;
     backdrop-filter: blur(6px);
     padding: 0.8rem;
     border-radius: 1rem;
@@ -310,7 +308,6 @@
     top: 100%;
     left: 10%;
     transform: translateX(-10%);
-
   }
 
   .profile-dropdown.open .dropdown-content {
@@ -324,8 +321,7 @@
     border: none;
   }
 }
-.nav-links.open::before 
-{
+.nav-links.open::before {
   display: none;
 }
 
@@ -333,8 +329,7 @@
 
 @media (max-width: 300px) {
   .sidebar-overlay {
-display: none ;
- 
+    display: none;
   }
 
   .navbar {
@@ -346,7 +341,6 @@ display: none ;
   .logo {
     transform: scale(3) translateX(2px);
     margin-left: 2rem;
-
   }
 
   .hamburger {
@@ -355,16 +349,15 @@ display: none ;
   }
 
   .nav-links {
-    
     position: absolute;
     top: -50px;
     right: 0;
-    width: 100%; 
+    width: 100%;
     min-width: 100%;
     max-width: 100%;
-    height:5000px; 
+    height: 5000px;
     padding: 0.5rem 0.5rem;
-    background-color:  rgba(43, 4, 93, 0.597);
+    background-color: rgba(43, 4, 93, 0.597);
     backdrop-filter: blur(6px);
     flex-direction: column;
     align-items: flex-end;
@@ -374,23 +367,19 @@ display: none ;
     padding-top: 115px;
   }
 
-
-  
   .nav-links.open {
     display: flex;
   }
 
-
   .nav-links li a,
   .profile-main-button {
-    
     width: 55%;
     max-width: 120px;
     font-size: 0.75rem;
     padding: 0.5rem 0.6rem;
     border-radius: 6px;
     display: flex;
-    justify-content:center;
+    justify-content: center;
     align-items: center;
   }
   .nav-links li a svg,
@@ -410,8 +399,7 @@ display: none ;
     flex-direction: column;
     align-items: center;
     backdrop-filter: none;
-    box-shadow: 0 2px 5px  rgba(43, 4, 93, 0.597);
-   
+    box-shadow: 0 2px 5px rgba(43, 4, 93, 0.597);
   }
 
   .dropdown-content a {
@@ -427,7 +415,6 @@ display: none ;
   .dropdown-content a svg {
     font-size: 0.85rem;
   }
-  
 }
 
 /* -------------------- RESPONSIVE: DESKTOP -------------------- */
@@ -461,6 +448,3 @@ display: none ;
     display: none;
   }
 }
-
-
-

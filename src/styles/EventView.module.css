@@ -1,0 +1,379 @@
+/* EventView.module.css */
+.container {
+  min-height: 100vh;
+  background-color: #2f2464;
+  padding: 1rem;
+}
+
+.content {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.reportButton {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reportButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.eventCard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.eventImage {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.infoCard {
+  background: rgba(79, 70, 229, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.infoCardButton {
+  background: rgba(79, 70, 229, 0.5);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.infoCardButton:hover {
+  background: rgba(79, 70, 229, 0.7);
+}
+
+.infoLabel {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  color: white;
+  font-weight: 600;
+}
+
+.locationCard {
+  background: rgba(79, 70, 229, 0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.locationLabel {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.locationText {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.descriptionCard {
+  background: rgba(55, 48, 163, 0.5);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem; /* Match gap between sections */
+}
+
+.descriptionTitle {
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.descriptionText {
+  color: white;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.guestCard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.guestHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.guestTitle {
+  color: white;
+  font-weight: 600;
+}
+
+.guestCount {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.plannerSection {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.plannerCard {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
+  border-radius: 0.5rem;
+}
+
+.plannerImage {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+  border: 2px solid white;
+}
+
+.plannerName {
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.plannerRole {
+  color: #e9d5ff;
+  font-size: 0.75rem;
+}
+
+.guestsList {
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.guestItem {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.guestItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.guestImage {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+}
+
+.guestName {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wishlistButton {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.wishlistButton:hover {
+  background: #1d4ed8;
+}
+
+.contributeButton {
+  width: 100%;
+  background: rgba(55, 48, 163, 0.6);
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #4f46e5;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.contributeButton:hover {
+  background: rgba(55, 48, 163, 0.8);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.modalTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.modalDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.modalTextarea {
+  width: 95%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  resize: none;
+  height: 6rem;
+  font-size: 0.875rem;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.modalButtonSecondary {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalButtonSecondary:hover {
+  background: #f9fafb;
+}
+
+.modalButtonPrimary {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalButtonPrimary:hover {
+  background: #b91c1c;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+
+}

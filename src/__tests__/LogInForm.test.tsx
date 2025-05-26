@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 import LogInForm from "~/components/ui/Account/LogInForm";
-import { act } from 'react';
+import { act } from "react";
 
 const mockPush = jest.fn();
 
@@ -13,24 +13,35 @@ jest.mock("next/router", () => ({
 }));
 
 type MutationVariables = { email: string; password: string };
-type OnSuccessCallback = (data: { sessionToken: string; expires: number }) => void;
+type OnSuccessCallback = (data: {
+  sessionToken: string;
+  expires: number;
+}) => void;
 type OnErrorCallback = (error: { message: string }) => void;
 const mockMutate = jest.fn<
   void,
   [MutationVariables, OnSuccessCallback, OnErrorCallback]
 >();
 
-jest.mock("~/trpc/react", () => ({
+jest.mock("~/utils/api", () => ({
   api: {
     auth: {
       login: {
         login: {
-          useMutation: jest.fn(({ onSuccess, onError }) => ({
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            mutate: (data: MutationVariables) => mockMutate(data, onSuccess, onError),
-            isPending: false,
-            error: null,
-          })),
+          useMutation: jest.fn(
+            ({
+              onSuccess,
+              onError,
+            }: {
+              onSuccess: OnSuccessCallback;
+              onError: OnErrorCallback;
+            }) => ({
+              mutate: (data: MutationVariables) =>
+                mockMutate(data, onSuccess, onError),
+              isPending: false,
+              error: null,
+            }),
+          ),
         },
       },
     },
@@ -58,7 +69,9 @@ describe("LogInForm", () => {
     render(<LogInForm />);
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
     /*expect(await screen.findByText(/email is required/i)).toBeInTheDocument();*/
-    expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/password is required/i),
+    ).toBeInTheDocument();
   });
 
   test("validates invalid email format", async () => {
@@ -70,7 +83,9 @@ describe("LogInForm", () => {
       target: { value: "password123" },
     });
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
-    expect(await screen.findByText(/invalid email address/i)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/invalid email address/i),
+    ).toBeInTheDocument();
   });
 
   test("toggles password visibility", () => {
@@ -101,7 +116,10 @@ describe("LogInForm", () => {
   test("navigates to forgot password page", () => {
     render(<LogInForm />);
     const forgotPasswordLink = screen.getByText(/forgot password/i);
-    expect(forgotPasswordLink.closest("a")).toHaveAttribute("href", "/forgotpassword");
+    expect(forgotPasswordLink.closest("a")).toHaveAttribute(
+      "href",
+      "/forgotpassword",
+    );
   });
 
   test("navigates to signup page", () => {
@@ -144,11 +162,9 @@ describe("LogInForm extra behaviors", () => {
 
     await waitFor(() => {
       expect(mockMutate).toHaveBeenCalled();
-      const firstCall = mockMutate.mock.calls[0] as [
-        MutationVariables,
-        OnSuccessCallback,
-        OnErrorCallback
-      ] | undefined;
+      const firstCall = mockMutate.mock.calls[0] as
+        | [MutationVariables, OnSuccessCallback, OnErrorCallback]
+        | undefined;
       if (!firstCall) throw new Error("mockMutate was not called");
       const [, onSuccess] = firstCall;
 
@@ -163,7 +179,6 @@ describe("LogInForm extra behaviors", () => {
     });
   });
 
-
   test("handles 'User not found' error", async () => {
     render(<LogInForm />);
     fireEvent.change(screen.getByLabelText(/email/i), {
@@ -175,14 +190,11 @@ describe("LogInForm extra behaviors", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
 
-
     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
 
-    const firstCall = mockMutate.mock.calls[0] as [
-      MutationVariables,
-      OnSuccessCallback,
-      OnErrorCallback
-    ] | undefined;
+    const firstCall = mockMutate.mock.calls[0] as
+      | [MutationVariables, OnSuccessCallback, OnErrorCallback]
+      | undefined;
 
     if (!firstCall) throw new Error("mockMutate was not called");
 
@@ -207,11 +219,9 @@ describe("LogInForm extra behaviors", () => {
 
     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
 
-    const firstCall = mockMutate.mock.calls[0] as [
-      MutationVariables,
-      OnSuccessCallback,
-      OnErrorCallback
-    ] | undefined;
+    const firstCall = mockMutate.mock.calls[0] as
+      | [MutationVariables, OnSuccessCallback, OnErrorCallback]
+      | undefined;
 
     if (!firstCall) throw new Error("mockMutate was not called");
 
