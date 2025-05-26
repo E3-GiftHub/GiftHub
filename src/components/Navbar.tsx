@@ -109,20 +109,20 @@ useEffect(() => {
       }`}
     >
       <div className={styles["navbar-left"]}>
-        <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+       <Link href="/">
+    <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+  </Link>
       </div>
 
-      {isLandingPage ? (
-         !isLoggedIn && (
-        <div className={styles["login-wrapper"]}>
-          <Link href="/login#" className={styles["login-button"]}>
-            <FaUser />
-            <FaArrowRight />
-            Login
-          </Link>
-        </div>
-         )
-      ) : (
+      {isLandingPage && !isLoggedIn ? (
+  <div className={styles["login-wrapper"]}>
+    <Link href="/login#" className={styles["login-button"]}>
+      <FaUser />
+      <FaArrowRight />
+      Login
+    </Link>
+  </div>
+) : (
         <>
           <button
             className={styles.hamburger}
