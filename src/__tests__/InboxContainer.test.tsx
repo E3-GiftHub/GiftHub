@@ -2,18 +2,17 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import InboxContainer from "../components/ui/InboxContainer";
 
-
 jest.mock("../../styles/InboxContainer.module.css", () => ({
   separator: "separator",
   notificationList: "notificationList",
 }));
 
-
 jest.mock("../components/ui/CustomContainer", () => ({
   __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
-
 
 type InboxContainerHeaderProps = {
   onTabChange: (tab: string) => void;
@@ -24,13 +23,14 @@ jest.mock("../components/ui/InboxContainerHeader", () => ({
   __esModule: true,
   default: (props: InboxContainerHeaderProps) => (
     <div>
-      <button onClick={() => props.onTabChange("Invitations")}>Invitations Tab</button>
+      <button onClick={() => props.onTabChange("Invitations")}>
+        Invitations Tab
+      </button>
       <button onClick={() => props.onTabChange("My events")}>Events Tab</button>
       <button onClick={props.onOpenMobileFilter}>Open Filter</button>
     </div>
   ),
 }));
-
 
 type MobileFilterMenuProps = {
   visible: boolean;
@@ -45,21 +45,20 @@ jest.mock("../components/ui/MobileFilterMenu", () => ({
     props.visible ? (
       <div>
         <p>Mobile Filter Visible</p>
-        <button onClick={() => props.onSelect("Invitations")}>Select Invitations</button>
+        <button onClick={() => props.onSelect("Invitations")}>
+          Select Invitations
+        </button>
         <button onClick={props.onClose}>Close Filter</button>
       </div>
     ) : null,
 }));
-
 
 jest.mock("../components/ui/InboxNotification", () => ({
   __esModule: true,
   default: ({ data }: { data: { text: string } }) => <div>{data.text}</div>,
 }));
 
-
-
-jest.mock("~/trpc/react", () => ({
+jest.mock("~/utils/api", () => ({
   api: {
     contributions: {
       getContributionsForUserEvents: {
@@ -104,7 +103,6 @@ jest.mock("~/trpc/react", () => ({
     },
   },
 }));
-
 
 describe("InboxContainer", () => {
   it("renders all notifications initially", async () => {

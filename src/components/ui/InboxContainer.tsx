@@ -5,12 +5,11 @@ import styles from "../../styles/InboxContainer.module.css";
 import MobileFilterMenu from "./MobileFilterMenu";
 import InboxNotification from "~/components/ui/InboxNotification";
 import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 
 const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
   const [showMobileFilter, setShowMobileFilter] = useState(false);
-
 
   const { data: contributions = [] } =
     api.contributions.getContributionsForUserEvents.useQuery();
@@ -21,43 +20,43 @@ const InboxContainer = () => {
   const { data: invitations = [] } =
     api.invitationsNotification.getUserInvitations.useQuery();
 
-const notifications: InboxNotificationResponse[] = [
-  ...contributions.map((n, idx) => ({
-    id: `contribution-${idx}`,
-    text: n.text,
-    type: n.type as "event" | "invitation",
-    link: n.link,
-    firstName: n.firstName ?? "",
-    lastName: n.lastName ?? "",
-    profilePicture: n.profilePicture ?? "",
-    notificationDate: n.notificationDate ?? new Date().toISOString(),
-  })),
-  ...purchasedItems.map((n, idx) => ({
-    id: `purchase-${idx}`,
-    text: n.text,
-    type: n.type as "event" | "invitation",
-    link: n.link,
-    firstName: n.firstName ?? "",
-    lastName: n.lastName ?? "",
-    profilePicture: n.profilePicture ?? "",
-    notificationDate: n.notificationDate ?? new Date().toISOString(),
-  })),
-  ...invitations.map((n) => ({
-    id: n.id,
-    text: n.description,
-    type: n.type as "event" | "invitation",
-    link: n.link,
-    firstName: n.firstName ?? "",
-    lastName: n.lastName ?? "",
-    profilePicture: n.profilePicture ?? "",
-    notificationDate: n.createdAt
-      ? new Date(n.createdAt).toISOString()
-      : new Date().toISOString(),
-  })),
-].sort(
+  const notifications: InboxNotificationResponse[] = [
+    ...contributions.map((n, idx) => ({
+      id: `contribution-${idx}`,
+      text: n.text,
+      type: n.type as "event" | "invitation",
+      link: n.link,
+      firstName: n.firstName ?? "",
+      lastName: n.lastName ?? "",
+      profilePicture: n.profilePicture ?? "",
+      notificationDate: n.notificationDate ?? new Date().toISOString(),
+    })),
+    ...purchasedItems.map((n, idx) => ({
+      id: `purchase-${idx}`,
+      text: n.text,
+      type: n.type as "event" | "invitation",
+      link: n.link,
+      firstName: n.firstName ?? "",
+      lastName: n.lastName ?? "",
+      profilePicture: n.profilePicture ?? "",
+      notificationDate: n.notificationDate ?? new Date().toISOString(),
+    })),
+    ...invitations.map((n) => ({
+      id: n.id,
+      text: n.description,
+      type: n.type as "event" | "invitation",
+      link: n.link,
+      firstName: n.firstName ?? "",
+      lastName: n.lastName ?? "",
+      profilePicture: n.profilePicture ?? "",
+      notificationDate: n.createdAt
+        ? new Date(n.createdAt).toISOString()
+        : new Date().toISOString(),
+    })),
+  ].sort(
     (a, b) =>
       new Date(b.notificationDate).getTime() -
-      new Date(a.notificationDate).getTime()
+      new Date(a.notificationDate).getTime(),
   );
 
   const filtered = notifications.filter((n) => {

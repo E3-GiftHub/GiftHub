@@ -2,10 +2,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MyEventsSection from "../components/MyEventsSection";
 import shortEventsMockResponse from "../components/mock-data/shortEventsMockResponse";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 import { act } from "react";
 
-jest.mock("~/trpc/react", () => ({
+jest.mock("~/utils/api", () => ({
   api: {
     eventPreview: {
       getUpcomingEvents: {
