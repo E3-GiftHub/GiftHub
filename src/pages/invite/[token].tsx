@@ -2,7 +2,7 @@
 import Head from "next/head";
 import EventCard from "~/components/ui/EventCard";
 import styles from "../../styles/EventCardPage.module.css";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { db as prisma } from "~/server/db"; // Adjust path as needed
 
 type InvitePageProps = {
@@ -34,11 +34,12 @@ export default function InvitePage({ event }: InvitePageProps) {
       <div className={styles.giftHubPage}>
         <main>
           <EventCard
-            name={event.name}
+            //name={event.name}
             description={event.description}
-            date={event.date}
-            location={event.location}
+            //date={event.date}
+            //location={event.location}
             image={event.image}
+            title={event.name}
           />
         </main>
       </div>
@@ -64,7 +65,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const event = {
     name: eventRecord.title,
     description: eventRecord.description,
-    date: eventRecord.date.toLocaleString(),
+    date: eventRecord.date?.toLocaleString(),
     location: eventRecord.location,
     image: eventRecord.pictureUrl ?? "/api/placeholder/160/160",
   };
