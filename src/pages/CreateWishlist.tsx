@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import { useState } from "react";
 // import { Search } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -9,11 +9,21 @@ import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
 // Mock data for demonstration
-const mockWishlists = new Map<string, { items: Array<{ name: string; photo: string; price: string; quantity: number }> }>();
+const mockWishlists = new Map<
+  string,
+  {
+    items: Array<{
+      name: string;
+      photo: string;
+      price: string;
+      quantity: number;
+    }>;
+  }
+>();
 
 export default function CreateWishlist() {
-  const router = useRouter()
-  const { eventId } = router.query
+  const router = useRouter();
+  const { eventId } = router.query;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     name: string;
@@ -27,7 +37,12 @@ export default function CreateWishlist() {
     description: "",
   });
 
-  const openModal = (item: { name: string; photo: string; price: string; description?: string }) => {
+  const openModal = (item: {
+    name: string;
+    photo: string;
+    price: string;
+    description?: string;
+  }) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
@@ -37,7 +52,7 @@ export default function CreateWishlist() {
   };
 
   const handleCancel = () => {
-    router.back()
+    router.back();
   };
 
   const handleSave = () => {
@@ -45,18 +60,23 @@ export default function CreateWishlist() {
     if (!mockWishlists.has(eventId as string)) {
       mockWishlists.set(eventId as string, { items: [] });
     }
-    router.back()
+    router.back();
   };
 
-  const handleAddToWishlist = (item: { name: string; photo: string; price: string; quantity: number }) => {
+  const handleAddToWishlist = (item: {
+    name: string;
+    photo: string;
+    price: string;
+    quantity: number;
+  }) => {
     if (!mockWishlists.has(eventId as string)) {
       mockWishlists.set(eventId as string, { items: [] });
     }
     const wishlist = mockWishlists.get(eventId as string);
     if (wishlist) {
       wishlist.items.push(item);
-      console.log('Added item to wishlist:', item);
-      console.log('Current wishlist:', wishlist);
+      console.log("Added item to wishlist:", item);
+      console.log("Current wishlist:", wishlist);
     }
     closeModal();
   };
@@ -67,7 +87,9 @@ export default function CreateWishlist() {
       <div className={styles.container}>
         <main className={styles.main}>
           <div className={styles.titleContainer}>
-            <h1 className={styles.title}>Create Wishlist for Event1{eventId}</h1>
+            <h1 className={styles.title}>
+              Create Wishlist for Event1{eventId}
+            </h1>
           </div>
 
           {/* Search Bar */}
@@ -100,7 +122,7 @@ export default function CreateWishlist() {
                   <h3 className={styles.itemTitle}>Item1 Name</h3>
                   <p className={styles.itemPrice}>Item1 Price</p>
                   <button
-                    className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}
+                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
                     onClick={() =>
                       openModal({
                         name: "Item1 Name",
@@ -123,7 +145,7 @@ export default function CreateWishlist() {
                   <h3 className={styles.itemTitle}>Item2 Name</h3>
                   <p className={styles.itemPrice}>Item2 Price</p>
                   <button
-                    className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}
+                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
                     onClick={() =>
                       openModal({
                         name: "Item2 Name",
@@ -146,7 +168,7 @@ export default function CreateWishlist() {
                   <h3 className={styles.itemTitle}>Item3 Name</h3>
                   <p className={styles.itemPrice}>Item3 Price</p>
                   <button
-                    className={`${buttonStyles.button} ${buttonStyles['button-primary']}`}
+                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
                     onClick={() =>
                       openModal({
                         name: "Item3 Name",
@@ -177,4 +199,4 @@ export default function CreateWishlist() {
       </div>
     </div>
   );
-} 
+}

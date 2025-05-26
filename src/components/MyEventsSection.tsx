@@ -9,9 +9,8 @@ import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
 import { api } from "~/trpc/react";
-import Modal from "~/components/ModalEventHome";
+import Modal from "~/components/Modal";
 import { useState } from "react";
-
 
 const MyEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
