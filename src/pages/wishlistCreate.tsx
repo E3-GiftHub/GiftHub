@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 // import { Search } from "lucide-react";
 import Navbar from "../components/Navbar";
-import AddToWishlistModal from "../components/add-to-wishlist-modal";
+import AddToWishlistModal from "../components/AddToWishlistModal";
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 

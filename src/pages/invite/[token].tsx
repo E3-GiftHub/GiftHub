@@ -1,6 +1,6 @@
 // pages/invite/[token].tsx
 import Head from "next/head";
-import EventCard from "~/components/EventCard";
+import EventCard from "~/components/ui/EventCard";
 import styles from "../../styles/EventCardPage.module.css";
 import { GetServerSidePropsContext } from "next";
 import { db as prisma } from "~/server/db"; // Adjust path as needed
