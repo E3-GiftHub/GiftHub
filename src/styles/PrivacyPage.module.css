@@ -1,0 +1,155 @@
+
+.privacyPageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0f172a;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.privacyMainContent {
+  flex-grow: 1;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.privacyContentWrapper {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  width: 100%; 
+  background-color: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacyContentWrapper {
+    margin: 3rem 0;
+    padding: 2.5rem; 
+  }
+}
+
+.privacyHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacyHeader {
+    margin-bottom: 3rem;
+  }
+}
+
+.privacyTitle {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacyTitle {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.privacyLastUpdated {
+  color: #ffffff;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacyLastUpdated {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+.privacySection {
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacySection {
+    margin-bottom: 2rem;
+  }
+}
+
+.privacySectionTitle {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacySectionTitle {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+}
+
+.privacyParagraph {
+  color: #ffffff;
+  line-height: 1.625;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .privacyParagraph {
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+}
+
+.privacyParagraphSpaced {
+  margin-bottom: 0.5rem;
+  box-sizing: border-box;
+}
+
+.privacyList {
+  list-style-type: disc;
+  padding-left: 1.5rem; 
+  color: #ffffff;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  box-sizing: border-box;
+}
+
+.privacyList li {
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .privacyList {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+.privacyList strong,
+.privacyParagraph strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.privacyLink {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.privacyLink:hover {
+  color: #f0f0f0;
+}

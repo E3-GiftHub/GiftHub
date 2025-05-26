@@ -10,17 +10,16 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 //! enum
 
-enum StatusType {
+enum Status {
   PENDING
   ACCEPTED
-  // REJECTED: if rejected => delete row
+  REJECTED
 }
 
 enum PriorityType {
@@ -29,10 +28,11 @@ enum PriorityType {
   HIGH
 }
 
-/// we keep this in case of new types of marks
 enum MarkType {
   PURCHASED
-  // NULL: if null => delete row
+  RESERVED
+  CONTRIBUTED
+  // NULL: if the mark is null => delete row
 }
 
 //! default models
@@ -108,6 +108,7 @@ model User {
   // relations
   eventsCreated Event[]
   invitations   Invitation[]
+  stripeLinks StripeLink[]
 
   postsMedia    Media[]
   marks         Mark[]
@@ -118,11 +119,9 @@ model User {
   eventReports  EventReport[]
 
   // mandatory assets
-  accounts                 Account[]
-  sessions                 Session[]
-  posts                    Post[]
-  MediaNotification        MediaNotification[]
-  ContributionNotification ContributionNotification[]
+  accounts Account[]
+  sessions Session[]
+  posts    Post[]
 }
 
 model Event {
@@ -153,59 +152,75 @@ model Invitation {
   guestUsername String
   eventId       Int
 
-  status    StatusType @default(PENDING)
-  createdAt DateTime   @default(now())
+  status    Status    @default(PENDING)
+  createdAt DateTime  @default(now())
   repliedAt DateTime?
 
   guest User  @relation(fields: [guestUsername], references: [username])
   event Event @relation(fields: [eventId], references: [id])
-
-  @@index([guestUsername])
 }
 
 model Media {
   id               Int    @id @default(autoincrement())
   uploaderUsername String
   eventId          Int
-  url              String
 
-  caption   String?
+  url     String?
+  caption String?
+
   mediaType String?
   fileType  String?
   fileSize  Int?
   createdAt DateTime @default(now())
 
-  user              User                @relation(fields: [uploaderUsername], references: [username])
-  event             Event               @relation(fields: [eventId], references: [id])
-  MediaNotification MediaNotification[]
+  user  User  @relation(fields: [uploaderUsername], references: [username])
+  event Event @relation(fields: [eventId], references: [id])
 }
 
-// junction TABLE for event-specific wishlist entry
+model Mark {
+  id             Int    @id @default(autoincrement())
+  markerUsername String // always a Guest
+  eventId        Int
+  articleId      Int
+
+  type      MarkType
+  createdAt DateTime @default(now())
+
+  guest User          @relation(fields: [markerUsername], references: [username])
+  event Event         @relation(fields: [eventId], references: [id])
+  item  ItemCatalogue @relation(fields: [articleId], references: [id])
+}
+
+/// stores the wishlists from all events and the quantity of each item
 model EventArticle {
-  eventId  Int
-  itemId   Int
-  userNote String? // additional note
-  priority PriorityType?
+  eventId           Int
+  itemId            Int
+  quantityRequested Int?
+  quantityFulfilled Int?
+  priority          PriorityType?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  event Event @relation(fields: [eventId], references: [id])
-  item  Item? @relation(fields: [itemId], references: [id])
+  event Event         @relation(fields: [eventId], references: [id])
+  item  ItemCatalogue @relation(fields: [itemId], references: [id])
 
   @@id([eventId, itemId])
 }
 
-model Item {
+model ItemCatalogue {
   id          Int      @id @default(autoincrement())
   name        String?
   description String?
   imagesUrl   String?
   price       Decimal?
 
-  retailerId Int? //! NULL => custom item
-  retailer   Retailer? @relation(fields: [retailerId], references: [id])
+  retailerId  Int?
+  retailerUrl String?
+  retailer    Retailer? @relation(fields: [retailerId], references: [id])
 
+  // indicates a Planner special request
+  isCustom  Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -214,43 +229,27 @@ model Item {
   contributions   Contribution[]
 }
 
-model Mark {
-  markerUsername String // always a Guest
-  eventId        Int
-  articleId      Int
-
-  type      MarkType
-  createdAt DateTime @default(now())
-
-  guest User  @relation(fields: [markerUsername], references: [username])
-  event Event @relation(fields: [eventId], references: [id])
-  item  Item  @relation(fields: [articleId], references: [id])
-
-  @@id([eventId, articleId])
-}
-
 model Retailer {
-  id     Int     @id @default(autoincrement())
+  id     Int             @id @default(autoincrement())
   name   String?
   apiUrl String?
-  items  Item[]
+  items  ItemCatalogue[]
 }
 
+/// refers to a group contribution
 model Contribution {
   id                  Int    @id @default(autoincrement())
   contributorUsername String // always a Guest
   eventId             Int
   articleId           Int
 
-  cashAmount Decimal
+  cashAmount Decimal?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt // ! users can withdraw their contribution
 
-  guest User  @relation(fields: [contributorUsername], references: [username])
-  event Event @relation(fields: [eventId], references: [id])
-  item  Item  @relation(fields: [articleId], references: [id])
-
-  ContributionNotification ContributionNotification[]
+  guest User          @relation(fields: [contributorUsername], references: [username])
+  event Event         @relation(fields: [eventId], references: [id])
+  item  ItemCatalogue @relation(fields: [articleId], references: [id])
 }
 
 //! reports
@@ -279,29 +278,23 @@ model EventReport {
   event Event @relation(fields: [eventId], references: [id])
 }
 
-//! notification
+model StripeLink {
+  id                 String   @id @default(cuid())
+  checkoutSessionId  String   @unique             //(ex: cs_test_xxxxxxxx)
+  checkoutUrl        String                       
+  amount             Decimal                      
+  active             Boolean  @default(true)      
 
-enum NotificationAction {
-  READ
-  DELETE
-}
+  eventId            Int                          
+  articleId          Int                          
 
-model MediaNotification {
-  id       Int                @id @default(autoincrement())
-  username String
-  mediaId  Int
-  action   NotificationAction
+  creatorId          String
+  creator            User     @relation(fields: [creatorId], references: [username], onDelete: Cascade)
 
-  user  User  @relation(fields: [username], references: [username])
-  media Media @relation(fields: [mediaId], references: [id])
-}
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-model ContributionNotification {
-  id             Int                @id @default(autoincrement())
-  username       String
-  contributionId Int
-  action         NotificationAction
-
-  user User         @relation(fields: [username], references: [username])
-  cash Contribution @relation(fields: [contributionId], references: [id])
+  @@index([creatorId])
+  @@index([eventId])
+  @@index([articleId])
 }

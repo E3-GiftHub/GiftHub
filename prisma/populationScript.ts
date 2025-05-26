@@ -1,5 +1,5 @@
-import { PrismaClient, PriorityType, StatusType, MarkType } from '@prisma/client';
-import type { Retailer, User, Event, Item } from '@prisma/client';
+import { PrismaClient, PriorityType, Status, MarkType } from '@prisma/client';
+import type { Retailer, User, Event, ItemCatalogue } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +14,7 @@ async function main() {
     const retailers = await createRetailers();
     console.log(`Created ${retailers.length} retailers`);
 
-    const items = await createItems(retailers);
+    const items = await createItemCatalogue(retailers);
     console.log(`Created ${items.length} catalogue items`);
 
     const events = await createEvents(users);
@@ -53,7 +53,7 @@ async function clearDatabase() {
         'EventArticle',
         'Media',
         'Invitation',
-        'Item',
+        'ItemCatalogue',
         'Retailer',
         'Event',
         'User',
@@ -105,8 +105,8 @@ async function createRetailers() {
     ];
     const retailers = [];
 
-    for (const element of retailerNames) {
-        const name = element;
+    for (let i = 0; i < retailerNames.length; i++) {
+        const name = retailerNames[i];
         const retailer = await prisma.retailer.create({
             data: {
                 name,
@@ -120,7 +120,7 @@ async function createRetailers() {
     return retailers;
 }
 
-async function createItems(retailers: Retailer[]) {
+async function createItemCatalogue(retailers: Retailer[]) {
     const items = [];
     const itemsData = [
         { name: 'Smart TV', description: '55" 4K Smart TV', price: 699.99, retailerId: 1 },
@@ -139,13 +139,14 @@ async function createItems(retailers: Retailer[]) {
     ];
 
     for (const itemData of itemsData) {
-        const item = await prisma.item.create({
+        const item = await prisma.itemCatalogue.create({
             data: {
                 name: itemData.name,
                 description: itemData.description,
                 price: itemData.price,
                 imagesUrl: `${itemData.name}.jpg`,
-                retailerId: itemData.retailerId
+                retailerId: itemData.retailerId,
+                isCustom: itemData.isCustom || false,
             },
         });
 
@@ -185,22 +186,22 @@ async function createEvents(users: User[]) {
 }
 
 async function createInvitations(users: User[], events: Event[]) {
-
     const invitations = [];
+
     for (const event of events) {
         const creator = users.find(user => user.username === event.createdByUsername);
 
         for (const user of users) {
             if (user.username !== creator!.username) {
-                let status: StatusType;
+                let status: Status;
                 if (Math.random() > 0.3) {
-                    status = StatusType.ACCEPTED;
+                    status = Status.ACCEPTED;
                 } else {
                     const isPending = Math.random() > 0.5;
-                    status = isPending ? StatusType.PENDING : StatusType.ACCEPTED;
+                    status = isPending ? Status.PENDING : Status.REJECTED;
                 }
 
-                const repliedAt = status !== StatusType.PENDING ? new Date() : null;
+                const repliedAt = status !== Status.PENDING ? new Date() : null;
 
                 const invitation = await prisma.invitation.create({
                     data: {
@@ -219,7 +220,7 @@ async function createInvitations(users: User[], events: Event[]) {
     return invitations;
 }
 
-async function createEventArticles(events: Event[], items: Item[]) {
+async function createEventArticles(events: Event[], items: ItemCatalogue[]) {
 
     const eventArticles = [];
 
@@ -228,13 +229,16 @@ async function createEventArticles(events: Event[], items: Item[]) {
         const selectedItems = getRandomItems(items, numItems);
 
         for (const item of selectedItems) {
+            const quantity = 1 + Math.floor(Math.random() * 3);
+            const fulfilled = Math.floor(Math.random() * quantity);
             const priorities = [PriorityType.LOW, PriorityType.MEDIUM, PriorityType.HIGH];
 
             const eventArticle = await prisma.eventArticle.create({
                 data: {
                     eventId: event.id,
                     itemId: item.id,
-                    userNote: "text",
+                    quantityRequested: quantity,
+                    quantityFulfilled: fulfilled,
                     priority: priorities[Math.floor(Math.random() * priorities.length)],
                 },
             });
@@ -246,9 +250,9 @@ async function createEventArticles(events: Event[], items: Item[]) {
     return eventArticles;
 }
 
-async function createMarks(users: User[], events: Event[], items: Item[]) {
+async function createMarks(users: User[], events: Event[], items: ItemCatalogue[]) {
     const marks = [];
-    const markTypes = [MarkType.PURCHASED];
+    const markTypes = [MarkType.PURCHASED, MarkType.RESERVED];
 
     for (const event of events) {
         const eventArticles = await prisma.eventArticle.findMany({
@@ -257,7 +261,7 @@ async function createMarks(users: User[], events: Event[], items: Item[]) {
         });
 
         const invitations = await prisma.invitation.findMany({
-            where: { eventId: event.id, status: StatusType.ACCEPTED },
+            where: { eventId: event.id, status: Status.ACCEPTED },
         });
 
         const invitedUsernames = invitations.map(inv => inv.guestUsername);
@@ -285,12 +289,12 @@ async function createMarks(users: User[], events: Event[], items: Item[]) {
     return marks;
 }
 
-async function createContributions(users: User[], events: Event[], items: Item[]) {
+async function createContributions(users: User[], events: Event[], items: ItemCatalogue[]) {
     const contributions = [];
 
     for (const event of events) {
         const invitations = await prisma.invitation.findMany({
-            where: { eventId: event.id, status: StatusType.ACCEPTED },
+            where: { eventId: event.id, status: Status.ACCEPTED },
         });
 
         const invitedUsernames = invitations.map(inv => inv.guestUsername);
@@ -309,9 +313,7 @@ async function createContributions(users: User[], events: Event[], items: Item[]
             if (eventArticle.itemId) {
                 itemContributions[eventArticle.itemId.toString()] = {
                     total: 0,
-                    price: Number(
-                        eventArticle.item ? 
-                            eventArticle.item.price : 5 ) || 0
+                    price: Number(eventArticle.item.price) || 0
                 };
             }
         }
@@ -331,16 +333,13 @@ async function createContributions(users: User[], events: Event[], items: Item[]
             if (Math.random() > 0.6) {
                 const randomEventArticle = eventArticles[Math.floor(Math.random() * eventArticles.length)];
                 const itemId = randomEventArticle!.itemId;
-                const itemPrice = Number(
-                    randomEventArticle ?
-                        (randomEventArticle.item ? 
-                            randomEventArticle.item.price : 5) : 0);
+                const itemPrice = Number(randomEventArticle!.item.price) || 0;
 
                 if (itemPrice > 0 && itemId) {
                     const percentContribution = 0.15 + (Math.random() * 0.35);
                     let amount = Math.round(itemPrice * percentContribution);
 
-                    const currentTotal = itemContributions[itemId.toString()]?.total ?? 0;
+                    const currentTotal = itemContributions[itemId.toString()]?.total || 0;
                     if (currentTotal + amount > itemPrice) {
                         amount = itemPrice - currentTotal;
                     }
@@ -364,7 +363,7 @@ async function createContributions(users: User[], events: Event[], items: Item[]
                                 markerUsername: user.username,
                                 eventId: event.id,
                                 articleId: itemId,
-                                type: MarkType.PURCHASED,
+                                type: MarkType.CONTRIBUTED,
                             },
                         });
 
@@ -451,8 +450,8 @@ async function createEventReports(users: User[], events: Event[]) {
 
         const report = await prisma.eventReport.create({
             data: {
+                eventId: reportedEvent!.id,
                 reportedByUsername: reportingUser!.username,
-                reportedId: reportedEvent!.id,
                 reason,
                 description: `Event report for ${reason}`,
             },
