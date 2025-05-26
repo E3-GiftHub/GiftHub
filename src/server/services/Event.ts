@@ -8,7 +8,7 @@ export class EventEntity {
   constructor(event: Event) {
     this.data = event;
   }
-/*  Depricated
+  /*  Depricated
   static async publishEvent(eventId: number): Promise<void> {
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event) throw new Error("Event not found");
@@ -21,7 +21,6 @@ export class EventEntity {
         eventId: this.data.id,
         guestUsername: guestId,
         status: StatusType.PENDING,
-        
       },
     });
   }

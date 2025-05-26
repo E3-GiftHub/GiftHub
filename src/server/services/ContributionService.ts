@@ -9,31 +9,31 @@ export class ContributionService {
     contributionId: string,
     contributorUsername: string,
     eventId: string,
-    articleId: string, 
+    articleId: string,
     amount: number,
     date: Date = new Date(),
-    message?: string
+    message?: string,
   ) {
     const itemIdInt = parseInt(articleId);
     const eventIdInt = parseInt(eventId);
-    
+
     // Fetch the wishlist item
-    const dbItem = await db.itemCatalogue.findUnique({
-      where: { id: itemIdInt }
+    const dbItem = await db.item.findUnique({
+      where: { id: itemIdInt },
     });
-    
+
     if (!dbItem) {
       throw new EventManagementException("Wishlist item not found");
     }
-    
+
     // Fetch the event item to get event details
     const eventItem = await db.eventArticle.findFirst({
-      where: { 
+      where: {
         itemId: itemIdInt,
-        eventId: eventIdInt
-      }
+        eventId: eventIdInt,
+      },
     });
-    
+
     if (!eventItem) {
       throw new EventManagementException("Event item association not found");
     }
@@ -47,8 +47,8 @@ export class ContributionService {
         articleId: itemIdInt,
         cashAmount: amount,
         createdAt: date,
-        updatedAt: date
-      }
+        updatedAt: date,
+      },
     });
 
     return {
@@ -58,7 +58,7 @@ export class ContributionService {
       articleId: contribution.articleId.toString(),
       amount: contribution.cashAmount?.toNumber() || 0,
       createdAt: contribution.createdAt,
-      message
+      message,
     };
   }
 
@@ -68,19 +68,19 @@ export class ContributionService {
   async processContribution(contributionId: string, articleId: string) {
     const contribIdInt = parseInt(contributionId);
     const itemIdInt = parseInt(articleId);
-    
+
     // Fetch the contribution
     const contribution = await db.contribution.findUnique({
-      where: { id: contribIdInt }
+      where: { id: contribIdInt },
     });
-    
+
     if (!contribution) {
       throw new EventManagementException("Contribution not found");
     }
 
     // Fetch all contributions for this item to calculate total
     const contributions = await db.contribution.findMany({
-      where: { articleId: itemIdInt }
+      where: { articleId: itemIdInt },
     });
 
     // Calculate total contributed amount
@@ -89,41 +89,45 @@ export class ContributionService {
     }, 0);
 
     // Fetch the item
-    const item = await db.itemCatalogue.findUnique({
-      where: { id: itemIdInt }
+    const item = await db.item.findUnique({
+      where: { id: itemIdInt },
     });
-    
+
     if (!item) {
       throw new EventManagementException("Item not found");
     }
 
     // Get event item to find quantity
     const eventItem = await db.eventArticle.findFirst({
-      where: { 
+      where: {
         itemId: itemIdInt,
-        eventId: contribution.eventId
-      }
+        eventId: contribution.eventId,
+      },
     });
-    
+
     if (!eventItem) {
       throw new EventManagementException("Event item not found");
     }
 
-    const totalPrice = (item.price?.toNumber() || 0) * (eventItem.quantityRequested || 1);
+    const totalPrice =
+      (item.price?.toNumber() || 0) * (eventItem.quantityRequested || 1);
     const isFulfilled = totalContributed >= totalPrice;
 
     // Update the event item fulfillment status if needed
-    if (isFulfilled && eventItem.quantityFulfilled !== eventItem.quantityRequested) {
+    if (
+      isFulfilled &&
+      eventItem.quantityFulfilled !== eventItem.quantityRequested
+    ) {
       await db.eventArticle.update({
-        where: { 
+        where: {
           eventId_itemId: {
             eventId: eventItem.eventId,
-            itemId: itemIdInt
-          }
+            itemId: itemIdInt,
+          },
         },
         data: {
-          quantityFulfilled: eventItem.quantityRequested
-        }
+          quantityFulfilled: eventItem.quantityRequested,
+        },
       });
     }
 
@@ -131,44 +135,47 @@ export class ContributionService {
       contributionId,
       articleId,
       totalContributed,
-      isFulfilled
+      isFulfilled,
     };
   }
 
   /**
    * Manage a contribution (approve, reject, refund)
    */
-  async manageContribution(contributionId: string, action: 'approve' | 'reject' | 'refund') {
+  async manageContribution(
+    contributionId: string,
+    action: "approve" | "reject" | "refund",
+  ) {
     const contribIdInt = parseInt(contributionId);
-    
+
     const contribution = await db.contribution.findUnique({
-      where: { id: contribIdInt }
+      where: { id: contribIdInt },
     });
-    
+
     if (!contribution) {
       throw new EventManagementException("Contribution not found");
     }
 
     switch (action) {
-      case 'approve':
+      case "approve":
         // Logic for approving a contribution
         return await db.contribution.update({
           where: { id: contribIdInt },
-          data: { updatedAt: new Date() }
+          data: { updatedAt: new Date() },
         });
-      
-      case 'reject':
+
+      case "reject":
         // Logic for rejecting a contribution
         return await db.contribution.delete({
-          where: { id: contribIdInt }
+          where: { id: contribIdInt },
         });
-        
-      case 'refund':
+
+      case "refund":
         // Logic for refunding a contribution
         return await db.contribution.delete({
-          where: { id: contribIdInt }
+          where: { id: contribIdInt },
         });
-      
+
       default:
         throw new EventManagementException("Invalid action specified");
     }
@@ -179,29 +186,30 @@ export class ContributionService {
    */
   async getContributionsForItem(articleId: string) {
     const itemIdInt = parseInt(articleId);
-    
+
     const contributions = await db.contribution.findMany({
       where: { articleId: itemIdInt },
       include: {
         guest: {
           select: {
-            username: true, 
+            username: true,
             fname: true,
             lname: true,
-            pictureUrl: true
-          }
-        }
-      }
+            pictureUrl: true,
+          },
+        },
+      },
     });
 
-    return contributions.map(contribution => ({
+    return contributions.map((contribution) => ({
       id: contribution.id.toString(),
       contributorUsername: contribution.contributorUsername,
-      contributorName: `${contribution.guest.fname ?? ''} ${contribution.guest.lname || ''}`.trim(),
+      contributorName:
+        `${contribution.guest.fname ?? ""} ${contribution.guest.lname || ""}`.trim(),
       contributorPicture: contribution.guest.pictureUrl,
       amount: contribution.cashAmount?.toNumber() ?? 0,
       createdAt: contribution.createdAt,
-      updatedAt: contribution.updatedAt
+      updatedAt: contribution.updatedAt,
     }));
   }
 }

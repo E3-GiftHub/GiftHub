@@ -14,7 +14,7 @@ export class WishlistService {
     return { success: true, data: { wishlistIdentifier: eventIdentifier } };
   }
 
-   async getWishlist(wishlistIdentifier: string) {
+  async getWishlist(wishlistIdentifier: string) {
     // Implement your wishlist retrieval logic here
     return { success: true, data: { wishlistIdentifier } };
   }
@@ -31,12 +31,12 @@ export class WishlistService {
       quantityFulfilled: number | null;
       priority?: PriorityType | null;
       item: {
-      name: string | null;
-      description: string | null;
-      price: number | null;
+        name: string | null;
+        description: string | null;
+        price: number | null;
       };
     }
-/*  Old version
+    /*  Old version
     const items: WishlistItemDTO[] = entries.map((ea: EventArticleWithItem) => ({
       itemIdentifier: ea.itemId.toString(),
       name: ea.item.name ?? "",
@@ -50,23 +50,19 @@ export class WishlistService {
 */
 
     const items: WishlistItemDTO[] = entries.map((ea) => ({
-	  itemIdentifier: ea.itemId.toString(),
-	  name: ea.item.name ?? "",
-	  description: ea.item.description ?? undefined,
-	  price: ea.item.price ? ea.item.price.toNumber() : undefined,
-	  quantity: ea.quantityRequested ?? 0,
-	  isReserved: (ea.quantityRequested ?? 0) === 0 && (ea.quantityFulfilled ?? 0) === 0,
-	  contributedAmount: ea.quantityFulfilled ?? 0,
-	  priority: ea.priority ?? undefined,
-}));
-
+      itemIdentifier: ea.itemId.toString(),
+      name: ea?.item?.name ?? undefined,
+      description: ea?.item?.description ?? undefined,
+      price: ea?.item?.price ? ea.item.price.toNumber() : undefined,
+      priority: ea?.priority ?? undefined,
+    }));
 
     return new WishlistDTO(
       eventId.toString(),
       eventId.toString(),
       items,
       entries[0]?.createdAt ?? new Date(),
-      entries[0]?.updatedAt ?? undefined
+      entries[0]?.updatedAt ?? undefined,
     );
   }
 
@@ -83,8 +79,6 @@ export class WishlistService {
       data: {
         eventId: params.eventId,
         itemId: params.itemId,
-        quantityRequested: params.quantityRequested,
-        quantityFulfilled: 0,
         priority: params.priority ?? PriorityType.LOW,
       },
     });
@@ -94,7 +88,6 @@ export class WishlistService {
       name: "", // you may fetch item details separately if needed
       description: undefined,
       price: undefined,
-      quantity: record.quantityRequested ?? 0,
       isReserved: false,
       contributedAmount: 0,
       priority: record.priority ?? undefined,

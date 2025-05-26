@@ -50,6 +50,9 @@
   ],
   "exclude": [
     "node_modules",
-    "coverage"
+    "coverage",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "__tests__"
   ]
 }
