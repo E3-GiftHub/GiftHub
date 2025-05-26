@@ -28,13 +28,20 @@ jest.mock("~/utils/api", () => ({
     auth: {
       login: {
         login: {
-          useMutation: jest.fn(({ onSuccess, onError }) => ({
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            mutate: (data: MutationVariables) =>
-              mockMutate(data, onSuccess, onError),
-            isPending: false,
-            error: null,
-          })),
+          useMutation: jest.fn(
+            ({
+              onSuccess,
+              onError,
+            }: {
+              onSuccess: OnSuccessCallback;
+              onError: OnErrorCallback;
+            }) => ({
+              mutate: (data: MutationVariables) =>
+                mockMutate(data, onSuccess, onError),
+              isPending: false,
+              error: null,
+            }),
+          ),
         },
       },
     },
