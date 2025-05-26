@@ -1,12 +1,27 @@
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
-import { TRPCReactProvider } from "~/trpc/react";
+import { Geist } from "next/font/google";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+import { api } from "~/utils/api";
+
+import "~/styles/globals.css";
+
+const geist = Geist({
+  subsets: ["latin"],
+});
+
+const MyApp: AppType<{ session: Session | null }> = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}) => {
   return (
-    <TRPCReactProvider>
-      <Component {...pageProps} />
-    </TRPCReactProvider>
+    <SessionProvider session={session}>
+      <div className={geist.className}>
+        <Component {...pageProps} />
+      </div>
+    </SessionProvider>
   );
 };
 
-export default MyApp;
+export default api.withTRPC(MyApp);

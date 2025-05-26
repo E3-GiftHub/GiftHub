@@ -12,7 +12,6 @@ import { api } from "~/trpc/react";
 import Modal from "~/components/Modal";
 import { useState } from "react";
 
-
 const MyEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const openModal = () => setShowModal(true);
