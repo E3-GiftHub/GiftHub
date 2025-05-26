@@ -23,7 +23,7 @@ const mockMutate = jest.fn<
   [MutationVariables, OnSuccessCallback, OnErrorCallback]
 >();
 
-jest.mock("~/utils/api", () => ({
+jest.mock("~/trpc/react", () => ({
   api: {
     auth: {
       login: {
@@ -36,6 +36,7 @@ jest.mock("~/utils/api", () => ({
               onSuccess: OnSuccessCallback;
               onError: OnErrorCallback;
             }) => ({
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
               mutate: (data: MutationVariables) =>
                 mockMutate(data, onSuccess, onError),
               isPending: false,

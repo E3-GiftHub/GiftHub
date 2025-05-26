@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import SignUpForm from "~/components/ui/Account/SignUpForm";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import { jest } from "@jest/globals";
 
 const mockPush = jest.fn();
@@ -30,7 +30,7 @@ const mutateMock = jest.fn() as jest.MockedFunction<
   ) => void
 >;
 
-jest.mock("~/utils/api", () => ({
+jest.mock("~/trpc/react", () => ({
   api: {
     auth: {
       signup: {
