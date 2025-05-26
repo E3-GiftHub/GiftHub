@@ -1,20 +1,20 @@
 import React from "react";
 import Head from "next/head";
-import Contribution from '~/components/contribution';
-import Navbar from '~/components/Navbar';
-import Footer from '~/components/Footer';
-import styles from '../styles/contribution.module.css';
-import { useRouter } from 'next/router';
+import Contribution from "~/components/Contribution";
+import Navbar from "~/components/Navbar";
+import Footer from "~/components/Footer";
+import styles from "../styles/contribution.module.css";
+import { useRouter } from "next/router";
 
 const ContributionPage: React.FC = () => {
   const router = useRouter();
 
   const handleWishlist = () => {
-    void router.push('/wishlist');
+    void router.push("/wishlist");
   };
 
   const handlePay = () => {
-    void window.open('https://google.com', '_blank');
+    void window.open("https://google.com", "_blank");
   };
 
   return (
@@ -26,7 +26,7 @@ const ContributionPage: React.FC = () => {
       <Navbar />
       <main>
         <div className={styles.contentWrapper}>
-          <Contribution 
+          <Contribution
             eventName="Event name"
             wishlist={handleWishlist}
             pay={handlePay}

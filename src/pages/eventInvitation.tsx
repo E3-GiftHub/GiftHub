@@ -1,9 +1,9 @@
 import React from "react";
-import InvitationCard from "../components/invitationcard";
+import InvitationCard from "../components/InvitationCard";
 import Head from "next/head";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
-import styles from "../styles/eventinvite.module.css"
+import styles from "../styles/eventinvite.module.css";
 
 export default function DemoPage() {
   return (
@@ -12,9 +12,9 @@ export default function DemoPage() {
         <title>GiftHub </title>
       </Head>
       <div className={styles.giftHubPage}>
-        <Navbar /> 
+        <Navbar />
         <main>
-              <InvitationCard/>
+          <InvitationCard />
         </main>
         <Footer />
       </div>
