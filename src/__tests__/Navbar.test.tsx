@@ -1,14 +1,31 @@
+jest.mock("next/router", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    prefetch: jest.fn(),
+    pathname: "/home",
+    route: "/home",
+    query: {},
+    asPath: "/home",
+    replace: jest.fn(),
+    reload: jest.fn(),
+    back: jest.fn(),
+    isFallback: false,
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+      emit: jest.fn(),
+    },
+    beforePopState: jest.fn(),
+    isReady: true,
+  }),
+}));
+
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Navbar from "../components/Navbar";
-import { MemoryRouter } from "react-router-dom";
 
 const renderWithRoute = (initialPath: string) => {
-  return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Navbar />
-    </MemoryRouter>
-  );
+  return render(<Navbar />);
 };
 const mockHref = (url: string) => {
   Object.defineProperty(window, "location", {
@@ -25,19 +42,23 @@ describe("Navbar component", () => {
     expect(logo).toBeInTheDocument();
   });
 
-  {/*test("renders login button when on landing page", () => {
+  {
+    /*test("renders login button when on landing page", () => {
     renderWithRoute("/");
 
     const loginButton = screen.getByText(/Login/i);
     expect(loginButton).toBeInTheDocument();
-  });*/}
+  });*/
+  }
 
   test("renders navigation links when not on landing page", () => {
     renderWithRoute("/home");
 
     expect(screen.getByText(/Home/i)).toBeInTheDocument();
     expect(screen.getByText(/Inbox/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Profile$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /^Profile$/i }),
+    ).toBeInTheDocument();
   });
 
   test("opens and closes hamburger menu", () => {
@@ -76,7 +97,7 @@ describe("Navbar component", () => {
 test("highlights Inbox button when on /inbox", () => {
   mockHref("http://localhost:3000/inbox#");
   render(<Navbar />);
-  
+
   const inboxLink = screen.getByText(/Inbox/i).closest("a");
   expect(inboxLink).toHaveClass("nav-link-active");
 });
@@ -84,7 +105,7 @@ test("highlights Inbox button when on /inbox", () => {
 test("highlights Home button when on /home", () => {
   mockHref("http://localhost:3000/home#");
   render(<Navbar />);
-  
+
   const homeLink = screen.getByText(/Home/i).closest("a");
   expect(homeLink).toHaveClass("nav-link-active");
 });
