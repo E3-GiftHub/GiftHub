@@ -1,5 +1,5 @@
 import Head from "next/head";
-import EventCard from "~/components/EventCard";
+import EventCard from "~/components/ui/EventCard";
 import styles from "../styles/EventCardPage.module.css";
 
 export default function EventCardPage() {
