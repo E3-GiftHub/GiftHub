@@ -1,10 +1,17 @@
 import React from "react";
 import "./../styles/globals.css";
 import styles from "../styles/AboutPage.module.css";
-
+import Link from "next/link";
 export default function AboutPage() {
   return (
     <div className={styles.aboutPage}>
+       <nav className={styles.navbar}>
+        <div className={styles.navLeft}>
+          <Link href="/">
+            <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+          </Link>
+        </div>
+      </nav>
       <h1>About GiftHub</h1>
 
       <p className={styles.intro}>
