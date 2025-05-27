@@ -1,57 +1,65 @@
-// InvitationService.ts
-
-// InvitationService.ts
-import type { InvitationDTO } from "./InvitationDTO";
+import { db as prisma } from "~/server/db";
+import { Status } from "@prisma/client";
+import { InvitationEntity } from "./Invitation";
+import { TRPCError } from "@trpc/server";
 
 export class InvitationService {
-  private invitations = new Map<string, InvitationDTO>();
+  static async createInvitation(eventId: bigint, email: string) {
+    const existingInvite = await prisma.invitation.findFirst({
+      where: {
+        eventId: Number(eventId),
+        email,
+      },
+    });
 
-  /**
-   * List all invitations for an event.
-   */
-  listInvitations(
-    eventIdentifier: string
-  ): { success: true; data: InvitationDTO[] } {
-    const data = Array.from(this.invitations.values())
-      .filter((inv) => inv.eventIdentifier === eventIdentifier);
-    return { success: true, data };
-  }
-
-  /**
-   * Remove a guest's invitation from an event.
-   */
-  removeInvitation(
-    eventIdentifier: string,
-    guestIdentifier: string
-  ): { success: boolean; error?: string } {
-    // Find the matching invitation
-    const entry = Array.from(this.invitations.entries())
-      .find(([_, inv]) =>
-        inv.eventIdentifier === eventIdentifier &&
-        inv.guestIdentifier === guestIdentifier
-      );
-
-    if (!entry) {
-      return { success: false, error: "Invitation not found." };
+    if (existingInvite) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Invitation already exists for this email",
+      });
     }
 
-    this.invitations.delete(entry[0]);
-    return { success: true };
+    const invitation = await prisma.invitation.create({
+      data: {
+        eventId: Number(eventId),
+        email,
+        status: "PENDING",
+      },
+    });
+
+    return new InvitationEntity(invitation);
   }
 
-  /**
-   * (Helper) Create a new invitation.
-   * In a real app, you'd call this when sending invites.
-   */
-  createInvitation(data: Omit<InvitationDTO, "invitationId" | "createdAt">) {
-    const invitationId = crypto.randomUUID();
-    const inv: InvitationDTO = {
-      invitationId,
-      ...data,
-      status: "pending",
-      createdAt: new Date(),
-    };
-    this.invitations.set(invitationId, inv);
-    return { success: true, data: inv };
+  static async updateInvitationStatus(
+    invitationId: bigint,
+    status: Status
+  ) {
+    const invitation = await prisma.invitation.update({
+      where: { id: Number(invitationId) },
+      data: { status },
+    });
+
+    return new InvitationEntity(invitation);
+  }
+
+  static async getInvitation(invitationId: bigint) {
+    const invitation = await prisma.invitation.findUnique({
+      where: { id: Number(invitationId) },
+    });
+
+    if (!invitation) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Invitation not found",
+      });
+    }
+
+    return new InvitationEntity(invitation);
+  }
+
+  static async deleteInvitation(invitationId: bigint) {
+    await prisma.invitation.delete({
+      where: { id: Number(invitationId) },
+    });
   }
 }
