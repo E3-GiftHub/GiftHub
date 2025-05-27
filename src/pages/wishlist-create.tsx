@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/router";
 import { useState } from "react";
-// import { Search } from "lucide-react";
+import { useDebounce } from "use-debounce";
+import { api } from "~/trpc/react";
 import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
 import styles from "../styles/WishlistPage.module.css";
@@ -18,13 +19,22 @@ const mockWishlists = new Map<
       photo: string;
       price: string;
       quantity: number;
-    }>;
+    }>
   }
 >();
 
 export default function CreateWishlist() {
   const router = useRouter();
   const { eventId } = router.query;
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+
+  const { data: searchResults = [], isLoading } = api.ebay.search.useQuery(
+    { query: debouncedSearchTerm },
+    { enabled: debouncedSearchTerm.length > 1 }
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     name: string;
@@ -48,16 +58,11 @@ export default function CreateWishlist() {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const closeModal = () => setIsModalOpen(false);
 
-  const handleCancel = () => {
-    router.back();
-  };
+  const handleCancel = () => router.back();
 
   const handleSave = () => {
-    // Create a new wishlist if it doesn't exist
     if (!mockWishlists.has(eventId as string)) {
       mockWishlists.set(eventId as string, { items: [] });
     }
@@ -77,7 +82,6 @@ export default function CreateWishlist() {
     if (wishlist) {
       wishlist.items.push(item);
       console.log("Added item to wishlist:", item);
-      console.log("Current wishlist:", wishlist);
     }
     closeModal();
   };
@@ -89,7 +93,7 @@ export default function CreateWishlist() {
         <main className={styles.main}>
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>
-              Create Wishlist for Event1{eventId}
+              Create Wishlist for Event {eventId}
             </h1>
           </div>
 
@@ -105,86 +109,52 @@ export default function CreateWishlist() {
                   id="product-search"
                   className={styles.searchInput}
                   placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
           </div>
 
-          {/* Trending Items */}
-          <div>
-            <h2 className={styles.sectionTitle}>Trending items:</h2>
+          {/* Search Results */}
+          {isLoading && <p>Searching...</p>}
+
+          {searchResults.length > 0 && (
             <div className={styles.itemGrid}>
-              {/* Item 1 */}
-              <div className={styles.itemCard}>
-                <div className={styles.itemImage}>
-                  <span className="text-black">Item1 Photo</span>
+              {searchResults.map((item: any) => (
+                <div key={item.itemId} className={styles.itemCard}>
+                  <div className={styles.itemImage}>
+                    <img
+                      src={item.image?.imageUrl}
+                      alt={item.title}
+                      style={{ width: "100%", height: "auto" }}
+                    />
+                  </div>
+                  <div className={styles.itemContent}>
+                    <h3 className={styles.itemTitle}>{item.title}</h3>
+                    <p className={styles.itemPrice}>
+                      {item.price?.value} {item.price?.currency}
+                    </p>
+                    <button
+                      className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                      onClick={() =>
+                        openModal({
+                          name: item.title,
+                          photo: item.image?.imageUrl || "",
+                          price: `${item.price?.value} ${item.price?.currency}`,
+                          description: item.shortDescription || "",
+                        })
+                      }
+                    >
+                      Add to Wishlist
+                    </button>
+                  </div>
                 </div>
-                <div className={styles.itemContent}>
-                  <h3 className={styles.itemTitle}>Item1 Name</h3>
-                  <p className={styles.itemPrice}>Item1 Price</p>
-                  <button
-                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                    onClick={() =>
-                      openModal({
-                        name: "Item1 Name",
-                        photo: "Item1 Photo",
-                        price: "Item1 Price",
-                      })
-                    }
-                  >
-                    Add to Wishlist
-                  </button>
-                </div>
-              </div>
-
-              {/* Item 2 */}
-              <div className={styles.itemCard}>
-                <div className={styles.itemImage}>
-                  <span className="text-black">Item2 Photo</span>
-                </div>
-                <div className={styles.itemContent}>
-                  <h3 className={styles.itemTitle}>Item2 Name</h3>
-                  <p className={styles.itemPrice}>Item2 Price</p>
-                  <button
-                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                    onClick={() =>
-                      openModal({
-                        name: "Item2 Name",
-                        photo: "Item2 Photo",
-                        price: "Item2 Price",
-                      })
-                    }
-                  >
-                    Add to Wishlist
-                  </button>
-                </div>
-              </div>
-
-              {/* Item 3 */}
-              <div className={styles.itemCard}>
-                <div className={styles.itemImage}>
-                  <span className="text-black">Item3 Photo</span>
-                </div>
-                <div className={styles.itemContent}>
-                  <h3 className={styles.itemTitle}>Item3 Name</h3>
-                  <p className={styles.itemPrice}>Item3 Price</p>
-                  <button
-                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                    onClick={() =>
-                      openModal({
-                        name: "Item3 Name",
-                        photo: "Item3 Photo",
-                        price: "Item3 Price",
-                      })
-                    }
-                  >
-                    Add to Wishlist
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
+          )}
 
+          {/* Modal */}
           {isModalOpen && (
             <AddToWishlistModal
               isOpen={isModalOpen}

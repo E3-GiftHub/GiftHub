@@ -8,6 +8,7 @@ import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
+import { UploadButton } from "~/utils/uploadthing";
 import "./../styles/globals.css";
 
 function parseId(param: string | string[] | undefined): number | null {
@@ -33,6 +34,8 @@ function GuestListPreview(guestNames: string[]) {
 export default function EventView() {
   const router = useRouter();
   const { id } = router.query;
+
+  const [showUploadButton, setShowUploadButton] = useState(false);
 
   const parsedId = parseId(id) ?? 0;
 
@@ -64,6 +67,7 @@ export default function EventView() {
   );
   const handleRemoveGuest = (idx: number) =>
     setGuestList((prev) => prev.filter((_, i) => i !== idx));
+
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
     if (name && name.trim()) {
@@ -125,11 +129,13 @@ export default function EventView() {
 
   const handleRemoveMedia = (idx: number) =>
     setMediaList((prev) => prev.filter((_, i) => i !== idx));
+
   const handleUploadMedia = () =>
     setMediaList((prev) => [
       ...prev,
       `/placeholder/image${prev.length + 1}.jpg`,
     ]);
+
   const handleSaveMedia = () => setShowMediaModal(false);
 
   // inline edit confirmation
