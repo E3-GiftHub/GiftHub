@@ -1,19 +1,56 @@
 "use client";
 
-import "../styles/globals.css";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/router";
+
+function parseId(param: string | string[] | undefined): number | null {
+  if (typeof param === "string") {
+    const num = Number(param);
+    return isNaN(num) ? null : num;
+  }
+  return null; // ignore arrays or undefined
+}
+
+function GuestListPreview(guestNames: string[]) {
+  return (
+    <div className={styles.guestList}>
+      {guestNames.map((guest, index) => (
+        <div className={styles.guestItem} key={index}>
+          {guest}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function EventView() {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const parsedId = parseId(id) ?? 0;
+
+  const { data } = api.event.getEventID.useQuery({
+    eventId: parsedId,
+  });
+
+  const guestsData = api.guest.getGuestsForEvent.useQuery({
+    eventId: parsedId,
+  });
+
+  const eventData = data?.data;
+
   const [formData, setFormData] = useState({
+    title: "",
+    description: "",
     date: "",
     time: "",
     location: "",
-    description: "",
   });
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingField, setPendingField] = useState<null | string>(null);
@@ -24,10 +61,24 @@ export default function EventView() {
   const [guestList, setGuestList] = useState(
     Array.from({ length: 24 }, (_, i) => `Guest ${i + 1}`),
   );
-  const handleRemoveGuest = (idx: number) =>
-    setGuestList((prev) => prev.filter((_, i) => i !== idx));
-  const handleAddGuest = () =>
-    setGuestList((prev) => [...prev, `Guest ${prev.length + 1}`]);
+
+  //const removeGuestMutation = api.guest.removeGuestFromEvent.useMutation();
+  const handleRemoveGuest = () => {
+    console.log("Simulate adding guest");
+    // removeGuestMutation.mutate({
+    //   eventId: parsedId,
+    //   guestUsername: "", // Replace with the actual username from the UI
+    // });
+  };
+
+  const addGuestMutation = api.guest.addGuestToEvent.useMutation();
+
+  const handleAddGuest = () => {
+    addGuestMutation.mutate({
+      eventId: parsedId,
+      guestUsername: "", // Replace with the actual username from the UI
+    });
+  };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
 
   // Media list state
@@ -35,6 +86,52 @@ export default function EventView() {
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
+
+  useEffect(() => {
+    if (eventData?.date) {
+      // Ensure date is formatted as yyyy-mm-dd
+      const dateObj = new Date(eventData.date);
+      const date = dateObj.toISOString().split("T")[0] ?? "";
+      setFormData({
+        title: eventData.title ?? "",
+        description: eventData.description ?? "",
+        date: date,
+        time: dateObj.toTimeString().slice(0, 5),
+        location: eventData.location ?? "",
+      });
+      console.log("date ", date);
+    }
+  }, [eventData]);
+
+  useEffect(() => {
+    if (guestsData?.data) {
+      const guestNames = guestsData.data.map(
+        (guestElement) => guestElement.guest.username,
+      );
+      if (JSON.stringify(guestNames) !== JSON.stringify(guestList)) {
+        setGuestList(guestNames);
+      }
+    }
+  }, [guestsData, guestList]);
+
+  if (eventData === undefined) {
+    return (
+      <div className={styles.pageWrapper}>
+        <Navbar />
+        <div
+          className={styles.container}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <h2>Loading event...</h2>
+        </div>
+      </div>
+    );
+  }
+
   const handleRemoveMedia = (idx: number) =>
     setMediaList((prev) => prev.filter((_, i) => i !== idx));
   const handleUploadMedia = () =>
@@ -114,7 +211,7 @@ export default function EventView() {
 
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2>Event_1</h2>
+          <h2>{eventData?.title ?? "Loading event..."}</h2>
         </div>
 
         <div className={styles.wrapper}>
@@ -122,7 +219,10 @@ export default function EventView() {
           <div className={styles.topSection}>
             {/* Poza */}
             <div className={styles.photoSection}>
-              <div className={styles.photoBox}>Event photo here</div>
+              <img
+                className={styles.photoBox}
+                src={eventData.pictureUrl ?? undefined}
+              />
             </div>
             {/* Data + Locația */}
             <div className={styles.infoBox}>
@@ -190,13 +290,7 @@ export default function EventView() {
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              <div className={styles.guestList}>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <div key={i} className={styles.guestItem}>
-                    Guest {i + 1}
-                  </div>
-                ))}
-              </div>
+              {GuestListPreview(guestList)}
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}
