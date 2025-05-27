@@ -4,24 +4,13 @@ import { TRPCError } from "@trpc/server";
 import {MarkType} from "@prisma/client";
 export const contributionsRouter = createTRPCRouter({
     getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
-        /*
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "You must be logged in",
-            });
-        }
-            
-        const currentUser = ctx.session.user;
-        const userIdentifier = currentUser.id;
-        */
 
-        const currentUsername = "user1";
+        const userIdentifier = ctx.session!.user!.name!;
 
         const contributions = await ctx.db.contribution.findMany({
             where: {
                 event: {
-                    createdByUsername: currentUsername,
+                    createdByUsername: userIdentifier,
                 },
             },
             include: {
@@ -48,24 +37,14 @@ export const contributionsRouter = createTRPCRouter({
 
     getPurchasedItemsForUserEvents: publicProcedure.query(async ({ ctx }) => {
 
-        /*
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "You must be logged in",
-            });
-        }
 
-        const currentUser = ctx.session.user;
-        const userIdentifier = currentUser.id;
-        */
 
-        const currentUsername = "user1";
+        const userIdentifier = ctx.session!.user!.name!;
 
         const purchasedItems = await ctx.db.mark.findMany({
             where: {
                 event: {
-                    createdByUsername: currentUsername,
+                    createdByUsername: userIdentifier,
                 },
                 type: MarkType.PURCHASED,
             },

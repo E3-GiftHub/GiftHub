@@ -10,17 +10,9 @@ export const invitationsRouter = createTRPCRouter({
       })
     ).query(async ({ ctx, input }) => {
       const { month, year } = input;
-    /*
-    // Enable this once session handling is ready
-    if (!ctx.session) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "You must be logged in",
-      });
-    }
-    */
 
-    const userIdentifier = "user1"; 
+
+    const userIdentifier = ctx.session!.user!.name!;
 
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
