@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
-    "@prisma/client": "^6.7.0",
+    "@prisma/client": "^6.8.2",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.69.0",
     "@trpc/client": "^11.0.0",
@@ -72,7 +72,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "prisma": "^6.7.0",
+    "prisma": "^6.8.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.0.15",
