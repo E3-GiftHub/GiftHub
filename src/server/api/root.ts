@@ -9,6 +9,8 @@ import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
 import { guestRouter } from "~/server/api/routers/GuestRouter";
+import { ebayRouter } from "~/server/api/routers/EbayRouter"
+
 
 /**
  * This is the primary router for your server.
@@ -25,6 +27,7 @@ export const appRouter = createTRPCRouter({
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
   invitationsNotification: invitesNotificationRouter,
+  ebay: ebayRouter,
 
   event: eventRouter,
   guest: guestRouter,
