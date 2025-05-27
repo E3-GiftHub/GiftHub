@@ -48,7 +48,11 @@ const MyEventsSection: React.FC = () => {
       </Modal>
 
       <div className={styles["buttons-wrapper"]}>
-        <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
+        <ButtonComponent
+          text={"Add new event"}
+          style={ButtonStyle.PRIMARY}
+          onClick={() => router.push("CreateEvent")}
+        />
       </div>
     </Container>
   );
