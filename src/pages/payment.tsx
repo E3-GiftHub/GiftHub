@@ -1,27 +1,30 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 // For App Router to get path params, you'd typically get it from page props if it's a dynamic segment like /checkout/[eventId]/page.js
 // or use the `useParams` hook from `next/navigation`.
 // For Pages Router, you'd use `useRouter` from `next/router`.
 // For now, we'll use constants for simplicity.
 
-import styles from '../assets/Payment.module.css';
-import Image from 'next/image';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import '../app/globals.css';
+import styles from "../styles/Payment.module.css";
+import Image from "next/image";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import "../app/globals.css";
 
 // --- START: Placeholder Values ---
 // In a real application, these IDs should be dynamic.
 // For example, eventId could come from the URL, and articleId might be the ID
 // of a specific product associated with this page/event.
 const CURRENT_EVENT_ID = 43858; // Assuming "Event Number 43858" is the eventId
-const TARGET_ARTICLE_ID = 101;  // An example ItemCatalogue.id (e.g., for the cake)
+const TARGET_ARTICLE_ID = 101; // An example ItemCatalogue.id (e.g., for the cake)
 // --- END: Placeholder Values ---
 
 export default function CheckoutPage() {
-  const [contributionAmount, setContributionAmount] = useState('');
-  const [progress, setProgress] = useState<{ total: number; goal: number } | null>(null);
+  const [contributionAmount, setContributionAmount] = useState("");
+  const [progress, setProgress] = useState<{
+    total: number;
+    goal: number;
+  } | null>(null);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -40,7 +43,9 @@ export default function CheckoutPage() {
 
       setIsLoadingProgress(true);
       try {
-        const res = await fetch(`/api/payment/progress?eventId=${eventIdToUse}`);
+        const res = await fetch(
+          `/api/payment/progress?eventId=${eventIdToUse}`,
+        );
         if (!res.ok) {
           let errorMsg = `Failed to fetch progress: ${res.status}`;
           try {
@@ -67,18 +72,23 @@ export default function CheckoutPage() {
   const handleCheckout = async () => {
     const amount = Number(contributionAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid contribution amount.'); // Translated
+      alert("Please enter a valid contribution amount."); // Translated
       return;
     }
 
     if (!eventIdToUse || !TARGET_ARTICLE_ID) {
-      alert('Event or Article information is missing. Checkout cannot proceed.'); // Translated
-      console.error("Missing eventId or articleId for checkout:", { eventIdToUse, TARGET_ARTICLE_ID });
+      alert(
+        "Event or Article information is missing. Checkout cannot proceed.",
+      ); // Translated
+      console.error("Missing eventId or articleId for checkout:", {
+        eventIdToUse,
+        TARGET_ARTICLE_ID,
+      });
       return;
     }
 
     setIsCheckingOut(true);
-    const endpoint = '/api/payment/contribute';
+    const endpoint = "/api/payment/contribute";
     const body = {
       amount: amount,
       eventId: eventIdToUse,
@@ -87,9 +97,9 @@ export default function CheckoutPage() {
 
     try {
       const res = await fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });
@@ -99,12 +109,17 @@ export default function CheckoutPage() {
       if (res.ok && data.url) {
         window.location.href = data.url; // Redirect to Stripe
       } else {
-        alert(data.message || 'Failed to initiate Stripe checkout. Please try again.'); // Translated (fallback)
+        alert(
+          data.message ||
+            "Failed to initiate Stripe checkout. Please try again.",
+        ); // Translated (fallback)
         console.error("Checkout failed:", data);
       }
     } catch (error) {
       console.error("Checkout request failed:", error);
-      alert('An error occurred during processing. Please check your connection and try again.'); // Translated
+      alert(
+        "An error occurred during processing. Please check your connection and try again.",
+      ); // Translated
     } finally {
       setIsCheckingOut(false);
     }
@@ -112,48 +127,74 @@ export default function CheckoutPage() {
 
   let progressContent;
   if (isLoadingProgress) {
-    progressContent = <p style={{ marginTop: "20px", textAlign: "center" }}>Loading progress...</p>; // Translated
-  } else if (progress && typeof progress.total === 'number' && typeof progress.goal === 'number') {
-    const percentage = progress.goal > 0 ? (progress.total / progress.goal) * 100 : 0;
+    progressContent = (
+      <p style={{ marginTop: "20px", textAlign: "center" }}>
+        Loading progress...
+      </p>
+    ); // Translated
+  } else if (
+    progress &&
+    typeof progress.total === "number" &&
+    typeof progress.goal === "number"
+  ) {
+    const percentage =
+      progress.goal > 0 ? (progress.total / progress.goal) * 100 : 0;
     progressContent = (
       <div style={{ marginTop: "20px" }}>
         <p style={{ marginBottom: "8px", textAlign: "center" }}>
-          €{progress.total.toFixed(2)} raised out of €{progress.goal.toFixed(2)} {/* Translated "strânși din" to "raised out of" */}
+          €{progress.total.toFixed(2)} raised out of €{progress.goal.toFixed(2)}{" "}
+          {/* Translated "strânși din" to "raised out of" */}
         </p>
-        <div style={{
-          width: "100%",
-          backgroundColor: "#4A4A4A",
-          borderRadius: "8px",
-          overflow: "hidden",
-          height: "20px",
-        }}>
-          <div style={{
-            width: `${Math.min(percentage, 100)}%`,
-            backgroundColor: "#8a2be2",
-            height: "100%",
-            transition: "width 0.5s ease-in-out",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontSize: "12px"
-          }}>
+        <div
+          style={{
+            width: "100%",
+            backgroundColor: "#4A4A4A",
+            borderRadius: "8px",
+            overflow: "hidden",
+            height: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: `${Math.min(percentage, 100)}%`,
+              backgroundColor: "#8a2be2",
+              height: "100%",
+              transition: "width 0.5s ease-in-out",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "12px",
+            }}
+          >
             {/* {percentage > 5 && `${percentage.toFixed(0)}%`} */}
           </div>
         </div>
       </div>
     );
   } else {
-    progressContent = <p style={{ marginTop: "20px", textAlign: "center", color: "orange" }}>Progress information could not be loaded.</p>; // Translated
+    progressContent = (
+      <p style={{ marginTop: "20px", textAlign: "center", color: "orange" }}>
+        Progress information could not be loaded.
+      </p>
+    ); // Translated
   }
 
   return (
     <div className={styles.container}>
       <Navbar />
       <div className={styles.card}>
-        <h2 className={styles.orderId}>Order id #14385683458738543</h2> {/* Already in English */}
-        <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <label htmlFor="contributionAmountInput" style={{ marginRight: '10px', display: 'block', marginBottom: '5px' }}>
+        <h2 className={styles.orderId}>Order id #14385683458738543</h2>{" "}
+        {/* Already in English */}
+        <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+          <label
+            htmlFor="contributionAmountInput"
+            style={{
+              marginRight: "10px",
+              display: "block",
+              marginBottom: "5px",
+            }}
+          >
             Contribution Amount (EUR): {/* Translated */}
           </label>
           <input
@@ -167,29 +208,35 @@ export default function CheckoutPage() {
             disabled={isCheckingOut}
           />
         </div>
-
         <div className={styles.tableHeader}>
           <span>Event</span> {/* Translated */}
           <span>Contribution Amount</span> {/* Translated */}
         </div>
         <div className={styles.eventRowAlt}>
-          <Image src="/cake.png" alt="Birthday Cake" width={100} height={100} className={styles.image} />
+          <Image
+            src="/cake.png"
+            alt="Birthday Cake"
+            width={100}
+            height={100}
+            className={styles.image}
+          />
           <div className={styles.eventDetails}>
             <span>Giga Chad Birthday Party</span> {/* Kept as a proper name */}
-            <span>Event No. {eventIdToUse}</span> {/* Translated "Eveniment Nr." to "Event No." */}
+            <span>Event No. {eventIdToUse}</span>{" "}
+            {/* Translated "Eveniment Nr." to "Event No." */}
           </div>
-          <span className={styles.amountAlt}>100 lei/euro</span> {/* Kept as specific data display */}
+          <span className={styles.amountAlt}>100 lei/euro</span>{" "}
+          {/* Kept as specific data display */}
         </div>
-
         {progressContent}
-
         <div className={styles.checkoutBtnWrapper}>
           <button
             className={styles.checkoutBtn}
             onClick={handleCheckout}
             disabled={isCheckingOut || isLoadingProgress}
           >
-            {isCheckingOut ? 'Processing...' : 'CHECKOUT'} {/* Translated "Se procesează..." */}
+            {isCheckingOut ? "Processing..." : "CHECKOUT"}{" "}
+            {/* Translated "Se procesează..." */}
           </button>
         </div>
       </div>
