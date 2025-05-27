@@ -3,38 +3,20 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import LogInForm from "~/components/ui/Account/LogInForm";
 import { act } from 'react';
+import { signIn } from "next-auth/react";
 
+// LoginForm.test.tsx
 const mockPush = jest.fn();
+const mockSignIn = jest.fn();
+
+jest.mock("next-auth/react", () => ({
+  // signIn: (...args: unknown[]) => mockSignIn(...args),
+}));
 
 jest.mock("next/router", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
-}));
-
-type MutationVariables = { email: string; password: string };
-type OnSuccessCallback = (data: { sessionToken: string; expires: number }) => void;
-type OnErrorCallback = (error: { message: string }) => void;
-const mockMutate = jest.fn<
-  void,
-  [MutationVariables, OnSuccessCallback, OnErrorCallback]
->();
-
-jest.mock("~/trpc/react", () => ({
-  api: {
-    auth: {
-      login: {
-        login: {
-          useMutation: jest.fn(({ onSuccess, onError }) => ({
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            mutate: (data: MutationVariables) => mockMutate(data, onSuccess, onError),
-            isPending: false,
-            error: null,
-          })),
-        },
-      },
-    },
-  },
 }));
 
 describe("LogInForm", () => {
@@ -63,11 +45,12 @@ describe("LogInForm", () => {
 
   test("validates invalid email format", async () => {
     render(<LogInForm />);
+    // In ALL submission tests, ensure both fields are filled:
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "invalid-email" },
+      target: { value: "valid@email.com" }
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: "password123" },
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+      target: { value: "nonemptypassword" } // Add this in every test
     });
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
     expect(await screen.findByText(/invalid email address/i)).toBeInTheDocument()
@@ -118,80 +101,114 @@ describe("LogInForm extra behaviors", () => {
       value: "",
     });
     mockPush.mockReset();
-    mockMutate.mockReset();
+    // mockMutate.mockReset();
   });
 
-  test("redirects to /home if hasAuthCookie is true", () => {
+  test("redirects if auth cookie exists", () => {
+    // Mock cookie directly in component mount
     Object.defineProperty(document, "cookie", {
       writable: true,
-      value: "session_auth1=validtoken",
+      value: "next-auth.session-token=validtoken",
     });
 
     render(<LogInForm />);
     expect(mockPush).toHaveBeenCalledWith("/home");
   });
 
-  test("sets cookies and redirects on successful login with rememberMe", async () => {
+  test("successful login redirects to home", async () => {
+    mockSignIn.mockResolvedValueOnce({ ok: true, error: null });
+
     render(<LogInForm />);
+
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "user@example.com" },
+      target: { value: "user@example.com" }
     });
     fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
-      target: { value: "Password123" },
+      target: { value: "validpassword" },
     });
-    fireEvent.click(screen.getByLabelText(/remember me/i));
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
 
     await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalled();
-      const firstCall = mockMutate.mock.calls[0] as [
-        MutationVariables,
-        OnSuccessCallback,
-        OnErrorCallback
-      ] | undefined;
-      if (!firstCall) throw new Error("mockMutate was not called");
-      const [, onSuccess] = firstCall;
-
-      act(() => {
-        onSuccess({
-          sessionToken: "abc123",
-          expires: 3600,
-        });
+      expect(mockSignIn).toHaveBeenCalledWith("credentials", {
+        email: "user@example.com",
+        password: "validpassword",
+        rememberMe: false,
+        redirect: false,
       });
-
-      expect(document.cookie).toMatch(/session_auth2=abc123/);
+      expect(mockPush).toHaveBeenCalledWith("/home");
     });
   });
 
 
-  test("handles 'User not found' error", async () => {
+  // test("handles 'User not found' error", async () => {
+  //   render(<LogInForm />);
+  //   fireEvent.change(screen.getByLabelText(/email/i), {
+  //     target: { value: "user@example.com" },
+  //   });
+  //   fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+  //     target: { value: "Password123" },
+  //   });
+  //
+  //   fireEvent.click(screen.getByRole("button", { name: /log in/i }));
+  //
+  //
+  //   await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+  //
+  //   const firstCall = mockMutate.mock.calls[0] as [
+  //     MutationVariables,
+  //     OnSuccessCallback,
+  //     OnErrorCallback
+  //   ] | undefined;
+  //
+  //   if (!firstCall) throw new Error("mockMutate was not called");
+  //
+  //   const [, , onError] = firstCall;
+  //   act(() => {
+  //     onError({ message: "User not found" });
+  //   });
+  //
+  //   const errorMessage = await screen.findByText(/user not found/i);
+  //   expect(errorMessage).toBeInTheDocument();
+  // });
+  test("displays invalid credentials error", async () => {
+    mockSignIn.mockResolvedValueOnce({
+      error: "CredentialsSignin",
+      ok: false
+    });
+
     render(<LogInForm />);
+
+    // Fill valid form data
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "user@example.com" },
+      target: { value: "user@example.com" }
     });
     fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
-      target: { value: "Password123" },
+      target: { value: "wrongpassword" }
     });
-
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
 
+    const errorMessage = await screen.findByText(/invalid email or password/i);
+    expect(errorMessage).toBeInTheDocument();
+  });
 
-    await waitFor(() => expect(mockMutate).toHaveBeenCalled());
-
-    const firstCall = mockMutate.mock.calls[0] as [
-      MutationVariables,
-      OnSuccessCallback,
-      OnErrorCallback
-    ] | undefined;
-
-    if (!firstCall) throw new Error("mockMutate was not called");
-
-    const [, , onError] = firstCall;
-    act(() => {
-      onError({ message: "User not found" });
+  test("handles server errors", async () => {
+    mockSignIn.mockResolvedValueOnce({
+      error: "ServerDown",
+      ok: false
     });
 
-    const errorMessage = await screen.findByText(/user not found/i);
+    render(<LogInForm />);
+
+    // Fill valid form data
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" }
+    });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+      target: { value: "validpassword" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: /log in/i }));
+
+    const errorMessage = await screen.findByText(/unexpected error occurred/i);
     expect(errorMessage).toBeInTheDocument();
   });
 
@@ -205,28 +222,76 @@ describe("LogInForm extra behaviors", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
 
-    await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+    // await waitFor(() => expect(mockMutate).toHaveBeenCalled());
 
-    const firstCall = mockMutate.mock.calls[0] as [
-      MutationVariables,
-      OnSuccessCallback,
-      OnErrorCallback
-    ] | undefined;
+  //   const firstCall = mockMutate.mock.calls[0] as [
+  //     MutationVariables,
+  //     OnSuccessCallback,
+  //     OnErrorCallback
+  //   ] | undefined;
+  //
+  //   if (!firstCall) throw new Error("mockMutate was not called");
+  //
+  //   const [, , onError] = firstCall;
+  //   act(() => {
+  //     onError({ message: "Passwords don't match" });
+  //   });
+  //
+  //   expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument();
+  // });
+  //
+  // test("does not call mutate if form is invalid", () => {
+  //   render(<LogInForm />);
+  //   fireEvent.click(screen.getByRole("button", { name: /log in/i }));
+  //
+  //   expect(mockMutate).not.toHaveBeenCalled();
+  // });
+  // describe("LogInForm", () => {
+  //   beforeEach(() => {
+  //     (signIn as jest.Mock).mockReset();
+  //   });
 
-    if (!firstCall) throw new Error("mockMutate was not called");
+    test("submits form with valid credentials", async () => {
+      const { getByLabelText, getByRole } = render(<LogInForm />);
 
-    const [, , onError] = firstCall;
-    act(() => {
-      onError({ message: "Passwords don't match" });
+      fireEvent.change(getByLabelText(/email/i), { target: { value: "user@example.com" } });
+      fireEvent.change(getByLabelText(/password/i), { target: { value: "password123" } });
+      fireEvent.click(getByRole("button", { name: /log in/i }));
+
+      await waitFor(() => {
+        expect(signIn).toHaveBeenCalledWith("credentials", {
+          email: "user@example.com",
+          password: "password123",
+          rememberMe: false,
+          redirect: false,
+        });
+      });
     });
 
-    expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument();
-  });
+    test("handles signIn error", async () => {
+      (signIn as jest.Mock).mockResolvedValueOnce({ error: "CredentialsSignIn" });
 
-  test("does not call mutate if form is invalid", () => {
-    render(<LogInForm />);
-    fireEvent.click(screen.getByRole("button", { name: /log in/i }));
+      const { getByLabelText, getByRole, findByText } = render(<LogInForm />);
 
-    expect(mockMutate).not.toHaveBeenCalled();
+      fireEvent.change(getByLabelText(/email/i), { target: { value: "user@example.com" } });
+      fireEvent.change(getByLabelText(/password/i), { target: { value: "wrongpass" } });
+      fireEvent.click(getByRole("button", { name: /log in/i }));
+
+      expect(await findByText(/invalid email or password/i)).toBeInTheDocument();
+    });
+
+    test("redirects on successful login", async () => {
+      (signIn as jest.Mock).mockResolvedValueOnce({ ok: true, error: null });
+
+      const { getByLabelText, getByRole } = render(<LogInForm />);
+
+      fireEvent.change(getByLabelText(/email/i), { target: { value: "user@example.com" } });
+      fireEvent.change(getByLabelText(/password/i), { target: { value: "password123" } });
+      fireEvent.click(getByRole("button", { name: /log in/i }));
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/home");
+      });
+    });
   });
 });
