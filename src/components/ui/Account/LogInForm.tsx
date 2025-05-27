@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
-import { api } from "~/trpc/react";
 import Link from "next/link";
+import {signIn} from "next-auth/react";
 
 export default function LogInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
   const router = useRouter();
 
@@ -18,44 +19,6 @@ export default function LogInForm() {
     passwordRequired: `Pass${""}word is required`,
   });
   const validationMessages = getValidationMessages();
-
-  React.useEffect(() => {
-    const cookie = document.cookie.split(";");
-    const hasAuthCookie = cookie.some((cookie) => {
-      const [name] = cookie.trim().split("=");
-      return name === "session_auth1" || name === "session_auth2";
-    });
-
-    if (hasAuthCookie) {
-      void router.push("/home");
-    }
-  }, [router]);
-
-  const loginMutation = api.auth.login.login.useMutation({
-    onSuccess: (data) => {
-      if (rememberMe) {
-        const expires = Date.now() + 30 * 24 * 60 * 60;
-        document.cookie = `session_auth1=${data.sessionToken}; path=/; max-age=${expires}; ${
-          process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
-        }`;
-      }
-
-      document.cookie = `session_auth2=${data.sessionToken}; path=/; max-age=${data.expires}; ${
-        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
-      }`;
-
-      void router.push("/home");
-    },
-    onError: (err) => {
-      if (err.message === "User not found") {
-        setErrors({ server: err.message });
-      } else if (err.message === "Passwords don't match") {
-        setErrors({ password: err.message });
-      } else {
-        setErrors({ server: "An unexpected error occurred" });
-      }
-    },
-  });
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -75,8 +38,39 @@ export default function LogInForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors(null);
-    if (validateForm()) {
-      loginMutation.mutate({ email, password });
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+
+    try{
+      const result = await signIn("credentials", {
+        email,
+        password,
+        rememberMe,
+        redirect: false,
+      });
+
+      if(result?.error) {
+        if(result.error === "CredentialsSignIn") {
+          setErrors({ email: "Invalid email or password" });
+        }
+        else {
+          setErrors({ server: result.error });
+        }
+      }
+      else {
+        if(rememberMe){
+          document.cookie = `persistent-token=${email}; path=/; max-age=2592000`;
+        }
+        void router.push("/home");
+      }
+    }
+    catch(err) {
+      console.log(err);
+      setErrors({ server: "An unexpected error occurred" });
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -164,7 +158,7 @@ export default function LogInForm() {
           className={styles.primaryButton}
           onClick={handleSubmit}
         >
-          {loginMutation.isPending ? "Logging in..." : "Log in"}
+          {isLoading ? "Logging in..." : "Log in"}
         </button>
         <label className={styles.rememberMe}>
           <input

@@ -12,24 +12,32 @@ import {
 import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { signOut} from "next-auth/react";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
-
   const profileRef = useRef<HTMLLIElement>(null);
 
   const router = useRouter();
 
-  const handleLogout = async () => {
-    // Remove cookies manually on the client
-    document.cookie = "session_auth1=; path=/; max-age=0";
-    document.cookie = "session_auth2=; path=/; max-age=0";
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
 
-    // Redirect
-    await router.push("/login");
+    try{
+      await signOut({
+        redirect: false,
+        callbackUrl: '/login',
+      });
+
+      document.cookie = 'persistent-token=; path=/; max-age=0';
+
+      void router.push('/login');
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
