@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 import Link from "next/link";
 
 export default function LogInForm() {

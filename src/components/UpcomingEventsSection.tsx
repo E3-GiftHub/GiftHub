@@ -6,7 +6,7 @@ import {
 import ContainerEventTitle from "~/components/ui/ContainerEventTitle";
 import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import Calendar from "~/components/ui/Calendar";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 import Modal from "~/components/Modal";
 import React, { useState } from "react";
 
@@ -40,7 +40,7 @@ const UpcomingEventsSection: React.FC = () => {
       <ContainerEventTitle title={"My invitations"} />
 
       <div style={{}}>
-         <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
+        <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </div>
 
       {trimmedEvents.map((event, index) => (

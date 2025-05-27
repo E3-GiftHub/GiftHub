@@ -12,14 +12,17 @@ import {
   isSameDay,
 } from "date-fns";
 import styles from "../../styles/Calendar.module.css";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 
 type CalendarProps = {
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
 };
 
-export default function Calendar({ currentDate, setCurrentDate }: CalendarProps) {
+export default function Calendar({
+  currentDate,
+  setCurrentDate,
+}: CalendarProps) {
   const { data: events, isLoading } = api.calendar.getEventsByMonth.useQuery({
     month: currentDate.getMonth() + 1,
     year: currentDate.getFullYear(),
@@ -79,7 +82,7 @@ export default function Calendar({ currentDate, setCurrentDate }: CalendarProps)
             key={cloneDay.toISOString()}
           >
             <span>{format(cloneDay, "d")}</span>
-          </div>
+          </div>,
         );
 
         day = addDays(day, 1);
@@ -88,7 +91,7 @@ export default function Calendar({ currentDate, setCurrentDate }: CalendarProps)
       rows.push(
         <div className={styles.week} key={day.toISOString()}>
           {days}
-        </div>
+        </div>,
       );
       days = [];
     }

@@ -8,10 +8,9 @@ import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
-import { api } from "~/trpc/react";
+import { api } from "~/utils/api";
 import Modal from "~/components/Modal";
 import { useState } from "react";
-
 
 const MyEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
