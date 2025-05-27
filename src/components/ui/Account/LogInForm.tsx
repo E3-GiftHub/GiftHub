@@ -170,9 +170,7 @@ export default function LogInForm() {
           />{" "}
           Remember me
         </label>
-        <div className={styles.divider}>
-          <span className={styles.dividerText}>OR</span>
-        </div>
+
         <p className={styles.footer}>
           Don&apos;t have an account?{" "}
           <Link href="/signup">
