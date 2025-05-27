@@ -24,7 +24,7 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
 
   return (
     <Link
-      href={`/EventView?id=${eventData.id}`}
+      href={`/event-view?id=${eventData.id}`}
       className={styles["event-row-wrapper"]}
     >
       <div className={styles["left-column"]}>

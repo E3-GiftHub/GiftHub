@@ -51,7 +51,7 @@ const MyEventsSection: React.FC = () => {
         <ButtonComponent
           text={"Add new event"}
           style={ButtonStyle.PRIMARY}
-          onClick={() => router.push("CreateEvent")}
+          onClick={() => router.push("event-create")}
         />
       </div>
     </Container>

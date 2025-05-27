@@ -8,6 +8,7 @@ import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
+import "./../styles/globals.css";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
