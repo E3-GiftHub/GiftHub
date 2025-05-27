@@ -26,8 +26,12 @@ export default function EventView() {
   );
   const handleRemoveGuest = (idx: number) =>
     setGuestList((prev) => prev.filter((_, i) => i !== idx));
-  const handleAddGuest = () =>
-    setGuestList((prev) => [...prev, `Guest ${prev.length + 1}`]);
+  const handleAddGuest = () => {
+    const name = window.prompt("Enter guest name:");
+    if (name && name.trim()) {
+      setGuestList((prev) => [...prev, name.trim()]);
+    }
+  };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
 
   // Media list state
@@ -191,9 +195,9 @@ export default function EventView() {
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
               <div className={styles.guestList}>
-                {Array.from({ length: 12 }, (_, i) => (
+                {guestList.map((guest, i) => (
                   <div key={i} className={styles.guestItem}>
-                    Guest {i + 1}
+                    {guest}
                   </div>
                 ))}
               </div>

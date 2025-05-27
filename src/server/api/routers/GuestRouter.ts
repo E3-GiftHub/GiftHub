@@ -40,7 +40,6 @@ export const guestRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input }) => {
-      // Optionally, check if invitation already exists
       const existing = await prisma.invitation.findFirst({
         where: {
           eventId: input.eventId,
@@ -58,5 +57,28 @@ export const guestRouter = createTRPCRouter({
         },
       });
       return invitation;
+    }),
+
+  // ==== aici adaugi procedura de REMOVE ====
+  removeGuestFromEvent: publicProcedure
+    .input(
+      z.object({
+        eventId: z.number(),
+        guestUsername: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { count } = await prisma.invitation.deleteMany({
+        where: {
+          eventId: input.eventId,
+          guestUsername: input.guestUsername,
+        },
+      });
+      if (count === 0) {
+        throw new Error(
+          `No invitation found for user "${input.guestUsername}" on event ${input.eventId}`
+        );
+      }
+      return { removedCount: count };
     }),
 });
