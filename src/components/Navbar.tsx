@@ -18,32 +18,24 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const profileRef = useRef<HTMLLIElement>(null);
 
   const router = useRouter();
 
-  const handleLogout = async () => {
-    // Remove cookies manually on the client
-    document.cookie = "session_auth1=; path=/; max-age=0";
-    document.cookie = "session_auth2=; path=/; max-age=0";
-
-    // Redirect
-    await router.push("/login");
-  };
-
   useEffect(() => {
-    const specialPages = [
-      "https://gifthub-five.vercel.app/",
-      "/",
-      "/#",
-      " http://localhost:3000/#",
-      "http://localhost:3000/",
-    ];
+    const checkPageAndAuth = () => {
+      const { pathname, hash } = window.location;
+      const isLanding =
+        pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
 
-    const checkSpecialPage = () => {
-      const isSpecial = specialPages.includes(window.location.href);
-      setIsLandingPage(isSpecial);
+      setIsLandingPage(isLanding);
+
+      const loggedIn =
+        document.cookie.includes("session_auth1") ||
+        document.cookie.includes("session_auth2");
+      setIsLoggedIn(loggedIn);
     };
 
     const detectActivePage = () => {
@@ -53,16 +45,16 @@ const Navbar = () => {
       else setActivePage(null);
     };
 
-    checkSpecialPage();
+    checkPageAndAuth();
     detectActivePage();
 
     window.addEventListener("hashchange", () => {
-      checkSpecialPage();
+      checkPageAndAuth();
       detectActivePage();
     });
 
     return () => {
-      window.removeEventListener("hashchange", checkSpecialPage);
+      window.removeEventListener("hashchange", checkPageAndAuth);
     };
   }, []);
 
@@ -88,6 +80,22 @@ const Navbar = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      document.cookie = `session_auth1=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+      document.cookie = `session_auth2=; path=/; max-age=0; ${
+        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
+      }`;
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Failure: ", err);
+    }
+  };
+
   return (
     <nav
       className={`${styles.navbar} ${
@@ -95,10 +103,12 @@ const Navbar = () => {
       }`}
     >
       <div className={styles["navbar-left"]}>
-        <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        <Link href="/">
+          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        </Link>
       </div>
 
-      {isLandingPage ? (
+      {isLandingPage && !isLoggedIn ? (
         <div className={styles["login-wrapper"]}>
           <Link href="/login#" className={styles["login-button"]}>
             <FaUser />
@@ -161,7 +171,13 @@ const Navbar = () => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link href="/#" onClick={handleLogout}>
+                <Link
+                  href="/#"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await handleLogout();
+                  }}
+                >
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>
