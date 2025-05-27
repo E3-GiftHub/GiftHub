@@ -3,12 +3,33 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/router";
 
+// Mock pentru router
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
+// Mock pentru next-auth/react
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(),
+  signOut: jest.fn(),
+}));
+
+import { useSession, signOut } from "next-auth/react";
+
 describe("Navbar", () => {
   beforeEach(() => {
+    // Setare router mock
+    (useRouter as jest.Mock).mockReturnValue({
+      pathname: "/home",
+      push: jest.fn(),
+    });
+
+    // Simulăm o sesiune activă (user logat)
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { name: "Cati" } },
+      status: "authenticated",
+    });
+
     Object.defineProperty(window, "location", {
       value: {
         pathname: "/home",
@@ -36,36 +57,22 @@ describe("Navbar", () => {
   test("toggle la meniul de profil", () => {
     render(<Navbar />);
 
-    const profileToggle = screen.getByText("Profile", {
-      selector: "a.profile-main-button",
-    });
-
+    const profileToggle = screen.getByText("Profile");
     fireEvent.click(profileToggle);
 
     expect(screen.getByText(/Edit Profile/i)).toBeInTheDocument();
     expect(screen.getByText(/Logout/i)).toBeInTheDocument();
   });
 
-  test("click pe Logout apelează handlerul și redirecționează", () => {
-    Object.defineProperty(window.location, "href", {
-      writable: true,
-      value: "",
-    });
-
+  test("click pe Logout apelează signOut și redirecționează", () => {
     render(<Navbar />);
 
-    const profileBtn = screen.getByText("Profile", {
-      selector: "a.profile-main-button",
-    });
+    const profileBtn = screen.getByText("Profile");
     fireEvent.click(profileBtn);
 
     const logoutLink = screen.getByText(/Logout/i);
     fireEvent.click(logoutLink);
 
-    expect(window.location.href).toBe("/");
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/" });
   });
-});
-
-
-
 });
