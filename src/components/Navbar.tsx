@@ -32,6 +32,8 @@ const Navbar = () => {
         callbackUrl: '/login',
       });
 
+      document.cookie = 'persistent-token=; path=/; max-age=0';
+
       void router.push('/login');
     } catch(err) {
       console.error(err);

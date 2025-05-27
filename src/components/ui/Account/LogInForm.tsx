@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
-import { api } from "~/trpc/react";
 import Link from "next/link";
 import {signIn} from "next-auth/react";
 
@@ -60,6 +59,9 @@ export default function LogInForm() {
         }
       }
       else {
+        if(rememberMe){
+          document.cookie = `persistent-token=${email}; path=/; max-age=2592000`;
+        }
         void router.push("/home");
       }
     }

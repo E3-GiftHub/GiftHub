@@ -123,7 +123,7 @@ export const authConfig: NextAuthConfig = {
     // Add other providers here if needed (e.g., Google, GitHub)
   ],
   callbacks: {
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
         token.id = user.id; // Add the user ID to the JWT
@@ -146,6 +146,17 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
+  cookies: {
+    sessionToken:{
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 1,
+      }
+    }
+  },
   pages: {
     signIn: "/login", // Path to your custom login page
     // signOut: '/auth/signout', // (Optional) Custom sign-out page
@@ -158,6 +169,7 @@ export const authConfig: NextAuthConfig = {
     // maxAge: 30 * 24 * 60 * 60, // 30 days (Optional)
     // updateAge: 24 * 60 * 60, // 24 hours (Optional)
   },
+
   // The secret is used to sign and encrypt JWTs, and for CSRF protection.
   // Ensure this is set in your environment variables for production.
   secret: process.env.AUTH_SECRET,
