@@ -62,23 +62,13 @@ export default function EventView() {
   const [guestList, setGuestList] = useState(
     Array.from({ length: 24 }, (_, i) => `Guest ${i + 1}`),
   );
-
-  //const removeGuestMutation = api.guest.removeGuestFromEvent.useMutation();
-  const handleRemoveGuest = () => {
-    console.log("Simulate adding guest");
-    // removeGuestMutation.mutate({
-    //   eventId: parsedId,
-    //   guestUsername: "", // Replace with the actual username from the UI
-    // });
-  };
-
-  const addGuestMutation = api.guest.addGuestToEvent.useMutation();
-
+  const handleRemoveGuest = (idx: number) =>
+    setGuestList((prev) => prev.filter((_, i) => i !== idx));
   const handleAddGuest = () => {
-    addGuestMutation.mutate({
-      eventId: parsedId,
-      guestUsername: "", // Replace with the actual username from the UI
-    });
+    const name = window.prompt("Enter guest name:");
+    if (name && name.trim()) {
+      setGuestList((prev) => [...prev, name.trim()]);
+    }
   };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
 
