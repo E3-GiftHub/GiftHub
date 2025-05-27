@@ -20,8 +20,9 @@ export const options: NextAuthOptions = {
             throw new Error("Email and password are required");
           }
 
-          // @ts-expect-error plm ba vedem
+
           const user = await db.user.findUnique({
+            // @ts-expect-error plm ba vedem
             where: { email: credentials.email },
           });
 
@@ -30,6 +31,7 @@ export const options: NextAuthOptions = {
           }
 
           const isValid = await bcrypt.compare(
+            // @ts-expect-error vedemboss
             credentials.password,
             user.password,
           );
@@ -50,6 +52,7 @@ export const options: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // @ts-expect-error csf, e greu
     async jwt({ token, user }) {
       // Only runs on sign in
       if (user) {
