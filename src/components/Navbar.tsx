@@ -8,116 +8,75 @@ import {
   FaSignOutAlt,
   FaUserEdit,
   FaBars,
-  FaExternalLinkAlt, // Asigură-te că această iconiță este importată
 } from "react-icons/fa";
-import styles from "./../styles/Navbar.module.css"; // Asigură-te că și acest fișier CSS există și are stilurile necesare
-import { api } from "~/trpc/react";
-import { usePathname } from 'next/navigation';
+import styles from "./../styles/Navbar.module.css";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
-  const [userStripeAccountId, setUserStripeAccountId] = useState<string | null | undefined>(undefined);
 
   const profileRef = useRef<HTMLLIElement>(null);
-  const pathname = usePathname();
 
-  // tRPC query pentru datele utilizatorului (inclusiv stripeAccountId)
-  const {
-    data: currentUser,
-    isLoading: isLoadingUser,
-    isError: isUserQueryError,
-    error: userQueryError,
-    refetch: refetchUser
-  } = api.user.getSelf.useQuery(
-    undefined,
-    {
-      enabled: !isLandingPage, // Rulează doar dacă nu e landing page
-      retry: false,
-    }
-  );
+  const router = useRouter();
 
-  // tRPC mutation pentru a crea link-ul de login la Stripe Dashboard
-  const stripeDashboardLinkMutation = api.stripe.createDashboardLoginLink.useMutation({
-    onSuccess: (data) => {
-      if (data.url) {
-        window.open(data.url, '_blank'); // Deschide în tab nou
-      }
-    },
-    onError: (error) => {
-      alert(`Stripe Dashboard Error: ${error.message}`);
-    },
-  });
+  const handleLogout = async () => {
+    // Remove cookies manually on the client
+    document.cookie = "session_auth1=; path=/; max-age=0";
+    document.cookie = "session_auth2=; path=/; max-age=0";
 
-  // Handler pentru click pe butonul Stripe Dashboard
-  const handleStripeDashboardClick = () => {
-    stripeDashboardLinkMutation.mutate();
+    // Redirect
+    await router.push("/login");
   };
 
-  // useEffect pentru a actualiza userStripeAccountId la primirea datelor
   useEffect(() => {
-    if (currentUser) {
-      setUserStripeAccountId(currentUser.stripeAccountId ?? null);
-    }
-  }, [currentUser, setUserStripeAccountId]);
+    const specialPages = [
+      "https://gifthub-five.vercel.app/",
+      "/",
+      "/#",
+      " http://localhost:3000/#",
+      "http://localhost:3000/",
+    ];
 
-  // useEffect pentru a gestiona erorile de la query-ul getSelf
-  useEffect(() => {
-    if (isUserQueryError && userQueryError) {
-      console.error("Failed to fetch user self data:", userQueryError.message);
-      setUserStripeAccountId(null);
-    }
-  }, [isUserQueryError, userQueryError, setUserStripeAccountId]);
+    const checkSpecialPage = () => {
+      const isSpecial = specialPages.includes(window.location.href);
+      setIsLandingPage(isSpecial);
+    };
 
-  // useEffect pentru a detecta pagina de landing, pagina activă și a reîncărca datele utilizatorului dacă e necesar
-  useEffect(() => {
-    const specialPagesHostnames = ["localhost:3000"]; // Hostname-ul tău de dev
-    const specialPaths = ["/"]; // Calea pentru landing page (root)
+    const detectActivePage = () => {
+      const url = window.location.href;
+      if (url.includes("/home")) setActivePage("home");
+      else if (url.includes("/inbox")) setActivePage("inbox");
+      else setActivePage(null);
+    };
 
-    const isCurrentlySpecial =
-      pathname !== null &&
-      specialPaths.includes(pathname) &&
-      specialPagesHostnames.includes(window.location.host);
-    
-    setIsLandingPage(isCurrentlySpecial);
+    checkSpecialPage();
+    detectActivePage();
 
-    if (isCurrentlySpecial) {
-      setUserStripeAccountId(null); // Resetează pe landing page
-    } else {
-      // Condiție pentru refetch (dacă nu e landing page)
-      if (userStripeAccountId === undefined || (currentUser === undefined && !isLoadingUser && !isUserQueryError)) {
-        if (!isCurrentlySpecial) { // Dublă verificare că nu suntem pe landing page înainte de refetch
-            refetchUser();
-        }
-      }
-    }
+    window.addEventListener("hashchange", () => {
+      checkSpecialPage();
+      detectActivePage();
+    });
 
-    // Detectează pagina activă
-    if (pathname && pathname.includes("/home")) {
-      setActivePage("home");
-    } else if (pathname && pathname.includes("/inbox")) {
-      setActivePage("inbox");
-    } else {
-      setActivePage(null);
-    }
-  }, [pathname, currentUser, isLoadingUser, isUserQueryError, userStripeAccountId, refetchUser, setIsLandingPage, setUserStripeAccountId, setActivePage]);
+    return () => {
+      window.removeEventListener("hashchange", checkSpecialPage);
+    };
+  }, []);
 
-  // useEffect pentru a închide meniurile la click în afara lor (din codul vechi)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
 
-      // Închide meniul mobil
       if (
-        !target.closest(`.${styles["nav-links"]}`) && // Dacă nu e click pe containerul linkurilor
-        !target.closest(`.${styles.hamburger}`)        // Și nici pe butonul hamburger
+        !target.closest(`.${styles["nav-links"]}`) &&
+        !target.closest(`.${styles.hamburger}`)
       ) {
         setMenuOpen(false);
       }
 
-      // Închide dropdown-ul de profil
       if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
       }
@@ -127,10 +86,7 @@ const Navbar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []); // Array de dependințe gol, se rulează o singură dată la montare
-
-  // Calcularea vizibilității butonului Stripe
-  const showStripeButton = !isLoadingUser && !!userStripeAccountId && !isLandingPage && !isUserQueryError;
+  }, []);
 
   return (
     <nav
@@ -144,14 +100,11 @@ const Navbar = () => {
 
       {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <a
-            href="http://localhost:3000/login#" // Consideră Link from next/link
-            className={styles["login-button"]}
-          >
+          <Link href="/login#" className={styles["login-button"]}>
             <FaUser />
             <FaArrowRight />
             Login
-          </a>
+          </Link>
         </div>
       ) : (
         <>
@@ -163,70 +116,54 @@ const Navbar = () => {
             <FaBars />
           </button>
 
-          {/* Overlay-ul din codul vechi, se activează când meniul e deschis */}
-          {menuOpen && <div className={styles["sidebar-overlay"]} onClick={() => setMenuOpen(false)}></div>}
+          {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 
           <ul
-            className={`${styles["nav-links"]} ${
-              menuOpen ? styles.open : ""
-            }`}
+            className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
             <li>
-              <a // Consideră Link from next/link
-                href="http://localhost:3000/home#"
-                className={activePage === "home" ? styles["nav-link-active"] : ""}
+              <Link
+                href="/home#"
+                className={
+                  activePage === "home" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaHome /> Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a // Consideră Link from next/link
-                href="http://localhost:3000/inbox#"
-                className={activePage === "inbox" ? styles["nav-link-active"] : ""}
+              <Link
+                href="/inbox#"
+                className={
+                  activePage === "inbox" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaInbox /> Inbox
-              </a>
+              </Link>
             </li>
-
-            {/* Butonul Stripe Dashboard, adăugat condiționat */}
-            {showStripeButton && (
-              <li>
-                <button
-                  onClick={handleStripeDashboardClick}
-                  className={styles["nav-button-stripe"]} // Asigură-te că ai acest stil în Navbar.module.css
-                  disabled={stripeDashboardLinkMutation.isPending}
-                  title="Access your Stripe Dashboard"
-                >
-                  <FaExternalLinkAlt />
-                  <span>Stripe Dashboard</span>
-                </button>
-              </li>
-            )}
-            
             <li
               ref={profileRef}
               className={`${styles["profile-dropdown"]} ${
                 profileOpen ? styles.open : ""
               }`}
             >
-              <a
-                href="#" // Previne navigarea default
+              <Link
+                href="#"
                 className={styles["profile-main-button"]}
                 onClick={(e) => {
-                  e.preventDefault(); // Important pentru a nu schimba URL-ul
+                  e.preventDefault();
                   setProfileOpen(!profileOpen);
                 }}
               >
                 <FaUser /> Profile
-              </a>
+              </Link>
               <div className={styles["dropdown-content"]}>
-                <a href="http://localhost:3000/profile#"> {/* Consideră Link from next/link */}
+                <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
-                </a>
-                {/* Pentru logout, probabil vrei să apelezi o funcție, nu doar un link simplu */}
-                <a href="http://localhost:3000/#"> {/* Consideră Link from next/link și funcție de logout */}
+                </Link>
+                <Link href="/#" onClick={handleLogout}>
                   <FaSignOutAlt /> Logout
-                </a>
+                </Link>
               </div>
             </li>
           </ul>
