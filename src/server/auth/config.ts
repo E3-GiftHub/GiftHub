@@ -153,7 +153,6 @@ export const authConfig: NextAuthConfig = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60 * 1,
       }
     }
   },
@@ -166,7 +165,7 @@ export const authConfig: NextAuthConfig = {
   },
   session: {
     strategy: "jwt", // Recommended strategy, especially with Credentials provider
-    // maxAge: 30 * 24 * 60 * 60, // 30 days (Optional)
+    maxAge: 60 * 60, // 30 days (Optional)
     // updateAge: 24 * 60 * 60, // 24 hours (Optional)
   },
 
