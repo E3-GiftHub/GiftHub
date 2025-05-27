@@ -18,25 +18,25 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
-const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const profileRef = useRef<HTMLLIElement>(null);
 
   const router = useRouter();
 
-useEffect(() => {
-  const checkPageAndAuth = () => {
-  const { pathname, hash } = window.location;
-  const isLanding =
-       pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
+  useEffect(() => {
+    const checkPageAndAuth = () => {
+      const { pathname, hash } = window.location;
+      const isLanding =
+        pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
 
-  setIsLandingPage(isLanding);
+      setIsLandingPage(isLanding);
 
-  const loggedIn =
-    document.cookie.includes("session_auth1") ||
-    document.cookie.includes("session_auth2");
-  setIsLoggedIn(loggedIn);
-};
+      const loggedIn =
+        document.cookie.includes("session_auth1") ||
+        document.cookie.includes("session_auth2");
+      setIsLoggedIn(loggedIn);
+    };
 
   const detectActivePage = () => {
     const url = window.location.href;
@@ -45,19 +45,18 @@ useEffect(() => {
     else setActivePage(null);
   };
 
-  checkPageAndAuth();
-  detectActivePage();
-
-  window.addEventListener("hashchange", () => {
     checkPageAndAuth();
     detectActivePage();
-  });
 
-  return () => {
-    window.removeEventListener("hashchange", checkPageAndAuth);
-  };
-}, []);
+    window.addEventListener("hashchange", () => {
+      checkPageAndAuth();
+      detectActivePage();
+    });
 
+    return () => {
+      window.removeEventListener("hashchange", checkPageAndAuth);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,11 +80,8 @@ useEffect(() => {
     };
   }, []);
 
-
-
-
   const handleLogout = async () => {
-    try{
+    try {
       document.cookie = `session_auth1=; path=/; max-age=0; ${
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
@@ -94,13 +90,14 @@ useEffect(() => {
         process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
       }`;
 
-
       window.location.href = "/";
-
-    }catch(err){
+    } catch (err) {
       console.error("Failure: ", err);
     }
   };
+
+
+
 
   return (
     <nav
@@ -109,20 +106,20 @@ useEffect(() => {
       }`}
     >
       <div className={styles["navbar-left"]}>
-       <Link href="/">
-    <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
-  </Link>
+        <Link href="/">
+          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        </Link>
       </div>
 
       {isLandingPage && !isLoggedIn ? (
-  <div className={styles["login-wrapper"]}>
-    <Link href="/login#" className={styles["login-button"]}>
-      <FaUser />
-      <FaArrowRight />
-      Login
-    </Link>
-  </div>
-) : (
+        <div className={styles["login-wrapper"]}>
+          <Link href="/login#" className={styles["login-button"]}>
+            <FaUser />
+            <FaArrowRight />
+            Login
+          </Link>
+        </div>
+      ) : (
         <>
           <button
             className={styles.hamburger}
@@ -177,11 +174,13 @@ useEffect(() => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link href="/#"
-                onClick={async (e) => {
-  e.preventDefault();
-  await handleLogout();
-}}>
+                <Link
+                  href="/#"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    await handleLogout();
+                  }}
+                >
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>
