@@ -146,7 +146,8 @@ const Navbar = () => {
                   href="/#"
                   onClick={(e) => {
                     e.preventDefault();
-                    signOut({ callbackUrl: "/" });
+                    void signOut({ callbackUrl: "/" });
+
                   }}
                 >
                   <FaSignOutAlt /> Logout
