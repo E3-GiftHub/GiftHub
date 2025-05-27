@@ -21,7 +21,7 @@ export default function TermsPage() {
       <div className={styles.features}>
         <h2>GiftHub Terms and Conditions of Use</h2>
         <p>Effective Date: 16.05.2025</p>
-        <p>Please read these Terms and Conditions of Use ("Terms") carefully before using the GiftHub platform. By creating an account or using our services, you agree to be bound by these Terms. If you do not agree, you must not access or use our services.</p>
+        <p>Please read these Terms and Conditions of Use (&quot;Terms&quot;) carefully before using the GiftHub platform. By creating an account or using our services, you agree to be bound by these Terms. If you do not agree, you must not access or use our services.</p>
       </div>
 
       <div className={styles.tech}>
@@ -70,7 +70,7 @@ export default function TermsPage() {
         <p>a. User Responsibility</p>
         <p>You are responsible for your interactions and communications with other users. GiftHub does not pre-screen all content or actions and cannot guarantee the behavior of other users. In case of disputes (e.g., regarding a gift that was not delivered), users must resolve the issue directly. However, we may offer support where appropriate.</p>
         <p>b. Platform Disclaimer</p>
-        <p>GiftHub is provided "as is" and "as available", without warranties of any kind. While we aim to offer a secure and functional experience, we do not guarantee:</p>
+        <p>GiftHub is provided &quot;as is&quot; and &quot;as available&quot;, without warranties of any kind. While we aim to offer a secure and functional experience, we do not guarantee:</p>
         <ul>
           <li>That the service will meet your needs or expectations.</li>
           <li>That it will be uninterrupted, timely, secure, or error-free.</li>
