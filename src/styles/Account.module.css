@@ -161,7 +161,6 @@
 
 .inputTitle {
   font-size: clamp(1rem, .5vw, 1.5rem);
-  /*font-size: clamp(0.85rem, 0.9vw, 0.95rem);*/
   margin-left: 0.5em;
   font-weight: 500;
 }
