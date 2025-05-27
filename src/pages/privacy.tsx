@@ -68,7 +68,7 @@ const PrivacyPolicyPage: React.FC = () => {
         <h2>5. Sharing Data with Third Parties</h2>
         <p>We adhere to the principle of data minimization and will not share your personal data with third parties unless necessary and safe. Key third parties include:</p>
         <ul>
-          <li><strong>Stripe, Inc. ("Stripe"):</strong> For payment processing and account services for event creators. As mentioned, when you create an event, you authorize us to create a Stripe Express account for you using your email. Stripe will process your financial data (such as bank account details for payouts) in accordance with their own Privacy Policy and Terms of Service. GiftHub acts as a middleman service and does not hold any of the funds that go into our platform accounts; all financial transactions related to events are handled through Stripe. The Stripe Express account created will have the ability to transfer, receive, and connect external bank accounts. We encourage you to review Stripe's policies.</li>
+          <li><strong>Stripe, Inc. (&quot;Stripe&quot;):</strong> For payment processing and account services for event creators. As mentioned, when you create an event, you authorize us to create a Stripe Express account for you using your email. Stripe will process your financial data (such as bank account details for payouts) in accordance with their own Privacy Policy and Terms of Service. GiftHub acts as a middleman service and does not hold any of the funds that go into our platform accounts; all financial transactions related to events are handled through Stripe. The Stripe Express account created will have the ability to transfer, receive, and connect external bank accounts. We encourage you to review Stripe&apos;s policies.</li>
           <li><strong>Service Providers:</strong> We may use third-party service providers for hosting, data analytics, customer support, and email delivery. These providers are contractually bound to protect your data and only use it for the purposes we specify.</li>
           <li><strong>Legal Authorities:</strong> If required by law or to protect our rights, we may disclose your information to legal authorities or in response to valid legal requests.</li>
         </ul>
@@ -81,7 +81,7 @@ const PrivacyPolicyPage: React.FC = () => {
         <ul>
           <li><strong>Right of Access:</strong> You can request confirmation that we are processing data about you and access to that data.</li>
           <li><strong>Right to Rectification:</strong> You can request correction of inaccurate or incomplete personal data.</li>
-          <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> You can request the deletion of your personal data under certain conditions.</li>
+          <li><strong>Right to Erasure (&quot;Right to be Forgotten&quot;):</strong> You can request the deletion of your personal data under certain conditions.</li>
           <li><strong>Right to Restriction of Processing:</strong> You can request that we limit the processing of your personal data under certain conditions.</li>
           <li><strong>Right to Data Portability:</strong> You can request to receive your personal data in a structured, commonly used, and machine-readable format, and to transmit it to another controller.</li>
           <li><strong>Right to Object:</strong> You can object to the processing of your personal data under certain conditions, particularly for direct marketing purposes.</li>
@@ -123,13 +123,13 @@ const PrivacyPolicyPage: React.FC = () => {
       </div>
 
       <div className={styles.features}>
-        <h2>11. Children's Privacy</h2>
+        <h2>11. Children&apos;s Privacy</h2>
         <p>GiftHub is not intended for use by individuals under the age of 16 (or a higher age if stipulated by local law for consent to data processing). We do not knowingly collect personal data from children. If we become aware that we have inadvertently collected personal data from a child, we will take steps to delete such information promptly.</p>
       </div>
 
       <div className={styles.tech}>
         <h2>12. Changes to This Privacy Policy</h2>
-        <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any significant changes by posting the new policy on our platform and updating the "Last Updated" date. We encourage you to review this Privacy Policy periodically.</p>
+        <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any significant changes by posting the new policy on our platform and updating the &quot;Last Updated&quot; date. We encourage you to review this Privacy Policy periodically.</p>
       </div>
 
       <div className={styles.features}>
