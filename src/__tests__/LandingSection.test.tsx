@@ -3,14 +3,28 @@ import { render, screen } from "@testing-library/react";
 import LandingSection from "../components/LandingSection";
 import { useRouter } from "next/router";
 
+// Mocks
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(),
+}));
+
+import { useSession } from "next-auth/react";
+
 describe("LandingSection component", () => {
   beforeEach(() => {
+    // router mock
     (useRouter as jest.Mock).mockReturnValue({
       push: jest.fn(),
+    });
+
+    // simulăm un utilizator neautentificat
+    (useSession as jest.Mock).mockReturnValue({
+      data: null,
+      status: "unauthenticated",
     });
 
     render(<LandingSection />);
@@ -26,7 +40,7 @@ describe("LandingSection component", () => {
     ).toBeInTheDocument();
   });
 
-  test("renders the SIGN UP button", () => {
+  test("renders the SIGN UP button when user is unauthenticated", () => {
     const button = screen.getByRole("button", { name: /sign up/i });
     expect(button).toBeInTheDocument();
   });

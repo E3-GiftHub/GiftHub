@@ -2,9 +2,9 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const invitesNotificationRouter = createTRPCRouter({
     getUserInvitations: publicProcedure.query(async ({ ctx }) => {
-        const userIdentifier = "user1"; // Hardcoded user for now
+        const userIdentifier = ctx.session!.user!.name!;
 
-        // Fetch invitations with status PENDING for user1
+
         const invitations = await ctx.db.invitation.findMany({
             where: {
                 guestUsername: userIdentifier,

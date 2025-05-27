@@ -14,24 +14,11 @@ export const calendarRouter = createTRPCRouter({
             const { month, year } = input;
 
 
-            /*
-            if (!ctx.session) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "You must be logged in",
-                });
-            }
-                
-
-            const currentUser = ctx.session.user;
-            const userIdentifier = currentUser.id;
-
-            */
 
             const startDate = new Date(year, month - 1, 1);
             const endDate = new Date(year, month, 0);
 
-            const userIdentifier = "user1"; 
+            const userIdentifier = ctx.session!.user!.name!;
 
             const invitations = await ctx.db.invitation.findMany({
             where: {
