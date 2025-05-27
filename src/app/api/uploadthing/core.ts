@@ -1,9 +1,12 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const f = createUploadthing();
 
-const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
+//TODO: luam username din sesiune
+const auth = (req: Request) => ({ id: "user1" }); // Fake auth function
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
@@ -34,6 +37,26 @@ export const ourFileRouter = {
       console.log("Upload complete for userId:", metadata.userId);
 
       console.log("file url", file.ufsUrl);
+
+      try {
+        await prisma.media.create({
+          data: {
+            uploaderUsername: metadata.userId,
+            //TODO: luam id event din url
+            eventId: 11,//metadata.eventId,
+            url: file.ufsUrl,
+            caption: "",
+            mediaType: file.type, 
+            fileType: file.name.split('.').pop() || "unknown",
+            fileSize: file.size,
+          },
+        });
+
+        console.log("✅ Media entry saved in DB.");
+      } catch (err) {
+        console.error("❌ Error saving media to DB:", err);
+        throw new UploadThingError("Database insert failed");
+      }
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
