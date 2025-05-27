@@ -33,7 +33,7 @@ export default function TermsPage() {
       <div className={styles.features}>
         <h2>2. Description of Service</h2>
         <p>GiftHub is a peer-to-peer digital platform that enables users to organize and coordinate gift exchanges for events and occasions. GiftHub acts solely as a mediator and does not sell or distribute products directly.</p>
-        <p>Financial transactions (such as pooled fundraising for joint gifts) are processed by third-party providers (e.g., Stripe). These transactions are subject to the third party's terms and conditions, which you must review and accept separately.</p>
+        <p>Financial transactions (such as pooled fundraising for joint gifts) are processed by third-party providers (e.g., Stripe). These transactions are subject to the third party&#39;s terms and conditions, which you must review and accept separately.</p>
       </div>
 
       <div className={styles.tech}>
@@ -50,7 +50,7 @@ export default function TermsPage() {
       </div>
 
       <div className={styles.features}>
-        <h2>4. GiftHub's Rights and Responsibilities</h2>
+        <h2>4. GiftHub&#39;s Rights and Responsibilities</h2>
         <p>GiftHub reserves the right to:</p>
         <ul>
           <li>Modify, suspend, or discontinue the platform or parts of it for maintenance, updates, or improvements. Where feasible, users will be notified in advance of planned outages.</li>
