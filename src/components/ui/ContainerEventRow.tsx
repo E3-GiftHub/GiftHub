@@ -13,8 +13,10 @@ interface ContainerEventRowProps {
 }
 
 const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
-  const eventDate: Date = eventData.date ? new Date(eventData.date) : new Date();
-  
+  const eventDate: Date = eventData.date
+    ? new Date(eventData.date)
+    : new Date();
+
   const formattedDate = eventDate.toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -22,14 +24,14 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
 
   return (
     <Link
-      href={`/event-view?id=${eventData.id}`}
+      href={`/EventView?id=${eventData.id}`}
       className={styles["event-row-wrapper"]}
     >
       <div className={styles["left-column"]}>
         <img
           className={styles.thumbnail}
-          src={eventData.photo ?? '/placeholder.jpg'}
-          alt={eventData.title ?? 'event title'}
+          src={eventData.photo ?? "/placeholder.jpg"}
+          alt={eventData.title ?? "event title"}
         />
         <p className={styles.title}>{eventData.title}</p>
       </div>
