@@ -10,6 +10,7 @@ import EventInfoForm from "../app/_components/EventInfoForm";
 import Guests from "../app/_components/Guests";
 import Media from "../app/_components/Media";
 import ConfirmModal from "../app/_components/ConfirmModal";
+import WishlistComponent from "../app/_components/Wishlist";
 
 
 import { useRouter } from "next/navigation";
@@ -117,14 +118,7 @@ export default function EventView() {
                             mediaList={mediaList}
                             onOpenModal={() => setShowMediaModal(true)}
                         />
-                        <div className={styles.wishlistBox}>
-                            <button
-                                className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                                onClick={() => router.push("/CreateWishlist")}
-                            >
-                                Create Wishlist
-                            </button>
-                        </div>
+                        <WishlistComponent />
                     </div>
                 </div>
             </div>

@@ -1,0 +1,86 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #5c3d90;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.itemRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.deleteButton {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: red;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s ease;
+    margin-bottom: 0.7rem;
+}
+
+.deleteButton:hover {
+    color: #e74c3c;
+}
+
+.input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: white;
+}
+
+.titleInput {
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}

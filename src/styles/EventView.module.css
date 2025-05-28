@@ -290,7 +290,7 @@
 
 .mediaGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 1rem;
     max-height: calc(5.9 * 3.5rem); /* aprox. 6 invitați */
     overflow-y: auto;
@@ -507,4 +507,52 @@
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
+}
+
+
+.wishlistBoxContent {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 350px;
+    color: #fff;
+    text-align: center;
+}
+
+.wishlistTitle {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.wishlistList {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    max-height: calc(4* 3.5rem);
+    overflow-y: auto;
+}
+
+.wishlistList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wishlistList::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.wishlistList li {
+    background-color: #cbb1dc;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    color: #1e1e1e;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
