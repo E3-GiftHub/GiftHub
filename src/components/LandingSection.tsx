@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./../styles/LandingSectionStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 export default function LandingSection() {
   const router = useRouter();
@@ -9,7 +10,8 @@ export default function LandingSection() {
   const handleSignUp = async () => {
     await router.push("/signup");
   }
-  
+  const { status } = useSession();
+const isLoggedOut = status === "unauthenticated";
   return (
     <div className={styles["landing-container"]}>
       <img
@@ -69,11 +71,15 @@ export default function LandingSection() {
           Your All-in-One Gifting Solution. <br />
           Gift Together. Celebrate Better.
         </p>
-        <ButtonComponent
-          text={"SIGN UP"}
-          style={ButtonStyle.PRIMARY}
-          onClick={handleSignUp}
-        />
+
+          {isLoggedOut && (
+  <ButtonComponent
+    text={"SIGN UP"}
+    style={ButtonStyle.PRIMARY}
+    onClick={handleSignUp}
+  />
+)}
+      
       </div>
     </div>
   );

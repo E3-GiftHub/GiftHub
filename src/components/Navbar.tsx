@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   FaHome,
@@ -12,50 +13,36 @@ import {
 import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const profileRef = useRef<HTMLLIElement>(null);
-
   const router = useRouter();
 
   useEffect(() => {
-    const checkPageAndAuth = () => {
+    const updatePageState = () => {
       const { pathname, hash } = window.location;
       const isLanding =
         pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
-
       setIsLandingPage(isLanding);
 
-      const loggedIn =
-        document.cookie.includes("session_auth1") ||
-        document.cookie.includes("session_auth2");
-      setIsLoggedIn(loggedIn);
-    };
-
-    const detectActivePage = () => {
       const url = window.location.href;
       if (url.includes("/home")) setActivePage("home");
       else if (url.includes("/inbox")) setActivePage("inbox");
       else setActivePage(null);
     };
 
-    checkPageAndAuth();
-    detectActivePage();
-
-    window.addEventListener("hashchange", () => {
-      checkPageAndAuth();
-      detectActivePage();
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", checkPageAndAuth);
-    };
+    updatePageState();
+    window.addEventListener("hashchange", updatePageState);
+    return () => window.removeEventListener("hashchange", updatePageState);
   }, []);
 
   useEffect(() => {
@@ -80,22 +67,6 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      document.cookie = `session_auth1=; path=/; max-age=0; ${
-        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
-      }`;
-
-      document.cookie = `session_auth2=; path=/; max-age=0; ${
-        process.env.NODE_ENV === "production" ? "secure; samesite=lax" : ""
-      }`;
-
-      window.location.href = "/";
-    } catch (err) {
-      console.error("Failure: ", err);
-    }
-  };
-
   return (
     <nav
       className={`${styles.navbar} ${
@@ -110,7 +81,7 @@ const Navbar = () => {
 
       {isLandingPage && !isLoggedIn ? (
         <div className={styles["login-wrapper"]}>
-          <Link href="/login#" className={styles["login-button"]}>
+          <Link href="/api/auth/signin" className={styles["login-button"]}>
             <FaUser />
             <FaArrowRight />
             Login
@@ -173,9 +144,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   href="/#"
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.preventDefault();
-                    await handleLogout();
+                    void signOut({ callbackUrl: "/" });
+
                   }}
                 >
                   <FaSignOutAlt /> Logout

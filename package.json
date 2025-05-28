@@ -47,6 +47,7 @@
     "superjson": "^2.2.1",
     "ts-node": "^10.9.2",
     "uploadthing": "^7.7.2",
+    "use-debounce": "^10.0.4",
     "vitest": "^3.1.4",
     "zod": "^3.24.2"
   },
