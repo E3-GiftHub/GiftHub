@@ -38,7 +38,7 @@ export default function EventView() {
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
-  const eventId = Number(idParam) || 0
+  const eventId = Number(idParam) ?? 0
 
   const parsedId = parseId(id) ?? 0;
 

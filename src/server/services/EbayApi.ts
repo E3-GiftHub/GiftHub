@@ -66,6 +66,6 @@ const res = await axios.get<EbaySearchResponse>(EBAY_BROWSE_URL, {
     },
   });
 
-return res.data.itemSummaries || [];
+return res.data.itemSummaries ?? [];
 
 }
