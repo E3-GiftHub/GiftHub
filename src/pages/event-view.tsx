@@ -30,19 +30,17 @@ function GuestListPreview({ eventId }: GuestListPreviewProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchGuests() {
+    (async () => {
       try {
         const res = await fetch(`/api/guest-list?eventId=${eventId}`);
-        const data: GuestHeader[] = await res.json();
+        const data = (await res.json()) as GuestHeader[];
         setGuests(data);
       } catch (error) {
         console.error("Failed to load guests", error);
       } finally {
         setLoading(false);
       }
-    }
-
-    fetchGuests();
+    })();
   }, [eventId]);
 
   if (loading) return <div>Loading guests...</div>;
