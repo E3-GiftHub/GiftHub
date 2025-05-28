@@ -132,8 +132,21 @@ export default function EventView() {
     );
   }
 
-  const handleRemoveMedia = (idx: number) =>
-    setMediaList((prev) => prev.filter((_, i) => i !== idx));
+const removeMediaMutation = api.media.removeMedia.useMutation();
+const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
+  eventId: parsedId,
+});
+
+const handleRemoveMedia = async (mediaId: number) => {
+  try {
+    await removeMediaMutation.mutateAsync({ mediaId });
+
+    // Refresh media list after deletion
+    mediaRefetch();
+  } catch (err) {
+    console.error("❌ Failed to remove media:", err);
+  }
+};
 
   // inline edit confirmation
   const handleKeyDown = (
@@ -196,10 +209,7 @@ export default function EventView() {
       {showMediaModal && (
         <EditMediaModal
           media={mediaData.data ?? []}
-          onRemove={(id: number) => {
-            // opțional: apelează o mutație TRPC care șterge în DB
-            // apoi reîmprospătează mediaData
-          }}
+          onRemove={handleRemoveMedia}
           onUpload={() => setShowUploadModal(true)}
           onClose={() => setShowMediaModal(false)}
         />
