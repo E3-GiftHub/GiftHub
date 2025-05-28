@@ -1,13 +1,15 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import EditMediaModal from "../components/EditMediaModal"; // ajustează calea
+import EditMediaModal from "../components/EditMediaModal"; 
 import '@testing-library/jest-dom';
+import type { ImgHTMLAttributes } from "react";
 
 jest.mock("next/image", () => {
-  const MockedImage = (props: any) => <img {...props} />;
+  const MockedImage = (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />;
   MockedImage.displayName = "MockedImage";
   return MockedImage;
 });
+
 
 describe("EditMediaModal", () => {
   const media = ["/image1.jpg", "/image2.png"];

@@ -8,7 +8,6 @@ import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
-import { UploadButton } from "~/utils/uploadthing";
 import "./../styles/globals.css";
 
 function parseId(param: string | string[] | undefined): number | null {
@@ -35,7 +34,6 @@ export default function EventView() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [showUploadButton, setShowUploadButton] = useState(false);
 
   const parsedId = parseId(id) ?? 0;
 
@@ -70,7 +68,7 @@ export default function EventView() {
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
-    if (name && name.trim()) {
+   if (name?.trim()){
       setGuestList((prev) => [...prev, name.trim()]);
     }
   };
