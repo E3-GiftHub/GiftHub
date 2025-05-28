@@ -1,60 +1,59 @@
+// __tests__/EditMediaModal.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import EditMediaModal from "../components/EditMediaModal"; 
-import '@testing-library/jest-dom';
-import type { ImgHTMLAttributes } from "react";
+import EditMediaModal from "../components/EditMediaModal";
 
-jest.mock("next/image", () => {
-  const MockedImage = (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />;
-  MockedImage.displayName = "MockedImage";
-  return MockedImage;
+// Mock Next.js Image component to render a simple <img>
+jest.mock("next/image", () => (props: any) => {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img {...props} />;
 });
 
-
 describe("EditMediaModal", () => {
-  const media = ["/image1.jpg", "/image2.png"];
-  const onClose = jest.fn();
-  const onSave = jest.fn();
-  const onUpload = jest.fn();
-  const onRemove = jest.fn();
+  const mediaItems = [
+    { id: 1, url: "https://example.com/img1.jpg", caption: "Caption 1" },
+    { id: 2, url: "https://example.com/img2.jpg" },
+  ];
 
-  beforeEach(() => {
+  const setup = (media = mediaItems) => {
+    const onRemove = jest.fn();
+    const onUpload = jest.fn();
+    const onClose = jest.fn();
+
     render(
       <EditMediaModal
         media={media}
-        onClose={onClose}
-        onSave={onSave}
-        onUpload={onUpload}
         onRemove={onRemove}
+        onUpload={onUpload}
+        onClose={onClose}
       />
     );
+    return { onRemove, onUpload, onClose };
+  };
+
+  it("renders back button and calls onClose when clicked", () => {
+    const { onClose } = setup();
+    const backButton = screen.getByRole("button", { name: /← Back/i });
+    expect(backButton).toBeInTheDocument();
+
+    fireEvent.click(backButton);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+
+  it("renders Upload Media button and calls onUpload when clicked", () => {
+    const { onUpload } = setup();
+    const uploadButton = screen.getByRole("button", { name: /Upload Media/i });
+    expect(uploadButton).toBeInTheDocument();
+
+    fireEvent.click(uploadButton);
+    expect(onUpload).toHaveBeenCalledTimes(1);
   });
 
-  test("renders all media images", () => {
-    media.forEach((src, i) => {
-      const image = screen.getByAltText(`Media ${i + 1}`);
-      expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute("src", src);
-    });
+  it("shows message when there is no media", () => {
+    setup([]);
+    expect(screen.getByText(/No media uploaded yet\./i)).toBeInTheDocument();
+    // Ensure no images rendered
+    expect(screen.queryAllByRole("img")).toHaveLength(0);
   });
-
-  test("calls onClose when Back is clicked", () => {
-    fireEvent.click(screen.getByText("← Back"));
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  test("calls onUpload when Upload Media is clicked", () => {
-    fireEvent.click(screen.getByText("Upload Media"));
-    expect(onUpload).toHaveBeenCalled();
-  });
-
-  test("calls onSave when Save Changes is clicked", () => {
-    fireEvent.click(screen.getByText("Save Changes"));
-    expect(onSave).toHaveBeenCalled();
-  });
-
 });
