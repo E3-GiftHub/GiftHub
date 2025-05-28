@@ -56,7 +56,7 @@ export class ContributionService {
       contributorUsername: contribution.contributorUsername,
       eventId: contribution.eventId.toString(),
       articleId: contribution.articleId.toString(),
-      amount: contribution.cashAmount?.toNumber() || 0,
+      amount: contribution.cashAmount?.toNumber() ?? 0,
       createdAt: contribution.createdAt,
       message,
     };
@@ -85,7 +85,7 @@ export class ContributionService {
 
     // Calculate total contributed amount
     const totalContributed = contributions.reduce((total, contrib) => {
-      return total + (contrib.cashAmount?.toNumber() || 0);
+      return total + (contrib.cashAmount?.toNumber() ?? 0);
     }, 0);
 
     // Fetch the item
@@ -110,7 +110,7 @@ export class ContributionService {
     }
 
     // todo change this
-    const totalPrice = (item.price?.toNumber() || 0) * 1;
+    const totalPrice = (item.price?.toNumber() ?? 0) * 1;
     const isFulfilled = totalContributed >= totalPrice;
 
     // Update the event item fulfillment status if needed
@@ -200,7 +200,7 @@ export class ContributionService {
       id: contribution.id.toString(),
       contributorUsername: contribution.contributorUsername,
       contributorName:
-        `${contribution.guest.fname ?? ""} ${contribution.guest.lname || ""}`.trim(),
+        `${contribution.guest.fname ?? ""} ${contribution.guest.lname ?? ""}`.trim(),
       contributorPicture: contribution.guest.pictureUrl,
       amount: contribution.cashAmount?.toNumber() ?? 0,
       createdAt: contribution.createdAt,

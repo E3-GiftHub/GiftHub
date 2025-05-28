@@ -8,7 +8,7 @@ export const invitationViaLinkRouter = createTRPCRouter({
   createLink: publicProcedure
     .input(z.object({ eventId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.session || !ctx.session.user)
+    if (!ctx.session?.user)
         throw new TRPCError({ code: "UNAUTHORIZED" });
 
       const existing = await prisma.event.findUnique({
