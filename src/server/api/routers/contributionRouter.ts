@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { ContributionService } from "~/server/services/ContributionService";
+import { TRPCError } from "@trpc/server";
 
 export const contributionRouter = createTRPCRouter({
   createContribution: protectedProcedure
