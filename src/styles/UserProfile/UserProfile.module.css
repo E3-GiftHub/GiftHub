@@ -16,7 +16,7 @@
     max-height: 1000px;
     max-width: 1300px;
     background-color: #1d1949;
-    background-image: url('public/UserImages/Containers/Container.svg');
+    background-image: url('/UserImages/Containers/Container.svg');
     background-size: cover;
     border-radius: 10px;
     overflow: hidden;
@@ -39,7 +39,7 @@
     width: clamp(300px, 24vw, 500px);
     height: clamp(300px, 24vw, 500px);
     border-radius: 50%;
-    background: #2e275f url('public/UserImages/default_pfp.svg') center/contain;
+    background: #2e275f url('/UserImages/default_pfp.svg') center/contain;
     box-shadow: #000000 0 1px 20px -5px;
     position: relative;
 }
@@ -61,7 +61,7 @@
     width: 3.5em;
     height: 3.5em;
     border-radius: 50%;
-    background: url('public/UserImages/buttons/change_pfp.svg') center/contain;
+    background: url('/UserImages/buttons/change_pfp.svg') center/contain;
     border: none;
     cursor: pointer;
     transform: translate(30%, 30%);
@@ -163,6 +163,7 @@
     font-weight: 400;
     transition: transform 0.1s ease;
     background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+    cursor: pointer;
 }
 
 .button:hover {
