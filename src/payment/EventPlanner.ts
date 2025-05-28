@@ -1,10 +1,8 @@
 import { db as prisma } from "~/server/db";
 import { EventEntity } from "./Event";
-import { InvitationEntity } from "./Invitation";
 import { EventManagementException } from "./EventManagementException";
-import { Status } from "@prisma/client"
+import { StatusType, User } from "@prisma/client";
 import { stripe } from "~/server/stripe";
-
 
 export class EventPlanner {
   async createEvent(data: {
@@ -17,89 +15,110 @@ export class EventPlanner {
   }): Promise<EventEntity> {
     const user = await prisma.user.findUnique({
       where: { username: data.createdBy },
-    })
+    });
 
-    if (!user.stripeAccountId) {
-      const accountObject = await stripe.accounts.create(
-          {
-            type: 'express',
-            country: 'RO',
-            email: user.email,
-
-            capabilities: {
-              card_payments: { requested: true },
-              transfers: { requested: true },
-            },
-          }
+    if (!user) {
+      throw new EventManagementException(
+        `User with username '${data.createdBy}' not found.`
       );
-
-      user = await prisma.user.update({
-        where: { username: user.username },
-        data:  { stripeAccountId: accountObject.id },
-      })
     }
 
-    const event = await prisma.event.create({
+    let userWithStripe: User = user;
+
+    if (!userWithStripe.stripeConnectId) {
+      const userEmailForStripe = userWithStripe.email ? userWithStripe.email : undefined;
+
+      const accountObject = await stripe.accounts.create({
+        type: "express",
+        country: "RO",
+        email: userEmailForStripe,
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+      });
+
+      userWithStripe = await prisma.user.update({
+        where: { username: userWithStripe.username },
+        data: { stripeConnectId: accountObject.id },
+      });
+    }
+
+    const eventRecord = await prisma.event.create({
       data: {
         title: data.title,
         description: data.description,
         location: data.location,
         date: data.date,
         time: data.time,
-        createdBy: data.createdBy,
+        createdByUsername: data.createdBy,
       },
     });
 
-    return new EventEntity(event);
+    return new EventEntity(eventRecord);
   }
 
-  async removeEvent(eventId: bigint): Promise<void> {
+  async removeEvent(eventId: number): Promise<void> {
     await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: bigint, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({ where: { id: guestId } });
-    if (!exists) throw new EventManagementException("Guest does not exist");
+  async sendInvitation(eventId: number, guestUsername: string): Promise<void> {
+    const guestExists = await prisma.user.findUnique({
+      where: { username: guestUsername },
+    });
+
+    if (!guestExists) {
+      throw new EventManagementException(
+        `Guest with username '${guestUsername}' does not exist.`
+      );
+    }
+
+    const eventExists = await prisma.event.findUnique({
+        where: { id: eventId }
+    });
+
+    if (!eventExists) {
+        throw new EventManagementException(`Event with ID ${eventId} does not exist.`);
+    }
 
     await prisma.invitation.create({
       data: {
         eventId: eventId,
-        guestId: guestId,
+        guestUsername: guestUsername,
         status: Status.PENDING,
-        createdAt: new Date(),
       },
     });
   }
 
-  async manageWishlist(eventId: bigint) {
-    const wishlist = await prisma.eventItem.findMany({
+  async manageWishlist(eventId: number) {
+    const wishlist = await prisma.EventArticle.findMany({
       where: { eventId: eventId },
       include: { item: true },
     });
     return wishlist;
   }
 
-  async viewAnalytics(eventId: bigint) {
-    const inviteCount = await prisma.invitation.count({ where: { eventId: eventId } });
-    const accepted = await prisma.invitation.count({
-      where: { eventId: eventId, status: Status.ACCEPTED },
+  async viewAnalytics(eventId: number) {
+    const inviteCount = await prisma.invitation.count({
+      where: { eventId: eventId },
     });
-    const declined = await prisma.invitation.count({
-      where: { eventId: eventId, status: Status.REJECTED },
+    const acceptedCount = await prisma.invitation.count({
+      where: { eventId: eventId, status: Status.ACCEPTED },
     });
 
     return {
       inviteCount,
-      accepted,
-      declined,
+      accepted: acceptedCount,
     };
   }
 
-  async manageGallery(eventId: bigint) {
+  async manageGallery(eventId: number) {
     return await prisma.media.findMany({ where: { eventId: eventId } });
   }
 
-  async receiveContribution(eventId: bigint) {
-    return await prisma.contribution.findMany({ where: { eventId: eventId } });
+  async receiveContribution(eventId: number) {
+    return await prisma.contribution.findMany({
+      where: { eventId: eventId },
+    });
   }
 }

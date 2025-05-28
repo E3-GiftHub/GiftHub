@@ -1,7 +1,5 @@
-// app/api/payment/progress/route.ts (sau calea ta specifică)
-
-import { db } from "@/server/db"; // Clientul tău Prisma
-import { NextRequest, NextResponse } from "next/server"; // Folosim NextRequest pentru acces facil la URL
+import { db } from "@/server/db";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,6 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const eventId = parseInt(eventIdString, 10);
+
     if (isNaN(eventId)) {
       return NextResponse.json(
         { message: "eventId trebuie să fie un număr întreg valid." },
@@ -23,30 +22,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // --- CALCULAREA TOTALULUI PENTRU eventId SPECIFIC ---
     const totalAggregation = await db.contribution.aggregate({
       _sum: {
         cashAmount: true,
       },
       where: {
-        eventId: eventId, // Filtrează contribuțiile pentru eventId-ul specificat
+        eventId: eventId,
       },
     });
 
-    // Convertește Decimal în Number sau 0 dacă nu există contribuții
     const total = totalAggregation._sum.cashAmount
       ? Number(totalAggregation._sum.cashAmount)
       : 0;
 
-    // --- CALCULAREA GOAL-ULUI PENTRU eventId SPECIFIC ---
     const eventArticles = await db.eventArticle.findMany({
       where: {
-        eventId: eventId, // Găsește articolele pentru eventId-ul specificat
+        eventId: eventId,
       },
       include: {
-        item: { // 'item' este numele relației către ItemCatalogue în modelul EventArticle
+        item: {
           select: {
-            price: true, // Selectează doar câmpul 'price' din ItemCatalogue
+            price: true,
           },
         },
       },
@@ -55,13 +51,11 @@ export async function GET(request: NextRequest) {
     let calculatedGoal = 0;
     if (eventArticles) {
       for (const article of eventArticles) {
-        // Verifică dacă articolul, prețul și cantitatea solicitată sunt definite
         if (
           article.item &&
-          article.item.price != null && // Prețul poate fi Decimal? deci verificăm null
-          article.quantityRequested != null // Cantitatea poate fi Int? deci verificăm null
+          article.item.price != null &&
+          article.quantityRequested != null
         ) {
-          // Prisma returnează Decimal ca un tip special; convertim la Number pentru calcule
           calculatedGoal += Number(article.quantityRequested) * Number(article.item.price);
         }
       }
@@ -74,11 +68,14 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     const eventIdForError = request.nextUrl.searchParams.get("eventId") || "necunoscut";
-    console.error(`Eroare la preluarea progresului pentru eventId ${eventIdForError}:`, error);
+    console.error(
+      `Eroare server în /api/payment/progress pentru eventId '${eventIdForError}':`, 
+      error
+    );
     
-    const errorMessage = error instanceof Error ? error.message : "A apărut o eroare necunoscută.";
+    const errorMessage = error instanceof Error ? error.message : "A apărut o eroare server necunoscută.";
     return NextResponse.json(
-      { message: "A eșuat preluarea progresului plății.", error: errorMessage },
+      { message: "A eșuat preluarea progresului plății din cauza unei erori pe server.", error: errorMessage },
       { status: 500 }
     );
   }

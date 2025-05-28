@@ -15,12 +15,50 @@ if (!ctx.session) {
 
 
     // alegem userul care participa la evenimentul cel mai recent
+    const mostRecentEvent = await ctx.db.event.findFirst({
+      orderBy: { date: "desc" },
+      include: {
+        invitations: true,
+      }
+    });
+
+    if (!mostRecentEvent) {
+      return [];
+    }
+
+    let userIdentifier = mostRecentEvent.createdByUsername;
+
+    const acceptedInvitation = mostRecentEvent.invitations.find(
+        inv => inv.status === "ACCEPTED"
+    );
+
+    if (acceptedInvitation) {
+      userIdentifier = acceptedInvitation.guestUsername;
+    }
+
+    if (!userIdentifier) {
+      return [];
+    }
+
     const today = new Date();
+
+    ///////
 
     const userEvents = await ctx.db.event.findMany({
       where: {
-        createdByUsername: "user1",
-        date: { gte: today },
+        OR: [
+          { createdByUsername: userIdentifier },
+          {
+            invitations: {
+              some: {
+                guestUsername: userIdentifier,
+                status: "ACCEPTED"
+              }
+            }
+          }
+        ],
+        NOT: { id: mostRecentEvent.id },
+        date: { gte: today }
       },
       orderBy: { date: "asc" },
       select: {

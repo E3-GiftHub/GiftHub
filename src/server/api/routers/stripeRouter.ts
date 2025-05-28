@@ -1,43 +1,53 @@
 // src/server/api/routers/stripeRouter.ts
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc"; // Asigură-te că publicProcedure este importat dacă păstrezi helloStripe
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { stripe } from "../../stripe"; // Calea către instanța ta Stripe SDK
+import { stripe } from "../../stripe";
 import { TRPCError } from "@trpc/server";
-import Stripe from "stripe"; // Tipurile Stripe
+import Stripe from "stripe";
 
 export const stripeRouter = createTRPCRouter({
-  // Procedura ta existentă createExpressAccount
   createExpressAccount: protectedProcedure
     .input(z.object({
       country: z.string(),
       email: z.string().email(),
     }))
     .mutation(async ({ input, ctx }) => {
-      // Logica ta originală pentru createExpressAccount
+      // Presupunem că ctx.session.user.id conține username-ul utilizatorului,
+      // deoarece 'username' este @id în modelul User.
+      if (!ctx.session.user.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "User identifier not found in session." });
+      }
+      const userIdentifier = ctx.session.user.id;
+
       const account = await stripe.accounts.create({
         type: "express",
         country: input.country,
         email: input.email,
-        metadata: { userId: ctx.session.user.id }, // Presupunând că ctx.session.user.id este câmpul corect
+        metadata: { userId: userIdentifier }, // userId în metadata Stripe este OK, valoarea este username-ul
         capabilities: {
           card_payments: { requested: true },
           transfers: { requested: true },
         },
       });
+
       await ctx.db.user.update({
-        where: { id: ctx.session.user.id }, // Presupunând că ctx.session.user.id este câmpul corect
-        data: { stripeAccountId: account.id },
+        where: { username: userIdentifier }, // Corectat: id -> username
+        data: { stripeConnectId: account.id }, // Corectat: stripeAccountId -> stripeConnectId
       });
       return { accountId: account.id };
     }),
 
-  // ✨ VERSIUNEA ORIGINALĂ COMPLETĂ a createDashboardLoginLink ✨
   createDashboardLoginLink: protectedProcedure
     .mutation(async ({ ctx }) => {
-      const userId = ctx.session.user.id; // protectedProcedure asigură că session.user.id există
+      // Presupunem că ctx.session.user.id conține username-ul utilizatorului.
+      if (!ctx.session.user.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "User identifier not found in session." });
+      }
+      const userIdentifier = ctx.session.user.id;
 
       const user = await ctx.db.user.findUnique({
-        where: { id: userId }, // Presupunând că ctx.session.user.id este câmpul corect
+        where: { username: userIdentifier }, // Corectat: id -> username
+        select: { stripeConnectId: true }, // Selectăm doar câmpul necesar
       });
 
       if (!user) {
@@ -47,7 +57,7 @@ export const stripeRouter = createTRPCRouter({
         });
       }
 
-      if (!user.stripeAccountId) {
+      if (!user.stripeConnectId) { // Corectat: stripeAccountId -> stripeConnectId
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
           message: "Stripe account not configured for this user.",
@@ -56,7 +66,7 @@ export const stripeRouter = createTRPCRouter({
 
       try {
         const loginLink = await stripe.accounts.createLoginLink(
-          user.stripeAccountId
+          user.stripeConnectId // Corectat: stripeAccountId -> stripeConnectId
         );
         return { url: loginLink.url };
       } catch (error) {
@@ -75,7 +85,6 @@ export const stripeRouter = createTRPCRouter({
       }
     }),
 
-  // Procedura de test helloStripe (o poți șterge dacă nu mai este necesară)
   helloStripe: publicProcedure.query(() => {
     console.log(">>> [TEST] Backend: stripeRouter.helloStripe a fost apelat!");
     return "Mesaj de test din helloStripe!";
