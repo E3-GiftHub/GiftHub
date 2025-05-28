@@ -140,7 +140,7 @@ const handleRemoveMedia = async (mediaId: number) => {
     await removeMediaMutation.mutateAsync({ mediaId });
 
     // Refresh media list after deletion
-    mediaRefetch();
+    await mediaRefetch();
   } catch (err) {
     console.error("❌ Failed to remove media:", err);
   }
