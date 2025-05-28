@@ -1,5 +1,6 @@
 import { api } from "~/trpc/react";
 import styles from "../styles/invitationcard.module.css";
+import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
 
 const EVENT_ID = 13;
@@ -20,16 +21,16 @@ export default function InvitationCard({
 
   const handleAccept = () => {
     acceptInvitation.mutate({ eventId, guestUsername });
+    console.log("ACCEPTAT!!!");
     onAccept?.();
   };
 
-  const handleDecline = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const handleDecline = () => {
+    console.log("RESPINS!!!");
     onDecline?.();
   };
 
-  const handleAcceptClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const handleAcceptClick = () => {
     handleAccept();
   };
 
@@ -64,18 +65,16 @@ export default function InvitationCard({
               </p>
             </div>
             <div className={styles.actions}>
-              <button
-                className={`${styles.button} ${styles.declineButton}`}
+              <ButtonComponent
+                text="Decline invite"
+                style={ButtonStyle.PRIMARY}
                 onClick={handleDecline}
-              >
-                Decline invite
-              </button>
-              <button
-                className={`${styles.button} ${styles.acceptButton}`}
+              />
+              <ButtonComponent
+                text="Accept invite"
+                style={ButtonStyle.PRIMARY}
                 onClick={handleAcceptClick}
-              >
-                Accept invite
-              </button>
+              />
             </div>
           </div>
         </div>
