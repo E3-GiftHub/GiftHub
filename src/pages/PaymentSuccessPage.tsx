@@ -1,10 +1,10 @@
-'use client';
-import React from 'react';
-import styles from '../assets/Payment.module.css';
+"use client";
+import React from "react";
+import styles from "../styles/Payment.module.css";
 
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import '../app/globals.css';
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import "../app/globals.css";
 
 interface SVGIconProps {
   className?: string;
@@ -25,7 +25,7 @@ const SuccessIcon: React.FC<SVGIconProps> = ({ className, style }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className || styles.icon}
-    style={style || { color: '#4CAF50' }}
+    style={style || { color: "#4CAF50" }}
   >
     <circle cx="12" cy="12" r="10" />
     <polyline points="9 12 12 15 17 10" />
@@ -36,7 +36,9 @@ interface PaymentSuccessPageProps {
   orderId?: string;
 }
 
-const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({ orderId = "N/A" }) => {
+const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({
+  orderId = "N/A",
+}) => {
   const handleViewOrder = (): void => {
     console.log("Navigating to order details...");
   };
@@ -56,10 +58,18 @@ const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({ orderId = "N/A"
           </div>
           <h2 className={styles.failureMessage}>Payment Successful</h2>
 
-          <p style={{ textAlign: 'center', margin: '20px 0', fontSize: '1.1rem' }}>
-            Your payment for order <span className={styles.orderId}>#{orderId}</span> was processed successfully.
+          <p
+            style={{
+              textAlign: "center",
+              margin: "20px 0",
+              fontSize: "1.1rem",
+            }}
+          >
+            Your payment for order{" "}
+            <span className={styles.orderId}>#{orderId}</span> was processed
+            successfully.
           </p>
-          <p style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <p style={{ textAlign: "center", marginBottom: "30px" }}>
             You can now view your order details or return to the homepage.
           </p>
 
