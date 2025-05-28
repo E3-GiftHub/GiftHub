@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
 import Footer from "../components/Footer";
 import "./../styles/globals.css";
-import { Prisma, PrismaClient, StatusType } from "@prisma/client";
 import { type GuestHeader } from "~/models/GuestHeader";
 
 function parseId(param: string | string[] | undefined): number | null {
@@ -22,7 +21,11 @@ function parseId(param: string | string[] | undefined): number | null {
   return null; // ignore arrays or undefined
 }
 
-function GuestListPreview({ eventId }: { eventId: number }) {
+interface GuestListPreviewProps {
+  eventId: number;
+}
+
+function GuestListPreview({ eventId }: GuestListPreviewProps) {
   const [guests, setGuests] = useState<GuestHeader[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,17 +48,13 @@ function GuestListPreview({ eventId }: { eventId: number }) {
   if (loading) return <div>Loading guests...</div>;
 
   return (
-    <div className="guestList">
-      {guests.map((guest, index) => (
-        <div className="guestItem" key={index}>
-          <img src={guest.pictureUrl ?? "/default-avatar.png"} />
-          <div>
-            <strong>
-              {guest.fname} {guest.lname}
-            </strong>{" "}
-            <br />
-            <small>{guest.email}</small>
-          </div>
+    <div className={styles.guestList}>
+      {guests.map((guest) => (
+        <div className={styles.guestItem} key={guest.username}>
+          <p>{guest.username}</p>
+          <p>{guest.fname}</p>
+          <p>{guest.lname}</p>
+          <img src={guest.pictureUrl ?? ""} alt="user visual description" />
         </div>
       ))}
     </div>
@@ -116,6 +115,10 @@ export default function EventView() {
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
+  const removeMediaMutation = api.media.removeMedia.useMutation();
+  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
+    eventId: parsedId,
+  });
 
   useEffect(() => {
     if (eventData?.date) {
@@ -162,16 +165,16 @@ export default function EventView() {
     );
   }
 
-  const handleRemoveMedia = (idx: number) =>
-    setMediaList((prev) => prev.filter((_, i) => i !== idx));
+  const handleRemoveMedia = async (mediaId: number) => {
+    try {
+      await removeMediaMutation.mutateAsync({ mediaId });
 
-  const handleUploadMedia = () =>
-    setMediaList((prev) => [
-      ...prev,
-      `/placeholder/image${prev.length + 1}.jpg`,
-    ]);
-
-  const handleSaveMedia = () => setShowMediaModal(false);
+      // Refresh media list after deletion
+      await mediaRefetch();
+    } catch (err) {
+      console.error("❌ Failed to remove media:", err);
+    }
+  };
 
   // inline edit confirmation
   const handleKeyDown = (
@@ -233,10 +236,9 @@ export default function EventView() {
 
       {showMediaModal && (
         <EditMediaModal
-          media={mediaList}
+          media={mediaData.data ?? []}
           onRemove={handleRemoveMedia}
           onUpload={() => setShowUploadModal(true)}
-          onSave={handleSaveMedia}
           onClose={() => setShowMediaModal(false)}
         />
       )}
@@ -345,12 +347,12 @@ export default function EventView() {
               />
             </div>
           </div>
-          {/*todo delete this hardcode*/
-          /* Rand: Lista de invitați + buton + wishlist */}
+
+          {/* todo harcode!Rand: Lista de invitați + buton + wishlist */}
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              {GuestListPreview(12)}
+              <GuestListPreview eventId={eventId} />
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}
