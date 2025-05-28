@@ -40,7 +40,9 @@ function GuestListPreview({ eventId }: GuestListPreviewProps) {
       } finally {
         setLoading(false);
       }
-    })();
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
   }, [eventId]);
 
   if (loading) return <div>Loading guests...</div>;
