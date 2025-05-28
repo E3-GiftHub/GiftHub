@@ -45,7 +45,11 @@ describe("AddToWishlistModal", () => {
 
   test("calls onAddToWishlist with correct values", () => {
   render(<AddToWishlistModal {...defaultProps} />);
-  const quantityInput = screen.getByLabelText("Quantity:") as HTMLInputElement;
+const el = screen.getByLabelText("Quantity:");
+if (!(el instanceof HTMLInputElement)) {
+  throw new Error("Expected input element");
+}
+const quantityInput = el;
 
   fireEvent.change(quantityInput, { target: { value: "3" } });
   fireEvent.click(screen.getByRole("button", { name: "Add to Wishlist" }));

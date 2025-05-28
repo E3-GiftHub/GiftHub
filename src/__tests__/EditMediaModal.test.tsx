@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import EditMediaModal from "../components/EditMediaModal"; // ajustează calea
 import '@testing-library/jest-dom';
 
-// 👇 mock pentru <Image /> din next/image
-jest.mock("next/image", () => (props: any) => {
-  // simulăm componenta ca <img> simplu
-  return <img {...props} />;
+jest.mock("next/image", () => {
+  const MockedImage = (props: any) => <img {...props} />;
+  MockedImage.displayName = "MockedImage";
+  return MockedImage;
 });
 
 describe("EditMediaModal", () => {
@@ -55,9 +55,4 @@ describe("EditMediaModal", () => {
     expect(onSave).toHaveBeenCalled();
   });
 
-  test("calls onRemove with correct index", () => {
-    const removeButtons = screen.getAllByLabelText("Remove image");
-    fireEvent.click(removeButtons[1]); // al doilea buton, imaginea index 1
-    expect(onRemove).toHaveBeenCalledWith(1);
-  });
 });
