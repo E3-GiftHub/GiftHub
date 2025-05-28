@@ -1,12 +1,27 @@
-// __tests__/EditMediaModal.test.tsx
+// src/__tests__/EditMediaModal.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import EditMediaModal from "../components/EditMediaModal";
 
-// Mock Next.js Image component to render a simple <img>
-jest.mock("next/image", () => (props: any) => {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img {...props} />;
+// Mock Next.js Image with a named functional component
+jest.mock("next/image", () => {
+  type ImageProps = {
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  };
+
+  const MockImage: React.FC<ImageProps> = ({ src, alt, ...rest }) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={src} alt={alt} {...rest} />;
+  };
+  MockImage.displayName = "MockImage";
+
+  return {
+    __esModule: true,
+    default: MockImage,
+  };
 });
 
 describe("EditMediaModal", () => {
@@ -40,7 +55,6 @@ describe("EditMediaModal", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-
   it("renders Upload Media button and calls onUpload when clicked", () => {
     const { onUpload } = setup();
     const uploadButton = screen.getByRole("button", { name: /Upload Media/i });
@@ -53,7 +67,6 @@ describe("EditMediaModal", () => {
   it("shows message when there is no media", () => {
     setup([]);
     expect(screen.getByText(/No media uploaded yet\./i)).toBeInTheDocument();
-    // Ensure no images rendered
     expect(screen.queryAllByRole("img")).toHaveLength(0);
   });
 });
