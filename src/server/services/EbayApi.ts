@@ -6,7 +6,27 @@ const EBAY_BROWSE_URL = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary
 
 const CLIENT_ID = process.env.EBAY_APP_ID!;
 const CLIENT_SECRET = process.env.EBAY_SECRET!;
+interface EbayAuthResponse {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+}
+interface EbayItem {
+  title: string;
+  price?: {
+    value: string;
+    currency: string;
+  };
+  itemId: string;
+  image?: {
+    imageUrl: string;
+  };
+  itemWebUrl: string;
+}
 
+interface EbaySearchResponse {
+  itemSummaries?: EbayItem[];
+}
 function getBasicAuthHeader(): string {
   const raw = `${CLIENT_ID}:${CLIENT_SECRET}`;
   return Buffer.from(raw).toString("base64");
@@ -23,7 +43,8 @@ async function getAccessToken(): Promise<string> {
     scope: "https://api.ebay.com/oauth/api_scope",
   });
 
-  const res = await axios.post(EBAY_OAUTH_URL, body, { headers });
+const res = await axios.post<EbayAuthResponse>(EBAY_OAUTH_URL, body, { headers });
+
   console.log("response status: ", res.statusText);
   return res.data.access_token;
 }
@@ -37,7 +58,7 @@ export async function searchEbayProducts(query: string) {
     "Content-Type": "application/json",
   };
 
-  const res = await axios.get(EBAY_BROWSE_URL, {
+const res = await axios.get<EbaySearchResponse>(EBAY_BROWSE_URL, {
     headers,
     params: {
       q: query,
@@ -45,5 +66,6 @@ export async function searchEbayProducts(query: string) {
     },
   });
 
-  return res.data.itemSummaries || [];
+return res.data.itemSummaries || [];
+
 }

@@ -9,6 +9,7 @@ import EditMediaModal from "../components/EditMediaModal";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
+import Footer from "../components/Footer";
 import "./../styles/globals.css";
 
 function parseId(param: string | string[] | undefined): number | null {
@@ -34,8 +35,10 @@ function GuestListPreview(guestNames: string[]) {
 export default function EventView() {
   const router = useRouter();
   const { id } = router.query;
-
-  const [showUploadButton, setShowUploadButton] = useState(false);
+  const idParam = Array.isArray(router.query.id)
+    ? router.query.id[0]
+    : router.query.id;
+  const eventId = Number(idParam) || 0
 
   const parsedId = parseId(id) ?? 0;
 
@@ -70,7 +73,7 @@ export default function EventView() {
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
-    if (name && name.trim()) {
+   if (name?.trim()){
       setGuestList((prev) => [...prev, name.trim()]);
     }
   };
@@ -78,6 +81,8 @@ export default function EventView() {
 
   // Media list state
   const [showMediaModal, setShowMediaModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const mediaData = api.media.getMediaByEvent.useQuery({ eventId: parsedId });
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
@@ -200,11 +205,40 @@ export default function EventView() {
         <EditMediaModal
           media={mediaList}
           onRemove={handleRemoveMedia}
-          onUpload={handleUploadMedia}
+          onUpload={() => setShowUploadModal(true)}
           onSave={handleSaveMedia}
           onClose={() => setShowMediaModal(false)}
         />
       )}
+
+      {showUploadModal && (
+        <div className={styles.modalBackdrop}>
+          <div className={styles.modal}>
+            <h3 className={styles.modalTitle}>Upload Media</h3>
+            <UploadButton
+              endpoint="imageUploader"
+              input={{ eventId }}            
+              onClientUploadComplete={(res) => {
+                console.log("Files:", res);
+                alert("Upload completed");
+                setShowUploadModal(false);
+              }}
+              onUploadError={(err: Error) => {
+                alert(`Error: ${err.message}`);
+              }}
+            />
+
+            <button
+              className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+              onClick={() => setShowUploadModal(false)}
+              style={{ marginTop: "1rem" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
 
       <div className={styles.container}>
         <div className={styles.header}>
@@ -298,14 +332,11 @@ export default function EventView() {
             <div className={styles.mediaGallery}>
               <label className={styles.label2}>Media Gallery</label>
               <div className={styles.mediaGrid}>
-                {Array.from({ length: 20 }, (_, i) => (
-                  <div key={i} className={styles.mediaItem}>
-                    <img
-                      src={`/placeholder/image${i + 1}.jpg`}
-                      alt={`Media ${i + 1}`}
-                    />
+                {mediaData.data?.map((mediaItem) => (
+                  <div key={mediaItem.id} className={styles.mediaItem}>
+                    <img src={mediaItem.url} alt={"Media photo"} />
                   </div>
-                ))}
+                )) || <p>Loading media...</p>}
               </div>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}
@@ -324,6 +355,8 @@ export default function EventView() {
           </div>
         </div>
       </div>
+
+    <Footer />
     </div>
   );
 }
