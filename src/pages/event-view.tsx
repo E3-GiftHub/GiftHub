@@ -11,6 +11,8 @@ import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
 import Footer from "../components/Footer";
 import "./../styles/globals.css";
+import { Prisma, PrismaClient, StatusType } from "@prisma/client";
+import { type GuestHeader } from "~/models/GuestHeader";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -20,12 +22,40 @@ function parseId(param: string | string[] | undefined): number | null {
   return null; // ignore arrays or undefined
 }
 
-function GuestListPreview(guestNames: string[]) {
+function GuestListPreview({ eventId }: { eventId: number }) {
+  const [guests, setGuests] = useState<GuestHeader[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGuests() {
+      try {
+        const res = await fetch(`/api/guest-list?eventId=${eventId}`);
+        const data: GuestHeader[] = await res.json();
+        setGuests(data);
+      } catch (error) {
+        console.error("Failed to load guests", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchGuests();
+  }, [eventId]);
+
+  if (loading) return <div>Loading guests...</div>;
+
   return (
-    <div className={styles.guestList}>
-      {guestNames.map((guest, index) => (
-        <div className={styles.guestItem} key={index}>
-          {guest}
+    <div className="guestList">
+      {guests.map((guest, index) => (
+        <div className="guestItem" key={index}>
+          <img src={guest.pictureUrl ?? "/default-avatar.png"} />
+          <div>
+            <strong>
+              {guest.fname} {guest.lname}
+            </strong>{" "}
+            <br />
+            <small>{guest.email}</small>
+          </div>
         </div>
       ))}
     </div>
@@ -38,7 +68,7 @@ export default function EventView() {
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
-  const eventId = Number(idParam) ?? 0
+  const eventId = Number(idParam) ?? 0;
 
   const parsedId = parseId(id) ?? 0;
 
@@ -73,7 +103,7 @@ export default function EventView() {
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
-   if (name?.trim()){
+    if (name?.trim()) {
       setGuestList((prev) => [...prev, name.trim()]);
     }
   };
@@ -135,6 +165,14 @@ export default function EventView() {
   const handleRemoveMedia = (idx: number) =>
     setMediaList((prev) => prev.filter((_, i) => i !== idx));
 
+  const handleUploadMedia = () =>
+    setMediaList((prev) => [
+      ...prev,
+      `/placeholder/image${prev.length + 1}.jpg`,
+    ]);
+
+  const handleSaveMedia = () => setShowMediaModal(false);
+
   // inline edit confirmation
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -195,16 +233,13 @@ export default function EventView() {
 
       {showMediaModal && (
         <EditMediaModal
-          media={mediaData.data ?? []}
-          onRemove={(id: number) => {
-            // opțional: apelează o mutație TRPC care șterge în DB
-            // apoi reîmprospătează mediaData
-          }}
+          media={mediaList}
+          onRemove={handleRemoveMedia}
           onUpload={() => setShowUploadModal(true)}
+          onSave={handleSaveMedia}
           onClose={() => setShowMediaModal(false)}
         />
       )}
-
 
       {showUploadModal && (
         <div className={styles.modalBackdrop}>
@@ -212,7 +247,7 @@ export default function EventView() {
             <h3 className={styles.modalTitle}>Upload Media</h3>
             <UploadButton
               endpoint="imageUploader"
-              input={{ eventId }}            
+              input={{ eventId }}
               onClientUploadComplete={(res) => {
                 console.log("Files:", res);
                 alert("Upload completed");
@@ -233,7 +268,6 @@ export default function EventView() {
           </div>
         </div>
       )}
-
 
       <div className={styles.container}>
         <div className={styles.header}>
@@ -311,12 +345,12 @@ export default function EventView() {
               />
             </div>
           </div>
-
-          {/* Rand: Lista de invitați + buton + wishlist */}
+          {/*todo delete this hardcode*/
+          /* Rand: Lista de invitați + buton + wishlist */}
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              {GuestListPreview(guestList)}
+              {GuestListPreview(12)}
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}
@@ -351,7 +385,7 @@ export default function EventView() {
         </div>
       </div>
 
-    <Footer />
+      <Footer />
     </div>
   );
 }
