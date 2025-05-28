@@ -49,6 +49,7 @@ export default function EventView() {
   const guestsData = api.guest.getGuestsForEvent.useQuery({
     eventId: parsedId,
   });
+  
 
   const eventData = data?.data;
 
@@ -86,6 +87,8 @@ export default function EventView() {
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
+  const removeMediaMutation = api.media.removeMedia.useMutation();
+  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({ eventId: parsedId,});
 
   useEffect(() => {
     if (eventData?.date) {
@@ -131,11 +134,6 @@ export default function EventView() {
       </div>
     );
   }
-
-const removeMediaMutation = api.media.removeMedia.useMutation();
-const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
-  eventId: parsedId,
-});
 
 const handleRemoveMedia = async (mediaId: number) => {
   try {
