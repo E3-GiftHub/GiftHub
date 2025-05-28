@@ -73,7 +73,7 @@ export default function EventView() {
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
-    if (name && name.trim()) {
+   if (name?.trim()){
       setGuestList((prev) => [...prev, name.trim()]);
     }
   };

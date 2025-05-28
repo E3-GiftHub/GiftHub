@@ -9,8 +9,18 @@ import AddToWishlistModal from "../components/AddToWishlistModal";
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import "./../styles/globals.css";
-
-// Mock data for demonstration
+interface EbayItem {
+  itemId: string;
+  title: string;
+  image?: {
+    imageUrl?: string;
+  };
+  price?: {
+    value?: string;
+    currency?: string;
+  };
+  shortDescription?: string;
+}
 const mockWishlists = new Map<
   string,
   {
@@ -121,7 +131,7 @@ export default function CreateWishlist() {
 
           {searchResults.length > 0 && (
             <div className={styles.itemGrid}>
-              {searchResults.map((item: any) => (
+              {searchResults.map((item: EbayItem) => (
                 <div key={item.itemId} className={styles.itemCard}>
                   <div className={styles.itemImage}>
                     <img
@@ -140,9 +150,9 @@ export default function CreateWishlist() {
                       onClick={() =>
                         openModal({
                           name: item.title,
-                          photo: item.image?.imageUrl || "",
+                          photo: item.image?.imageUrl ?? "",
                           price: `${item.price?.value} ${item.price?.currency}`,
-                          description: item.shortDescription || "",
+                          description: item.shortDescription ?? "",
                         })
                       }
                     >

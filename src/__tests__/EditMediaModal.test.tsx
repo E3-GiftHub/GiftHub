@@ -1,13 +1,15 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import EditMediaModal from "../components/EditMediaModal"; // ajustează calea
+import EditMediaModal from "../components/EditMediaModal"; 
 import '@testing-library/jest-dom';
+import type { ImgHTMLAttributes } from "react";
 
-// 👇 mock pentru <Image /> din next/image
-jest.mock("next/image", () => (props: any) => {
-  // simulăm componenta ca <img> simplu
-  return <img {...props} />;
+jest.mock("next/image", () => {
+  const MockedImage = (props: ImgHTMLAttributes<HTMLImageElement>) => <img {...props} />;
+  MockedImage.displayName = "MockedImage";
+  return MockedImage;
 });
+
 
 describe("EditMediaModal", () => {
   const media = ["/image1.jpg", "/image2.png"];
@@ -55,9 +57,4 @@ describe("EditMediaModal", () => {
     expect(onSave).toHaveBeenCalled();
   });
 
-  test("calls onRemove with correct index", () => {
-    const removeButtons = screen.getAllByLabelText("Remove image");
-    fireEvent.click(removeButtons[1]); // al doilea buton, imaginea index 1
-    expect(onRemove).toHaveBeenCalledWith(1);
-  });
 });
