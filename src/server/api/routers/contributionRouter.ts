@@ -17,11 +17,14 @@ export const contributionRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const contributionService = new ContributionService();
-      
+       const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Missing user ID in session." });
+      }
       try {
         const result = await contributionService.createContribution(
           input.contributionId,
-          ctx.session.user.id,
+           userId,
           input.eventId,
           input.articleId,
           input.amount,
