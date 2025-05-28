@@ -26,7 +26,7 @@ export const ourFileRouter = {
     .input(z.object({ eventId: z.number() }))
     .middleware(async ({ req, input }) => {
       const user = auth(req);
-      if (!user) throw new UploadThingError("Unauthorized");
+     if (!user) throw new Error("Unauthorized");
 
       // la acest punct, `input.eventId` e garantat de Zod
       return { userId: user.id, eventId: input.eventId };
@@ -40,7 +40,7 @@ export const ourFileRouter = {
           url:               file.ufsUrl,
           caption:           "",
           mediaType:         file.type,
-          fileType:          file.name.split(".").pop() || "unknown",
+          fileType:          file.name.split(".").pop() ?? "unknown",
           fileSize:          file.size,
         },
       });

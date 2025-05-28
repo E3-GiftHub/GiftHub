@@ -18,7 +18,8 @@ export class WishlistItem {
   private retailerUrl?: string; 
   private isCustom: boolean;
   private contributors: Contributor[] = [];
-  private totalContributed: number = 0;
+private totalContributed = 0;
+
 
   constructor(
     itemId: string,
@@ -28,10 +29,11 @@ export class WishlistItem {
     quantity: number,
     price: number,
     eventId: string,
-    fulfilled: boolean = false,
+   fulfilled = false,
     imageUrl?: string,
     retailerUrl?: string,
-    isCustom: boolean = false
+   isCustom = false
+
   ) {
     this.itemId = itemId;
     this.retailerId = retailerId;
