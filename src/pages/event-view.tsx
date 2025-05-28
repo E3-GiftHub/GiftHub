@@ -135,14 +135,6 @@ export default function EventView() {
   const handleRemoveMedia = (idx: number) =>
     setMediaList((prev) => prev.filter((_, i) => i !== idx));
 
-  const handleUploadMedia = () =>
-    setMediaList((prev) => [
-      ...prev,
-      `/placeholder/image${prev.length + 1}.jpg`,
-    ]);
-
-  const handleSaveMedia = () => setShowMediaModal(false);
-
   // inline edit confirmation
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -203,13 +195,16 @@ export default function EventView() {
 
       {showMediaModal && (
         <EditMediaModal
-          media={mediaList}
-          onRemove={handleRemoveMedia}
+          media={mediaData.data ?? []}
+          onRemove={(id: number) => {
+            // opțional: apelează o mutație TRPC care șterge în DB
+            // apoi reîmprospătează mediaData
+          }}
           onUpload={() => setShowUploadModal(true)}
-          onSave={handleSaveMedia}
           onClose={() => setShowMediaModal(false)}
         />
       )}
+
 
       {showUploadModal && (
         <div className={styles.modalBackdrop}>
@@ -336,7 +331,7 @@ export default function EventView() {
                   <div key={mediaItem.id} className={styles.mediaItem}>
                     <img src={mediaItem.url} alt={"Media photo"} />
                   </div>
-                )) || <p>Loading media...</p>}
+                )) ?? <p>Loading media...</p>}
               </div>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}

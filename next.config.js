@@ -6,6 +6,11 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
+    images: {
+    domains: [
+      "b6i98qhrlj.ufs.sh",
+    ],
+  },
 };
 
 export default config;
