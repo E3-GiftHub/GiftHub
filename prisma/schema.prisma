@@ -241,12 +241,16 @@ model Mark {
     @@index([eventId])
 }
 
+// ! real money
+// ! SetDefault = deleted content 
+// ! it is about real money, do not delete records
+
 model Contribution {
     id            Int    @id @default(autoincrement())
     guestUsername String @default("DELETED_USER") // always a Guest
     articleId     Int    @default(-1)
-    eventId       Int?   @default(-1) /// required by prisma
-    itemId        Int?   @default(-1) /// required by prisma
+    eventId       Int? /// required by prisma
+    itemId        Int? /// required by prisma
 
     cashAmount Decimal
     currency   String
@@ -254,12 +258,10 @@ model Contribution {
     updatedAt  DateTime @updatedAt // ! users can NOT withdraw back
     // ! updated only if SetDefault
 
-    // ! SetDefault = deleted content 
-    // ! it is about real money, do not delete records
     guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
     article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
-    event   Event?       @relation(fields: [eventId], references: [id], onDelete: SetDefault)
-    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetDefault)
+    event   Event?       @relation(fields: [eventId], references: [id])
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetNull)
 
     ContributionNotification ContributionNotification[]
 
@@ -274,8 +276,8 @@ enum StatusPayment {
 
 model StripeLink {
     id            String @id @default(cuid())
-    guestUsername String
-    articleId     Int? // optional in case of `direct contribution`
+    guestUsername String @default("DELETED_USER")
+    articleId     Int? // optional: `direct contribution` case
     eventId       Int? /// required by prisma
     itemId        Int? /// required by prisma
 
@@ -289,10 +291,10 @@ model StripeLink {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    guest   User          @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
-    article EventArticle? @relation(fields: [articleId], references: [id])
-    event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-    Item    Item?         @relation(fields: [itemId], references: [id])
+    guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+    event   Event?        @relation(fields: [eventId], references: [id])
+    Item    Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
 
     @@index([eventId, articleId, status])
 }
