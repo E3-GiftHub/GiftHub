@@ -1,5 +1,7 @@
 // https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
 
+//! enum
+
 ENUM StatusType {
   PENDING
   ACCEPTED
@@ -12,12 +14,13 @@ ENUM PriorityType {
   HIGH
 }
 
+/// we keep this in case of new types of marks
 ENUM MarkType {
   PURCHASED
-  RESERVED
-  CONTRIBUTED
   // NULL: if null => delete row
 }
+
+//! implemented models
 
 TABLE User {
   username STRING pk
@@ -26,7 +29,7 @@ TABLE User {
   fname STRING
   lname STRING
   password STRING
-  iban STRING
+  stripeConnectId STRING
   pictureUrl STRING
 
   emailVerified DATETIME
@@ -42,6 +45,7 @@ TABLE Event {
   date DATETIME
   time DATETIME
   pictureUrl STRING
+  token STRING
 
   createdByUsername STRING [ref: > User.username]
   createdAt DATETIME
@@ -73,14 +77,13 @@ TABLE Media {
 
 // junction TABLE for event-specific wishlist entry
 TABLE EventArticle {
+  id INTEGER PK
   eventId INTEGER [ref: > Event.id]
   itemId INTEGER [ref: > Item.id]
-  userNote STRING
+  userNote STRING // additional note
   priority PriorityType
   createdAt DATETIME
   updatedAt DATETIME
-
-  Note: "Composite primary key on (eventId, itemId)"
 }
 
 TABLE Item {
@@ -90,7 +93,7 @@ TABLE Item {
   imagesUrl STRING
   price DECIMAL
 
-  retailerId INTEGER [ref: > Retailer.id]
+  retailerId INTEGER [ref: > Retailer.id] //! NULL => custom item
   retailerUrl STRING
 
   createdAt DATETIME
@@ -98,9 +101,10 @@ TABLE Item {
 }
 
 TABLE Mark {
-  markerUsername STRING [ref: > User.username]
-  eventId INTEGER [ref: > Event.id]
-  articleId INTEGER [ref: > Item.id]
+  markerUsername STRING [ref: > User.username] // always a Guest
+  articleId INTEGER [ref: > EventArticle.id]
+  eventId INTEGER [ref: > Event.id] /// required by prisma
+  itemId INTEGER [ref: > Item.id] /// required by prisma
 
   type MarkType
   createdAt DATETIME
@@ -112,22 +116,53 @@ TABLE Retailer {
   apiUrl STRING
 }
 
+//! real money
+//! SetDefault = deleted content
+//! it is about real money, do not delete records
+
 TABLE Contribution {
   id INTEGER pk
-  contributorUsername STRING [ref: > User.username]
+  guestUsername STRING [ref: > User.username]
+  articleId INTEGER [ref: > EventArticle.id]
   eventId INTEGER [ref: > Event.id]
-  articleId INTEGER [ref: > Item.id]
+  itemId INTEGER [ref: > Item.id]
 
   cashAmount DECIMAL
+  currency STRING
+  createdAt DATETIME
+  updatedAt DATETIME //! updated only if SetDefault
+}
+
+
+ENUM StatusPayment {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+TABLE StripeLink {
+  id STRING PK
+  guestUsername STRING
+  articleId INTEGER // optional: `direct contribution` case
+  eventId INTEGER /// required by prisma
+  itemId INTEGER /// required by prisma
+
+  stripePaymentLinkId STRING
+  paymentLinkUrl STRING // reusable redirecting link
+
+  amount DECIMAL
+  currency STRING
+  status StatusPayment
+
   createdAt DATETIME
   updatedAt DATETIME
-
-  Note: "References EventArticles via (eventId, itemId)"
 }
+
+//! reports
 
 TABLE UserReport {
   id INTEGER pk
-  reportedByUsername STRING [ref: > User.username]
+  reportedByUsername STRING [ref: > User.username] // NOT always a Guest
   reportedUsername STRING [ref: > User.username]
   reason STRING
   description STRING
@@ -142,6 +177,8 @@ TABLE EventReport {
   description STRING
   reportedAt DATETIME
 }
+
+//! notification
 
 ENUM NotificationAction {
   READ

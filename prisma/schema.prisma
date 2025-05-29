@@ -186,7 +186,7 @@ model EventArticle {
     event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
     item  Item  @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
-    // @@id([eventId, itemId]) // ! an item can be added ++ times
+    // @@id([eventId, itemId]) //! an item can be added ++ times
     Mark         Mark[]
     Contribution Contribution[]
     StripeLink   StripeLink[]
@@ -241,9 +241,9 @@ model Mark {
     @@index([eventId])
 }
 
-// ! real money
-// ! SetDefault = deleted content 
-// ! it is about real money, do not delete records
+//! real money
+//! SetDefault = deleted content 
+//! it is about real money, do not delete records
 
 model Contribution {
     id            Int    @id @default(autoincrement())
@@ -255,8 +255,8 @@ model Contribution {
     cashAmount Decimal
     currency   String
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt // ! users can NOT withdraw back
-    // ! updated only if SetDefault
+    updatedAt  DateTime @updatedAt //! users can NOT withdraw back
+    //! updated only if SetDefault
 
     guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
     article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
