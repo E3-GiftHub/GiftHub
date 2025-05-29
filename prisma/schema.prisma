@@ -154,7 +154,7 @@ model Invitation {
 
 model Media {
     id               Int    @id @default(autoincrement())
-    uploaderUsername String
+    uploaderUsername String @default("DELETED_USER")
     eventId          Int
     url              String
 
@@ -164,8 +164,8 @@ model Media {
     fileSize  Int?
     createdAt DateTime @default(now())
 
-    user  User  @relation(fields: [uploaderUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
+    user  User  @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
     notifications MediaNotification[]
 
@@ -183,13 +183,16 @@ model EventArticle {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item  @relation(fields: [itemId], references: [id])
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    item  Item  @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
     // @@id([eventId, itemId]) // ! an item can be added ++ times
     Mark         Mark[]
     Contribution Contribution[]
     StripeLink   StripeLink[]
+
+    @@index([eventId])
+    @@index([itemId])
 }
 
 model Item {
@@ -229,32 +232,38 @@ model Mark {
     type      MarkType
     createdAt DateTime @default(now())
 
-    guest   User         @relation(fields: [markerUsername], references: [username])
-    article EventArticle @relation(fields: [articleId], references: [id])
-    event   Event?       @relation(fields: [eventId], references: [id])
-    item    Item?        @relation(fields: [itemId], references: [id])
+    guest   User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
     @@id([markerUsername, articleId])
+    @@index([eventId])
 }
 
 model Contribution {
     id            Int    @id @default(autoincrement())
-    guestUsername String // always a Guest
-    articleId     Int
-    eventId       Int? /// required by prisma
-    itemId        Int? /// required by prisma
+    guestUsername String @default("DELETED_USER") // always a Guest
+    articleId     Int    @default(-1)
+    eventId       Int?   @default(-1) /// required by prisma
+    itemId        Int?   @default(-1) /// required by prisma
 
     cashAmount Decimal
     currency   String
     createdAt  DateTime @default(now())
-    // updatedAt  DateTime @updatedAt // ! users can NOT withdraw back
+    updatedAt  DateTime @updatedAt // ! users can NOT withdraw back
+    // ! updated only if SetDefault
 
-    guest   User         @relation(fields: [guestUsername], references: [username])
-    article EventArticle @relation(fields: [articleId], references: [id])
-    event   Event?       @relation(fields: [eventId], references: [id])
-    item    Item?        @relation(fields: [itemId], references: [id])
+    // ! SetDefault = deleted content 
+    // ! it is about real money, do not delete records
+    guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: SetDefault)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetDefault)
 
     ContributionNotification ContributionNotification[]
+
+    @@index([guestUsername, eventId])
 }
 
 enum StatusPayment {
@@ -327,8 +336,10 @@ model MediaNotification {
     mediaId  Int
     action   NotificationAction
 
-    user  User  @relation(fields: [username], references: [username])
-    media Media @relation(fields: [mediaId], references: [id])
+    user  User  @relation(fields: [username], references: [username], onDelete: Cascade)
+    media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+    @@index([username])
 }
 
 model ContributionNotification {
@@ -337,6 +348,8 @@ model ContributionNotification {
     contributionId Int
     action         NotificationAction
 
-    user User         @relation(fields: [username], references: [username])
-    cash Contribution @relation(fields: [contributionId], references: [id])
+    user User         @relation(fields: [username], references: [username], onDelete: Cascade)
+    cash Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+    @@index([username])
 }
