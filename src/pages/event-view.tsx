@@ -62,6 +62,10 @@ function GuestListPreview({ eventId }: GuestListPreviewProps) {
 }
 
 export default function EventView() {
+  //update events
+  const updateEventMutation = api.event.updateEvent.useMutation();
+
+  //get the event id
   const router = useRouter();
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
@@ -188,12 +192,30 @@ export default function EventView() {
       setShowConfirm(true);
     }
   };
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!pendingField) return;
-    setFormData((prev) => ({ ...prev, [pendingField]: tempValue }));
+
+    setFormData(prev => ({ ...prev, [pendingField]: tempValue }));
     setPendingField(null);
     setShowConfirm(false);
+
+    const payload = {
+      eventId:    eventId,                        
+      title:      pendingField === "title"       ? tempValue : formData.title,
+      description:pendingField === "description" ? tempValue : formData.description,
+      date:       pendingField === "date"        ? tempValue : formData.date,
+      time:       pendingField === "time"        ? tempValue : formData.time,
+      location:   pendingField === "location"    ? tempValue : formData.location,
+    };
+
+    try {
+      await updateEventMutation.mutateAsync(payload);
+      console.log("Event updated!");
+    } catch (err) {
+      console.error("Failed to update event:", err);
+    }
   };
+
 
   return (
     <div className={styles.pageWrapper}>
@@ -303,14 +325,16 @@ export default function EventView() {
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Time</label>
                 <input
-                  className={styles.input}
                   type="time"
                   value={formData.time}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, time: e.target.value }))
-                  }
-                  onKeyDown={(e) => handleKeyDown(e, "time")}
+                  onChange={(e) => {       
+                    setFormData((prev) => ({ ...prev, time: e.target.value }));
+                    formData.time = "HH:MM"
+                  }}
+                  onKeyDown={(e) => {handleKeyDown(e,"time")}}
+                  className={styles.input}
                 />
+
               </div>
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Location</label>
