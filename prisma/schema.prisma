@@ -77,14 +77,14 @@ model VerificationToken {
 //! implemented models
 
 model User {
-    username   String  @id @unique @default(cuid())
-    email      String? @unique
-    id         String? @unique
-    fname      String?
-    lname      String?
-    password   String? // stored with hash obviously
-    iban       String?
-    pictureUrl String?
+    username        String  @id @unique @default(cuid())
+    email           String? @unique
+    id              String? @unique
+    fname           String?
+    lname           String?
+    password        String? // stored with hash obviously
+    stripeConnectId String? @unique
+    pictureUrl      String?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -97,16 +97,17 @@ model User {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
+    paymentLinks  StripeLink[]
 
     reporters     UserReport[]  @relation("reporter")
     reportedUsers UserReport[]  @relation("reported")
     eventReports  EventReport[]
 
     // mandatory assets
-    accounts                 Account[]
-    sessions                 Session[]
-    MediaNotification        MediaNotification[]
-    ContributionNotification ContributionNotification[]
+    accounts                  Account[]
+    sessions                  Session[]
+    mediaNotifications        MediaNotification[]
+    contributionNotifications ContributionNotification[]
 }
 
 model Event {
@@ -117,6 +118,7 @@ model Event {
     date        DateTime?
     time        DateTime?
     pictureUrl  String?
+    token       String?   @unique
 
     createdByUsername String
     createdAt         DateTime @default(now())
@@ -130,6 +132,7 @@ model Event {
     contributions Contribution[]
     eventArticles EventArticle[]
     eventReports  EventReport[]
+    paymentLinks  StripeLink[]
 }
 
 model Invitation {
@@ -144,7 +147,9 @@ model Invitation {
     guest User  @relation(fields: [guestUsername], references: [username])
     event Event @relation(fields: [eventId], references: [id])
 
-    @@index([guestUsername])
+    @@index([guestUsername, eventId])
+    @@index([eventId])
+    @@index([status])
 }
 
 model Media {
@@ -159,13 +164,17 @@ model Media {
     fileSize  Int?
     createdAt DateTime @default(now())
 
-    user              User                @relation(fields: [uploaderUsername], references: [username])
-    event             Event               @relation(fields: [eventId], references: [id])
-    MediaNotification MediaNotification[]
+    user  User  @relation(fields: [uploaderUsername], references: [username])
+    event Event @relation(fields: [eventId], references: [id])
+
+    notifications MediaNotification[]
+
+    @@index([uploaderUsername, eventId])
 }
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
+    id       Int           @id @default(autoincrement())
     eventId  Int
     itemId   Int
     userNote String? // additional note
@@ -175,9 +184,12 @@ model EventArticle {
     updatedAt DateTime @updatedAt
 
     event Event @relation(fields: [eventId], references: [id])
-    item  Item? @relation(fields: [itemId], references: [id])
+    item  Item  @relation(fields: [itemId], references: [id])
 
-    @@id([eventId, itemId])
+    // @@id([eventId, itemId]) // ! an item can be added ++ times
+    Mark         Mark[]
+    Contribution Contribution[]
+    StripeLink   StripeLink[]
 }
 
 model Item {
@@ -196,21 +208,9 @@ model Item {
     eventOccurences EventArticle[]
     marks           Mark[]
     contributions   Contribution[]
-}
+    StripeLink      StripeLink[]
 
-model Mark {
-    markerUsername String // always a Guest
-    eventId        Int
-    articleId      Int
-
-    type      MarkType
-    createdAt DateTime @default(now())
-
-    guest User  @relation(fields: [markerUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item  @relation(fields: [articleId], references: [id])
-
-    @@id([eventId, articleId])
+    @@index([retailerId])
 }
 
 model Retailer {
@@ -220,21 +220,72 @@ model Retailer {
     items  Item[]
 }
 
+model Mark {
+    markerUsername String // always a Guest
+    articleId      Int
+    eventId        Int? /// required by prisma
+    itemId         Int? /// required by prisma
+
+    type      MarkType
+    createdAt DateTime @default(now())
+
+    guest   User         @relation(fields: [markerUsername], references: [username])
+    article EventArticle @relation(fields: [articleId], references: [id])
+    event   Event?       @relation(fields: [eventId], references: [id])
+    item    Item?        @relation(fields: [itemId], references: [id])
+
+    @@id([markerUsername, articleId])
+}
+
 model Contribution {
-    id                  Int    @id @default(autoincrement())
-    contributorUsername String // always a Guest
-    eventId             Int
-    articleId           Int
+    id            Int    @id @default(autoincrement())
+    guestUsername String // always a Guest
+    articleId     Int
+    eventId       Int? /// required by prisma
+    itemId        Int? /// required by prisma
 
     cashAmount Decimal
+    currency   String
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt // ! users can withdraw their contribution
+    // updatedAt  DateTime @updatedAt // ! users can NOT withdraw back
 
-    guest User  @relation(fields: [contributorUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item  @relation(fields: [articleId], references: [id])
+    guest   User         @relation(fields: [guestUsername], references: [username])
+    article EventArticle @relation(fields: [articleId], references: [id])
+    event   Event?       @relation(fields: [eventId], references: [id])
+    item    Item?        @relation(fields: [itemId], references: [id])
 
     ContributionNotification ContributionNotification[]
+}
+
+enum StatusPayment {
+    PENDING
+    ACCEPTED
+    EXPIRED
+}
+
+model StripeLink {
+    id            String @id @default(cuid())
+    guestUsername String
+    articleId     Int? // optional in case of `direct contribution`
+    eventId       Int? /// required by prisma
+    itemId        Int? /// required by prisma
+
+    stripePaymentLinkId String @unique
+    paymentLinkUrl      String // reusable redirecting link
+
+    amount   Decimal
+    currency String
+    status   StatusPayment
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    guest   User          @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
+    article EventArticle? @relation(fields: [articleId], references: [id])
+    event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    Item    Item?         @relation(fields: [itemId], references: [id])
+
+    @@index([eventId, articleId, status])
 }
 
 //! reports
