@@ -175,4 +175,27 @@ export const eventRouter = createTRPCRouter({
         });
       });
     }),
+    
+    updateEvent: publicProcedure
+    .input(z.object({
+      eventId:    z.number(),
+      title:      z.string().nullable(),
+      description:z.string().nullable(),
+      date:       z.string().nullable(),
+      time:       z.string().nullable(),
+      location:   z.string().nullable(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { eventId, title, description, date, time, location } = input;
+      return ctx.db.event.update({
+        where: { id: eventId },
+        data: {
+          title,
+          description,
+          date:       date ? new Date(date) : undefined,
+          time:       time ? new Date(`${date}T${time}`) : undefined,
+          location,
+        },
+      });
+    }),
 });

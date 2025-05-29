@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
 import Footer from "../components/Footer";
 import "./../styles/globals.css";
+import { type GuestHeader } from "~/models/GuestHeader";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -20,12 +21,40 @@ function parseId(param: string | string[] | undefined): number | null {
   return null; // ignore arrays or undefined
 }
 
-function GuestListPreview(guestNames: string[]) {
+interface GuestListPreviewProps {
+  eventId: number;
+}
+
+function GuestListPreview({ eventId }: GuestListPreviewProps) {
+  const [guests, setGuests] = useState<GuestHeader[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`/api/guest-list?eventId=${eventId}`);
+        const data = (await res.json()) as GuestHeader[];
+        setGuests(data);
+      } catch (error) {
+        console.error("Failed to load guests", error);
+      } finally {
+        setLoading(false);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  }, [eventId]);
+
+  if (loading) return <div>Loading guests...</div>;
+
   return (
     <div className={styles.guestList}>
-      {guestNames.map((guest, index) => (
-        <div className={styles.guestItem} key={index}>
-          {guest}
+      {guests.map((guest) => (
+        <div className={styles.guestItem} key={guest.username}>
+          <p>{guest.username}</p>
+          <p>{guest.fname}</p>
+          <p>{guest.lname}</p>
+          <img src={guest.pictureUrl ?? ""} alt="user visual description" />
         </div>
       ))}
     </div>
@@ -33,12 +62,16 @@ function GuestListPreview(guestNames: string[]) {
 }
 
 export default function EventView() {
+  //update events
+  const updateEventMutation = api.event.updateEvent.useMutation();
+
+  //get the event id
   const router = useRouter();
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
-  const eventId = Number(idParam) ?? 0
+  const eventId = Number(idParam) ?? 0;
 
   const parsedId = parseId(id) ?? 0;
 
@@ -49,7 +82,6 @@ export default function EventView() {
   const guestsData = api.guest.getGuestsForEvent.useQuery({
     eventId: parsedId,
   });
-  
 
   const eventData = data?.data;
 
@@ -74,7 +106,7 @@ export default function EventView() {
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest name:");
-   if (name?.trim()){
+    if (name?.trim()) {
       setGuestList((prev) => [...prev, name.trim()]);
     }
   };
@@ -88,7 +120,9 @@ export default function EventView() {
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
   const removeMediaMutation = api.media.removeMedia.useMutation();
-  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({ eventId: parsedId,});
+  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
+    eventId: parsedId,
+  });
 
   useEffect(() => {
     if (eventData?.date) {
@@ -135,16 +169,16 @@ export default function EventView() {
     );
   }
 
-const handleRemoveMedia = async (mediaId: number) => {
-  try {
-    await removeMediaMutation.mutateAsync({ mediaId });
+  const handleRemoveMedia = async (mediaId: number) => {
+    try {
+      await removeMediaMutation.mutateAsync({ mediaId });
 
-    // Refresh media list after deletion
-    await mediaRefetch();
-  } catch (err) {
-    console.error("❌ Failed to remove media:", err);
-  }
-};
+      // Refresh media list after deletion
+      await mediaRefetch();
+    } catch (err) {
+      console.error("❌ Failed to remove media:", err);
+    }
+  };
 
   // inline edit confirmation
   const handleKeyDown = (
@@ -158,12 +192,30 @@ const handleRemoveMedia = async (mediaId: number) => {
       setShowConfirm(true);
     }
   };
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!pendingField) return;
-    setFormData((prev) => ({ ...prev, [pendingField]: tempValue }));
+
+    setFormData(prev => ({ ...prev, [pendingField]: tempValue }));
     setPendingField(null);
     setShowConfirm(false);
+
+    const payload = {
+      eventId:    eventId,                        
+      title:      pendingField === "title"       ? tempValue : formData.title,
+      description:pendingField === "description" ? tempValue : formData.description,
+      date:       pendingField === "date"        ? tempValue : formData.date,
+      time:       pendingField === "time"        ? tempValue : formData.time,
+      location:   pendingField === "location"    ? tempValue : formData.location,
+    };
+
+    try {
+      await updateEventMutation.mutateAsync(payload);
+      console.log("Event updated!");
+    } catch (err) {
+      console.error("Failed to update event:", err);
+    }
   };
+
 
   return (
     <div className={styles.pageWrapper}>
@@ -213,14 +265,13 @@ const handleRemoveMedia = async (mediaId: number) => {
         />
       )}
 
-
       {showUploadModal && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modal}>
             <h3 className={styles.modalTitle}>Upload Media</h3>
             <UploadButton
               endpoint="imageUploader"
-              input={{ eventId }}            
+              input={{ eventId }}
               onClientUploadComplete={(res) => {
                 console.log("Files:", res);
                 alert("Upload completed");
@@ -241,7 +292,6 @@ const handleRemoveMedia = async (mediaId: number) => {
           </div>
         </div>
       )}
-
 
       <div className={styles.container}>
         <div className={styles.header}>
@@ -275,14 +325,16 @@ const handleRemoveMedia = async (mediaId: number) => {
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Time</label>
                 <input
-                  className={styles.input}
                   type="time"
                   value={formData.time}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, time: e.target.value }))
-                  }
-                  onKeyDown={(e) => handleKeyDown(e, "time")}
+                  onChange={(e) => {       
+                    setFormData((prev) => ({ ...prev, time: e.target.value }));
+                    formData.time = "HH:MM"
+                  }}
+                  onKeyDown={(e) => {handleKeyDown(e,"time")}}
+                  className={styles.input}
                 />
+
               </div>
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Location</label>
@@ -320,11 +372,11 @@ const handleRemoveMedia = async (mediaId: number) => {
             </div>
           </div>
 
-          {/* Rand: Lista de invitați + buton + wishlist */}
+          {/* todo harcode!Rand: Lista de invitați + buton + wishlist */}
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              {GuestListPreview(guestList)}
+              <GuestListPreview eventId={eventId} />
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}
@@ -359,7 +411,7 @@ const handleRemoveMedia = async (mediaId: number) => {
         </div>
       </div>
 
-    <Footer />
+      <Footer />
     </div>
   );
 }
