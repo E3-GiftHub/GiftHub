@@ -130,9 +130,9 @@ model Event {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
+    paymentLinks  StripeLink[]
     eventArticles EventArticle[]
     eventReports  EventReport[]
-    paymentLinks  StripeLink[]
 }
 
 model Invitation {
@@ -144,8 +144,8 @@ model Invitation {
     createdAt DateTime   @default(now())
     repliedAt DateTime?
 
-    guest User  @relation(fields: [guestUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
+    guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
     @@index([guestUsername, eventId])
     @@index([eventId])
