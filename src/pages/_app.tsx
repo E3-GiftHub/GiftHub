@@ -1,5 +1,7 @@
 import "~/styles/globals.css";
-import { type AppType } from "next/app";
+import { type AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { type Session } from "next-auth";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Geist } from "next/font/google";
 import Head from "next/head";
@@ -9,7 +11,10 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp = ({
+  Component,
+  pageProps,
+}: AppProps<{ session: Session | null }>) => {
   return (
     <>
       <Head>
@@ -22,9 +27,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       </Head>
 
       <div className={geist.variable}>
-        <TRPCReactProvider>
-          <Component {...pageProps} />
-        </TRPCReactProvider>
+        <SessionProvider session={pageProps.session}>
+          <TRPCReactProvider>
+            <Component {...pageProps} />
+          </TRPCReactProvider>
+        </SessionProvider>
       </div>
     </>
   );

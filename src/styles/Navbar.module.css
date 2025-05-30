@@ -1,11 +1,11 @@
 /*navbar dashbord*/
 .special-navbar {
   background-color: #1a1840 !important;
-  padding: 0.5rem 2rem !important;
+  padding: 0.5rem 3rem !important;
   justify-content: space-between;
 }
 .login-wrapper {
-  margin-right: 1rem;
+  margin-right: 2rem;
 }
 
 .login-button {
