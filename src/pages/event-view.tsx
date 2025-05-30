@@ -67,21 +67,73 @@ export default function EventView() {
 
   //get the event id
   const router = useRouter();
+  
+
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
+ 
+  console.log("idParam: ", idParam);
   const eventId = Number(idParam) ?? 0;
-
+  console.log("Event id: ", eventId);
   const parsedId = parseId(id) ?? 0;
 
+
+
+  //const [eventId, setEventId] = useState<number | null>(null);
+
+  //const [parsedId, setParsedId] = useState<number | null>(null);
+
+/*
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const { id } = router.query;
+    const idParam = Array.isArray(id) ? id[0] : id;
+    const parsed = Number(idParam);
+
+    setEventId(!isNaN(parsed) ? parsed : 0);
+  }, [router.isReady, router.query]);
+
+  const parsedId = eventId!;
+
+  
+  useEffect(() => {
+    if (!router.isReady || router.query.id == null) return;
+
+    // Extract eventId (which is 'id' param here)
+    const eventId = router.query.id;
+
+    // eventId can be string | string[] | undefined
+    const idParam = Array.isArray(eventId) ? eventId[0] : eventId;
+
+    // Convert to number
+    const numId = Number(idParam);
+
+    // Only set if valid number
+    if (!isNaN(numId)) {
+      setParsedId(numId); // <--- This is where you copy eventId into parsedId
+    } else {
+      setParsedId(null);
+    }
+  }, [router.isReady, router.query]);
+
+  const eventId = router.query.id;
+  
+  //console.log("ID: ",parsedId);
+*/
   const { data } = api.event.getEventID.useQuery({
     eventId: parsedId,
-  });
+  },
+  { enabled: parsedId !== null }
+  );
 
   const guestsData = api.guest.getGuestsForEvent.useQuery({
     eventId: parsedId,
-  });
+  },
+  { enabled: parsedId !== null }
+  );
 
   const eventData = data?.data;
 
@@ -115,14 +167,19 @@ export default function EventView() {
   // Media list state
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const mediaData = api.media.getMediaByEvent.useQuery({ eventId: parsedId });
+  const mediaData = api.media.getMediaByEvent.useQuery({ eventId: parsedId }, { enabled: parsedId !== null && parsedId > 0 });
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
   const removeMediaMutation = api.media.removeMedia.useMutation();
   const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
     eventId: parsedId,
-  });
+  },
+  { enabled: parsedId !== null && parsedId > 0 }
+
+);
+
+  console.log("ID: ",parsedId);
 
   useEffect(() => {
     if (eventData?.date) {

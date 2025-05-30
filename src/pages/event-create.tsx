@@ -19,7 +19,7 @@ export default function Page() {
 
   const createEventMutation = api.event.createEvent.useMutation({
     onSuccess: (data) => {
-      router.push(`/event/${data.data.id}`);
+      router.push(`/event-view?id=${data.data.id}`);
     },
     onError: (error) => {
       alert(
