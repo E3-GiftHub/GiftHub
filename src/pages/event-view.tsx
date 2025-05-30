@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../components/GuestListModal";
-import EditMediaModal from "../components/EventView/EditMediaModal";
+import EditMediaModal from "../components/EditMediaModal";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
