@@ -1,7 +1,7 @@
 // src/__tests__/EditMediaModal.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import EditMediaModal from "../components/EditMediaModal";
+import EditMediaModal from "../components/EventView/EditMediaModal";
 
 // Mock Next.js Image with a named functional component
 jest.mock("next/image", () => {

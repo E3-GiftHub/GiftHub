@@ -1,464 +1,558 @@
+:global(html) {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #1a1242;
+}
+:global(body) {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+}
+:global(#__next) {
+    min-height: 100%;
+}
+:global(*),
+:global(*::before),
+:global(*::after) {
+    box-sizing: border-box;
+}
+
 .pageWrapper {
-  width: 100%;
-  min-height: 100vh;
-  background-color: #1a1242;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #1a1242;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 9vh;
 }
 
 .container {
-  width: clamp(340px, 90%, 1367px);
-  border-radius: 15px;
-  background-color: #2e236c;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  margin: 9vh auto 0;
-  flex-grow: 1;
-  padding-bottom: 2vh;
-  margin-bottom: 9vh;
+    width: clamp(340px, 90%, 1367px);
+    border-radius: 15px;
+    background-color: #2E236C;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    margin: 9vh auto 0;
+    flex-grow: 1;
+    padding-bottom: 2vh;
 }
 
 .header {
-  position: relative;
-  width: 100%;
-  height: clamp(50px, 13.7vh, 148px);
-  opacity: 0.5;
-  background-image: url("../../public/backgrounds/home.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1vh;
+    position: relative;
+    width: 100%;
+    height: clamp(50px, 13.7vh, 148px);
+    opacity: 0.5;
+    background-image: url('../../public/backgrounds/home.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1vh;
 }
 
 .header h2 {
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  text-shadow: 0px 0px 10px #000;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px #000;
 }
 
 .wrapper {
-  color: #fff;
-  padding: 2rem;
+    color: #fff;
+    padding: 2rem;
 }
 
 .topSection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  padding-bottom: 7vh;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding-bottom: 7vh;
 }
 
 .photoBox {
-  margin-top: 1rem;
-  height: 230px;
-  width: 200px;
-  background-color: #cbb1dc;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1e1e1e;
-  font-weight: 500;
+    margin-top:1rem;
+    height: 230px;
+    width:200px;
+    background-color: #cbb1dc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e1e1e;
+    font-weight: 500;
 }
 
 .infoBox {
-  flex: 1 1 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-width: 240px;
+    flex: 1 1 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 240px;
 }
 
 .fieldGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .label {
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.95rem;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
 .label2 {
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-align: center;
-  padding: 0.5rem;
-  text-transform: uppercase;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 0.5rem;
+    text-transform: uppercase;
 }
 
 .input {
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 10px;
-  background-color: #cbb1dc;
-  color: #1e1e1e;
-  font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #cbb1dc;
+    color: #1e1e1e;
+    font-size: 1rem;
 }
 
 .descriptionBox {
-  flex: 1 1 200px;
-  display: flex;
-  flex-direction: column;
-  min-width: 300px;
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
 }
 
 .textarea {
-  flex-grow: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 10px;
-  background-color: #cbb1dc;
-  color: #1e1e1e;
-  font-size: 1rem;
-  resize: none;
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background-color: #cbb1dc;
+    color: #1e1e1e;
+    font-size: 1rem;
+    resize: none;
 }
 
 .bottomRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
 }
 
 .guestBoard {
-  flex: 1 1 200px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
-  background-color: #43328b;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    flex: 1 1 200px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #43328B;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+
 .guestList {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  max-height: calc(6 * 3.5rem); /* aprox. 6 invitați */
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-height: calc(6 * 3.5rem); /* aprox. 6 invitați */
+    overflow-y: auto;
 }
 
 .guestList::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .guestList::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
 }
 
 .guestItem {
-  background-color: #cbb1dc;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
-  padding: 0.5rem;
-  color: #1e1e1e;
-  font-size: 0.9rem;
+    background-color: #cbb1dc;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding: 0.5rem;
+    color: #1e1e1e;
+    font-size: 0.9rem;
 }
 
+
 .wishlistBox {
-  flex: 1 1 250px;
-  background-image: url("../../public/backgrounds/backgroundW.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
-  width: clamp(143px, 18.7vw, 360px);
-  height: auto;
-  margin-top: 0vh;
+    flex: 1 1 250px;
+    background-image: url('../../public/backgrounds/backgroundW.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    width: clamp(143px, 18.7vw, 360px);
+    height: auto;
+    margin-top: 0vh;
 }
 
 .photoSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .seeMoreOverride {
-  height: clamp(30px, 18.7vh, 40px);
-  padding: 0rem;
-  display: flex; /* Asigură layout-ul */
-  align-items: center; /* Centrează pe verticală */
-  justify-content: center; /* Centrează pe orizontală */
-  text-align: center; /* Fallback */
+
+    height: clamp(30px, 18.7vh, 40px);
+    padding: 0rem;
+    display: flex;                /* Asigură layout-ul */
+    align-items: center;          /* Centrează pe verticală */
+    justify-content: center;      /* Centrează pe orizontală */
+    text-align: center;           /* Fallback */
 }
 
 /* 🔽 MEDIA QUERIES - Responsive tweaks */
 
 @media (max-width: 768px) {
-  .topSection {
-    flex-direction: column;
-    align-items: stretch;
-  }
+    .topSection {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-  .photoBox,
-  .infoBox,
-  .descriptionBox {
-    width: 100%;
-    min-width: 100%;
-  }
+    .photoBox,
+    .infoBox,
+    .descriptionBox {
+        width: 100%;
+        min-width: 100%;
+    }
 
-  .bottomRow {
-    flex-direction: column;
-  }
+    .bottomRow {
+        flex-direction: column;
+    }
 
-  .guestBoard,
-  .wishlistBox {
-    width: 100%;
-  }
+    .guestBoard,
+    .wishlistBox {
+        width: 100%;
+    }
 
-  .guestList {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    .guestList {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 480px) {
-  .guestList {
-    grid-template-columns: repeat(1, 1fr);
-  }
+    .guestList {
+        grid-template-columns: repeat(1, 1fr);
+    }
 
-  .header h2 {
-    font-size: 1.5rem;
-  }
+    .header h2 {
+        font-size: 1.5rem;
+    }
 
-  .wrapper {
-    padding: 1rem;
-  }
+    .wrapper {
+        padding: 1rem;
+    }
 
-  .topSection {
-    padding: 1rem 0;
-  }
+    .topSection {
+        padding: 1rem 0;
+    }
 
-  .wishlistBox {
-    margin: 0;
-  }
+    .wishlistBox {
+        margin: 0;
+    }
 }
 
+
+
 .mediaGallery {
-  flex: 1.5 1 300px;
-  background-color: #43328b;
-  border-radius: 15px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    flex: 1.5 1 300px;
+    background-color: #43328B;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .mediaGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  max-height: calc(5.9 * 3.5rem); /* aprox. 6 invitați */
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    max-height: calc(5.9 * 3.5rem); /* aprox. 6 invitați */
+    overflow-y: auto;
 }
 
 .mediaGrid::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .mediaGrid::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
 }
 
 .mediaItem {
-  background-color:none;
-  padding: 0.5rem;
-  border-radius: 8px;
-  text-align: center;
-  color: #1e1e1e;
-  font-size: 2rem;
+    background-color: #cbb1dc;
+    padding: 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    color: #1e1e1e;
+    font-size: 2rem;
 }
 
 .mediaItem img {
-  max-width: 100%;
-  border-radius: 8px;
-  max-height: 100%;
+    max-width: 100%;
+    border-radius: 8px;
+    max-height: 100%;
 }
 
-.mediaButton {
-  margin-top: 0.1rem;
-  max-height: 2.7rem;
+.mediaButton{
+    margin-top: 0.1rem;
+    max-height: 2.7rem;
 }
 
 @media (max-width: 768px) {
-  .mediaGalleryBox {
-    width: 100%;
-  }
-  .photoSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3.5rem;
-  }
+    .mediaGalleryBox {
+        width: 100%;
+    }
+    .photoSection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3.5rem;
+    }
 }
 .modalBackdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 .modal {
-  background: #5c3d90;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  width: 90%;
-}
-
-.modalActions {
-  display: flex;
-  justify-content: space-between; /* spațiu între Add și Save */
-  align-items: center;
-  margin-top: 1rem;
-}
-
-.guestRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  background-color: #43328b;
-  margin-bottom: 8px;
-  border-radius: 8px;
-}
-
-.removeGuestButton {
-  background-color: transparent;
-  color: red;
-  font-size: 1.2rem;
-  border: none;
-  cursor: pointer;
+    background: #5c3d90;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    max-height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .modalHeader {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
 }
 
-.modalActionsRight {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 1rem;
+.modalTitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 .modalContent {
-  max-height: 400px; /* sau cât vrei tu */
-  overflow-y: auto;
-  padding-right: 0.5rem;
+    flex: 1;
+    min-height: 0;              /* 👈 esențial pentru scroll */
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .modalContent::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .modalContent::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.modalActions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 600px) {
+    .modalActions {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.guestRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #43328B;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}
+
+.removeGuestButton {
+    background-color: transparent;
+    color: red;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
 }
 
 /* === EditMediaModal === */
 .editMediaModalWrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .editMediaModalContent {
-  background: #43328b;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  overflow: hidden; 
+    background: #43328B;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .editMediaHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-.editMediaGrid {
-  display: grid;
-  gap: 1rem;
-  overflow-y: auto;
-  flex-grow: 1;
-  padding: 1rem 0;
-  max-height: 60vh; 
-    grid-template-columns: repeat(4, 1fr);
-}
 
 .editMediaItem img {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
+
+.editMediaGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 1rem 0;
 }
 
 .editMediaItem {
-  position: relative;
-  border:none;
-  border-radius: none;
-  overflow: hidden;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #5c3d90;
 }
 
 .removeButton {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #ff5c5c;
-  border: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  z-index: 1;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ff5c5c;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    z-index: 1;
 }
 
 .editMediaActions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+
+.wishlistBoxContent {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 350px;
+    color: #fff;
+    text-align: center;
+}
+
+.wishlistTitle {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.wishlistList {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    max-height: calc(4* 3.5rem);
+    overflow-y: auto;
+}
+
+.wishlistList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wishlistList::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.wishlistList li {
+    background-color: #cbb1dc;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    color: #1e1e1e;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
