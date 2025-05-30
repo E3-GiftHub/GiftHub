@@ -127,7 +127,7 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.itemImage}>
                   <img
-                    src={item.imageUrl ?? 'path/pentru/imagineeeee'} // petru aici schimbi :P :P :D
+                    src={item.imageUrl ?? '/databasepic/itempic.png'} // Petru schimbi aici :P :P :D
                     alt={item.nume}
                     className={styles.actualItemImage}
                   />
