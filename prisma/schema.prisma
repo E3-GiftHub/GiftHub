@@ -3,6 +3,14 @@
  * https://pris.ly/d/prisma-schema
  * https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
  * https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+ * ! summary
+ * * 0. enum
+ * * 1. default models
+ * * 2. implemented components - main data
+ * * 3. event components
+ * * 4. actions
+ * * 5. reports
+ * * 6. notifications
  */
 
 generator client {
@@ -33,6 +41,12 @@ enum PriorityType {
 enum MarkType {
     PURCHASED
     // NULL: if null => delete row
+}
+
+enum StatusPayment {
+    PENDING
+    ACCEPTED
+    EXPIRED
 }
 
 //! default models
@@ -74,7 +88,7 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-//! implemented models
+//! implemented components - main data
 
 model User {
     username        String  @id @unique @default(cuid())
@@ -110,6 +124,23 @@ model User {
     contributionNotifications ContributionNotification[]
 }
 
+model Invitation {
+    id            Int    @id @default(autoincrement())
+    guestUsername String
+    eventId       Int
+
+    status    StatusType @default(PENDING)
+    createdAt DateTime   @default(now())
+    repliedAt DateTime?
+
+    guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+    @@index([guestUsername, eventId])
+    @@index([eventId])
+    @@index([status])
+}
+
 model Event {
     id          Int       @id @default(autoincrement())
     title       String?
@@ -135,42 +166,7 @@ model Event {
     eventReports  EventReport[]
 }
 
-model Invitation {
-    id            Int    @id @default(autoincrement())
-    guestUsername String
-    eventId       Int
-
-    status    StatusType @default(PENDING)
-    createdAt DateTime   @default(now())
-    repliedAt DateTime?
-
-    guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
-    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-    @@index([guestUsername, eventId])
-    @@index([eventId])
-    @@index([status])
-}
-
-model Media {
-    id               Int    @id @default(autoincrement())
-    uploaderUsername String @default("DELETED_USER")
-    eventId          Int
-    url              String
-
-    caption   String?
-    mediaType String?
-    fileType  String?
-    fileSize  Int?
-    createdAt DateTime @default(now())
-
-    user  User  @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
-    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-
-    notifications MediaNotification[]
-
-    @@index([uploaderUsername, eventId])
-}
+//! event components
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
@@ -223,62 +219,37 @@ model Retailer {
     items  Item[]
 }
 
-model Mark {
-    markerUsername String // always a Guest
-    articleId      Int
-    eventId        Int? /// required by prisma
-    itemId         Int? /// required by prisma
+//! actions
 
-    type      MarkType
+model Media {
+    id               Int    @id @default(autoincrement())
+    uploaderUsername String @default("DELETED_USER")
+    eventId          Int
+    url              String
+
+    caption   String?
+    mediaType String?
+    fileType  String?
+    fileSize  Int?
     createdAt DateTime @default(now())
 
-    guest   User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
-    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+    user  User  @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-    @@id([markerUsername, articleId])
-    @@index([eventId])
+    notifications MediaNotification[]
+
+    @@index([uploaderUsername, eventId])
 }
 
 //! real money
 //! SetDefault = deleted content 
 //! it is about real money, do not delete records
 
-model Contribution {
-    id            Int    @id @default(autoincrement())
-    guestUsername String @default("DELETED_USER") // always a Guest
-    articleId     Int    @default(-1)
-    eventId       Int? /// required by prisma
-    itemId        Int? /// required by prisma
-
-    cashAmount Decimal
-    currency   String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt //! users can NOT withdraw back
-    //! updated only if SetDefault
-
-    guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-    article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
-    event   Event?       @relation(fields: [eventId], references: [id])
-    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetNull)
-
-    ContributionNotification ContributionNotification[]
-
-    @@index([guestUsername, eventId])
-}
-
-enum StatusPayment {
-    PENDING
-    ACCEPTED
-    EXPIRED
-}
-
 model StripeLink {
     id            String @id @default(cuid())
     guestUsername String @default("DELETED_USER")
-    articleId     Int? // optional: `direct contribution` case
     eventId       Int? /// required by prisma
+    articleId     Int? // optional: `direct contribution` case
     itemId        Int? /// required by prisma
 
     stripePaymentLinkId String @unique
@@ -292,11 +263,52 @@ model StripeLink {
     updatedAt DateTime @updatedAt
 
     guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
     event   Event?        @relation(fields: [eventId], references: [id])
+    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
     Item    Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
 
     @@index([eventId, articleId, status])
+}
+
+model Contribution {
+    id            Int    @id @default(autoincrement())
+    guestUsername String @default("DELETED_USER") // always a Guest
+    eventId       Int? /// required by prisma
+    articleId     Int    @default(-1)
+    itemId        Int? /// required by prisma
+
+    cashAmount Decimal
+    currency   String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt //! users can NOT withdraw back
+    //! updated only if SetDefault
+
+    guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    event   Event?       @relation(fields: [eventId], references: [id])
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetNull)
+
+    ContributionNotification ContributionNotification[]
+
+    @@index([guestUsername, eventId])
+}
+
+model Mark {
+    markerUsername String // always a Guest
+    eventId        Int? /// required by prisma
+    articleId      Int
+    itemId         Int? /// required by prisma
+
+    type      MarkType
+    createdAt DateTime @default(now())
+
+    guest   User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@id([markerUsername, articleId])
+    @@index([eventId])
 }
 
 //! reports
@@ -325,7 +337,7 @@ model EventReport {
     event Event @relation(fields: [reportedId], references: [id])
 }
 
-//! notification
+//! notifications
 
 enum NotificationAction {
     READ
