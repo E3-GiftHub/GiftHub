@@ -7,6 +7,22 @@ import { useRouter } from 'next/router';
 
 const USERNAME = 'user2';
 
+// Functia asta ia imaginile based on id-ul produsului
+const getItemImage = (item: TrendingItem) => {
+  const productImages = [
+    '/illustrations/account_visual.png',
+    '/illustrations/babyShower.svg',
+    '/illustrations/birthdayParty.svg',
+  ];
+  //daca produsu are o imagine, o pune pe aia
+  if (item.imageUrl) {
+    return item.imageUrl;
+  }
+  //altfel foloseste una de aici  gen de mai sus
+  const imageIndex = item.id % productImages.length;
+  return productImages[imageIndex];
+};
+
 const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
   const router = useRouter();
@@ -127,7 +143,7 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.itemImage}>
                   <img
-                    src={item.imageUrl ?? '/databasepic/itempic.png'} // Petru schimbi aici :P :P :D
+                    src={getItemImage(item)}
                     alt={item.nume}
                     className={styles.actualItemImage}
                   />
