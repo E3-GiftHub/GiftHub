@@ -149,7 +149,7 @@ model Event {
     date        DateTime?
     time        DateTime?
     pictureUrl  String?
-    token       String?   @unique
+    token       String?
 
     createdByUsername String
     createdAt         DateTime @default(now())

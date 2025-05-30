@@ -444,6 +444,7 @@ async function createContributions(
               data: {
                 guestUsername: user.username,
                 eventId: event.id,
+                articleId: itemId,
                 itemId: itemId,
                 cashAmount: amount,
                 currency: "RON",
