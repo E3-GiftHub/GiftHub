@@ -82,7 +82,7 @@ async function createUsers() {
         fname: `FirstName${i}`,
         lname: `LastName${i}`,
         password: `hashedPassword${i}`,
-        iban: `RO${Math.floor(Math.random() * 10000000000000000)}`,
+        stripeConnectId: `RO${Math.floor(Math.random() * 10000000000000000)}`,
         pictureUrl: `picture${i}.jpg`,
         emailVerified: new Date(),
       },
@@ -442,10 +442,12 @@ async function createContributions(
           if (amount > 0) {
             const contribution = await prisma.contribution.create({
               data: {
-                contributorUsername: user.username,
+                guestUsername: user.username,
                 eventId: event.id,
                 articleId: itemId,
+                itemId: itemId,
                 cashAmount: amount,
+                currency: "RON",
               },
             });
 
