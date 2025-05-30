@@ -145,8 +145,9 @@ export default function EventView() {
     location: "",
   });
   const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingField, setPendingField] = useState<null | string>(null);
-  const [tempValue, setTempValue] = useState("");
+const [pendingField, setPendingField] = useState<
+  keyof typeof formData | null
+>(null);  const [tempValue, setTempValue] = useState("");
 
   // Guest list state
   const [showGuestModal, setShowGuestModal] = useState(false);
@@ -240,7 +241,7 @@ export default function EventView() {
   // inline edit confirmation
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
-    field: string,
+    field: keyof typeof formData,
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -249,6 +250,8 @@ export default function EventView() {
       setShowConfirm(true);
     }
   };
+
+
   const handleConfirm = async () => {
     if (!pendingField) return;
 
@@ -272,6 +275,23 @@ export default function EventView() {
       console.error("Failed to update event:", err);
     }
   };
+
+  const handleCancel = () => {
+  if (!pendingField) return; // If no field is being edited, exit
+
+  setShowConfirm(false);
+  setPendingField(null); // Exit edit mode
+  setTempValue(""); // Clear temporary input value
+
+  // Safely revert only fields that exist in formData
+  setFormData(prev => ({
+    ...prev,
+    [pendingField]: eventData[pendingField as keyof typeof formData] ?? prev[pendingField],
+  }));
+};
+
+
+
 
 
   return (
@@ -304,7 +324,7 @@ export default function EventView() {
               </button>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                onClick={() => setShowConfirm(false)}
+                onClick={handleCancel}
               >
                 Cancel
               </button>
@@ -352,8 +372,30 @@ export default function EventView() {
 
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2>{eventData?.title ?? "Loading event..."}</h2>
+          {pendingField === "title" ? (
+            <input
+              className={styles.input}
+              type="text"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
+              onKeyDown={(e) => handleKeyDown(e, "title")}
+              autoFocus
+            />
+          ) : (
+            <h2
+              className={styles.title}
+              onClick={() => {
+                setPendingField("title");
+                setTempValue(formData.title);
+              }}
+            >
+              {formData.title}
+            </h2>
+          )}
         </div>
+
 
         <div className={styles.wrapper}>
           {/* Rand: Poză + Data+Locație + Descriere */}
