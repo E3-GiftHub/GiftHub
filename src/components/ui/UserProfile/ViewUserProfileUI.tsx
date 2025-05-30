@@ -134,7 +134,7 @@ export default function ViewUserProfileUI({
                   loading && styles.loading,
                 )}
               >
-                &nbsp;&nbsp;
+                &nbsp;
                 {renderContent(lname)}
               </p>
             </div>
