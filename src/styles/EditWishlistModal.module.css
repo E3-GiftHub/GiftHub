@@ -18,12 +18,33 @@
     width: 90%;
     max-width: 500px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    max-height: 90vh;
+    overflow: hidden; /* opțional */
+    display: flex;
+    flex-direction: column;
+}
+
+
+.itemList {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        max-height: 40vh;
+}
+.itemList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.itemList::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
 }
 
 .input {
     width: 100%;
     padding: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
@@ -84,3 +105,4 @@
     margin-bottom: 1.5rem;
     text-align: center;
 }
+

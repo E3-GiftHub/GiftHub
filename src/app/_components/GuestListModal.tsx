@@ -1,5 +1,5 @@
 // app/_components/GuestListModal.tsx
-import styles from "../../styles/EventView.module.css";
+import styles from "../../styles/GuestListModal.module.css";
 import buttonStyles from "../../styles/Button.module.css";
 import { useState } from "react";
 import AddGuestModal from "./AddGuestModal";

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Navbar from "../app/_components/Navbar";
 import styles from "../styles/EventView.module.css";
-import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../app/_components/GuestListModal";
 import EditMediaModal from "../app/_components/EditMediaModal";
 import EventInfoForm from "../app/_components/EventInfoForm";
@@ -11,7 +10,7 @@ import Guests from "../app/_components/Guests";
 import Media from "../app/_components/Media";
 import ConfirmModal from "../app/_components/ConfirmModal";
 import WishlistComponent from "../app/_components/Wishlist";
-
+import DeleteEventModal from "~/app/_components/DeleteEventModal";
 
 import { useRouter } from "next/navigation";
 
@@ -23,6 +22,8 @@ export default function EventView() {
     const [showConfirm, setShowConfirm] = useState(false);
     const [pendingField, setPendingField] = useState<null | string>(null);
     const [tempValue, setTempValue] = useState("");
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // Guest list state
     const [showGuestModal, setShowGuestModal] = useState(false);
@@ -91,9 +92,25 @@ export default function EventView() {
                 />
             )}
 
+            {showDeleteModal && (
+                <DeleteEventModal
+                    onConfirm={() => {
+                        setShowDeleteModal(false);
+                        // aici poți pune logica reală de ștergere
+                        console.log("Eveniment șters");
+                        router.push("/"); // sau navigate elsewhere
+                    }}
+                    onCancel={() => setShowDeleteModal(false)}
+                />
+            )}
+
+
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <h2>Event_1</h2>
+                        <h2>Event_1</h2>
+                        <button className={styles.deleteButton} onClick={() => setShowDeleteModal(true)}>
+                            Delete Event
+                        </button>
                 </div>
 
                 <div className={styles.wrapper}>

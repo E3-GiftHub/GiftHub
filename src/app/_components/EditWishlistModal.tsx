@@ -44,28 +44,36 @@ export default function EditWishlistModal({ wishlist, onClose, onSave }: Props) 
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-                <h2>Edit Wishlist</h2>
-                {items.map((item, index) => (
-                    <div key={index} className={styles.itemRow}>
-                        <input
-                            type="text"
-                            value={item}
-                            onChange={(e) => handleItemChange(index, e.target.value)}
-                            placeholder={`Item ${index + 1}`}
-                            className={styles.input}
-                        />
-                        <button
-                            className={styles.deleteButton}
-                            onClick={() => handleDeleteItem(index)}
-                            aria-label="Delete item"
-                        >
-                            &times;
-                        </button>
-                    </div>
-                ))}
-                <button className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`} onClick={handleAddItem}>
+                <h2 className={styles.modalTitle}>Edit Wishlist</h2>
+
+                <div className={styles.itemList}>
+                    {items.map((item, index) => (
+                        <div key={index} className={styles.itemRow}>
+                            <input
+                                type="text"
+                                value={item}
+                                onChange={(e) => handleItemChange(index, e.target.value)}
+                                placeholder={`Item ${index + 1}`}
+                                className={styles.input}
+                            />
+                            <button
+                                className={styles.deleteButton}
+                                onClick={() => handleDeleteItem(index)}
+                                aria-label="Delete item"
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <button
+                    className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                    onClick={handleAddItem}
+                >
                     + Add Item
                 </button>
+
                 <div className={styles.modalActions}>
                     <button
                         className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}

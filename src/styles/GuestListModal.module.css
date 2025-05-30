@@ -1,0 +1,91 @@
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.modal {
+    background: #5c3d90;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    max-height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.modalHeader {
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+.modalTitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.modalContent {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.modalContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+}
+
+.modalActions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 600px) {
+    .modalActions {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.guestRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #43328B;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}
+
+.removeGuestButton {
+    background-color: transparent;
+    color: red;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
+}

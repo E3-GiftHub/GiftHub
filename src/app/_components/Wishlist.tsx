@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "../../styles/EventView.module.css";
+import styles from "../../styles/Wishlist.module.css";
 import buttonStyles from "../../styles/Button.module.css";
 import { useRouter } from "next/navigation";
 import EditWishlistModal from "./EditWishlistModal";

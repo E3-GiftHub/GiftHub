@@ -1,6 +1,7 @@
 // /app/_components/Guests.tsx
-import styles from "../../styles/EventView.module.css";
+import styles from "../../styles/GuestList.module.css";
 import buttonStyles from "../../styles/Button.module.css";
+
 
 interface Props {
     guestList: string[];
@@ -10,7 +11,7 @@ interface Props {
 export default function Guests({ guestList, onOpenModal }: Props) {
     return (
         <div className={styles.guestBoard}>
-            <label className={styles.label2}>Guest List</label>
+            <label className={styles.Guestlabel2}>Guest List</label>
             <div className={styles.guestList}>
                 {guestList.slice(0, 12).map((guest, i) => (
                     <div key={i} className={styles.guestItem}>

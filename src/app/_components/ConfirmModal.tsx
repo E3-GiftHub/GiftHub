@@ -1,5 +1,5 @@
 // /app/_components/ConfirmModal.tsx
-import styles from "../../styles/EventView.module.css";
+import styles from "../../styles/ConfirmModal.module.css";
 import buttonStyles from "../../styles/Button.module.css";
 
 interface Props {
@@ -23,7 +23,7 @@ export default function ConfirmModal({ pendingField, onConfirm, onCancel }: Prop
                         Yes
                     </button>
                     <button
-                        className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+                        className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
                         onClick={onCancel}
                     >
                         Cancel
