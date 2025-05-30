@@ -74,10 +74,6 @@ const EventView: React.FC<EventViewProps> = ({
                   <div className={styles.infoValue}>{eventData.date}</div>
                 </div>
                 
-                <div className={styles.infoCard}>
-                  <span className={styles.infoLabel}>Goal</span>
-                  <div className={styles.infoValue}>${eventData.goal}</div>
-                </div>
                 
                 <button
                   onClick={handleMediaView}
