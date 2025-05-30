@@ -1,0 +1,45 @@
+.button {
+  padding: 1rem 2rem;
+
+  border-radius: 10px;
+  outline: none;
+  border: none;
+
+  color: white;
+
+  font-size: 0.8rem;
+  font-weight: 400;
+  transition: transform 0.1s ease;
+}
+
+.button:hover {
+  transform: scale(1.1);
+}
+
+.button:active {
+  transform: scale(1);
+}
+
+.button-primary {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+}
+
+.button-secondary {
+  background: linear-gradient(0deg, #a287fe 0%, #d4c8fe 100%);
+
+  box-shadow: inset 0px -5px 1px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 720px) {
+  .button {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
+}

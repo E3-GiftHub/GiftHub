@@ -1,0 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&family=Jura:wght@300..700&display=swap");
+
+body {
+  background-color: #17153b;
+  margin: 0;
+  font-family: Heebo, sans-serif;
+}
+
+@media (max-width: 720px) {
+  body {
+    background-image: linear-gradient(#17153b, #433d8b);
+    overflow-x: hidden;
+  }
+}
