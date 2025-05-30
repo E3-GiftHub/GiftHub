@@ -3,6 +3,14 @@
  * https://pris.ly/d/prisma-schema
  * https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
  * https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+ * ! summary
+ * * 0. enum
+ * * 1. default models
+ * * 2. implemented components - main data
+ * * 3. event components
+ * * 4. actions
+ * * 5. reports
+ * * 6. notifications
  */
 
 generator client {
@@ -33,6 +41,12 @@ enum PriorityType {
 enum MarkType {
     PURCHASED
     // NULL: if null => delete row
+}
+
+enum StatusPayment {
+    PENDING
+    ACCEPTED
+    EXPIRED
 }
 
 //! default models
@@ -74,17 +88,19 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-//! implemented models
+//! implemented components - main data
 
 model User {
-    username   String  @id @unique @default(cuid())
-    email      String? @unique
-    id         String? @unique
-    fname      String?
-    lname      String?
-    password   String? // stored with hash obviously
-    iban       String?
-    pictureUrl String?
+    username        String    @id @unique @default(cuid())
+    email           String?   @unique
+    id              String?   @unique
+    fname           String?
+    lname           String?
+    password        String? // stored with hash obviously
+    stripeConnectId String? // NOT UNIQUE: only one null value allowed
+    emailToken      String? // NOT UNIQUE: only one null value allowed
+    tokenExpires    DateTime?
+    pictureUrl      String?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -97,40 +113,17 @@ model User {
     postsMedia    Media[]
     marks         Mark[]
     contributions Contribution[]
+    paymentLinks  StripeLink[]
 
     reporters     UserReport[]  @relation("reporter")
     reportedUsers UserReport[]  @relation("reported")
     eventReports  EventReport[]
 
     // mandatory assets
-    accounts                 Account[]
-    sessions                 Session[]
-    MediaNotification        MediaNotification[]
-    ContributionNotification ContributionNotification[]
-}
-
-model Event {
-    id          Int       @id @default(autoincrement())
-    title       String?
-    description String?
-    location    String?
-    date        DateTime?
-    time        DateTime?
-    pictureUrl  String?
-    token       String?   @unique
-
-    createdByUsername String
-    createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt
-    user              User     @relation(fields: [createdByUsername], references: [username])
-
-    invitations Invitation[]
-
-    postsMedia    Media[]
-    marks         Mark[]
-    contributions Contribution[]
-    eventArticles EventArticle[]
-    eventReports  EventReport[]
+    accounts                  Account[]
+    sessions                  Session[]
+    mediaNotifications        MediaNotification[]
+    contributionNotifications ContributionNotification[]
 }
 
 model Invitation {
@@ -142,43 +135,62 @@ model Invitation {
     createdAt DateTime   @default(now())
     repliedAt DateTime?
 
-    guest User  @relation(fields: [guestUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
+    guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-    @@index([guestUsername])
+    @@index([guestUsername, eventId])
+    @@index([eventId])
+    @@index([status])
 }
 
-model Media {
-    id               Int    @id @default(autoincrement())
-    uploaderUsername String
-    eventId          Int
-    url              String
+model Event {
+    id          Int       @id @default(autoincrement())
+    title       String?
+    description String?
+    location    String?
+    date        DateTime?
+    time        DateTime?
+    pictureUrl  String?
+    token       String?
 
-    caption   String?
-    mediaType String?
-    fileType  String?
-    fileSize  Int?
-    createdAt DateTime @default(now())
+    createdByUsername String   @default("DELETED_USER")
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    user              User     @relation(fields: [createdByUsername], references: [username], onDelete: SetDefault)
 
-    user              User                @relation(fields: [uploaderUsername], references: [username])
-    event             Event               @relation(fields: [eventId], references: [id])
-    MediaNotification MediaNotification[]
+    invitations Invitation[]
+
+    postsMedia    Media[]
+    marks         Mark[]
+    contributions Contribution[]
+    paymentLinks  StripeLink[]
+    eventArticles EventArticle[]
+    eventReports  EventReport[]
 }
+
+//! event components
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
+    id       Int           @id @default(autoincrement())
     eventId  Int
-    itemId   Int
+    itemId   Int           @default(-1) // deleted item
     userNote String? // additional note
     priority PriorityType?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item? @relation(fields: [itemId], references: [id])
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    item  Item  @relation(fields: [itemId], references: [id], onDelete: SetDefault)
 
-    @@id([eventId, itemId])
+    // @@id([eventId, itemId]) //! an item can be added ++ times
+    Mark         Mark[]
+    Contribution Contribution[]
+    StripeLink   StripeLink[]
+
+    @@index([eventId])
+    @@index([itemId])
 }
 
 model Item {
@@ -186,10 +198,10 @@ model Item {
     name        String?
     description String?
     imagesUrl   String?
-    price       Decimal?
+    price       Decimal? //! NULL => custom item
 
-    retailerId Int? //! NULL => custom item
-    retailer   Retailer? @relation(fields: [retailerId], references: [id])
+    retailerId Int?
+    retailer   Retailer? @relation(fields: [retailerId], references: [id], onDelete: SetNull)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -197,21 +209,9 @@ model Item {
     eventOccurences EventArticle[]
     marks           Mark[]
     contributions   Contribution[]
-}
+    StripeLink      StripeLink[]
 
-model Mark {
-    markerUsername String // always a Guest
-    eventId        Int
-    articleId      Int
-
-    type      MarkType
-    createdAt DateTime @default(now())
-
-    guest User  @relation(fields: [markerUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item  @relation(fields: [articleId], references: [id])
-
-    @@id([eventId, articleId])
+    @@index([retailerId])
 }
 
 model Retailer {
@@ -221,21 +221,96 @@ model Retailer {
     items  Item[]
 }
 
+//! actions
+
+model Media {
+    id               Int    @id @default(autoincrement())
+    uploaderUsername String @default("DELETED_USER")
+    eventId          Int
+    url              String
+
+    caption   String?
+    mediaType String?
+    fileType  String?
+    fileSize  Int?
+    createdAt DateTime @default(now())
+
+    user  User  @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+    notifications MediaNotification[]
+
+    @@index([uploaderUsername, eventId])
+}
+
+//! real money
+//! SetDefault = deleted content 
+//! it is about real money, do not delete records
+
+model StripeLink {
+    id            String @id @default(cuid())
+    guestUsername String @default("DELETED_USER")
+    eventId       Int? /// required by prisma
+    articleId     Int? // optional: `direct contribution` case
+    itemId        Int? /// required by prisma
+
+    stripePaymentLinkId String @unique
+    paymentLinkUrl      String // reusable redirecting link
+
+    amount   Decimal
+    currency String
+    status   StatusPayment
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    Item    Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@index([eventId, articleId, status])
+}
+
 model Contribution {
-    id                  Int    @id @default(autoincrement())
-    contributorUsername String // always a Guest
-    eventId             Int
-    articleId           Int
+    id            Int    @id @default(autoincrement())
+    guestUsername String @default("DELETED_USER") // always a Guest
+    eventId       Int? /// required by prisma
+    articleId     Int
+    itemId        Int? /// required by prisma
 
     cashAmount Decimal
+    currency   String
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt // ! users can withdraw their contribution
+    updatedAt  DateTime @updatedAt //! users can NOT withdraw back
+    //! updated only if SetDefault
 
-    guest User  @relation(fields: [contributorUsername], references: [username])
-    event Event @relation(fields: [eventId], references: [id])
-    item  Item  @relation(fields: [articleId], references: [id])
+    guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Restrict)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
     ContributionNotification ContributionNotification[]
+
+    @@index([guestUsername, eventId])
+}
+
+model Mark {
+    markerUsername String // always a Guest
+    eventId        Int? /// required by prisma
+    articleId      Int
+    itemId         Int? /// required by prisma
+
+    type      MarkType
+    createdAt DateTime @default(now())
+
+    guest   User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@id([markerUsername, articleId])
+    @@index([eventId])
 }
 
 //! reports
@@ -264,7 +339,7 @@ model EventReport {
     event Event @relation(fields: [reportedId], references: [id])
 }
 
-//! notification
+//! notifications
 
 enum NotificationAction {
     READ
@@ -277,8 +352,10 @@ model MediaNotification {
     mediaId  Int
     action   NotificationAction
 
-    user  User  @relation(fields: [username], references: [username])
-    media Media @relation(fields: [mediaId], references: [id])
+    user  User  @relation(fields: [username], references: [username], onDelete: Cascade)
+    media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+    @@index([username])
 }
 
 model ContributionNotification {
@@ -287,6 +364,8 @@ model ContributionNotification {
     contributionId Int
     action         NotificationAction
 
-    user User         @relation(fields: [username], references: [username])
-    cash Contribution @relation(fields: [contributionId], references: [id])
+    user User         @relation(fields: [username], references: [username], onDelete: Cascade)
+    cash Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+    @@index([username])
 }
