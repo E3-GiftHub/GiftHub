@@ -150,7 +150,7 @@ export default function UserProfileUI({
               &nbsp;&nbsp;&nbsp;&nbsp;|
             </p>
             <p className={clsx(styles.nameField, styles.lname, loading && styles.loading)}>
-              &nbsp;&nbsp;
+              &nbsp;
               {renderContent(lname)}
             </p>
           </div>
