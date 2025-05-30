@@ -10,9 +10,11 @@ const Footer = () => {
 
   useEffect(() => {
     const checkIfLanding = () => {
-      const href = window.location.href;
-      setIsLandingPage(href === "http://localhost:3000/" || href === "http://localhost:3000/#");
-    };
+  const pathname = window.location.pathname;
+  const hash = window.location.hash.trim();
+  setIsLandingPage(pathname === "/" && (hash === "" || hash === "#"));
+};
+
 
     checkIfLanding();
     window.addEventListener("hashchange", checkIfLanding);

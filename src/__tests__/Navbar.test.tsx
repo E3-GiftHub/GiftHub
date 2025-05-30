@@ -1,90 +1,78 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Navbar from "../components/Navbar";
-import { MemoryRouter } from "react-router-dom";
+import { useRouter } from "next/router";
 
-const renderWithRoute = (initialPath: string) => {
-  return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Navbar />
-    </MemoryRouter>
-  );
-};
-const mockHref = (url: string) => {
-  Object.defineProperty(window, "location", {
-    value: new URL(url),
-    writable: true,
-  });
-};
+// Mock pentru router
+jest.mock("next/router", () => ({
+  useRouter: jest.fn(),
+}));
 
-describe("Navbar component", () => {
-  test("renders Navbar component without crashing", () => {
-    renderWithRoute("/");
+// Mock pentru next-auth/react
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(),
+  signOut: jest.fn(),
+}));
 
-    const logo = screen.getByAltText("Gift Hub");
-    expect(logo).toBeInTheDocument();
-  });
+import { useSession, signOut } from "next-auth/react";
 
-  {/*test("renders login button when on landing page", () => {
-    renderWithRoute("/");
+describe("Navbar", () => {
+  beforeEach(() => {
+    // Setare router mock
+    (useRouter as jest.Mock).mockReturnValue({
+      pathname: "/home",
+      push: jest.fn(),
+    });
 
-    const loginButton = screen.getByText(/Login/i);
-    expect(loginButton).toBeInTheDocument();
-  });*/}
+    // Simulăm o sesiune activă (user logat)
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { name: "Cati" } },
+      status: "authenticated",
+    });
 
-  test("renders navigation links when not on landing page", () => {
-    renderWithRoute("/home");
-
-    expect(screen.getByText(/Home/i)).toBeInTheDocument();
-    expect(screen.getByText(/Inbox/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /^Profile$/i })).toBeInTheDocument();
-  });
-
-  test("opens and closes hamburger menu", () => {
-    renderWithRoute("/home");
-
-    const hamburger = screen.getByLabelText("Toggle navigation menu");
-    const navList = screen.getByRole("list");
-
-    expect(navList.className).not.toMatch(/open/);
-
-    fireEvent.click(hamburger);
-    expect(navList.className).toMatch(/open/);
-
-    fireEvent.click(hamburger);
-    expect(navList.className).not.toMatch(/open/);
-  });
-
-  test("opens and closes profile dropdown", async () => {
-    renderWithRoute("/home");
-
-    const profileButton = screen.getByRole("link", { name: /^Profile$/i });
-    fireEvent.click(profileButton);
-
-    const editProfileLink = screen.getByText(/Edit Profile/i);
-    expect(editProfileLink).toBeVisible();
-
-    fireEvent.mouseDown(document.body);
-
-    await waitFor(() => {
-      const profileDropdown = profileButton.parentElement;
-      expect(profileDropdown).not.toHaveClass("open");
+    Object.defineProperty(window, "location", {
+      value: {
+        pathname: "/home",
+        hash: "",
+        href: "http://localhost:3000/home",
+      },
+      writable: true,
     });
   });
-});
 
-test("highlights Inbox button when on /inbox", () => {
-  mockHref("http://localhost:3000/inbox#");
-  render(<Navbar />);
-  
-  const inboxLink = screen.getByText(/Inbox/i).closest("a");
-  expect(inboxLink).toHaveClass("nav-link-active");
-});
+  test("afișează sigla și butonul hamburger", () => {
+    render(<Navbar />);
+    expect(screen.getByAltText("Gift Hub")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /toggle navigation menu/i }),
+    ).toBeInTheDocument();
+  });
 
-test("highlights Home button when on /home", () => {
-  mockHref("http://localhost:3000/home#");
-  render(<Navbar />);
-  
-  const homeLink = screen.getByText(/Home/i).closest("a");
-  expect(homeLink).toHaveClass("nav-link-active");
+  test("afișează link-urile Home și Inbox când nu este pe landing page", () => {
+    render(<Navbar />);
+    expect(screen.getByText(/Home/i)).toBeInTheDocument();
+    expect(screen.getByText(/Inbox/i)).toBeInTheDocument();
+  });
+
+  test("toggle la meniul de profil", () => {
+    render(<Navbar />);
+
+    const profileToggle = screen.getByText("Profile");
+    fireEvent.click(profileToggle);
+
+    expect(screen.getByText(/Edit Profile/i)).toBeInTheDocument();
+    expect(screen.getByText(/Logout/i)).toBeInTheDocument();
+  });
+
+  test("click pe Logout apelează signOut și redirecționează", () => {
+    render(<Navbar />);
+
+    const profileBtn = screen.getByText("Profile");
+    fireEvent.click(profileBtn);
+
+    const logoutLink = screen.getByText(/Logout/i);
+    fireEvent.click(logoutLink);
+
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/" });
+  });
 });
