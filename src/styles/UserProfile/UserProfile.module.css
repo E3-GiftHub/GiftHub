@@ -16,7 +16,7 @@
     max-height: 1000px;
     max-width: 1300px;
     background-color: #1d1949;
-    background-image: url('public/UserImages/Containers/Container.svg');
+    background-image: url('/UserImages/Containers/Container.svg');
     background-size: cover;
     border-radius: 10px;
     overflow: hidden;
@@ -39,7 +39,7 @@
     width: clamp(300px, 24vw, 500px);
     height: clamp(300px, 24vw, 500px);
     border-radius: 50%;
-    background: #2e275f url('public/UserImages/default_pfp.svg') center/contain;
+    background: #2e275f url('/UserImages/default_pfp.svg') center/contain;
     box-shadow: #000000 0 1px 20px -5px;
     position: relative;
 }
@@ -61,7 +61,7 @@
     width: 3.5em;
     height: 3.5em;
     border-radius: 50%;
-    background: url('public/UserImages/buttons/change_pfp.svg') center/contain;
+    background: url('/UserImages/buttons/change_pfp.svg') center/contain;
     border: none;
     cursor: pointer;
     transform: translate(30%, 30%);
@@ -163,14 +163,20 @@
     font-weight: 400;
     transition: transform 0.1s ease;
     background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+    cursor: pointer;
 }
 
 .button:hover {
     transform: scale(1.1);
 }
 
+.buttonDanger {
+    background: radial-gradient(circle, rgb(161, 1, 1) 9%, rgb(119, 0, 0) 100%);
+}
+
 .icon {
     margin-right: 8px;
+    margin-bottom: 4px;
     vertical-align: middle;
     width: 21px;
     height: 21px;
@@ -221,19 +227,16 @@
     display: block;
 }
 
-/* Adjust button container spacing */
 .buttonContainer {
     gap: 3.6rem;
 }
 
-/* Add disabled state styling for the save button */
 .button:disabled {
     opacity: 0.7;
     cursor: not-allowed;
     background: #4a4569;
 }
 
-/* Loading state for input fields */
 .inputField.loading {
     background-color: #3a3468;
     border-color: #4a4569;
@@ -290,6 +293,101 @@
 .inputField::placeholder {
     color: #6b6892;
     font-style: italic;
+}
+
+.modalOverlay{
+    position: fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background: rgba(0, 0, 0, 0.5);;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    margin-left: 1em;
+    margin-right: 1em;
+    color: white;
+    background: #2E236B;
+    padding: 24px;
+    border-radius: 8px;
+    width: 320px;
+    max-width: 90%;
+}
+
+.modalContent h3{
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.modalContent label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.modalContent select,
+.modalContent textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #433D8A;
+    color: white;
+    border-radius: 4px;
+    border: 2px solid #c8a4e4;
+    box-sizing: border-box;
+    margin-bottom: 1em;
+}
+
+.buttonContainerReport {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.buttonSubmitReport {
+    padding: .8rem;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    font-size: .9em;
+    font-weight: 500;
+    transition: transform 0.1s ease;
+    background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+    cursor: pointer;
+}
+
+.cancelButton {
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.53);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.confirmationMessage p {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.closeButton {
+    padding: .8rem;
+    margin-left: 8.8em;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    font-size: .9em;
+    font-weight: 400;
+    transition: transform 0.1s ease;
+    background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+    cursor: pointer;
 }
 
 @media (max-width: 1040px) {
