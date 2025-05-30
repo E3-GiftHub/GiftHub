@@ -154,10 +154,23 @@ export default function ViewUserProfileUI({
       </div>
 
       {modalOpen && (
-        <div className={styles.modalOverlay} onClick={handleClose}>
+        <div
+          className={styles.modalOverlay}
+          onClick={handleClose}
+          tabIndex={0}
+          role="button"
+          aria-label="Close modal"
+          onKeyDown={(e) => {
+            // Support Enter/Space to close overlay
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleClose();
+            }
+          }}
+        >
           <div
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()} // Basic handler for linting
           >
             {!submitted ? (
               <form onSubmit={handleSubmit}>
