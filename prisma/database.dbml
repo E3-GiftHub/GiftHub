@@ -1,4 +1,13 @@
 // https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
+// 0. enum
+// 1. default models
+// 2. implemented components - main data
+// 3. event components
+// 4. actions
+// 5. reports
+// 6. notifications
+
+//! enum
 
 ENUM StatusType {
   PENDING
@@ -12,12 +21,19 @@ ENUM PriorityType {
   HIGH
 }
 
+/// we keep this in case of new types of marks
 ENUM MarkType {
   PURCHASED
-  RESERVED
-  CONTRIBUTED
   // NULL: if null => delete row
 }
+
+ENUM StatusPayment {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+//! implemented models - main data
 
 TABLE User {
   username STRING pk
@@ -26,24 +42,10 @@ TABLE User {
   fname STRING
   lname STRING
   password STRING
-  iban STRING
+  stripeConnectId STRING
   pictureUrl STRING
 
   emailVerified DATETIME
-  createdAt DATETIME
-  updatedAt DATETIME
-}
-
-TABLE Event {
-  id INTEGER pk
-  title STRING
-  description STRING
-  location STRING
-  date DATETIME
-  time DATETIME
-  pictureUrl STRING
-
-  createdByUsername STRING [ref: > User.username]
   createdAt DATETIME
   updatedAt DATETIME
 }
@@ -58,6 +60,55 @@ TABLE Invitation {
   repliedAt DATETIME
 }
 
+TABLE Event {
+  id INTEGER pk
+  title STRING
+  description STRING
+  location STRING
+  date DATETIME
+  time DATETIME
+  pictureUrl STRING
+  token STRING
+
+  createdByUsername STRING [ref: > User.username]
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+//! event components
+
+// junction TABLE for event-specific wishlist entry
+TABLE EventArticle {
+  id INTEGER PK
+  eventId INTEGER [ref: > Event.id]
+  itemId INTEGER [ref: > Item.id]
+  userNote STRING // additional note
+  priority PriorityType
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Item {
+  id INGETER pk
+  name STRING
+  description STRING
+  imagesUrl STRING
+  price DECIMAL
+
+  retailerId INTEGER [ref: > Retailer.id] //! NULL => custom item
+  retailerUrl STRING
+
+  createdAt DATETIME
+  updatedAt DATETIME
+}
+
+TABLE Retailer {
+  id INTEGER pk
+  name STRING
+  apiUrl STRING
+}
+
+//! actions
 TABLE Media {
   id INTEGER pk
   uploaderUsername STRING [ref: > User.username]
@@ -71,63 +122,56 @@ TABLE Media {
   createdAt DATETIME
 }
 
-// junction TABLE for event-specific wishlist entry
-TABLE EventArticle {
-  eventId INTEGER [ref: > Event.id]
-  itemId INTEGER [ref: > Item.id]
-  userNote STRING
-  priority PriorityType
+//! real money
+//! SetDefault = deleted content
+//! it is about real money, do not delete records
+
+TABLE StripeLink {
+  id STRING PK
+  guestUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id] /// required by prisma
+  articleId INTEGER [ref: > EventArticle.id] // optional: `direct contribution` case
+  itemId INTEGER [ref: > Item.id] /// required by prisma
+
+  stripePaymentLinkId STRING
+  paymentLinkUrl STRING // reusable redirecting link
+
+  amount DECIMAL
+  currency STRING
+  status StatusPayment
+
   createdAt DATETIME
   updatedAt DATETIME
-
-  Note: "Composite primary key on (eventId, itemId)"
 }
 
-TABLE Item {
-  id INGETER pk
-  name STRING
-  description STRING
-  imagesUrl STRING
-  price DECIMAL
+TABLE Contribution {
+  id INTEGER pk
+  guestUsername STRING [ref: > User.username]
+  eventId INTEGER [ref: > Event.id]
+  articleId INTEGER [ref: > EventArticle.id]
+  itemId INTEGER [ref: > Item.id]
 
-  retailerId INTEGER [ref: > Retailer.id]
-  retailerUrl STRING
-
+  cashAmount DECIMAL
+  currency STRING
   createdAt DATETIME
-  updatedAt DATETIME
+  updatedAt DATETIME //! updated only if SetDefault
 }
 
 TABLE Mark {
-  markerUsername STRING [ref: > User.username]
-  eventId INTEGER [ref: > Event.id]
-  articleId INTEGER [ref: > Item.id]
+  markerUsername STRING [ref: > User.username] // always a Guest
+  eventId INTEGER [ref: > Event.id] /// required by prisma
+  articleId INTEGER [ref: > EventArticle.id]
+  itemId INTEGER [ref: > Item.id] /// required by prisma
 
   type MarkType
   createdAt DATETIME
 }
 
-TABLE Retailer {
-  id INTEGER pk
-  name STRING
-  apiUrl STRING
-}
-
-TABLE Contribution {
-  id INTEGER pk
-  contributorUsername STRING [ref: > User.username]
-  eventId INTEGER [ref: > Event.id]
-  articleId INTEGER [ref: > Item.id]
-
-  cashAmount DECIMAL
-  createdAt DATETIME
-  updatedAt DATETIME
-
-  Note: "References EventArticles via (eventId, itemId)"
-}
+//! reports
 
 TABLE UserReport {
   id INTEGER pk
-  reportedByUsername STRING [ref: > User.username]
+  reportedByUsername STRING [ref: > User.username] // NOT always a Guest
   reportedUsername STRING [ref: > User.username]
   reason STRING
   description STRING
@@ -142,6 +186,8 @@ TABLE EventReport {
   description STRING
   reportedAt DATETIME
 }
+
+//! notification
 
 ENUM NotificationAction {
   READ
