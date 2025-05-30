@@ -16,6 +16,13 @@ interface EditUserProfileProps {
   onSave?: (newFname: string, newLname: string, newUsername: string, newEmail: string, newIban: string) => void;
   onResetPassword?: () => void;
   loading?: boolean;
+  onUpdateSuccess?: (updatedUser: {
+    username: string;
+    fname: string;
+    lname: string;
+    email: string;
+    iban: string;
+  }) => void;
 }
 
 const ProfileButton = ({
@@ -57,6 +64,7 @@ export default function EditUserProfileUI({
                                             onSave,
                                             onResetPassword,
                                             loading = false,
+                                            onUpdateSuccess
                                           }: Readonly<EditUserProfileProps>) {
   const [usernameInput, setUsernameInput] = useState(username);
   const [emailInput, setEmailInput] = useState(email);
@@ -64,6 +72,9 @@ export default function EditUserProfileUI({
   const [lnameInput, setLnameInput] = useState(lname);
   const [ibanInput, setIbanInput] = useState(IBAN);
   const [emailError, setEmailError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setUsernameInput(username);
@@ -84,9 +95,49 @@ export default function EditUserProfileUI({
     setEmailError(validateEmail(value) ? "" : "Please enter a valid email address");
   };
 
-  const handleSave = () => {
-    if (onSave && !emailError) {
+  const handleSave = async () => {
+    /*if (onSave && !emailError) {
       onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
+    }*/
+
+    if (emailError) return;
+    setIsSaving(true);
+    setSaveError("");
+
+    try {
+      if (onSave) {
+        onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
+      } else {
+        const response = await fetch("/api/user/update", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fname: fnameInput,
+            lname: lnameInput,
+            username: usernameInput,
+            email: emailInput,
+            iban: ibanInput,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to update user");
+        }
+        const data = await response.json();
+
+        if (onUpdateSuccess) {
+          onUpdateSuccess(data.user);
+        } else {
+          void router.push("/profile");
+        }
+      }
+    } catch (error) {
+      setSaveError(
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -187,7 +238,7 @@ export default function EditUserProfileUI({
               iconSrc="/UserImages/buttons/save-icon.svg"
               alt=""
               onClick={handleSave}
-              loading={loading}
+              loading={loading || isSaving}
               disabled={!!emailError}
             >
               Save changes

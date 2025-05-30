@@ -3,13 +3,19 @@ import Navbar from "~/components/Navbar";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
 import { mockUser } from "~/components/ui/UserProfile/mockUser";
 import type { GetServerSideProps } from "next";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/router";
 
 // Define the expected structure for the user object
-interface User {
-  username: string;
-  email?: string;
-  picture?: string;
-}
+// interface User {
+//   id: string;
+//   username: string;
+//   fname?: string;
+//   lname?: string;
+//   iban?: string;
+//   email?: string;
+//   picture?: string;
+// }
 
 // export const getServerSideProps: GetServerSideProps = async () => {
 //   try {
@@ -35,34 +41,42 @@ interface User {
 //   }
 // };
 
-export default function UserProfile({ user }: { user: User }) {
+export default function UserProfile() {
+
+  const{data: userData} = api.profile.user.get.useQuery();
+  const deleteUser = api.profile.user.delete.useMutation();
+  const router = useRouter();
+
+  // const userData = {
+  //   username: router.query.username || mockUser.username,
+  //   fname: router.query.fname || mockUser.fname,
+  //   lname: router.query.lname || mockUser.lname,
+  //   email: router.query.email || mockUser.email,
+  //   iban: router.query.iban || mockUser.iban,
+  //   picture: router.query.avatarUrl || mockUser.picture
+  // };
+
+
+
   const handleDelete = async () => {
+
+
     if (!confirm("Are you sure you want to delete your account?")) return;
 
     try {
-      const res = await fetch("/api/user/delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: user.username }),
-      });
-
-      // Use type assertion here as well
-      const data = (await res.json()) as { message?: string; error?: string };
-
-      if (!res.ok) {
-        alert("Failed to delete: " + (data.error ?? "Unknown error"));
-        return;
-      }
-
-      alert("Account deleted successfully");
+      await deleteUser.mutateAsync();
+      alert("Deleted account successfully!");
       window.location.href = "/";
     } catch (err) {
       console.error("Unexpected error during deletion:", err);
       alert("An error occurred while deleting your account.");
     }
   };
+
+  const handleEdit = () => {
+   void router.push("/editprofile");
+
+  }
 
   // const handleEditPhoto = async () => {
   //   // You can implement this function to edit the user's avatar
@@ -73,13 +87,13 @@ export default function UserProfile({ user }: { user: User }) {
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        key={mockUser.id}
-        username={mockUser.username}
-        fname={mockUser.fname}
-        lname={mockUser.lname}
-        email={mockUser.email}
-        iban={mockUser.iban}
-        avatarUrl={mockUser.picture}
+        //key={userData.id}
+        username={userData?.username}
+        fname={userData?.fname || ''}
+        lname={userData?.lname || ''}
+        email={userData?.email || ''}
+        iban={userData?.iban || ''}
+        avatarUrl={userData?.pictureUrl || ''}
       />
       <div className={styles["empty-space"]}></div>
     </div>

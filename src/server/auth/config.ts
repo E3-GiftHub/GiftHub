@@ -112,7 +112,7 @@ export const authConfig: NextAuthConfig = {
         // This object will be available in the `user` property of the `jwt` callback.
         console.log(`Authorize: Successfully authenticated user ${email}`);
         return {
-          id: user.id,
+          id: user.username,
           name: user.username, // Or user.name, adjust based on your User model
           email: user.email,
           // You can add any other properties you want to be available
@@ -126,7 +126,7 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
-        token.id = user.id; // Add the user ID to the JWT
+        token.id = user.name; // Add the user ID to the JWT
         // You can add other custom claims to the token here
         // token.username = user.username; // if user object has username
       }

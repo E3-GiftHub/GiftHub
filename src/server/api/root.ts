@@ -7,6 +7,7 @@ import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
 
 import { authRouter } from "~/server/api/routers/authRouter";
+import { profileRouter } from "~/server/api/routers/profileRouter";
 
 /**
  * This is the primary router for your server.
@@ -15,6 +16,7 @@ import { authRouter } from "~/server/api/routers/authRouter";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
+  profile: profileRouter,
   calendar: calendarRouter,
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
