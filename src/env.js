@@ -19,7 +19,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     SMTP_HOST: z.string(),
-    SMTP_PORT: z.coerce.number(),
+    SMTP_PORT: z.string(), 
     SMTP_USER: z.string().email(),
     SMTP_PASS: z.string(),
   },
