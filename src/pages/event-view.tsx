@@ -68,7 +68,7 @@ export default function EventView() {
   //get the event id
   const router = useRouter();
   
-/*
+
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
@@ -78,12 +78,12 @@ export default function EventView() {
   const eventId = Number(idParam) ?? 0;
   console.log("Event id: ", eventId);
   const parsedId = parseId(id) ?? 0;
-*/
+
 
 
   //const [eventId, setEventId] = useState<number | null>(null);
 
-  const [parsedId, setParsedId] = useState<number | null>(null);
+  //const [parsedId, setParsedId] = useState<number | null>(null);
 
 /*
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function EventView() {
   }, [router.isReady, router.query]);
 
   const parsedId = eventId!;
-*/
+
   
   useEffect(() => {
     if (!router.isReady || router.query.id == null) return;
@@ -122,7 +122,7 @@ export default function EventView() {
   const eventId = router.query.id;
   
   //console.log("ID: ",parsedId);
-
+*/
   const { data } = api.event.getEventID.useQuery({
     eventId: parsedId,
   },
