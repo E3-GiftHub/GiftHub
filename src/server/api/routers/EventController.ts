@@ -30,7 +30,7 @@ export const eventRouter = createTRPCRouter({
       }),
     )
      .mutation(({ input, ctx }) => {
-      const user = ctx.session?.user?.username;
+      const user = ctx.session?.user?.name;
       if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
 
       return handle(() =>
