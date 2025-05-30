@@ -172,7 +172,7 @@ model Event {
 model EventArticle {
     id       Int           @id @default(autoincrement())
     eventId  Int
-    itemId   Int
+    itemId   Int           @default(-1) // deleted item
     userNote String? // additional note
     priority PriorityType?
 
@@ -180,7 +180,7 @@ model EventArticle {
     updatedAt DateTime @updatedAt
 
     event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-    item  Item  @relation(fields: [itemId], references: [id], onDelete: Restrict)
+    item  Item  @relation(fields: [itemId], references: [id], onDelete: SetDefault)
 
     // @@id([eventId, itemId]) //! an item can be added ++ times
     Mark         Mark[]
@@ -196,10 +196,10 @@ model Item {
     name        String?
     description String?
     imagesUrl   String?
-    price       Decimal?
+    price       Decimal? //! NULL => custom item
 
-    retailerId Int? //! NULL => custom item
-    retailer   Retailer? @relation(fields: [retailerId], references: [id])
+    retailerId Int?
+    retailer   Retailer? @relation(fields: [retailerId], references: [id], onDelete: SetNull)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -264,8 +264,8 @@ model StripeLink {
 
     guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
     event   Event?        @relation(fields: [eventId], references: [id])
-    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
-    Item    Item?         @relation(fields: [itemId], references: [id], onDelete: SetNull)
+    article EventArticle? @relation(fields: [articleId], references: [id])
+    Item    Item?         @relation(fields: [itemId], references: [id])
 
     @@index([eventId, articleId, status])
 }
@@ -274,7 +274,7 @@ model Contribution {
     id            Int    @id @default(autoincrement())
     guestUsername String @default("DELETED_USER") // always a Guest
     eventId       Int? /// required by prisma
-    articleId     Int    @default(-1)
+    articleId     Int
     itemId        Int? /// required by prisma
 
     cashAmount Decimal
@@ -285,8 +285,8 @@ model Contribution {
 
     guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
     event   Event?       @relation(fields: [eventId], references: [id])
-    article EventArticle @relation(fields: [articleId], references: [id], onDelete: SetDefault)
-    item    Item?        @relation(fields: [itemId], references: [id], onDelete: SetNull)
+    article EventArticle @relation(fields: [articleId], references: [id])
+    item    Item?        @relation(fields: [itemId], references: [id])
 
     ContributionNotification ContributionNotification[]
 
