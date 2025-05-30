@@ -22,14 +22,16 @@ export class EventPlanner {
         date: data.date,
         time: data.time,
         token: nanoid(12),
-        //createdByUsername: data.createdBy,
-        user: {
-          //connect: { username: data.createdBy },
-          connectOrCreate: {
-            where: { username: data.createdBy },
-            create: { username: data.createdBy },
-          },
+        createdByUsername: data.createdBy,
+        /*
+	user: {
+          connect: { username: data.createdBy },
+          //connectOrCreate: {
+            //where: { username: data.createdBy },
+            //create: { username: data.createdBy },
+          //},
         },
+	*/
       },
     });
 

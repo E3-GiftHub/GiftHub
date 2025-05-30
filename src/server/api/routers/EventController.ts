@@ -30,14 +30,14 @@ export const eventRouter = createTRPCRouter({
       }),
     )
      .mutation(({ input, ctx }) => {
-      const userId = ctx.session?.user?.id;
-      if (!userId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      const user = ctx.session?.user?.username;
+      if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
 
       return handle(() =>
         eventPlanner
           .createEvent({
             ...input,
-            createdBy: userId,
+            createdBy: user,
           })
           .then((event) => event.raw)
       );
