@@ -10,31 +10,9 @@ export const invitationsRouter = createTRPCRouter({
       })
     ).query(async ({ ctx, input }) => {
       const { month, year } = input;
-    /*
-    // Enable this once session handling is ready
-    if (!ctx.session) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "You must be logged in",
-      });
-    }
-    */
 
-    const allUsers = await ctx.db.user.findMany({
-      select: { username: true },
-    });
 
-    if (!allUsers.length) {
-      return [];
-    }
-
-// Alege un utilizator random
-    const randomIndex = Math.floor(Math.random() * allUsers.length);
-    const userIdentifier = allUsers[randomIndex]?.username;
-
-    if (!userIdentifier) {
-      return [];
-    }
+    const userIdentifier = ctx.session!.user!.name!;
 
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
@@ -43,34 +21,34 @@ export const invitationsRouter = createTRPCRouter({
       where: {
         guestUsername: userIdentifier,
         event: {
-            date: {
-              gte: startDate,
-              lte: endDate,
-            },
+          date: {
+            gte: startDate,
+            lte: endDate,
           },
+        },
       },
       orderBy: {
         event: {
-        date: "asc",
+          date: "asc",
         },
-     },
+      },
       include: {
         event: true,
       },
     });
 
     return invitations
-        .filter((inv) => inv.event !== null)
-        .map((inv) => {
-          const event = inv.event;
-          return {
-            id: event.id,
-            title: event.title,
-            description: event.description,
-            photo: event.pictureUrl,
-            location: event.location,
-            date: event.date,
-          };
-        });
+      .filter((inv) => inv.event !== null)
+      .map((inv) => {
+        const event = inv.event;
+        return {
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          photo: event.pictureUrl,
+          location: event.location,
+          date: event.date,
+        };
+      });
   }),
 });

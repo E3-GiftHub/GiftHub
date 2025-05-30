@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   FaHome,
@@ -10,41 +11,38 @@ import {
   FaBars,
 } from "react-icons/fa";
 import styles from "./../styles/Navbar.module.css";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
 
   const profileRef = useRef<HTMLLIElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const specialPages = ["http://localhost:3000/#", "http://localhost:3000/"];
+    const updatePageState = () => {
+      const { pathname, hash } = window.location;
+      const isLanding =
+        pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
+      setIsLandingPage(isLanding);
 
-    const checkSpecialPage = () => {
-      const isSpecial = specialPages.includes(window.location.href);
-      setIsLandingPage(isSpecial);
-    };
-
-    const detectActivePage = () => {
       const url = window.location.href;
       if (url.includes("/home")) setActivePage("home");
       else if (url.includes("/inbox")) setActivePage("inbox");
       else setActivePage(null);
     };
 
-    checkSpecialPage();
-    detectActivePage();
-
-    window.addEventListener("hashchange", () => {
-      checkSpecialPage();
-      detectActivePage();
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", checkSpecialPage);
-    };
+    updatePageState();
+    window.addEventListener("hashchange", updatePageState);
+    return () => window.removeEventListener("hashchange", updatePageState);
   }, []);
 
   useEffect(() => {
@@ -76,19 +74,18 @@ const Navbar = () => {
       }`}
     >
       <div className={styles["navbar-left"]}>
-        <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        <Link href="/">
+          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        </Link>
       </div>
 
-      {isLandingPage ? (
+      {isLandingPage && !isLoggedIn ? (
         <div className={styles["login-wrapper"]}>
-          <a
-            href="http://localhost:3000/login#"
-            className={styles["login-button"]}
-          >
+          <Link href="/api/auth/signin" className={styles["login-button"]}>
             <FaUser />
             <FaArrowRight />
             Login
-          </a>
+          </Link>
         </div>
       ) : (
         <>
@@ -103,25 +100,27 @@ const Navbar = () => {
           {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 
           <ul
-            className={`${styles["nav-links"]} ${
-              menuOpen ? styles.open : ""
-            }`}
+            className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
             <li>
-              <a
-                href="http://localhost:3000/home#"
-                className={activePage === "home" ? styles["nav-link-active"] : ""}
+              <Link
+                href="/home#"
+                className={
+                  activePage === "home" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaHome /> Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="http://localhost:3000/inbox#"
-                className={activePage === "inbox" ? styles["nav-link-active"] : ""}
+              <Link
+                href="/inbox#"
+                className={
+                  activePage === "inbox" ? styles["nav-link-active"] : ""
+                }
               >
                 <FaInbox /> Inbox
-              </a>
+              </Link>
             </li>
             <li
               ref={profileRef}
@@ -129,7 +128,7 @@ const Navbar = () => {
                 profileOpen ? styles.open : ""
               }`}
             >
-              <a
+              <Link
                 href="#"
                 className={styles["profile-main-button"]}
                 onClick={(e) => {
@@ -138,14 +137,21 @@ const Navbar = () => {
                 }}
               >
                 <FaUser /> Profile
-              </a>
+              </Link>
               <div className={styles["dropdown-content"]}>
-                <a href="http://localhost:3000/profile#">
+                <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
-                </a>
-                <a href="http://localhost:3000/#">
+                </Link>
+                <Link
+                  href="/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    void signOut({ callbackUrl: "/" });
+
+                  }}
+                >
                   <FaSignOutAlt /> Logout
-                </a>
+                </Link>
               </div>
             </li>
           </ul>
