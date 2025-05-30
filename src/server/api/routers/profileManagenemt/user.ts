@@ -15,7 +15,7 @@ export const userRouter = createTRPCRouter({
           lname: true,
           id: true,
           email: true,
-          iban: true,
+          //iban: true,
           pictureUrl: true,
         },
       });
@@ -43,9 +43,9 @@ export const userRouter = createTRPCRouter({
         data: {
           fname: input.fname!,
           lname: input.lname!,
-          username: input.username!,
+          id: input.username!,
           email: input.email,
-          iban: input.iban!,
+          //iban: input.iban!,
         }
       });
       return updatedUser;

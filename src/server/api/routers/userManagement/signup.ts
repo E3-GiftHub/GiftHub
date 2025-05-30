@@ -44,7 +44,7 @@ export const signupRouter = createTRPCRouter({
           password: hashPasswd,
           fname: null,
           lname: null,
-          stripeConnectId: null,
+          //stripeConnectId: null,
           pictureUrl: "/UserImages/default_pgp.svg",
         },
       });

@@ -28,7 +28,7 @@ export default function EditUserProfile() {
     newLname: string,
     newUsername: string,
     newEmail: string,
-    newIban: string
+    //newIban: string
   ) => {
     setIsLoading(true);
     try{
@@ -37,7 +37,7 @@ export default function EditUserProfile() {
         lname: newLname,
         username: newUsername,
         email: newEmail,
-        iban: newIban
+        //iban: newIban
       });
 
       void router.push("/profile");
@@ -59,11 +59,11 @@ export default function EditUserProfile() {
       <Navbar />
       <EditUserProfileUI
         //key={currentUser.id}
-        username={userData?.username}
+        username={userData?.id || ''}
         fname={userData?.fname || ''}
         lname={userData?.lname || ''}
         email={userData?.email || ''}
-        IBAN={userData?.iban || ''}
+        //IBAN={userData?.iban || ''}
         avatarUrl={userData?.pictureUrl || ''}
         onSave={handleSave}
         onResetPassword={handleResetPassword}

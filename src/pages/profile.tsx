@@ -88,11 +88,11 @@ export default function UserProfile() {
       <Navbar />
       <UserProfileUI
         //key={userData.id}
-        username={userData?.username}
+        username={userData?.id || ''}
         fname={userData?.fname || ''}
         lname={userData?.lname || ''}
         email={userData?.email || ''}
-        iban={userData?.iban || ''}
+        //iban={userData?.iban || ''}
         avatarUrl={userData?.pictureUrl || ''}
       />
       <div className={styles["empty-space"]}></div>
