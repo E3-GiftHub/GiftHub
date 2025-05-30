@@ -146,7 +146,7 @@ export default function LogInForm() {
             </div>
           </div>
           <p className={styles.forgotPassword}>
-            <Link href="/forgotpassword" className={styles.forgotPassword}>
+            <Link href="/forgot-password" className={styles.forgotPassword}>
               Forgot password?
             </Link>
           </p>
