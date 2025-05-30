@@ -11,7 +11,7 @@ export default async function handler(
   const eventId = Number(req.query.eventId);
   if (!eventId) return res.status(400).json({ error: "Missing eventId" });
 
-  const guests = await prisma.invitation.findMany({
+  const invitations = await prisma.invitation.findMany({
     where: { eventId: eventId, status: StatusType.ACCEPTED },
     include: {
       guest: {
@@ -26,5 +26,5 @@ export default async function handler(
     },
   });
 
-  return res.status(200).json(guests);
+  return res.status(200).json(invitations.map((invite) => invite.guest));
 }

@@ -1,11 +1,13 @@
 // components/GuestListModal.tsx
-import React from "react";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import type { GuestHeader } from "~/models/GuestHeader";
 
 type GuestListModalProps = {
-  guests: string[];
-  onRemoveGuest: (index: number) => void;
+  loading: boolean;
+  eventId: number;
+  guests: readonly GuestHeader[];
+  onRemoveGuest: (username: string) => void;
   onClose: () => void;
   onSave: () => void;
   onAddGuest: () => void;
@@ -13,12 +15,16 @@ type GuestListModalProps = {
 };
 
 export default function GuestListModal({
+  loading,
+  eventId,
   guests,
   onRemoveGuest,
+  onAddGuest,
   onClose,
   onSave,
-  onAddGuest,
-}: GuestListModalProps) {
+  onBack,
+}: Readonly<GuestListModalProps>) {
+  if (loading) return <div>Loading guests...</div>;
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modal}>
@@ -34,14 +40,17 @@ export default function GuestListModal({
         <h3 className={styles.modalTitle}>Full Guest List</h3>
 
         <div className={styles.modalContent}>
-          {guests.map((guest, index) => (
-            <div key={index} className={styles.guestRow}>
-              <span>{guest}</span>
+          {guests.map((guest) => (
+            <div className={styles.guestRow} key={guest.username}>
+              <img src={guest.pictureUrl ?? ""} alt="user visual description" />
+              <p>
+                {guest.fname} {guest.lname} {guest.username}
+              </p>
               <button
                 className={styles.removeGuestButton}
-                onClick={() => onRemoveGuest(index)}
+                onClick={() => onRemoveGuest(guest.username)}
               >
-                ✕
+                Remove
               </button>
             </div>
           ))}

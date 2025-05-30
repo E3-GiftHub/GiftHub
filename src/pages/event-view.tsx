@@ -22,39 +22,27 @@ function parseId(param: string | string[] | undefined): number | null {
 }
 
 interface GuestListPreviewProps {
+  loading: boolean;
   eventId: number;
+  guests: readonly GuestHeader[];
 }
 
-function GuestListPreview({ eventId }: GuestListPreviewProps) {
-  const [guests, setGuests] = useState<GuestHeader[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`/api/guest-list?eventId=${eventId}`);
-        const data = (await res.json()) as GuestHeader[];
-        setGuests(data);
-      } catch (error) {
-        console.error("Failed to load guests", error);
-      } finally {
-        setLoading(false);
-      }
-    })().catch((err) => {
-      console.error("Unexpected error in useEffect:", err);
-    });
-  }, [eventId]);
-
+// prints at most 10 guests
+function GuestListPreview({
+  loading,
+  eventId,
+  guests,
+}: Readonly<GuestListPreviewProps>) {
   if (loading) return <div>Loading guests...</div>;
 
   return (
     <div className={styles.guestList}>
-      {guests.map((guest) => (
+      {guests.slice(0, 10).map((guest) => (
         <div className={styles.guestItem} key={guest.username}>
-          <p>{guest.username}</p>
-          <p>{guest.fname}</p>
-          <p>{guest.lname}</p>
           <img src={guest.pictureUrl ?? ""} alt="user visual description" />
+          <p>
+            {guest.fname} {guest.lname} {guest.username}
+          </p>
         </div>
       ))}
     </div>
@@ -67,25 +55,42 @@ export default function EventView() {
 
   //get the event id
   const router = useRouter();
-  
 
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
- 
+
   console.log("idParam: ", idParam);
   const eventId = Number(idParam) ?? 0;
   console.log("Event id: ", eventId);
   const parsedId = parseId(id) ?? 0;
 
-
-
+  //! AICI FACEM ROST DE GUESTS
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [guests, setGuests] = useState<GuestHeader[]>([]);
+  const [loadingGuests, setLoadingGuests] = useState(true);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`./api/guest-list?eventId=${eventId}`);
+        const data = (await res.json()) as GuestHeader[];
+        setGuests(data);
+      } catch (error) {
+        console.error("Failed to load guests", error);
+      } finally {
+        setLoadingGuests(false);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  }, [eventId]);
+  //! AICI SE TERMINA FACEREA DE ROST DE GUESTS
   //const [eventId, setEventId] = useState<number | null>(null);
 
   //const [parsedId, setParsedId] = useState<number | null>(null);
 
-/*
+  /*
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -123,16 +128,11 @@ export default function EventView() {
   
   //console.log("ID: ",parsedId);
 */
-  const { data } = api.event.getEventID.useQuery({
-    eventId: parsedId,
-  },
-  { enabled: parsedId !== null }
-  );
-
-  const guestsData = api.guest.getGuestsForEvent.useQuery({
-    eventId: parsedId,
-  },
-  { enabled: parsedId !== null }
+  const { data } = api.event.getEventID.useQuery(
+    {
+      eventId: parsedId,
+    },
+    { enabled: parsedId !== null },
   );
 
   const eventData = data?.data;
@@ -145,22 +145,47 @@ export default function EventView() {
     location: "",
   });
   const [showConfirm, setShowConfirm] = useState(false);
-const [pendingField, setPendingField] = useState<
-  keyof typeof formData | null
->(null);  const [tempValue, setTempValue] = useState("");
+  const [pendingField, setPendingField] = useState<
+    keyof typeof formData | null
+  >(null);
+  const [tempValue, setTempValue] = useState("");
 
-  // Guest list state
-  const [showGuestModal, setShowGuestModal] = useState(false);
-  const [guestList, setGuestList] = useState(
-    Array.from({ length: 24 }, (_, i) => `Guest ${i + 1}`),
-  );
-  const handleRemoveGuest = (idx: number) =>
-    setGuestList((prev) => prev.filter((_, i) => i !== idx));
+  // todo to change the frontend with hooks ANDREI
+  const handleRemoveGuest = (username: string) => {
+    const f = async () => {
+      try {
+        const res = await fetch(
+          `./api/guest-remove?username=${username}&eventId=${eventId}`,
+        );
+
+        const apiStatus = await res.json();
+        console.log(apiStatus);
+      } catch (error) {
+        console.error("Failed to remove guests", error);
+      }
+    };
+    f();
+  };
 
   const handleAddGuest = () => {
-    const name = window.prompt("Enter guest name:");
-    if (name?.trim()) {
-      setGuestList((prev) => [...prev, name.trim()]);
+    const name = window.prompt("Enter guest username:");
+    const user = guests.find((g) => g.username === name);
+
+    // the user is not already a Guest in this Event
+    if (user == null) {
+      const f = async () => {
+        try {
+          const res = await fetch(
+            `./api/guest-invite?username=${name}&eventId=${eventId}`,
+          );
+
+          const apiStatus = await res.json();
+          console.log(apiStatus);
+        } catch (error) {
+          console.error("Failed to insert guests", error);
+        }
+      };
+      f();
     }
   };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
@@ -168,19 +193,22 @@ const [pendingField, setPendingField] = useState<
   // Media list state
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const mediaData = api.media.getMediaByEvent.useQuery({ eventId: parsedId }, { enabled: parsedId !== null && parsedId > 0 });
+  const mediaData = api.media.getMediaByEvent.useQuery(
+    { eventId: parsedId },
+    { enabled: parsedId !== null && parsedId > 0 },
+  );
   const [mediaList, setMediaList] = useState(
     Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
   const removeMediaMutation = api.media.removeMedia.useMutation();
-  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery({
-    eventId: parsedId,
-  },
-  { enabled: parsedId !== null && parsedId > 0 }
+  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery(
+    {
+      eventId: parsedId,
+    },
+    { enabled: parsedId !== null && parsedId > 0 },
+  );
 
-);
-
-  console.log("ID: ",parsedId);
+  console.log("ID: ", parsedId);
 
   useEffect(() => {
     if (eventData?.date) {
@@ -197,17 +225,6 @@ const [pendingField, setPendingField] = useState<
       console.log("date ", date);
     }
   }, [eventData]);
-
-  useEffect(() => {
-    if (guestsData?.data) {
-      const guestNames = guestsData.data.map(
-        (guestElement) => guestElement.guest.username,
-      );
-      if (JSON.stringify(guestNames) !== JSON.stringify(guestList)) {
-        setGuestList(guestNames);
-      }
-    }
-  }, [guestsData, guestList]);
 
   if (eventData === undefined) {
     return (
@@ -251,21 +268,21 @@ const [pendingField, setPendingField] = useState<
     }
   };
 
-
   const handleConfirm = async () => {
     if (!pendingField) return;
 
-    setFormData(prev => ({ ...prev, [pendingField]: tempValue }));
+    setFormData((prev) => ({ ...prev, [pendingField]: tempValue }));
     setPendingField(null);
     setShowConfirm(false);
 
     const payload = {
-      eventId:    eventId,                        
-      title:      pendingField === "title"       ? tempValue : formData.title,
-      description:pendingField === "description" ? tempValue : formData.description,
-      date:       pendingField === "date"        ? tempValue : formData.date,
-      time:       pendingField === "time"        ? tempValue : formData.time,
-      location:   pendingField === "location"    ? tempValue : formData.location,
+      eventId: eventId,
+      title: pendingField === "title" ? tempValue : formData.title,
+      description:
+        pendingField === "description" ? tempValue : formData.description,
+      date: pendingField === "date" ? tempValue : formData.date,
+      time: pendingField === "time" ? tempValue : formData.time,
+      location: pendingField === "location" ? tempValue : formData.location,
     };
 
     try {
@@ -277,22 +294,19 @@ const [pendingField, setPendingField] = useState<
   };
 
   const handleCancel = () => {
-  if (!pendingField) return; // If no field is being edited, exit
+    if (!pendingField) return; // If no field is being edited, exit
 
-  setShowConfirm(false);
-  setPendingField(null); // Exit edit mode
-  setTempValue(""); // Clear temporary input value
+    setShowConfirm(false);
+    setPendingField(null); // Exit edit mode
+    setTempValue(""); // Clear temporary input value
 
-  // Safely revert only fields that exist in formData
-  setFormData(prev => ({
-    ...prev,
-    [pendingField]: eventData[pendingField as keyof typeof formData] ?? prev[pendingField],
-  }));
-};
-
-
-
-
+    // Safely revert only fields that exist in formData
+    setFormData((prev) => ({
+      ...prev,
+      [pendingField]:
+        eventData[pendingField as keyof typeof formData] ?? prev[pendingField],
+    }));
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -300,7 +314,9 @@ const [pendingField, setPendingField] = useState<
 
       {showGuestModal && (
         <GuestListModal
-          guests={guestList}
+          loading={loadingGuests}
+          eventId={eventId}
+          guests={guests}
           onRemoveGuest={handleRemoveGuest}
           onAddGuest={handleAddGuest}
           onSave={handleSaveGuestChanges}
@@ -396,7 +412,6 @@ const [pendingField, setPendingField] = useState<
           )}
         </div>
 
-
         <div className={styles.wrapper}>
           {/* Rand: Poză + Data+Locație + Descriere */}
           <div className={styles.topSection}>
@@ -405,6 +420,7 @@ const [pendingField, setPendingField] = useState<
               <img
                 className={styles.photoBox}
                 src={eventData.pictureUrl ?? undefined}
+                alt="the visual representation of the event"
               />
             </div>
             {/* Data + Locația */}
@@ -426,14 +442,15 @@ const [pendingField, setPendingField] = useState<
                 <input
                   type="time"
                   value={formData.time}
-                  onChange={(e) => {       
+                  onChange={(e) => {
                     setFormData((prev) => ({ ...prev, time: e.target.value }));
-                    formData.time = "HH:MM"
+                    formData.time = "HH:MM";
                   }}
-                  onKeyDown={(e) => {handleKeyDown(e,"time")}}
+                  onKeyDown={(e) => {
+                    handleKeyDown(e, "time");
+                  }}
                   className={styles.input}
                 />
-
               </div>
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>Location</label>
@@ -471,11 +488,15 @@ const [pendingField, setPendingField] = useState<
             </div>
           </div>
 
-          {/* todo harcode!Rand: Lista de invitați + buton + wishlist */}
+          {/* Rand: Lista de invitați + buton + wishlist */}
           <div className={styles.bottomRow}>
             <div className={styles.guestBoard}>
               <label className={styles.label2}>Guest List</label>
-              <GuestListPreview eventId={eventId} />
+              <GuestListPreview
+                loading={loadingGuests}
+                eventId={eventId}
+                guests={guests}
+              />
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
                 onClick={() => setShowGuestModal(true)}
@@ -488,7 +509,10 @@ const [pendingField, setPendingField] = useState<
               <div className={styles.mediaGrid}>
                 {mediaData.data?.map((mediaItem) => (
                   <div key={mediaItem.id} className={styles.mediaItem}>
-                    <img src={mediaItem.url} alt={"Media photo"} />
+                    <img
+                      src={mediaItem.url}
+                      alt={"representation of users' pictogrphic activity"}
+                    />
                   </div>
                 )) ?? <p>Loading media...</p>}
               </div>

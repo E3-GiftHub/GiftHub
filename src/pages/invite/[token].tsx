@@ -54,8 +54,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return { props: { event: null } };
   }
 
-  const eventRecord = await prisma.event.findUnique({
+  const eventRecord = await prisma.event.findFirst({
     where: { token: token },
+    select: { token: true },
   });
 
   if (!eventRecord) {
