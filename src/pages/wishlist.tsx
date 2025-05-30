@@ -7,9 +7,10 @@ import { useRouter } from "next/router";
 
 const WishlistPage: React.FC = () => {
   const router = useRouter();
+  const { id } = router.query;
 
   const handleContribute = () => {
-    void router.push("/contributionpage");
+    void router.push("/payment");
   };
 
   return (
@@ -23,7 +24,7 @@ const WishlistPage: React.FC = () => {
       </Head>
       <Navbar />
       <main className={styles.mainContent}>
-        <WishlistView contribution={handleContribute} />
+        <WishlistView contribution={handleContribute} eventId={id} />
       </main>
       <Footer />
     </div>

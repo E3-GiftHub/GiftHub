@@ -5,6 +5,7 @@ export interface TrendingItem {
   nume: string;
   pret: string;
   state: ItemState;
+  imageUrl?: string;
   contribution?: {
     current: number;
     total: number;
@@ -13,4 +14,5 @@ export interface TrendingItem {
 
 export interface WishlistProps {
   contribution: () => void;
+  eventId?: string | string[];
 }
