@@ -4,28 +4,36 @@ import { stripe } from "@/server/stripe";
 import { db as prisma } from "@/server/db";
 import type { StatusPayment } from "@prisma/client";
 import Stripe from "stripe";
+import { Prisma } from "@prisma/client"; // ← for Decimal
 
 /**
  * Creates a Stripe Payment Link for either:
- *   • A “contribution” (isContribute = true): funds stay in the platform’s Stripe account.
- *   • A “direct purchase” (isContribute = false): funds are forwarded to the event planner’s Stripe Connect account.
+ *   • A “contribution” (idType = "eventArticle"): funds stay in the platform’s Stripe account.
+ *   • A “direct purchase” (idType = "event"): funds are forwarded to the event planner’s Connect account.
  *
- * @param itemId       – The ID of the Item being “purchased” or “contributed toward”
- * @param isContribute – If true, money remains in platform; if false, money goes to the event planner’s Connect ID
- * @param amountRON    – The amount in whole RON (integer). E.g. 50 means 50.00 RON.
- *                       Stripe expects “unit_amount” in bani (1 RON = 100 bani), so we multiply by 100.
- * @param userId       – The purchaser’s username (to save into `StripeLink.guestUsername`).
+ * If there is already a StripeLink in our database with status = "PENDING",
+ * the same amount, made by the same user, and for the same event/article,
+ * this function immediately returns that existing link URL instead of creating a new one.
+ *
+ * @param id            – Either an EventArticle ID or an Event ID, depending on idType
+ * @param idType        – "eventArticle" or "event"
+ * @param amountRON     – The amount in whole RON (integer). E.g. 50 means 50.00 RON.
+ *                        Stripe expects `unit_amount` in bani (1 RON = 100 bani), so we multiply by 100.
+ * @param isContribute  – If true (only allowed when idType="eventArticle"), money remains in platform.
+ *                        If false, for idType="event" the money goes to the event planner’s Connect account.
+ * @param userId        – The purchaser’s username (to save into `StripeLink.guestUsername`).
  *
  * @returns An object containing:
- *    • url                  — the Stripe-hosted payment link URL
- *    • stripePaymentLinkId  — Stripe’s generated “payment_link” ID (used as the primary key in our DB)
- *    • amountInBani         — The computed integer in bani (amountRON * 100), as a BigInt
- *    • currency             — Always `"ron"` (must be lowercase ISO)
+ *    • url                 — the Stripe-hosted payment link URL
+ *    • stripePaymentLinkId — Stripe’s generated `payment_link` ID (used as the primary key in our DB)
+ *    • amountInBani        — The computed integer in bani (`amountRON * 100`), as a BigInt
+ *    • currency            — Always `"ron"` (must be lowercase ISO)
  */
 export async function createCheckoutLink(
-    itemId: number,
-    isContribute: boolean,
+    id: number,
+    idType: "eventArticle" | "event",
     amountRON: number,
+    isContribute: boolean,
     userId: string
 ): Promise<{
     url: string;
@@ -34,75 +42,141 @@ export async function createCheckoutLink(
     currency: string;
 }> {
     //
-    // 1. Validate `Item` existence and fetch its EventArticle→Event→User.stripeConnectId
-    //
-    const item = await prisma.item.findUnique({
-        where: { id: itemId },
-        include: {
-            // We only need the first EventArticle (wishlist entry) tied to this Item
-            eventOccurences: {
-                take: 1,
-                select: {
-                    id: true,
-                    event: {
-                        select: {
-                            id: true,
-                            createdByUsername: true,
-                            user: {
-                                select: {
-                                    stripeConnectId: true,
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    });
-
-    if (!item) {
-        throw new Error(`Item with id=${itemId} not found.`);
-    }
-
-    const eventOcc = item.eventOccurences[0];
-    if (!eventOcc) {
-        throw new Error(`Item ${itemId} is not tied to any event.`);
-    }
-
-    //
-    // 2. Convert the given amount (whole RON) to bani (Stripe’s smallest currency unit)
-    //    - Ensure `amountRON` is a positive integer.
+    // 1. Validate `amountRON` and compute `amountInBani`
     //
     if (!Number.isInteger(amountRON) || amountRON <= 0) {
         throw new Error(`Invalid amountRON: must be a positive integer, got ${amountRON}.`);
     }
     const amountInBani = BigInt(amountRON * 100); // e.g. 50 RON → 5000 bani
-    const currency = "ron"; // Stripe expects lowercase ISO currency code
+    const currency = "ron"; // Stripe requires lowercase ISO code
 
     //
-    // 3. If isContribute = false, extract the event planner’s Stripe Connect ID
+    // 2. Branch based on idType
+    //
+    // We'll prepare:
+    //   • itemId: either a real Item ID (if idType="eventArticle") or null (if idType="event")
+    //   • eventId: always the Event ID we end up charging against
+    //   • articleId: the EventArticle ID if idType="eventArticle", or null if idType="event"
+    //   • plannerUsername & plannerStripeId
+    //
+    let itemId: number | null = null;
+    let eventId: number;
+    let articleId: number | null = null;
+    let plannerUsername: string;
+    let plannerStripeId: string | null;
+
+    if (idType === "eventArticle") {
+        // ── Fetch the EventArticle row ──
+        const eventArticle = await prisma.eventArticle.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                item: { select: { id: true } }, // linked Item
+                event: {
+                    select: {
+                        id: true,
+                        createdByUsername: true,
+                        user: { select: { stripeConnectId: true } },
+                    },
+                },
+            },
+        });
+        if (!eventArticle) {
+            throw new Error(`EventArticle with id=${id} not found.`);
+        }
+        // Set fields:
+        articleId = eventArticle.id;
+        itemId = eventArticle.item.id;
+        eventId = eventArticle.event.id;
+        plannerUsername = eventArticle.event.createdByUsername;
+        plannerStripeId = eventArticle.event.user.stripeConnectId;
+        // For a “contribution” (idType="eventArticle"), we force isContribute = true:
+        if (!isContribute) {
+            throw new Error(`Contributions (idType="eventArticle") must have isContribute = true.`);
+        }
+    } else {
+        // idType === "event"
+        // ── Fetch the Event row ──
+        const eventRow = await prisma.event.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                createdByUsername: true,
+                user: { select: { stripeConnectId: true } },
+            },
+        });
+        if (!eventRow) {
+            throw new Error(`Event with id=${id} not found.`);
+        }
+        // Set fields:
+        articleId = null;
+        itemId = null; // no wishlist entry in “event” flow
+        eventId = eventRow.id;
+        plannerUsername = eventRow.createdByUsername;
+        plannerStripeId = eventRow.user.stripeConnectId;
+        // For a direct purchase of an Event, isContribute must be false:
+        if (isContribute) {
+            throw new Error(`Direct event purchases (idType="event") must have isContribute = false.`);
+        }
+    }
+
+    //
+    // 3. If isContribute = false, ensure plannerStripeId exists (so we can transfer funds)
     //
     let transferDestination: string | undefined = undefined;
     if (!isContribute) {
-        const plannerStripeId = eventOcc.event.user.stripeConnectId;
         if (!plannerStripeId) {
             throw new Error(
-                `Event planner "${eventOcc.event.createdByUsername}" does not have a Stripe Connect ID.`
+                `Event planner "${plannerUsername}" does not have a Stripe Connect ID.`
             );
         }
         transferDestination = plannerStripeId;
     }
 
     //
-    // 4. Create a Price object on Stripe for this exact amount and product description.
+    // 4. CHECK FOR AN EXISTING PENDING LINK
+    //    If one already exists with the same guestUsername, amount, eventId, & articleId,
+    //    return it immediately rather than creating a new one.
+    //
+    const existingLink = await prisma.stripeLink.findFirst({
+        where: {
+            guestUsername: userId,
+            amount: new Prisma.Decimal(amountRON.toString()),
+            status: "PENDING",
+            eventId: eventId,
+            articleId: articleId,
+        },
+        select: {
+            paymentLinkUrl: true,
+            stripePaymentLinkId: true,
+        },
+    });
+
+    if (existingLink) {
+        // Return the existing “PENDING” link
+        return {
+            url: existingLink.paymentLinkUrl,
+            stripePaymentLinkId: existingLink.stripePaymentLinkId,
+            amountInBani,
+            currency,
+        };
+    }
+
+    //
+    // 5. Create a Stripe Price object
+    //    • If idType="eventArticle", product name = "Item #<itemId> – Event #<eventId>"
+    //    • If idType="event",       product name = "Event #<eventId> – Planner: <plannerUsername>"
     //
     let price: Stripe.Price;
     try {
         price = await stripe.prices.create({
-            unit_amount: Number(amountInBani), // in bani (e.g. 5000 for 50.00 RON)
-            currency,                 // "ron"
+            unit_amount: Number(amountInBani),
+            currency,
             product_data: {
-                name: `Item #${itemId} – Event #${eventOcc.event.id}`,
+                name:
+                    idType === "eventArticle"
+                        ? `Item #${itemId} – Event #${eventId}`
+                        : `Event #${eventId} – Planner: ${plannerUsername}`,
             },
         });
     } catch (priceErr: any) {
@@ -113,16 +187,16 @@ export async function createCheckoutLink(
     }
 
     //
-    // 5. Build the Stripe PaymentLink parameters using the created Price ID.
+    // 6. Build the Stripe PaymentLink parameters
     //
     const paymentLinkParams: Stripe.PaymentLinkCreateParams = {
         line_items: [
             {
-                price: price.id, // reference the pre-created Price
+                price: price.id,
                 quantity: 1,
             },
         ],
-        // Include `transfer_data` at the top level (Connect only) if isContribute = false
+        // Only include transfer_data if isContribute = false (direct event purchase)
         ...(transferDestination
             ? {
                 transfer_data: {
@@ -130,10 +204,16 @@ export async function createCheckoutLink(
                 },
             }
             : {}),
-        // Metadata so you can reconcile on webhook events
         metadata: {
-            itemId: itemId.toString(),
-            eventArticleId: eventOcc.id.toString(),
+            // Always include eventId
+            eventId: eventId.toString(),
+            // If this was a contribution, also include eventArticleId
+            ...(idType === "eventArticle"
+                ? { eventArticleId: articleId!.toString() }
+                : {}),
+            // Include itemId if not null
+            ...(itemId !== null ? { itemId: itemId.toString() } : {}),
+            // Always include purchaserUsername, isContribute, and amountRON
             purchaserUsername: userId,
             isContribute: isContribute ? "true" : "false",
             amountRON: amountRON.toString(),
@@ -141,7 +221,7 @@ export async function createCheckoutLink(
     };
 
     //
-    // 6. Call Stripe to create the Payment Link
+    // 7. Call Stripe to create the Payment Link
     //
     let link: Stripe.PaymentLink;
     try {
@@ -154,28 +234,26 @@ export async function createCheckoutLink(
     }
 
     //
-    // 7. Persist a new row in our own `StripeLink` table
-    //    Use `link.id` (e.g. "plink_1AbCdEfGhIjKlMnOp") as the PK, store the URL, etc.
+    // 8. Persist a new row in our `StripeLink` table
     //
     try {
         await prisma.stripeLink.create({
             data: {
-                id: link.id,                        // Stripe’s generated payment_link ID
-                guestUsername: userId,              // who is purchasing
-                eventId: eventOcc.event.id,         // which event this is for
-                articleId: eventOcc.id,             // which wishlist entry
-                itemId: item.id,                    // which item
-                stripePaymentLinkId: link.id,       // duplicate of `id`, but matching your schema
-                paymentLinkUrl: link.url ?? "",     // the hosted URL to redirect the user
-                amount: amountRON.toString(),       // store "50" (RON) in your DB
-                currency,                           // "ron"
-                status: "PENDING" as StatusPayment, // initial status
+                id: link.id,                         // Stripe’s generated payment_link ID
+                guestUsername: userId,               // who is purchasing
+                eventId: eventId,                    // which event this is for
+                articleId: articleId,                // null if idType="event"
+                itemId: itemId,                      // null if idType="event"
+                stripePaymentLinkId: link.id,        // duplicate of `id`, matching your schema
+                paymentLinkUrl: link.url ?? "",      // the hosted URL to redirect the user
+                amount: new Prisma.Decimal(amountRON.toString()), // store e.g. "50" (RON) in your DB
+                currency,                            // "ron"
+                status: "PENDING" as StatusPayment,  // initial status
             },
         });
     } catch (prismaErr: any) {
         console.error("Prisma stripeLink.create error:", prismaErr);
-        // Ideally, you might want to delete the Stripe PaymentLink if your DB write fails,
-        // so you don’t orphan a link. But at minimum, surface an error to the caller:
+        // Optionally: roll back the Stripe PaymentLink if you want to avoid orphaned links
         throw new Error(
             `Failed to save StripeLink in database: ${prismaErr.message || prismaErr.toString()}`
         );

@@ -1,5 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 import styles from "../styles/Payment.module.css";
 import Image from "next/image";
@@ -7,232 +9,176 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../app/globals.css";
 
-const CURRENT_EVENT_ID = 43858;
-const TARGET_ARTICLE_ID = 101;
-// --- END: Placeholder Values ---
-
 export default function CheckoutPage() {
-  const [contributionAmount, setContributionAmount] = useState("");
-  const [progress, setProgress] = useState<{
-    total: number;
-    goal: number;
-  } | null>(null);
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const router = useRouter();
+    const { data: session, status } = useSession();
 
-  // Using the eventId defined above.
-  // In a dynamic scenario, you'd get this ID from props, context, or router.
-  const eventIdToUse = CURRENT_EVENT_ID;
+    // Local state for the amount the user types in (in RON)
+    const [contributionAmount, setContributionAmount] = useState("");
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      if (!eventIdToUse) {
-        console.warn("eventId is missing. Cannot fetch progress.");
-        setIsLoadingProgress(false);
-        setProgress(null);
-        return;
-      }
+    // State to hold the ID we got from the URL and the type (either "eventArticle" or "event")
+    const [idType, setIdType] = useState<"eventArticle" | "event" | null>(null);
+    const [idValue, setIdValue] = useState<number | null>(null);
 
-      setIsLoadingProgress(true);
-      try {
-        const res = await fetch(
-          `/api/payment/progress?eventId=${eventIdToUse}`,
-        );
-        if (!res.ok) {
-          let errorMsg = `Failed to fetch progress: ${res.status}`;
-          try {
-            const errorData = await res.json();
-            errorMsg = errorData.message || errorMsg;
-          } catch (parseError) {
-            // Ignore if response is not JSON
-          }
-          throw new Error(errorMsg);
+    // When the router is ready, parse ?eventid=… or ?articleid=…
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        const { eventid, articleid } = router.query;
+        if (typeof articleid === "string") {
+            setIdType("eventArticle");
+            setIdValue(parseInt(articleid, 10));
+        } else if (typeof eventid === "string") {
+            setIdType("event");
+            setIdValue(parseInt(eventid, 10));
+        } else {
+            setIdType(null);
+            setIdValue(null);
         }
-        const data = await res.json();
-        setProgress(data);
-      } catch (err) {
-        console.error("Error fetching progress:", err);
-        setProgress(null); // Set to null to indicate loading failure
-      } finally {
-        setIsLoadingProgress(false);
-      }
+    }, [router.isReady, router.query]);
+
+    // Handle the “Checkout” button click
+    const handleCheckout = async () => {
+        // 1. Validate user is signed in
+        if (status !== "authenticated" || !session?.user?.id) {
+            alert("You must be signed in to proceed.");
+            return;
+        }
+        const purchaserUsername = session.user.id as string;
+
+        // 2. Validate amount
+        const amount = Number(contributionAmount);
+        if (isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid contribution amount."); // or “purchase amount”
+            return;
+        }
+
+        // 3. Validate that we have a valid idType/idValue from the URL
+        if (!idType || idValue === null) {
+            alert("Cannot proceed: missing event or article ID in the URL.");
+            console.error("Missing ID from query:", { idType, idValue });
+            return;
+        }
+
+        // 4. Determine isContribute based on idType:
+        //    - if idType = "eventArticle", isContribute = true (contribution to a wishlist)
+        //    - if idType = "event",        isContribute = false (direct purchase to planner)
+        const isContribute = idType === "eventArticle";
+
+        setIsCheckingOut(true);
+
+        try {
+            // 5. Call our NEW API route (moved to /api/stripe/contribute)
+            const response = await fetch("/api/stripe/contribute", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: idValue,
+                    idType,
+                    amount,
+                    isContribute,
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok && data.url) {
+                // 6. Redirect the browser to Stripe’s hosted checkout
+                window.location.href = data.url;
+            } else {
+                alert(data.error || "Failed to initiate checkout. Please try again.");
+                console.error("Stripe Checkout Error:", data);
+            }
+        } catch (err) {
+            console.error("Network or unexpected error:", err);
+            alert(
+                "An error occurred while creating the checkout. Please check your connection and try again."
+            );
+        } finally {
+            setIsCheckingOut(false);
+        }
     };
 
-    fetchProgress();
-  }, [eventIdToUse]); // Re-run if eventIdToUse changes
-
-  const handleCheckout = async () => {
-    const amount = Number(contributionAmount);
-    if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid contribution amount."); // Translated
-      return;
+    // While router or session is loading, we can show a simple “Loading…” state
+    if (!router.isReady || status === "loading") {
+        return (
+            <div className={styles.container}>
+                <Navbar />
+                <div className={styles.card}>
+                    <p>Loading…</p>
+                </div>
+                <Footer />
+            </div>
+        );
     }
 
-    if (!eventIdToUse || !TARGET_ARTICLE_ID) {
-      alert(
-        "Event or Article information is missing. Checkout cannot proceed.",
-      ); // Translated
-      console.error("Missing eventId or articleId for checkout:", {
-        eventIdToUse,
-        TARGET_ARTICLE_ID,
-      });
-      return;
-    }
-
-    setIsCheckingOut(true);
-    const endpoint = "/api/payment/contribute";
-    const body = {
-      amount: amount,
-      eventId: eventIdToUse,
-      articleId: TARGET_ARTICLE_ID,
-    };
-
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.url) {
-        window.location.href = data.url; // Redirect to Stripe
-      } else {
-        alert(
-          data.message ||
-            "Failed to initiate Stripe checkout. Please try again.",
-        ); // Translated (fallback)
-        console.error("Checkout failed:", data);
-      }
-    } catch (error) {
-      console.error("Checkout request failed:", error);
-      alert(
-        "An error occurred during processing. Please check your connection and try again.",
-      ); // Translated
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
-
-  let progressContent;
-  if (isLoadingProgress) {
-    progressContent = (
-      <p style={{ marginTop: "20px", textAlign: "center" }}>
-        Loading progress...
-      </p>
-    ); // Translated
-  } else if (
-    progress &&
-    typeof progress.total === "number" &&
-    typeof progress.goal === "number"
-  ) {
-    const percentage =
-      progress.goal > 0 ? (progress.total / progress.goal) * 100 : 0;
-    progressContent = (
-      <div style={{ marginTop: "20px" }}>
-        <p style={{ marginBottom: "8px", textAlign: "center" }}>
-          €{progress.total.toFixed(2)} raised out of €{progress.goal.toFixed(2)}{" "}
-          {/* Translated "strânși din" to "raised out of" */}
-        </p>
-        <div
-          style={{
-            width: "100%",
-            backgroundColor: "#4A4A4A",
-            borderRadius: "8px",
-            overflow: "hidden",
-            height: "20px",
-          }}
-        >
-          <div
-            style={{
-              width: `${Math.min(percentage, 100)}%`,
-              backgroundColor: "#8a2be2",
-              height: "100%",
-              transition: "width 0.5s ease-in-out",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontSize: "12px",
-            }}
-          >
-            {/* {percentage > 5 && `${percentage.toFixed(0)}%`} */}
-          </div>
+    return (
+        <div className={styles.container}>
+            <Navbar />
+            <div className={styles.card}>
+                <h2 className={styles.orderId}>Order id #14385683458738543</h2>
+                <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+                    <label
+                        htmlFor="contributionAmountInput"
+                        style={{
+                            marginRight: "10px",
+                            display: "block",
+                            marginBottom: "5px",
+                        }}
+                    >
+                        {idType === "eventArticle"
+                            ? "Contribution Amount (RON):"
+                            : "Purchase Amount (RON):"}
+                    </label>
+                    <input
+                        id="contributionAmountInput"
+                        type="number"
+                        value={contributionAmount}
+                        onChange={(e) => setContributionAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        className={styles.contributionInput}
+                        min="1"
+                        disabled={isCheckingOut}
+                    />
+                </div>
+                <div className={styles.tableHeader}>
+          <span>
+            {idType === "eventArticle" ? "Contribute to Item" : "Event"}
+          </span>
+                </div>
+                <div className={styles.eventRowAlt}>
+                    <Image
+                        src="/cake.png"
+                        alt="Birthday Cake"
+                        width={100}
+                        height={100}
+                        className={styles.image}
+                    />
+                    <div className={styles.eventDetails}>
+                        {idType === "eventArticle" ? (
+                            <>
+                                <span>Wish‐list Item for Event #{idValue}</span>
+                                <span>Event No. {idValue}</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>Giga Chad Birthday Party</span>
+                                <span>Event No. {idValue}</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+                <div className={styles.checkoutBtnWrapper}>
+                    <button
+                        className={styles.checkoutBtn}
+                        onClick={handleCheckout}
+                        disabled={isCheckingOut}
+                    >
+                        {isCheckingOut ? "Processing…" : "CHECKOUT"}
+                    </button>
+                </div>
+            </div>
+            <Footer />
         </div>
-      </div>
     );
-  } else {
-    progressContent = (
-      <p style={{ marginTop: "20px", textAlign: "center", color: "orange" }}>
-        Progress information could not be loaded.
-      </p>
-    ); // Translated
-  }
-
-  return (
-    <div className={styles.container}>
-      <Navbar />
-      <div className={styles.card}>
-        <h2 className={styles.orderId}>Order id #14385683458738543</h2>{" "}
-        {/* Already in English */}
-        <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-          <label
-            htmlFor="contributionAmountInput"
-            style={{
-              marginRight: "10px",
-              display: "block",
-              marginBottom: "5px",
-            }}
-          >
-            Contribution Amount (EUR): {/* Translated */}
-          </label>
-          <input
-            id="contributionAmountInput"
-            type="number"
-            value={contributionAmount}
-            onChange={(e) => setContributionAmount(e.target.value)}
-            placeholder="Enter amount" // Translated
-            className={styles.contributionInput}
-            min="1"
-            disabled={isCheckingOut}
-          />
-        </div>
-        <div className={styles.tableHeader}>
-          <span>Event</span> {/* Translated */}
-          <span>Contribution Amount</span> {/* Translated */}
-        </div>
-        <div className={styles.eventRowAlt}>
-          <Image
-            src="/cake.png"
-            alt="Birthday Cake"
-            width={100}
-            height={100}
-            className={styles.image}
-          />
-          <div className={styles.eventDetails}>
-            <span>Giga Chad Birthday Party</span> {/* Kept as a proper name */}
-            <span>Event No. {eventIdToUse}</span>{" "}
-            {/* Translated "Eveniment Nr." to "Event No." */}
-          </div>
-          <span className={styles.amountAlt}>100 lei/euro</span>{" "}
-          {/* Kept as specific data display */}
-        </div>
-        {progressContent}
-        <div className={styles.checkoutBtnWrapper}>
-          <button
-            className={styles.checkoutBtn}
-            onClick={handleCheckout}
-            disabled={isCheckingOut || isLoadingProgress}
-          >
-            {isCheckingOut ? "Processing..." : "CHECKOUT"}{" "}
-            {/* Translated "Se procesează..." */}
-          </button>
-        </div>
-      </div>
-      <Footer />
-    </div>
-  );
 }
