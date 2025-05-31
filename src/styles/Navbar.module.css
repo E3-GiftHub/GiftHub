@@ -325,6 +325,11 @@
   display: none;
 }
 
+.nav-button-stripe {
+  width: 100px;
+  margin: 0;
+}
+
 /* -------------------- RESPONSIVE: SMALL MOBIL -------------------- */
 
 @media (max-width: 300px) {
@@ -415,6 +420,16 @@
   .dropdown-content a svg {
     font-size: 0.85rem;
   }
+  .nav-button-stripe {
+    width: 55%;
+    max-width: 120px;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .nav-button-stripe svg {
+    font-size: 0.85rem;
+  }
 }
 
 /* -------------------- RESPONSIVE: DESKTOP -------------------- */
@@ -447,4 +462,46 @@
   .sidebar-overlay {
     display: none;
   }
+}
+
+.nav-button-stripe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  color: #c8abd6;
+  border: 1px solid #c8abd6;
+  border-radius: 8px;
+  padding: 0.6rem 0.5rem;
+  width: 160px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: normal;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.nav-button-stripe:hover,
+.nav-button-stripe:focus {
+  background-color: white;
+  color: #1e1646;
+  border-color: white;
+  transform: scale(1.05);
+  outline: none;
+}
+
+.nav-button-stripe svg {
+  font-size: 1.1em;
+}
+
+.nav-button-stripe:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #555555;
+  border-color: #444444;
+  color: #aaaaaa;
+  transform: none;
 }
