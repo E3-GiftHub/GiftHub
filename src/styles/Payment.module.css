@@ -1,0 +1,162 @@
+.container {
+  background-color: #0e0621;
+  color: white;
+  min-height: 100vh;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  background-color: #2a1c57;
+  padding: 2rem;
+  border-radius: 10px;
+  margin: 2rem auto;
+  border: 1px solid #774fbc;
+  max-width: 800px;
+}
+
+.orderId {
+  text-align: center;
+  font-weight: bold;
+}
+
+.paymentSectionAlt {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.active {
+  background-color: #c2aaff;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+}
+
+.inactive {
+  background-color: transparent;
+  border: 1px solid #bbb;
+  color: #bbb;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.tableHeader {
+  background-color: #1a1333;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  font-weight: bold;
+  margin-top: 2rem;
+}
+
+.eventRowAlt {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #444;
+  border-bottom: 1px solid #444;
+}
+
+.eventDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.amountAlt {
+  margin-left: auto;
+  color: #ccc;
+}
+
+.image {
+  border-radius: 10px;
+}
+
+.checkoutBtnWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.checkoutBtn {
+  background: linear-gradient(to right, #627bff, #c684ff);
+  padding: 1rem 2rem;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.2);
+}
+
+.checkoutBtn:hover {
+  background: linear-gradient(to right, #7f95ff, #d29cff);
+  transform: scale(1.03);
+  box-shadow: 0px 0px 16px rgba(255, 255, 255, 0.4);
+}
+
+.inactive {
+  background-color: transparent;
+  border: 1px solid #bbb;
+  color: #bbb;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.inactive:hover {
+  background-color: #1f103b;
+  color: #fff;
+  border-color: #c2aaff;
+}
+
+.actionButton {
+  background: linear-gradient(to right, #627bff, #c684ff);
+  padding: 1rem 2rem;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+
+.actionButton:hover {
+  background: linear-gradient(to right, #7f95ff, #d29cff);
+  transform: scale(1.03);
+  box-shadow: 0px 0px 16px rgba(255, 255, 255, 0.4);
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  /* Spațiu între cele două butoane */
+  flex-wrap: wrap;
+}
+
+.mainContent {
+  flex-grow: 1;
+  /* împinge footerul jos */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.contributionInput {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 200px;
+  background-color: #1a1333;
+  color: white;
+}

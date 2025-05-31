@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 import LogInForm from "~/components/ui/Account/LogInForm";
-import { act } from 'react';
+import { act } from "react";
 import { signIn } from "next-auth/react";
 
 // LoginForm.test.tsx
@@ -40,7 +40,9 @@ describe("LogInForm", () => {
     render(<LogInForm />);
     fireEvent.click(screen.getByRole("button", { name: /log in/i }));
     /*expect(await screen.findByText(/email is required/i)).toBeInTheDocument();*/
-    expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/password is required/i),
+    ).toBeInTheDocument();
   });
 
   // test("validates invalid email format", async () => {
@@ -84,7 +86,10 @@ describe("LogInForm", () => {
   test("navigates to forgot password page", () => {
     render(<LogInForm />);
     const forgotPasswordLink = screen.getByText(/forgot password/i);
-    expect(forgotPasswordLink.closest("a")).toHaveAttribute("href", "/forgotpassword");
+    expect(forgotPasswordLink.closest("a")).toHaveAttribute(
+      "href",
+      "/forgotpassword",
+    );
   });
 
   test("navigates to signup page", () => {
@@ -103,7 +108,6 @@ describe("LogInForm extra behaviors", () => {
   //   mockPush.mockReset();
   //   // mockMutate.mockReset();
   // });
-
   // test("redirects if auth cookie exists", () => {
   //   // Mock cookie directly in component mount
   //   Object.defineProperty(document, "cookie", {
@@ -114,7 +118,6 @@ describe("LogInForm extra behaviors", () => {
   //   render(<LogInForm />);
   //   expect(mockPush).toHaveBeenCalledWith("/home");
   // });
-
   // test("successful login redirects to home", async () => {
   //   mockSignIn.mockResolvedValueOnce({ ok: true, error: null });
   //
@@ -138,8 +141,6 @@ describe("LogInForm extra behaviors", () => {
   //     expect(mockPush).toHaveBeenCalledWith("/home");
   //   });
   // });
-
-
   // test("handles 'User not found' error", async () => {
   //   render(<LogInForm />);
   //   fireEvent.change(screen.getByLabelText(/email/i), {
@@ -190,7 +191,6 @@ describe("LogInForm extra behaviors", () => {
   //   const errorMessage = await screen.findByText(/invalid email or password/i);
   //   expect(errorMessage).toBeInTheDocument();
   // });
-
   // test("handles server errors", async () => {
   //   mockSignIn.mockResolvedValueOnce({
   //     error: "ServerDown",
@@ -211,7 +211,6 @@ describe("LogInForm extra behaviors", () => {
   //   const errorMessage = await screen.findByText(/unexpected error occurred/i);
   //   expect(errorMessage).toBeInTheDocument();
   // });
-
   // test("handles 'Passwords don't match' error", async () => {
   //   render(<LogInForm />);
   //   fireEvent.change(screen.getByLabelText(/email/i), {

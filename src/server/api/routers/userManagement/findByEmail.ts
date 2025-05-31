@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 const findByEmailSchema = z.object({
@@ -8,22 +8,21 @@ const findByEmailSchema = z.object({
 export const recoveryRouter = createTRPCRouter({
   findByEmail: publicProcedure
     .input(findByEmailSchema)
-    .mutation(async ({input, ctx}) => {
-      const {email} = input;
+    .mutation(async ({ input, ctx }) => {
+      const { email } = input;
 
       const user = await ctx.db.user.findUnique({
         where: {
           email: input.email,
-        }
+        },
       });
 
-      if(!user)
-      {
+      if (!user) {
         throw new Error("User not found");
       }
 
-      return{
+      return {
         success: true,
-      }
-    })
-})
+      };
+    }),
+});
