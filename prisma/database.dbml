@@ -68,7 +68,6 @@ TABLE Event {
   description STRING
   location STRING
   date DATETIME
-  time DATETIME
   pictureUrl STRING
   token STRING
 
