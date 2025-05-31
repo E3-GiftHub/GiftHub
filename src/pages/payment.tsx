@@ -1,9 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-// For App Router to get path params, you'd typically get it from page props if it's a dynamic segment like /checkout/[eventId]/page.js
-// or use the `useParams` hook from `next/navigation`.
-// For Pages Router, you'd use `useRouter` from `next/router`.
-// For now, we'll use constants for simplicity.
 
 import styles from "../styles/Payment.module.css";
 import Image from "next/image";
@@ -11,12 +7,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../app/globals.css";
 
-// --- START: Placeholder Values ---
-// In a real application, these IDs should be dynamic.
-// For example, eventId could come from the URL, and articleId might be the ID
-// of a specific product associated with this page/event.
-const CURRENT_EVENT_ID = 43858; // Assuming "Event Number 43858" is the eventId
-const TARGET_ARTICLE_ID = 101; // An example ItemCatalogue.id (e.g., for the cake)
+const CURRENT_EVENT_ID = 43858;
+const TARGET_ARTICLE_ID = 101;
 // --- END: Placeholder Values ---
 
 export default function CheckoutPage() {

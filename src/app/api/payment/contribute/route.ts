@@ -49,12 +49,12 @@ export async function POST(req: NextRequest) {
 
     const existingPendingLink = await prisma.stripeLink.findFirst({
       where: {
-        creatorUsername: authenticatedUserUsername,
+        guestUsername: authenticatedUserUsername as string,
         eventId: eventId,
         articleId: articleId,
         amount: amount,
         currency: currency,
-        status: "pending",
+        status: "PENDING",
       },
       select: {
         paymentLinkUrl: true,
@@ -166,10 +166,10 @@ export async function POST(req: NextRequest) {
         paymentLinkUrl: stripePaymentLinkObject.url,
         amount: amount,
         currency: currency,
-        status: "pending",
+        status: "PENDING",
         eventId: eventId,
         articleId: articleId, 
-        creatorUsername: authenticatedUserUsername,
+        guestUsername: authenticatedUserUsername,
       },
     });
 

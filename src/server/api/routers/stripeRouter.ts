@@ -6,36 +6,6 @@ import { TRPCError } from "@trpc/server";
 import Stripe from "stripe";
 
 export const stripeRouter = createTRPCRouter({
-  createExpressAccount: protectedProcedure
-    .input(z.object({
-      country: z.string(),
-      email: z.string().email(),
-    }))
-    .mutation(async ({ input, ctx }) => {
-      // Presupunem că ctx.session.user.id conține username-ul utilizatorului,
-      // deoarece 'username' este @id în modelul User.
-      if (!ctx.session.user.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "User identifier not found in session." });
-      }
-      const userIdentifier = ctx.session.user.id;
-
-      const account = await stripe.accounts.create({
-        type: "express",
-        country: input.country,
-        email: input.email,
-        metadata: { userId: userIdentifier }, // userId în metadata Stripe este OK, valoarea este username-ul
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-        },
-      });
-
-      await ctx.db.user.update({
-        where: { username: userIdentifier }, // Corectat: id -> username
-        data: { stripeConnectId: account.id }, // Corectat: stripeAccountId -> stripeConnectId
-      });
-      return { accountId: account.id };
-    }),
 
   createDashboardLoginLink: protectedProcedure
     .mutation(async ({ ctx }) => {

@@ -1,8 +1,9 @@
-import { db as prisma } from "~/server/db";
+import { db as prisma } from "@/server/db";
 import { EventEntity } from "./Event";
 import { EventManagementException } from "./EventManagementException";
-import { StatusType, User } from "@prisma/client";
-import { stripe } from "~/server/stripe";
+import type { User } from "@prisma/client";
+import { StatusType } from "@prisma/client";
+import { stripe } from "@/server/stripe";
 
 export class EventPlanner {
   async createEvent(data: {
@@ -85,15 +86,15 @@ export class EventPlanner {
       data: {
         eventId: eventId,
         guestUsername: guestUsername,
-        status: Status.PENDING,
+        status: StatusType.PENDING,
       },
     });
   }
 
   async manageWishlist(eventId: number) {
-    const wishlist = await prisma.EventArticle.findMany({
-      where: { eventId: eventId },
-      include: { item: true },
+    const wishlist = await prisma.eventArticle.findMany({
+        where: { eventId: eventId },
+        include: { item: true },
     });
     return wishlist;
   }
@@ -103,7 +104,7 @@ export class EventPlanner {
       where: { eventId: eventId },
     });
     const acceptedCount = await prisma.invitation.count({
-      where: { eventId: eventId, status: Status.ACCEPTED },
+      where: { eventId: eventId, status: StatusType.ACCEPTED },
     });
 
     return {
