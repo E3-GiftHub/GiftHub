@@ -153,11 +153,7 @@ export default function EventView() {
             error: string;
           };
           console.log(apiStatus);
-          // Optionally add to view after successful invite
-          setGuests((prev) => [
-            ...prev,
-            { username: name, fname: "", lname: "", email: null, pictureUrl: "" },
-          ]);
+          // Do NOT add to view here; guest appears after they accept invitation
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
@@ -422,7 +418,7 @@ export default function EventView() {
                   type="time"
                   value={formData.time}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, time: e.target.value }))
+                    setFormData((prev) => ({ ...prev, time: e.target.value}))
                   }
                   onKeyDown={(e) => {
                     handleKeyDown(e, "time");
