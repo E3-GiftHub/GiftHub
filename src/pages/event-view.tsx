@@ -41,7 +41,7 @@ function GuestListPreview({
         <div className={styles.guestItem} key={guest.username}>
           <img src={guest.pictureUrl ?? ""} alt="user visual description" />
           <p>
-            {guest.fname} {guest.lname} {guest.username}
+            {guest.fname} {guest.lname} ({guest.username})
           </p>
         </div>
       ))}
@@ -50,10 +50,10 @@ function GuestListPreview({
 }
 
 export default function EventView() {
-  //update events
+  // update events
   const updateEventMutation = api.event.updateEvent.useMutation();
 
-  //get the event id
+  // get the event id
   const router = useRouter();
 
   const { id } = router.query;
@@ -73,7 +73,9 @@ export default function EventView() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`./api/guest-list?eventId=${eventId}`);
+        const res = await fetch(
+          `./api/guest-list?eventId=${eventId}`
+        );
         const data = (await res.json()) as GuestHeader[];
         setGuests(data);
       } catch (error) {
@@ -86,53 +88,12 @@ export default function EventView() {
     });
   }, [eventId]);
   //! AICI SE TERMINA FACEREA DE ROST DE GUESTS
-  //const [eventId, setEventId] = useState<number | null>(null);
 
-  //const [parsedId, setParsedId] = useState<number | null>(null);
-
-  /*
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const { id } = router.query;
-    const idParam = Array.isArray(id) ? id[0] : id;
-    const parsed = Number(idParam);
-
-    setEventId(!isNaN(parsed) ? parsed : 0);
-  }, [router.isReady, router.query]);
-
-  const parsedId = eventId!;
-
-  
-  useEffect(() => {
-    if (!router.isReady || router.query.id == null) return;
-
-    // Extract eventId (which is 'id' param here)
-    const eventId = router.query.id;
-
-    // eventId can be string | string[] | undefined
-    const idParam = Array.isArray(eventId) ? eventId[0] : eventId;
-
-    // Convert to number
-    const numId = Number(idParam);
-
-    // Only set if valid number
-    if (!isNaN(numId)) {
-      setParsedId(numId); // <--- This is where you copy eventId into parsedId
-    } else {
-      setParsedId(null);
-    }
-  }, [router.isReady, router.query]);
-
-  const eventId = router.query.id;
-  
-  //console.log("ID: ",parsedId);
-*/
   const { data } = api.event.getEventID.useQuery(
     {
       eventId: parsedId,
     },
-    { enabled: parsedId !== null },
+    { enabled: parsedId !== null }
   );
 
   const eventData = data?.data;
@@ -150,14 +111,18 @@ export default function EventView() {
   >(null);
   const [tempValue, setTempValue] = useState("");
 
-  // todo to change the frontend with hooks ANDREI
+  // todo to change the frontend with hooks ANDREI. 
+  // Andrei: done
   const handleRemoveGuest = (username: string) => {
+    // Remove from view immediately
+    setGuests((prev) => prev.filter((g) => g.username !== username));
+
+    // Then call API to remove in backend
     const f = async () => {
       try {
         const res = await fetch(
-          `./api/guest-remove?username=${username}&eventId=${eventId}`,
+          `./api/guest-remove?username=${username}&eventId=${eventId}`
         );
-
         const apiStatus = await res.json();
         console.log(apiStatus);
       } catch (error) {
@@ -172,15 +137,19 @@ export default function EventView() {
     const user = guests.find((g) => g.username === name);
 
     // the user is not already a Guest in this Event
-    if (user == null) {
+    if (user == null && name?.trim()) {
       const f = async () => {
         try {
           const res = await fetch(
-            `./api/guest-invite?username=${name}&eventId=${eventId}`,
+            `./api/guest-invite?username=${name}&eventId=${eventId}`
           );
-
           const apiStatus = await res.json();
           console.log(apiStatus);
+          // Optionally add to view after successful invite
+          setGuests((prev) => [
+            ...prev,
+            { username: name, fname: "", lname: "", email: null, pictureUrl: "" },
+          ]);
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
@@ -195,17 +164,17 @@ export default function EventView() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const mediaData = api.media.getMediaByEvent.useQuery(
     { eventId: parsedId },
-    { enabled: parsedId !== null && parsedId > 0 },
+    { enabled: parsedId !== null && parsedId > 0 }
   );
   const [mediaList, setMediaList] = useState(
-    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
+    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`)
   );
   const removeMediaMutation = api.media.removeMedia.useMutation();
   const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery(
     {
       eventId: parsedId,
     },
-    { enabled: parsedId !== null && parsedId > 0 },
+    { enabled: parsedId !== null && parsedId > 0 }
   );
 
   console.log("ID: ", parsedId);
@@ -247,7 +216,6 @@ export default function EventView() {
   const handleRemoveMedia = async (mediaId: number) => {
     try {
       await removeMediaMutation.mutateAsync({ mediaId });
-
       // Refresh media list after deletion
       await mediaRefetch();
     } catch (err) {
@@ -258,7 +226,7 @@ export default function EventView() {
   // inline edit confirmation
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
-    field: keyof typeof formData,
+    field: keyof typeof formData
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -442,10 +410,9 @@ export default function EventView() {
                 <input
                   type="time"
                   value={formData.time}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, time: e.target.value }));
-                    formData.time = "HH:MM";
-                  }}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, time: e.target.value }))
+                  }
                   onKeyDown={(e) => {
                     handleKeyDown(e, "time");
                   }}
@@ -511,7 +478,7 @@ export default function EventView() {
                   <div key={mediaItem.id} className={styles.mediaItem}>
                     <img
                       src={mediaItem.url}
-                      alt={"representation of users' pictogrphic activity"}
+                      alt="representation of users' pictogrphic activity"
                     />
                   </div>
                 )) ?? <p>Loading media...</p>}
