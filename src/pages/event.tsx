@@ -10,15 +10,32 @@ export default function EventViewPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const eventId = Number(id);
+  const { eventId } = router.query;
+  const { articleId } = router.query;
+  if (eventId != null) {
+    console.log("direct contribution");
+  } else {
+    console.log("item contribution");
+    if (articleId == null) console.error("error: did not found url parameters");
+  }
 
-  const { data: eventData, isLoading, error } = api.event.getById.useQuery(
-    { id: eventId },
-    { enabled: Boolean(id) && !isNaN(eventId) }
+  const eventIdD = Number(id);
+
+  const {
+    data: eventData,
+    isLoading,
+    error,
+  } = api.event.getById.useQuery(
+    { id: eventIdD },
+    { enabled: Boolean(id) && !isNaN(eventIdD) },
   );
 
   const handleContribute = () => {
-    void router.push("/contributionpage");
+    // eventIdD, directConstribution
+
+    void router.push("/payment?eventIdD=x");
+    void router.push("/payment?articleId=x");
+    // backend api call
   };
 
   const handleViewWishlist = () => {
@@ -34,7 +51,7 @@ export default function EventViewPage() {
     alert(`Event reported for: ${reason}`);
   };
 
-  if (!id || isNaN(eventId)) {
+  if (!id || isNaN(eventIdD)) {
     return <p>Invalid or missing event ID.</p>;
   }
 
@@ -54,7 +71,10 @@ export default function EventViewPage() {
     <>
       <Head>
         <title>Event View - GiftHub</title>
-        <meta name="description" content="View event details and manage contributions" />
+        <meta
+          name="description"
+          content="View event details and manage contributions"
+        />
       </Head>
 
       <Navbar />
@@ -64,6 +84,7 @@ export default function EventViewPage() {
             eventData={{
               id: String(eventData.id), // <-- Fix: convert number to string
               title: eventData.title,
+              goal: 1,
               picture: eventData.pictureUrl,
               description: eventData.description,
               location: eventData.location,

@@ -1,28 +1,24 @@
-import React, { useState } from 'react';
-import { Clock, MapPin, Users, Image, Flag } from 'lucide-react';
-import styles from '../styles/EventView.module.css';
-import type { EventData, EventViewProps } from '~/models/EventData';
+import React, { useState } from "react";
+import { Clock, MapPin, Users, Image, Flag } from "lucide-react";
+import styles from "../styles/EventView.module.css";
+import type { EventData, EventViewProps } from "~/models/EventData";
 
 const EventView: React.FC<EventViewProps> = ({
   eventData,
   onContribute,
   onViewWishlist,
   onMediaView,
-  onReport
+  onReport,
 }) => {
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportReason, setReportReason] = useState('');
+  const [reportReason, setReportReason] = useState("");
 
   const handleReport = () => {
     if (reportReason.trim()) {
       onReport?.(reportReason);
       setShowReportModal(false);
-      setReportReason('');
+      setReportReason("");
     }
-  };
-
-  const handleContribute = () => {
-    onContribute?.();
   };
 
   const handleViewWishlist = () => {
@@ -58,7 +54,7 @@ const EventView: React.FC<EventViewProps> = ({
                 alt={eventData.title}
                 className={styles.eventImage}
               />
-              
+
               {/* Event Info Grid */}
               <div className={styles.infoGrid}>
                 <div className={styles.infoCard}>
@@ -68,17 +64,17 @@ const EventView: React.FC<EventViewProps> = ({
                   </div>
                   <span className={styles.infoValue}>{eventData.time}</span>
                 </div>
-                
+
                 <div className={styles.infoCard}>
                   <span className={styles.infoLabel}>Date</span>
                   <div className={styles.infoValue}>{eventData.date}</div>
                 </div>
-                
+
                 <div className={styles.infoCard}>
                   <span className={styles.infoLabel}>Goal</span>
                   <div className={styles.infoValue}>${eventData.goal}</div>
                 </div>
-                
+
                 <button
                   onClick={handleMediaView}
                   className={styles.infoCardButton}
@@ -100,7 +96,9 @@ const EventView: React.FC<EventViewProps> = ({
               {/* Description */}
               <div className={styles.descriptionCard}>
                 <h3 className={styles.descriptionTitle}>Description</h3>
-                <p className={styles.descriptionText}>{eventData.description}</p>
+                <p className={styles.descriptionText}>
+                  {eventData.description}
+                </p>
               </div>
 
               {/* Action Buttons - Moved under description */}
@@ -111,9 +109,9 @@ const EventView: React.FC<EventViewProps> = ({
                 >
                   View Wishlist
                 </button>
-                
+
                 <button
-                  onClick={handleContribute}
+                  onClick={onContribute}
                   className={styles.contributeButton}
                 >
                   Contribute
@@ -144,7 +142,9 @@ const EventView: React.FC<EventViewProps> = ({
                     className={styles.plannerImage}
                   />
                   <div>
-                    <p className={styles.plannerName}>{eventData.planner.name}</p>
+                    <p className={styles.plannerName}>
+                      {eventData.planner.name}
+                    </p>
                     <p className={styles.plannerRole}>Organizer</p>
                   </div>
                 </div>
