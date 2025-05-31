@@ -15,7 +15,7 @@ export const itemRouter = createTRPCRouter({
 
       // For each item, get mark for user and sum of contributions
       const items = await Promise.all(
-        eventArticles.map(async (ea: (typeof eventArticles)[number]) => {
+        eventArticles.map(async (ea: typeof eventArticles[number]) => {
           // Check if the user marked as bought (external)
           const mark = await db.mark.findFirst({
             where: {
@@ -29,7 +29,7 @@ export const itemRouter = createTRPCRouter({
             where: {
               eventId: input.eventId,
               articleId: ea.itemId,
-              guestUsername: input.username,
+              contributorUsername: input.username,
             },
           });
 
@@ -60,7 +60,7 @@ export const itemRouter = createTRPCRouter({
               total: Number(ea.item?.price ?? 0),
             },
           };
-        }),
+        })
       );
       return items;
     }),
@@ -74,7 +74,7 @@ export const itemRouter = createTRPCRouter({
         username: z.string(),
         type: z.enum(["contributing", "external", "none"]),
         amount: z.number().optional(), // Only for contributions
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.type === "none") {
@@ -90,7 +90,7 @@ export const itemRouter = createTRPCRouter({
           where: {
             eventId: input.eventId,
             articleId: input.articleId,
-            guestUsername: input.username,
+            contributorUsername: input.username,
           },
         });
       } else if (input.type === "external") {
@@ -110,20 +110,14 @@ export const itemRouter = createTRPCRouter({
             type: "PURCHASED",
           },
         });
-      } else if (
-        input.type === "contributing" &&
-        input.amount &&
-        input.amount > 0
-      ) {
+      } else if (input.type === "contributing" && input.amount && input.amount > 0) {
         // Add a contribution (not a mark)
         await db.contribution.create({
           data: {
-            guestUsername: input.username,
             eventId: input.eventId,
             articleId: input.articleId,
-            itemId: input.articleId,
+            contributorUsername: input.username,
             cashAmount: input.amount,
-            currency: "RON",
           },
         });
       }

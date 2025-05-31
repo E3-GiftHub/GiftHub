@@ -3,10 +3,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
 }
 
-/*.signUpBox {
+.signUpBox {
   display: flex;
   flex-direction: row;
   background-color: #2E236B;
@@ -17,21 +16,8 @@
   max-height: 49em;
   height: 75vh;
   box-sizing: border-box;
-}*/
-
-.signUpBox {
-  display: flex;
-  flex-direction: row;
-  background-color: #2E236B;
-  border-radius: 15px;
-  width: min(calc(100vw - 1rem), 72em);
-  height: min(calc(100dvh - 1rem), 38em);
-  min-width: 320px;
-  min-height: 400px;
-  max-width: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
+  overflow: scroll;
+  scrollbar-width: none;
 }
 
 .leftPanel {
@@ -66,7 +52,7 @@
   top: 0;
   font-family: Jura, sans-serif;
   margin-bottom: 0.6em;
-  font-size: clamp(2rem, 6vw, 5rem);
+  font-size: 85px;
   color: white;
   text-shadow: 3px 5px 5px #917DA8;
 }
@@ -85,14 +71,11 @@
   padding: 1rem 2.5rem 2.5rem;
   box-sizing: border-box;
   height: 100%;
-  max-height: 100%;
-
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .top {
   display: flex;
-  width: 100%;
   flex-direction: column;
   align-items: center;
   text-align: center;
@@ -100,9 +83,8 @@
 
 .title {
   color: #FFFFFF;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: 2.5em;
   margin-top: 0;
-  margin-block-end: 0;
 }
 
 .resetPasswordPage .title{
@@ -124,14 +106,13 @@
 }
 
 .middle {
-  margin-top: -1em;
+  margin-top: -2rem;
+  margin-bottom: 0em;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
   width: 100%;
-  height: 100%;
-  box-sizing: border-box;
 }
 
 .formContainer {
@@ -141,14 +122,11 @@
   width: 100%;
   max-width: 32em;
   gap: 1rem;
-
-  flex-grow: 1;
-  max-height: 100%;
-  overflow-y: auto;
 }
 
 .signupPage .formContainer {
   gap: 0;
+  margin-top: -1em;
 }
 
 .formGroup {
@@ -160,15 +138,14 @@
 }
 
 .inputTitle {
-  font-size: clamp(1rem, .5vw, 1.5rem);
   margin-left: 0.5em;
   font-weight: 500;
+  font-size: 17px;
 }
 
 .inputField{
   width: 100%;
-  max-height: 3rem;
-  height: clamp(2.5rem, 5vh, 3rem);
+  height: 3rem;
   padding: 0 1rem;
   font-weight: 500;
   background-color: #433D8A;
@@ -183,7 +160,7 @@
   color: #FFFFFF;
   font-weight: 500;
   opacity: 50%;
-  font-size: clamp(0.85rem, 0.9vw, 0.95rem);
+  font-size: 15px;
 }
 
 .inputField:focus {
@@ -240,7 +217,6 @@
 }
 
 .bottom {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -426,7 +402,7 @@
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-/*@media (max-width: 1250px) {
+@media (max-width: 1250px) {
   .alternativeButtons{
     flex-direction: column;
   }
@@ -438,21 +414,18 @@
   .googleButton{
     width:16em;
   }
-}*/
+}
 
 @media (max-width: 1000px) {
 
   .fullPageWrapper{
     background-image: linear-gradient(#17153B, #433D8B);
   }
-
   .signUpBox {
-    flex-direction: column;
-    width: 90vw;
     height: 85vh;
+    min-width: 50em;
+    flex-direction: column;
     padding: 1em;
-    min-width: 0;
-    position: static;
   }
 
   .leftPanel {
@@ -463,14 +436,12 @@
     width: 100%;
     justify-content: flex-start;
     padding-top: 0;
-    overflow-y: auto;
   }
 
-  /*.formContainer {
+  .formContainer {
     gap: .5em;
     margin-top: -.5em;
-  }*/
-
+  }
 
   .primaryButton {
     margin-top: 3em;

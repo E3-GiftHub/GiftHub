@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   FaHome,
@@ -13,36 +12,58 @@ import {
 import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
-  const { data: session, status } = useSession();
-  const isLoggedIn = status === "authenticated";
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
 
   const profileRef = useRef<HTMLLIElement>(null);
+
   const router = useRouter();
 
-  useEffect(() => {
-    const updatePageState = () => {
-      const { pathname, hash } = window.location;
-      const isLanding =
-        pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
-      setIsLandingPage(isLanding);
+  const handleLogout = async () => {
+    // Remove cookies manually on the client
+    document.cookie = "session_auth1=; path=/; max-age=0";
+    document.cookie = "session_auth2=; path=/; max-age=0";
 
+    // Redirect
+    await router.push("/login");
+  };
+
+  useEffect(() => {
+    const specialPages = [
+      "https://gifthub-five.vercel.app/",
+      "/",
+      "/#",
+      " http://localhost:3000/#",
+      "http://localhost:3000/",
+    ];
+
+    const checkSpecialPage = () => {
+      const isSpecial = specialPages.includes(window.location.href);
+      setIsLandingPage(isSpecial);
+    };
+
+    const detectActivePage = () => {
       const url = window.location.href;
       if (url.includes("/home")) setActivePage("home");
       else if (url.includes("/inbox")) setActivePage("inbox");
       else setActivePage(null);
     };
 
-    updatePageState();
-    window.addEventListener("hashchange", updatePageState);
-    return () => window.removeEventListener("hashchange", updatePageState);
+    checkSpecialPage();
+    detectActivePage();
+
+    window.addEventListener("hashchange", () => {
+      checkSpecialPage();
+      detectActivePage();
+    });
+
+    return () => {
+      window.removeEventListener("hashchange", checkSpecialPage);
+    };
   }, []);
 
   useEffect(() => {
@@ -74,14 +95,12 @@ const Navbar = () => {
       }`}
     >
       <div className={styles["navbar-left"]}>
-        <Link href="/">
-          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
-        </Link>
+        <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
       </div>
 
-      {isLandingPage && !isLoggedIn ? (
+      {isLandingPage ? (
         <div className={styles["login-wrapper"]}>
-          <Link href="/api/auth/signin" className={styles["login-button"]}>
+          <Link href="/login#" className={styles["login-button"]}>
             <FaUser />
             <FaArrowRight />
             Login
@@ -142,14 +161,7 @@ const Navbar = () => {
                 <Link href="/profile#">
                   <FaUserEdit /> Edit Profile
                 </Link>
-                <Link
-                  href="/#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    void signOut({ callbackUrl: "/" });
-
-                  }}
-                >
+                <Link href="/#" onClick={handleLogout}>
                   <FaSignOutAlt /> Logout
                 </Link>
               </div>

@@ -201,6 +201,10 @@ export default function SignupForm() {
             {signupMutation.isPending ? "Signing up..." : "Sign up"}
           </button>
 
+          <div className={styles.divider}>
+            <span className={styles.dividerText}>OR</span>
+          </div>
+
           <p className={styles.footer}>
             Already have an account?{' '}
             <Link href="/login">

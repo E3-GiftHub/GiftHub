@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { mockUser } from "./mockUser";
+import { PrismaClient } from '@prisma/client';
+import { mockUser } from './mockUser';
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,7 @@ async function main() {
   await prisma.user.create({
     data: mockUser,
   });
-  console.log("Mock user created!");
+  console.log('Mock user created!');
 }
 
 main()

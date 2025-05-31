@@ -1,33 +1,3 @@
-.navbar {
-  position: absolute; 
-  top: -30px;
-  left: -15px;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: flex !important;
-  align-items: flex-start !important;
-  background: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  z-index: 9999;
-}
-
-.navLeft {
-  margin: 0 !important;
-  padding: 0.25rem 0.5rem !important;
-}
-
-.logo {
-  height: 100px; 
-  width: auto;
-  box-shadow: none !important;
-  background: none !important;
-  border: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-
 .aboutPage {
     max-width: 900px;
     margin: 0 auto;

@@ -1,4 +1,3 @@
-
 // https://dbdiagram.io/d/GiftHub-68038bc91ca52373f5920a71
 // 0. enum
 // 1. default models
@@ -43,7 +42,9 @@ TABLE User {
   fname STRING
   lname STRING
   password STRING
-  stripeConnectId STRING
+  stripeConnectId STRING // NOT UNIQUE: only one null value allowed
+  emailToken STRING // NOT UNIQUE: only one null value allowed
+  tokenExpires DATETIME
   pictureUrl STRING
 
   emailVerified DATETIME
