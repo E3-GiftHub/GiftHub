@@ -1,0 +1,7 @@
+.giftHubPage {
+  min-height: 100vh;
+  background-color: #2E236B;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

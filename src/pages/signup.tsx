@@ -7,8 +7,8 @@ export default function Signup() {
   return (
     <div className={styles.fullPageWrapper}>
       <div className={styles.signUpBox}>
-        <AccountUI/>
-        <SignupForm/>
+        <AccountUI />
+        <SignupForm />
       </div>
     </div>
   );
