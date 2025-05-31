@@ -4,7 +4,7 @@ import styles from "../styles/Payment.module.css";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "../app/globals.css";
+import "~/styles/globals.css";
 
 interface SVGIconProps {
   className?: string;

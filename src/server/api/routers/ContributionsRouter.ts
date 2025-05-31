@@ -36,7 +36,7 @@ export const contributionsRouter = createTRPCRouter({
         ? `${contribution.guest.fname} contributed ${contribution.cashAmount.toString()} lei to your gift`
         : `${contribution.guest.fname} contributed an unspecified amount to your gift`,
       type: "event",
-      link: `/event${contribution.event.id}#`,
+      link: `/event${contribution.event?.id}#`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
       profilePicture: "databasepic/profilepic.png",
@@ -76,7 +76,7 @@ export const contributionsRouter = createTRPCRouter({
     return purchasedItems.map((mark, index) => ({
       text: `${mark.guest.fname} bought an item from your wishlist`,
       type: "event",
-      link: `/event${mark.event.id}#`,
+      link: `/event${mark.event?.id}#`,
       firstName: mark.guest.fname,
       lastName: mark.guest.lname,
       profilePicture: "databasepic/profilepic.png",
