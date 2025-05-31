@@ -30,7 +30,7 @@ export default function GuestListModal({
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <button
-            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
             onClick={onClose}
           >
             ← Back
@@ -39,13 +39,18 @@ export default function GuestListModal({
 
         <h3 className={styles.modalTitle}>Full Guest List</h3>
 
-        <div className={styles.modalContent}>
+        <div className={styles.guestList}>
           {guests.map((guest) => (
             <div className={styles.guestRow} key={guest.username}>
-              <img src={guest.pictureUrl ?? ""} alt="user visual description" />
+              <img
+                className={styles.guestImage}
+                src={guest.pictureUrl ?? ""}
+                alt="user visual description"
+              />
               <p>
-                {guest.fname} {guest.lname} {guest.username}
+                {guest.fname} {guest.lname}
               </p>
+              <p>aka. {guest.username}</p>
               <button
                 className={styles.removeGuestButton}
                 onClick={() => onRemoveGuest(guest.username)}

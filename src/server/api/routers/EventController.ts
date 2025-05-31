@@ -210,14 +210,13 @@ export const eventRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { eventId, title, description, date, time, location } = input;
+      const { eventId, title, description, date, location } = input;
       return ctx.db.event.update({
         where: { id: eventId },
         data: {
           title,
           description,
           date: date ? new Date(date) : undefined,
-          time: time ? new Date(`${date}T${time}`) : undefined,
           location,
         },
       });

@@ -143,8 +143,8 @@
 .guestList {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
-  max-height: calc(6 * 3.5rem); /* aprox. 6 invitați */
+  gap: 0.5rem;
+  max-height: calc(10 * 3.5rem); /* aprox. 10 invitați */
   overflow-y: auto;
 }
 
@@ -158,13 +158,29 @@
 }
 
 .guestItem {
-  background-color: #cbb1dc;
-  border-radius: 10px;
-  overflow: hidden;
-  text-align: center;
+  display: flex;
+  align-items: center;
   padding: 0.5rem;
-  color: #1e1e1e;
-  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.guestItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.guestImage {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+}
+
+.guestName {
+  color: white;
+  font-size: 0.875rem;
 }
 
 .wishlistBox {
@@ -280,7 +296,7 @@
 }
 
 .mediaItem {
-  background-color:none;
+  background-color: none;
   padding: 0.5rem;
   border-radius: 8px;
   text-align: center;
@@ -408,7 +424,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 .editMediaHeader {
@@ -424,8 +440,8 @@
   overflow-y: auto;
   flex-grow: 1;
   padding: 1rem 0;
-  max-height: 60vh; 
-    grid-template-columns: repeat(4, 1fr);
+  max-height: 60vh;
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .editMediaItem img {
@@ -437,7 +453,7 @@
 
 .editMediaItem {
   position: relative;
-  border:none;
+  border: none;
   border-radius: none;
   overflow: hidden;
 }

@@ -10,7 +10,6 @@ export class EventPlanner {
     title: string;
     description: string;
     date: Date;
-    time: Date;
     location: string;
     createdBy: string;
   }): Promise<EventEntity> {
@@ -20,7 +19,6 @@ export class EventPlanner {
         description: data.description,
         location: data.location,
         date: data.date,
-        time: data.time,
         token: nanoid(12),
         createdByUsername: data.createdBy,
         /*

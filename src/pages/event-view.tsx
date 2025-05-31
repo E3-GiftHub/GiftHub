@@ -39,9 +39,13 @@ function GuestListPreview({
     <div className={styles.guestList}>
       {guests.slice(0, 10).map((guest) => (
         <div className={styles.guestItem} key={guest.username}>
-          <img src={guest.pictureUrl ?? ""} alt="user visual description" />
-          <p>
-            {guest.fname} {guest.lname} ({guest.username})
+          <img
+            className={styles.guestImage}
+            src={guest.pictureUrl ?? ""}
+            alt="user visual description"
+          />
+          <p className={styles.guestName}>
+            {guest.fname} {guest.lname}
           </p>
         </div>
       ))}
@@ -73,9 +77,7 @@ export default function EventView() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(
-          `./api/guest-list?eventId=${eventId}`
-        );
+        const res = await fetch(`./api/guest-list?eventId=${eventId}`);
         const data = (await res.json()) as GuestHeader[];
         setGuests(data);
       } catch (error) {
@@ -93,7 +95,7 @@ export default function EventView() {
     {
       eventId: parsedId,
     },
-    { enabled: parsedId !== null }
+    { enabled: parsedId !== null },
   );
 
   const eventData = data?.data;
@@ -111,7 +113,7 @@ export default function EventView() {
   >(null);
   const [tempValue, setTempValue] = useState("");
 
-  // todo to change the frontend with hooks ANDREI. 
+  // todo to change the frontend with hooks ANDREI.
   // Andrei: done
   const handleRemoveGuest = (username: string) => {
     // Remove from view immediately
@@ -121,7 +123,7 @@ export default function EventView() {
     const f = async () => {
       try {
         const res = await fetch(
-          `./api/guest-remove?username=${username}&eventId=${eventId}`
+          `./api/guest-remove?username=${username}&eventId=${eventId}`,
         );
 
         const apiStatus: { error: string } = (await res.json()) as {
@@ -146,7 +148,7 @@ export default function EventView() {
       const f = async () => {
         try {
           const res = await fetch(
-            `./api/guest-invite?username=${name}&eventId=${eventId}`
+            `./api/guest-invite?username=${name}&eventId=${eventId}`,
           );
 
           const apiStatus: { error: string } = (await res.json()) as {
@@ -170,17 +172,17 @@ export default function EventView() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const mediaData = api.media.getMediaByEvent.useQuery(
     { eventId: parsedId },
-    { enabled: parsedId !== null && parsedId > 0 }
+    { enabled: parsedId !== null && parsedId > 0 },
   );
   const [mediaList, setMediaList] = useState(
-    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`)
+    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
   );
   const removeMediaMutation = api.media.removeMedia.useMutation();
   const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery(
     {
       eventId: parsedId,
     },
-    { enabled: parsedId !== null && parsedId > 0 }
+    { enabled: parsedId !== null && parsedId > 0 },
   );
 
   console.log("ID: ", parsedId);
@@ -232,7 +234,7 @@ export default function EventView() {
   // inline edit confirmation
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
-    field: keyof typeof formData
+    field: keyof typeof formData,
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -275,10 +277,11 @@ export default function EventView() {
     setTempValue(""); // Clear temporary input value
 
     // Safely revert only fields that exist in formData
+    // todo redo this code
     setFormData((prev) => ({
       ...prev,
       [pendingField]:
-        eventData[pendingField /*as keyof typeof formData*/] ??
+        eventData /*[pendingField as keyof typeof formData]*/ ??
         prev[pendingField],
     }));
   };
@@ -418,7 +421,7 @@ export default function EventView() {
                   type="time"
                   value={formData.time}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, time: e.target.value}))
+                    setFormData((prev) => ({ ...prev, time: e.target.value }))
                   }
                   onKeyDown={(e) => {
                     handleKeyDown(e, "time");
