@@ -108,10 +108,8 @@ export class WishlistService {
   }): Promise<void> {
     await prisma.eventArticle.delete({
       where: {
-        eventId_itemId: {
-          eventId: params.eventId,
-          itemId: params.itemId,
-        },
+        id: params.itemId,
+        eventId: params.eventId,
       },
     });
   }

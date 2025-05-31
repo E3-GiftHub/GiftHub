@@ -42,10 +42,12 @@ export class ContributionService {
     const contribution = await db.contribution.create({
       data: {
         id: parseInt(contributionId),
-        contributorUsername,
+        guestUsername: "who the hell is this huy?", //todo change this
         eventId: eventIdInt,
         articleId: itemIdInt,
+        itemId: itemIdInt, // todo change this
         cashAmount: amount,
+        currency: "RON", // todo automate this
         createdAt: date,
         updatedAt: date,
       },
@@ -53,8 +55,8 @@ export class ContributionService {
 
     return {
       id: contribution.id.toString(),
-      contributorUsername: contribution.contributorUsername,
-      eventId: contribution.eventId.toString(),
+      contributorUsername: contribution.guestUsername,
+      eventId: contribution.eventId?.toString(),
       articleId: contribution.articleId.toString(),
       amount: contribution.cashAmount?.toNumber() ?? 0,
       createdAt: contribution.createdAt,
@@ -101,7 +103,7 @@ export class ContributionService {
     const eventItem = await db.eventArticle.findFirst({
       where: {
         itemId: itemIdInt,
-        eventId: contribution.eventId,
+        eventId: contribution.eventId ?? -1, // todo find a better way of doing this
       },
     });
 
@@ -117,10 +119,8 @@ export class ContributionService {
     if (isFulfilled) {
       await db.eventArticle.update({
         where: {
-          eventId_itemId: {
-            eventId: eventItem.eventId,
-            itemId: itemIdInt,
-          },
+          id: itemIdInt,
+          eventId: eventItem.eventId,
         },
         data: {}, // todo change this
       });
@@ -198,7 +198,7 @@ export class ContributionService {
 
     return contributions.map((contribution) => ({
       id: contribution.id.toString(),
-      contributorUsername: contribution.contributorUsername,
+      contributorUsername: contribution.guestUsername,
       contributorName:
         `${contribution.guest.fname ?? ""} ${contribution.guest.lname ?? ""}`.trim(),
       contributorPicture: contribution.guest.pictureUrl,
