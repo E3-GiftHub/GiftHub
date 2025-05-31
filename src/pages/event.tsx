@@ -5,28 +5,34 @@ import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
 import styles from "../styles/EventView.module.css";
+import { useEffect } from "react";
 
 export default function EventViewPage() {
   const router = useRouter();
-  const { id } = router.query;
 
-  const eventIdD = Number(id);
+  useEffect(() => {
+    if (!router.isReady) return;
+    const { eventId } = router.query;
+    console.log("Router is ready, id:", eventId);
+  }, [router.isReady]);
+
+  const { id } = router.query;
+  const eventId: number = Number(id);
 
   const {
     data: eventData,
     isLoading,
     error,
   } = api.event.getById.useQuery(
-    { id: eventIdD },
-    { enabled: Boolean(id) && !isNaN(eventIdD) },
+    { id: eventId },
+    { enabled: Boolean(id) && !isNaN(eventId) },
   );
 
   const handleContribute = () => {
-    // eventIdD, directConstribution
-
+    /*
     void router.push("/payment?eventIdD=x");
     void router.push("/payment?articleId=x");
-    // backend api call
+    */
   };
 
   const handleViewWishlist = () => {
@@ -34,7 +40,7 @@ export default function EventViewPage() {
   };
 
   const handleMediaView = () => {
-    void router.push("/media");
+    void router.push(`/media?eventId=${eventId}`);
   };
 
   const handleReport = (reason: string) => {
@@ -42,7 +48,7 @@ export default function EventViewPage() {
     alert(`Event reported for: ${reason}`);
   };
 
-  if (!id || isNaN(eventIdD)) {
+  if (!id || isNaN(eventId)) {
     return <p>Invalid or missing event ID.</p>;
   }
 
