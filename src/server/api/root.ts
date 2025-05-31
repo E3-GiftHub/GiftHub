@@ -5,7 +5,7 @@ import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter"
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
-
+import { userRouter } from "./routers/userRouter";
 import { authRouter } from "~/server/api/routers/authRouter";
 import { profileRouter } from "~/server/api/routers/profileRouter";
 
@@ -23,6 +23,7 @@ export const appRouter = createTRPCRouter({
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
   invitationsNotification: invitesNotificationRouter,
+  user: userRouter,
 });
 
 // export type definition of API

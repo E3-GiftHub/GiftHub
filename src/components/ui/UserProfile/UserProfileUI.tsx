@@ -3,8 +3,9 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import clsx from 'clsx';
 import "src/styles/globals.css";
-import { router } from "next/client";
-import { useRouter } from 'next/router'; // Corrected router import
+import { useRouter } from 'next/router';
+import { signOut } from 'next-auth/react';
+import { api } from "src/trpc/react";// Assuming this is your TRPC hook location
 
 interface UserProfileProps {
   username?: string;
@@ -18,7 +19,6 @@ interface UserProfileProps {
   onPhotoChange?: (file: File) => void;
   loading?: boolean;
 }
-
 
 const ProfileButton = ({
                          iconSrc,
@@ -61,10 +61,9 @@ export default function UserProfileUI({
                                       }: Readonly<UserProfileProps>) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
-  const router = useRouter(); // Properly initialize router
+  const router = useRouter();
 
   useEffect(() => {
-    // Update preview if parent updates avatarUrl
     setPreviewUrl(avatarUrl);
   }, [avatarUrl]);
 
@@ -73,7 +72,6 @@ export default function UserProfileUI({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Show preview locally
       const reader = new FileReader();
       reader.onloadend = () => {
         if (reader.result) {
@@ -82,7 +80,6 @@ export default function UserProfileUI({
       };
       reader.readAsDataURL(file);
 
-      // Call parent handler to actually process the file (upload, etc.)
       if (onPhotoChange) {
         onPhotoChange(file);
       }
@@ -93,33 +90,39 @@ export default function UserProfileUI({
     if (onEdit) {
       onEdit();
     } else {
-      await router.push("/editprofile"); // Default behavior if no onEdit prop provided
+      await router.push("/editprofile");
     }
   };
 
+  const deleteUserMutation = api.user.deleteUser.useMutation();
+
   const handleDelete = async () => {
-    if (onDelete) {
-      onDelete();
-    } else {
-      await router.push("/"); // Navigate to index page
+    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    if (!confirmed) return;
+
+    try {
+      await deleteUserMutation.mutateAsync();
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("An unexpected error occurred while deleting your account.");
     }
   };
+
 
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div
-              className={clsx(styles.avatarCircle, loading && styles.loading)}
-            >
-              {!loading && avatarUrl && (
+            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
+              {!loading && previewUrl && (
                 <Image
-                  src={avatarUrl}
+                  src={previewUrl}
                   width={200}
                   height={200}
                   className={styles.avatarImage}
-                  alt={""}
+                  alt=""
                 />
               )}
             </div>
@@ -146,12 +149,10 @@ export default function UserProfileUI({
           </h2>
           <div className={styles.nameContainer}>
             <p className={clsx(styles.nameField, styles.fname, loading && styles.loading)}>
-              {renderContent(fname)}
-              &nbsp;&nbsp;&nbsp;&nbsp;|
+              {renderContent(fname)}&nbsp;&nbsp;&nbsp;&nbsp;|
             </p>
             <p className={clsx(styles.nameField, styles.lname, loading && styles.loading)}>
-              &nbsp;
-              {renderContent(lname)}
+              &nbsp;&nbsp;{renderContent(lname)}
             </p>
           </div>
           <p className={clsx(styles.email, loading && styles.loading)}>

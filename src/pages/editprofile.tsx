@@ -1,75 +1,89 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React from "react";
 import styles from "~/styles/UserProfile/UserProfile.module.css";
 import Navbar from "~/components/Navbar";
 import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
-//import { mockUser } from "~/components/ui/UserProfile/mockUser";
-import {api} from "~/trpc/react";
-
-// interface UpdateResponse {
-//   success?: boolean;
-//   error?: string;
-//   user?: typeof mockUser;
-// }
+import { api } from "~/trpc/react";
 
 export default function EditUserProfile() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const {data: userData, isLoading: isUserLoading} = api.profile.user.get.useQuery();
 
-  // Initialize with mockUser or values from query if coming back from save
-  const updateUser = api.profile.user.update.useMutation();
-  //const [isSaving, setIsSaving] = useState(false);
+  const { data: user, isLoading: userLoading, error: userError } = api.user.getCurrentUser.useQuery();
 
-  //const [currentUser, setCurrentUser] = useState(initialUser);
+  const updateUserMutation = api.user.updateUser.useMutation();
 
   const handleSave = async (
     newFname: string,
     newLname: string,
-    newUsername: string,
+    _newUsername: string,
     newEmail: string,
-    //newIban: string
+    newIban: string
   ) => {
-    setIsLoading(true);
-    try{
-      await updateUser.mutateAsync({
+    updateUserMutation.mutate(
+      {
         fname: newFname,
         lname: newLname,
-        username: newUsername,
         email: newEmail,
-        //iban: newIban
-      });
-
-      void router.push("/profile");
-    }
-    catch(e){
-      console.error("Error saving user:", e);
-    }
-    finally {
-      setIsLoading(false);
-    }
+        iban: newIban,
+      },
+      {
+        onSuccess: () => {
+          alert("Profile updated successfully!");
+          void router.push("/profile");
+        },
+        onError: (error) => {
+          alert("Update failed: " + error.message);
+        },
+      }
+    );
   };
 
   const handleResetPassword = async () => {
     await router.push("/reset-password");
   };
 
+  if (userLoading) {
+    return (
+      <div className={styles["landing-page"]}>
+        <Navbar />
+        <p>Loading user data...</p>
+      </div>
+    );
+  }
+
+  if (userError) {
+    return (
+      <div className={styles["landing-page"]}>
+        <Navbar />
+        <p>Error loading user data: {userError.message}</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className={styles["landing-page"]}>
+        <Navbar />
+        <p>User not found or not logged in</p>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles['landing-page']}>
+    <div className={styles["landing-page"]}>
       <Navbar />
       <EditUserProfileUI
-        //key={currentUser.id}
-        username={userData?.id || ''}
-        fname={userData?.fname || ''}
-        lname={userData?.lname || ''}
-        email={userData?.email || ''}
-        //IBAN={userData?.iban || ''}
-        avatarUrl={userData?.pictureUrl || ''}
+        username={user.username}
+        fname={user.fname ?? ""}
+        lname={user.lname ?? ""}
+        email={user.email ?? ""}
+        IBAN={user.iban ?? ""}
+        avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
-        loading={isLoading}
+        disableUsernameEditing={true}
       />
-      <div className={styles['empty-space']}></div>
+      <div className={styles["empty-space"]}></div>
     </div>
-  )
+  );
 }

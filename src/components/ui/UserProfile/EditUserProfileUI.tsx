@@ -3,8 +3,8 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import "src/styles/globals.css";
-import {useRouter} from "next/router";
-import ContainerSVG from '@/assets/UserImages/Containers/Container.svg'
+import { useRouter } from "next/router";
+import ContainerSVG from '@/assets/UserImages/Containers/Container.svg';
 
 interface EditUserProfileProps {
   username?: string;
@@ -13,16 +13,16 @@ interface EditUserProfileProps {
   email?: string;
   IBAN?: string;
   avatarUrl?: string;
-  onSave?: (newFname: string, newLname: string, newUsername: string, newEmail: string, newIban: string) => void;
+  onSave?: (
+    newFname: string,
+    newLname: string,
+    newUsername: string,
+    newEmail: string,
+    newIban: string
+  ) => void;
   onResetPassword?: () => void;
   loading?: boolean;
-  onUpdateSuccess?: (updatedUser: {
-    username: string;
-    fname: string;
-    lname: string;
-    email: string;
-    iban: string;
-  }) => void;
+  disableUsernameEditing?: boolean; // <-- new prop added here
 }
 
 const ProfileButton = ({
@@ -64,7 +64,7 @@ export default function EditUserProfileUI({
                                             onSave,
                                             onResetPassword,
                                             loading = false,
-                                            onUpdateSuccess
+                                            disableUsernameEditing = false, // default false
                                           }: Readonly<EditUserProfileProps>) {
   const [usernameInput, setUsernameInput] = useState(username);
   const [emailInput, setEmailInput] = useState(email);
@@ -72,9 +72,6 @@ export default function EditUserProfileUI({
   const [lnameInput, setLnameInput] = useState(lname);
   const [ibanInput, setIbanInput] = useState(IBAN);
   const [emailError, setEmailError] = useState("");
-  const [saveError, setSaveError] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     setUsernameInput(username);
@@ -95,49 +92,9 @@ export default function EditUserProfileUI({
     setEmailError(validateEmail(value) ? "" : "Please enter a valid email address");
   };
 
-  const handleSave = async () => {
-    /*if (onSave && !emailError) {
+  const handleSave = () => {
+    if (onSave && !emailError) {
       onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
-    }*/
-
-    if (emailError) return;
-    setIsSaving(true);
-    setSaveError("");
-
-    try {
-      if (onSave) {
-        onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
-      } else {
-        const response = await fetch("/api/user/update", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fname: fnameInput,
-            lname: lnameInput,
-            username: usernameInput,
-            email: emailInput,
-            iban: ibanInput,
-          }),
-        });
-        if (!response.ok) {
-          throw new Error("Failed to update user");
-        }
-        const data = await response.json();
-
-        if (onUpdateSuccess) {
-          onUpdateSuccess(data.user);
-        } else {
-          void router.push("/profile");
-        }
-      }
-    } catch (error) {
-      setSaveError(
-        error instanceof Error ? error.message : "An unexpected error occurred",
-      );
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -161,10 +118,9 @@ export default function EditUserProfileUI({
         </div>
 
         <div className={styles.userInfoedit}>
-
           <div className={styles.inputGroup}>
             <label htmlFor="username" className={styles.inputLabel}>
-              {/*Username*/}
+              {/* Username */}
             </label>
             <input
               id="username"
@@ -172,13 +128,13 @@ export default function EditUserProfileUI({
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading}
+              disabled={loading || disableUsernameEditing} // <-- disable username input if prop true
             />
           </div>
 
           <div className={styles.inputGroup}>
             <label htmlFor="fname" className={styles.inputLabel}>
-              {/*First Name*/}
+              {/* First Name */}
             </label>
             <input
               id="fname"
@@ -192,7 +148,7 @@ export default function EditUserProfileUI({
 
           <div className={styles.inputGroup}>
             <label htmlFor="lname" className={styles.inputLabel}>
-              {/*Last Name*/}
+              {/* Last Name */}
             </label>
             <input
               id="lname"
@@ -206,7 +162,7 @@ export default function EditUserProfileUI({
 
           <div className={styles.inputGroup}>
             <label htmlFor="email" className={styles.inputLabel}>
-              {/*Email*/}
+              {/* Email */}
             </label>
             <input
               id="email"
@@ -221,7 +177,7 @@ export default function EditUserProfileUI({
 
           <div className={styles.inputGroup}>
             <label htmlFor="iban" className={styles.inputLabel}>
-              {/*IBAN*/}
+              {/* IBAN */}
             </label>
             <input
               id="iban"
@@ -238,7 +194,7 @@ export default function EditUserProfileUI({
               iconSrc="/UserImages/buttons/save-icon.svg"
               alt=""
               onClick={handleSave}
-              loading={loading || isSaving}
+              loading={loading}
               disabled={!!emailError}
             >
               Save changes
