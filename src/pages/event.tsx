@@ -10,15 +10,6 @@ export default function EventViewPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const { eventId } = router.query;
-  const { articleId } = router.query;
-  if (eventId != null) {
-    console.log("direct contribution");
-  } else {
-    console.log("item contribution");
-    if (articleId == null) console.error("error: did not found url parameters");
-  }
-
   const eventIdD = Number(id);
 
   const {
