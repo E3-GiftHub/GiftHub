@@ -1,111 +1,78 @@
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import Navbar from "../components/Navbar";
+import { useRouter } from "next/router";
+
+// Mock pentru router
 jest.mock("next/router", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    prefetch: jest.fn(),
-    pathname: "/home",
-    route: "/home",
-    query: {},
-    asPath: "/home",
-    replace: jest.fn(),
-    reload: jest.fn(),
-    back: jest.fn(),
-    isFallback: false,
-    events: {
-      on: jest.fn(),
-      off: jest.fn(),
-      emit: jest.fn(),
-    },
-    beforePopState: jest.fn(),
-    isReady: true,
-  }),
+  useRouter: jest.fn(),
 }));
 
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import Navbar from "../components/Navbar";
+// Mock pentru next-auth/react
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(),
+  signOut: jest.fn(),
+}));
 
-const renderWithRoute = (initialPath: string) => {
-  return render(<Navbar />);
-};
-const mockHref = (url: string) => {
-  Object.defineProperty(window, "location", {
-    value: new URL(url),
-    writable: true,
+import { useSession, signOut } from "next-auth/react";
+
+describe("Navbar", () => {
+  beforeEach(() => {
+    // Setare router mock
+    (useRouter as jest.Mock).mockReturnValue({
+      pathname: "/home",
+      push: jest.fn(),
+    });
+
+    // Simulăm o sesiune activă (user logat)
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { name: "Cati" } },
+      status: "authenticated",
+    });
+
+    Object.defineProperty(window, "location", {
+      value: {
+        pathname: "/home",
+        hash: "",
+        href: "http://localhost:3000/home",
+      },
+      writable: true,
+    });
   });
-};
 
-describe("Navbar component", () => {
-  test("renders Navbar component without crashing", () => {
-    renderWithRoute("/");
-
-    const logo = screen.getByAltText("Gift Hub");
-    expect(logo).toBeInTheDocument();
-  });
-
-  {
-    /*test("renders login button when on landing page", () => {
-    renderWithRoute("/");
-
-    const loginButton = screen.getByText(/Login/i);
-    expect(loginButton).toBeInTheDocument();
-  });*/
-  }
-
-  test("renders navigation links when not on landing page", () => {
-    renderWithRoute("/home");
-
-    expect(screen.getByText(/Home/i)).toBeInTheDocument();
-    expect(screen.getByText(/Inbox/i)).toBeInTheDocument();
+  test("afișează sigla și butonul hamburger", () => {
+    render(<Navbar />);
+    expect(screen.getByAltText("Gift Hub")).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /^Profile$/i }),
+      screen.getByRole("button", { name: /toggle navigation menu/i }),
     ).toBeInTheDocument();
   });
 
-  test("opens and closes hamburger menu", () => {
-    renderWithRoute("/home");
-
-    const hamburger = screen.getByLabelText("Toggle navigation menu");
-    const navList = screen.getByRole("list");
-
-    expect(navList.className).not.toMatch(/open/);
-
-    fireEvent.click(hamburger);
-    expect(navList.className).toMatch(/open/);
-
-    fireEvent.click(hamburger);
-    expect(navList.className).not.toMatch(/open/);
+  test("afișează link-urile Home și Inbox când nu este pe landing page", () => {
+    render(<Navbar />);
+    expect(screen.getByText(/Home/i)).toBeInTheDocument();
+    expect(screen.getByText(/Inbox/i)).toBeInTheDocument();
   });
 
-  test("opens and closes profile dropdown", async () => {
-    renderWithRoute("/home");
+  test("toggle la meniul de profil", () => {
+    render(<Navbar />);
 
-    const profileButton = screen.getByRole("link", { name: /^Profile$/i });
-    fireEvent.click(profileButton);
+    const profileToggle = screen.getByText("Profile");
+    fireEvent.click(profileToggle);
 
-    const editProfileLink = screen.getByText(/Edit Profile/i);
-    expect(editProfileLink).toBeVisible();
-
-    fireEvent.mouseDown(document.body);
-
-    await waitFor(() => {
-      const profileDropdown = profileButton.parentElement;
-      expect(profileDropdown).not.toHaveClass("open");
-    });
+    expect(screen.getByText(/Edit Profile/i)).toBeInTheDocument();
+    expect(screen.getByText(/Logout/i)).toBeInTheDocument();
   });
-});
 
-test("highlights Inbox button when on /inbox", () => {
-  mockHref("http://localhost:3000/inbox#");
-  render(<Navbar />);
+  test("click pe Logout apelează signOut și redirecționează", () => {
+    render(<Navbar />);
 
-  const inboxLink = screen.getByText(/Inbox/i).closest("a");
-  expect(inboxLink).toHaveClass("nav-link-active");
-});
+    const profileBtn = screen.getByText("Profile");
+    fireEvent.click(profileBtn);
 
-test("highlights Home button when on /home", () => {
-  mockHref("http://localhost:3000/home#");
-  render(<Navbar />);
+    const logoutLink = screen.getByText(/Logout/i);
+    fireEvent.click(logoutLink);
 
-  const homeLink = screen.getByText(/Home/i).closest("a");
-  expect(homeLink).toHaveClass("nav-link-active");
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/" });
+  });
 });

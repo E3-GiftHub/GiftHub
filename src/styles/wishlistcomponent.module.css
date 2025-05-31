@@ -123,6 +123,7 @@
   transition: all 0.2s ease;
   padding: 0.5rem;
   border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .itemCard:hover {
@@ -143,7 +144,14 @@
   color: #818CF8; /* indigo-400 */
   font-weight: 500;
   position: relative; /* For positioning the overlay */
-  overflow: hidden;/* For the progress indicator */
+  overflow: hidden; /* For the progress indicator */
+}
+
+.actualItemImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.5rem;
 }
 
 .contributionOverlay {

@@ -5,10 +5,25 @@ import type { TrendingItem } from '../models/WishlistEventGuest';
 import type { WishlistProps } from '../models/WishlistEventGuest';
 import { useRouter } from 'next/router';
 
-const EVENT_ID = 11;
 const USERNAME = 'user2';
 
-const Wishlist: React.FC<WishlistProps> = ({ contribution }) => {
+// Functia asta ia imaginile based on id-ul produsului
+const getItemImage = (item: TrendingItem) => {
+  const productImages = [
+    '/illustrations/account_visual.png',
+    '/illustrations/babyShower.svg',
+    '/illustrations/birthdayParty.svg',
+  ];
+  //daca produsu are o imagine, o pune pe aia
+  if (item.imageUrl) {
+    return item.imageUrl;
+  }
+  //altfel foloseste una de aici  gen de mai sus
+  const imageIndex = item.id % productImages.length;
+  return productImages[imageIndex];
+};
+
+const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
   const router = useRouter();
 
@@ -17,57 +32,48 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution }) => {
     isLoading,
     isError,
     refetch
-  } = api.item.getAll.useQuery({ eventId: EVENT_ID, username: USERNAME });
+  } = api.item.getAll.useQuery({ 
+    eventId: eventId ? Number(eventId) : 0, 
+    username: USERNAME 
+  }, {
+    enabled: !!eventId
+  });
 
   const setMark = api.item.setMark.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => void refetch(),
   });
 
   const {
     data: eventData,
     isLoading: isEventLoading
-  } = api.event.getById.useQuery({ id: EVENT_ID });
+  } = api.event.getById.useQuery({ 
+    id: eventId ? Number(eventId) : 0
+  }, {
+    enabled: !!eventId
+  });
 
   useEffect(() => {
     if(data)
       setTrendingItems(data);
   }, [data]);
 
-  if(isLoading)
+  // Show loading while router isn't ready or data is loading
+  if (!router.isReady || isLoading || isEventLoading) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
       </div>
     );
+  }
+
+  // Only show no event ID error after router is ready
+  if(!eventId) return <div>No event ID provided</div>;
+  
+  // Show error if event doesn't exist
+  if(!eventData && !isLoading) return <div>Event not found</div>;
+  
   if(isError)
     return <div>Failed to load items.</div>;
-
-  const handleButtonAction = (id: number, action: 'contributing' | 'external') => {
-    const item = trendingItems.find((i) => i.id === id);
-    if(!item)
-      return;
-    let newType: 'contributing' | 'external' | 'none' = action;
-    if(item.state === action)
-      newType = 'none';
-    setMark.mutate({
-      eventId: EVENT_ID,
-      articleId: id,
-      username: USERNAME,
-      type: newType,
-      amount: newType === 'contributing' ? 7 : undefined,
-    }, {
-      onSuccess: () => void refetch(),
-      onSettled: () => {
-        setTrendingItems((prev) =>
-          prev.map((it) =>
-            it.id === id
-              ? { ...it, state: newType === 'none' ? 'none' : newType }
-              : it
-          )
-        );
-      },
-    });
-  };
 
   const getButtonClass = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
     if((buttonType === 'contribute' && item.state === 'contributing') ||
@@ -77,32 +83,70 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution }) => {
   };
 
   const getButtonText = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
-    if(buttonType === 'contribute')
-      return item.state === 'contributing' ? 'Contributing' : 'Contribute';
+    if(buttonType === 'contribute') {
+      return 'Contribute';
+    }
     if(buttonType === 'external')
       return item.state === 'external' ? 'Bought' : 'Mark Bought';
     return '';
   };
 
-  const handleNavigation = () => {
-    void router.push({
-      pathname: '/some-path',
-      // ...existing code...
-    });
+  const handleButtonAction = (id: number, action: 'contributing' | 'external') => {
+    const item = trendingItems.find((i) => i.id === id);
+    if(!item) return;
+
+    if (action === 'external') {
+      // For external purchases, update local state immediately
+      const newType = item.state === 'external' ? 'none' : 'external';
+      
+      // Update local state optimistically
+      setTrendingItems((prev) =>
+        prev.map((it) =>
+          it.id === id ? { ...it, state: newType } : it
+        )
+      );
+
+      setMark.mutate({
+        eventId: Number(eventId),
+        articleId: id,
+        username: USERNAME,
+        type: newType,
+      }, {
+        onError: () => {
+          setTrendingItems((prev) =>
+            prev.map((it) =>
+              it.id === id ? { ...it, state: item.state } : it
+            )
+          );
+        }
+      });
+    } else {
+      // For contributions, always allow new contributions if not fully funded
+      const currentAmount = Number(item.contribution?.current) || 0;
+      const totalAmount = Number(item.pret);
+      
+      if (currentAmount < totalAmount) { 
+        contribution?.();
+      }
+    }
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.wishlistContainer}>
         <h1 className={styles.title}>
-          Wishlist View for {isEventLoading ? '...' : eventData?.title ?? EVENT_ID}
+          Wishlist View for {isEventLoading ? '...' : eventData?.title ?? eventId}
         </h1>
         <div className={styles.itemsContainer}>
           <div className={styles.itemsGrid}>
             {trendingItems.map((item: TrendingItem) => (
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.itemImage}>
-                  Photo
+                  <img
+                    src={getItemImage(item)}
+                    alt={item.nume}
+                    className={styles.actualItemImage}
+                  />
                   {item.state === 'contributing' && item.contribution && (
                     <div className={styles.contributionOverlay}>
                       <div className={styles.contributionText}>

@@ -12,6 +12,7 @@ export interface EventData {
   location: string;
   date: string;
   time: string;
+  goal: number;
   planner: User;
   guests: User[];
 }
