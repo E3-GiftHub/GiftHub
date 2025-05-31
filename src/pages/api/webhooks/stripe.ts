@@ -4,17 +4,20 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { buffer } from "micro";
 import Stripe from "stripe";
 import { db as prisma } from "@/server/db";
-import { Prisma } from "@prisma/client"; // ← for Prisma.Decimal
+import { Prisma } from "@prisma/client";
 
-// 1. Initialize Stripe with your secret key (same API version you use elsewhere)
+// Import your ContributionsTransfer service
+import { processEventItemContributions } from "@/server/services/ContributionsTransfer";
+
+// 1. Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2025-05-28.basil",
 });
 
-// 2. Pull in your webhook signing secret from .env
+// 2. Grab your webhook signing secret from environment
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-// 3. Disable Next.js’s bodyParser so we can get the raw request body
+// 3. Disable Next.js’s built-in bodyParser, so we can get raw request body
 export const config = {
     api: {
         bodyParser: false,
@@ -25,21 +28,6 @@ type ResponseData = {
     received: boolean;
 };
 
-/**
- * Webhook handler for Stripe Payment Link events:
- *   • payment.link.paid
- *   • payment.link.expired
- *
- * On `payment.link.paid`:
- *   1. Update StripeLink.status → "ACCEPTED"
- *   2. If metadata.isContribute === "true" && metadata.eventArticleId exists:
- *        • Insert a new row into `Contribution`
- *   3. Deactivate (archive) the Payment Link in Stripe
- *
- * On `payment.link.expired`:
- *   1. Update StripeLink.status → "EXPIRED"
- *   2. Deactivate the Payment Link in Stripe
- */
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<ResponseData>
@@ -50,7 +38,7 @@ export default async function handler(
         return res.status(405).end("Method Not Allowed");
     }
 
-    // 1. Read raw request body as Buffer
+    // 1. Read raw request body into a Buffer
     let buf: Buffer;
     try {
         buf = await buffer(req);
@@ -59,15 +47,15 @@ export default async function handler(
         return res.status(400).json({ received: false });
     }
 
-    // 2. Verify the Stripe signature header
+    // 2. Verify Stripe signature header
     const sig = req.headers["stripe-signature"];
     if (!sig) {
         console.error("Missing stripe-signature header");
         return res.status(400).json({ received: false });
     }
 
-    // 3. Attempt to construct the Event object
-    let event: any; // <-- loosened typing so TS won’t complain about event.type
+    // 3. Parse & verify the event
+    let event: any;
     try {
         event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
     } catch (err: any) {
@@ -75,16 +63,15 @@ export default async function handler(
         return res.status(400).json({ received: false });
     }
 
-    // 4. Handle the event by type
+    // 4. Handle relevant event types
     switch (event.type as string) {
         // ────── When a Payment Link is paid ──────
         case "payment.link.paid": {
-            // 4a. `event.data.object` is a Stripe.PaymentLink
             const paymentLinkObj = event.data.object as Stripe.PaymentLink;
-            const paymentLinkId = paymentLinkObj.id; // e.g. "plink_1AbCdEfGhIJKLmNoPqRsTuVw"
+            const paymentLinkId = paymentLinkObj.id;
             console.log("🔔 payment.link.paid for Payment Link:", paymentLinkId);
 
-            // 4b. Update our StripeLink row → status = "ACCEPTED"
+            // 4a. Update StripeLink.status → "ACCEPTED"
             try {
                 await prisma.stripeLink.updateMany({
                     where: {
@@ -98,10 +85,9 @@ export default async function handler(
                 });
             } catch (dbErr) {
                 console.error("Prisma error updating StripeLink to ACCEPTED:", dbErr);
-                // We do NOT return 500 here; we want to reply 200 to Stripe so it stops retrying
             }
 
-            // 4c. Check metadata to decide if we must create a Contribution
+            // 4b. Insert a Contribution record if this was a contribution flow
             const md = paymentLinkObj.metadata;
             const isContribute = md.isContribute === "true";
             const rawEventArticleId = md.eventArticleId;
@@ -113,18 +99,17 @@ export default async function handler(
             const eventArticleId = rawEventArticleId
                 ? parseInt(rawEventArticleId, 10)
                 : undefined;
-            const eventId = rawEventId ? parseInt(rawEventId, 10) : undefined;
+            // We intentionally do NOT parse rawEventId here, we'll handle fallback logic below
             const itemId = rawItemId ? parseInt(rawItemId, 10) : undefined;
-            const amountRON = rawAmountRON
-                ? parseFloat(rawAmountRON)
-                : undefined;
+            const amountRON = rawAmountRON ? parseFloat(rawAmountRON) : undefined;
 
             if (isContribute && eventArticleId && amountRON !== undefined) {
                 try {
                     await prisma.contribution.create({
                         data: {
                             guestUsername: purchaserUsername,
-                            eventId: eventId ?? null,
+                            // We’ll fill eventId below (after fallback resolution)
+                            eventId: rawEventId ? parseInt(rawEventId, 10) : null,
                             articleId: eventArticleId,
                             itemId: itemId ?? null,
                             cashAmount: new Prisma.Decimal(amountRON.toString()),
@@ -133,12 +118,10 @@ export default async function handler(
                     });
                 } catch (dbErr) {
                     console.error("Prisma error creating Contribution:", dbErr);
-                    // Again: do not abort the webhook, just log
                 }
             }
 
-            // 4d. Deactivate (archive) the Payment Link in Stripe
-            //      so it can’t be used again.
+            // 4c. Deactivate (archive) the Payment Link in Stripe
             try {
                 await stripe.paymentLinks.update(paymentLinkId, { active: false });
             } catch (stripeErr) {
@@ -148,16 +131,64 @@ export default async function handler(
                 );
             }
 
+            // 4d. Ensure we always have an eventId before calling processEventItemContributions
+            let eventId: number | undefined;
+            if (rawEventId) {
+                eventId = parseInt(rawEventId, 10);
+            } else if (eventArticleId) {
+                // Fallback: look up eventId from EventArticle table
+                try {
+                    const evtArticle = await prisma.eventArticle.findUnique({
+                        where: { id: eventArticleId },
+                        select: { eventId: true },
+                    });
+                    if (evtArticle) {
+                        eventId = evtArticle.eventId;
+                    } else {
+                        console.warn(
+                            `Could not find EventArticle with ID ${eventArticleId} to resolve eventId.`
+                        );
+                    }
+                } catch (lookupErr) {
+                    console.error(
+                        `Prisma error looking up eventId from EventArticle ${eventArticleId}:`,
+                        lookupErr
+                    );
+                }
+            }
+
+            if (eventId !== undefined) {
+                try {
+                    console.log(
+                        `Calling processEventItemContributions for event ID: ${eventId}`
+                    );
+                    await processEventItemContributions(eventId);
+                    console.log(
+                        `Finished processEventItemContributions for event ID: ${eventId}`
+                    );
+                } catch (procErr) {
+                    console.error(
+                        `Error in processEventItemContributions for event ID ${eventId}:`,
+                        procErr
+                    );
+                    // Do NOT rethrow, so we still return 200 to Stripe.
+                }
+            } else {
+                console.warn(
+                    "payment.link.paid webhook arrived without a resolvable eventId; skipping processEventItemContributions."
+                );
+            }
+
             break;
         }
 
         // ────── When a Payment Link expires ──────
         case "payment.link.expired": {
             const paymentLinkObj = event.data.object as Stripe.PaymentLink;
-            const paymentLinkId = paymentLinkObj.id; // e.g. "plink_1AbCdEfGhIJKLmNoPqRsTuVw"
+            const paymentLinkId = paymentLinkObj.id;
             console.log("🔔 payment.link.expired for Payment Link:", paymentLinkId);
 
-            // 4e. Update our StripeLink row → status = "EXPIRED"
+            // 4e. Update StripeLink.status → "EXPIRED"
             try {
                 await prisma.stripeLink.updateMany({
                     where: {
@@ -173,7 +204,7 @@ export default async function handler(
                 console.error("Prisma error updating StripeLink to EXPIRED:", dbErr);
             }
 
-            // 4f. Deactivate (archive) the link in Stripe, if not already gone
+            // 4f. Deactivate the link in Stripe (in case it’s still active)
             try {
                 await stripe.paymentLinks.update(paymentLinkId, { active: false });
             } catch (stripeErr) {
@@ -186,11 +217,11 @@ export default async function handler(
             break;
         }
 
-        // ────── All other event types we don’t care about ──────
+        // ────── All other event types ──────
         default:
             console.log(`⚪️  Unhandled event type: ${event.type}`);
     }
 
-    // 5. Return 200 to acknowledge receipt
+    // 5. Acknowledge receipt
     res.status(200).json({ received: true });
 }
