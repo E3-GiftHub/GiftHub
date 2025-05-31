@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   profilePicture: string;
-  role: 'planner' | 'guest';
+  role: "planner" | "guest";
 }
 export interface EventData {
   id: string;
@@ -11,8 +11,6 @@ export interface EventData {
   description: string;
   location: string;
   date: string;
-  time: string;
-  goal: number;
   planner: User;
   guests: User[];
 }

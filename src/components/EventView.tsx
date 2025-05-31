@@ -72,7 +72,7 @@ const EventView: React.FC<EventViewProps> = ({
 
                 <div className={styles.infoCard}>
                   <span className={styles.infoLabel}>Goal</span>
-                  <div className={styles.infoValue}>${eventData.goal}</div>
+                  <div className={styles.infoValue}>${1 /* todo change */}</div>
                 </div>
 
                 <button

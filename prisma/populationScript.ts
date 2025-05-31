@@ -249,7 +249,6 @@ async function createEvents(users: User[]) {
         description: `Join us for ${users[creatorIndex]!.fname}'s ${eventTypes[i]}!`,
         location: `${users[creatorIndex]!.fname}'s place`,
         date: eventDate,
-        time: eventTime,
         createdByUsername: users[creatorIndex]!.username,
       },
     });

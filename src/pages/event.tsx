@@ -75,12 +75,10 @@ export default function EventViewPage() {
             eventData={{
               id: String(eventData.id), // <-- Fix: convert number to string
               title: eventData.title,
-              goal: 1,
               picture: eventData.pictureUrl,
               description: eventData.description,
               location: eventData.location,
               date: eventData.date,
-              time: eventData.time,
               planner: eventData.planner,
               guests: eventData.guests,
             }}
