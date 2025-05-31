@@ -158,13 +158,17 @@ export default function EventView() {
           `./api/guest-remove?username=${username}&eventId=${eventId}`,
         );
 
-        const apiStatus = await res.json();
+        const apiStatus: { error: string } = (await res.json()) as {
+          error: string;
+        };
         console.log(apiStatus);
       } catch (error) {
         console.error("Failed to remove guests", error);
       }
     };
-    f();
+    f().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
   };
 
   const handleAddGuest = () => {
@@ -179,13 +183,17 @@ export default function EventView() {
             `./api/guest-invite?username=${name}&eventId=${eventId}`,
           );
 
-          const apiStatus = await res.json();
+          const apiStatus: { error: string } = (await res.json()) as {
+            error: string;
+          };
           console.log(apiStatus);
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
       };
-      f();
+      f().catch((err) => {
+        console.error("Unexpected error in useEffect:", err);
+      });
     }
   };
   const handleSaveGuestChanges = () => setShowGuestModal(false);
@@ -304,7 +312,8 @@ export default function EventView() {
     setFormData((prev) => ({
       ...prev,
       [pendingField]:
-        eventData[pendingField as keyof typeof formData] ?? prev[pendingField],
+        eventData[pendingField /*as keyof typeof formData*/] ??
+        prev[pendingField],
     }));
   };
 

@@ -29,9 +29,13 @@ export const eventRouter = createTRPCRouter({
         location: z.string().min(1, "Location is required"),
       }),
     )
-     .mutation(({ input, ctx }) => {
+    .mutation(({ input, ctx }) => {
       const user = ctx.session?.user?.name;
-      if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      if (!user)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
 
       return handle(() =>
         eventPlanner
@@ -39,7 +43,7 @@ export const eventRouter = createTRPCRouter({
             ...input,
             createdBy: user,
           })
-          .then((event) => event.raw)
+          .then((event) => event.raw),
       );
     }),
 
@@ -56,7 +60,7 @@ export const eventRouter = createTRPCRouter({
     .input(z.object({ token: z.string() }))
     .query(({ input }) =>
       handle(() =>
-        prisma.event.findUniqueOrThrow({
+        prisma.event.findFirstOrThrow({
           where: { token: input.token },
         }),
       ),
@@ -72,7 +76,11 @@ export const eventRouter = createTRPCRouter({
     .input(z.object({ eventId: z.number() }))
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.session?.user?.id;
-      if (!userId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      if (!userId)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
 
       return handle(async () => {
         const event = await prisma.event.findUnique({
@@ -124,37 +132,51 @@ export const eventRouter = createTRPCRouter({
 
 */
 
-   getUserEvents: publicProcedure.query(({ ctx }) => {
+  getUserEvents: publicProcedure.query(({ ctx }) => {
     const userId = ctx.session?.user?.id;
-    if (!userId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+    if (!userId)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
+      });
 
     return handle(() =>
       prisma.event.findMany({
         where: { createdByUsername: userId },
         orderBy: { date: "asc" },
-      })
+      }),
     );
   }),
 
   getInvitedEvents: publicProcedure.query(({ ctx }) => {
     const userId = ctx.session?.user?.id;
-    if (!userId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+    if (!userId)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
+      });
 
     return handle(() =>
       prisma.invitation.findMany({
         where: { guestUsername: userId },
         include: { event: true },
-      })
+      }),
     );
   }),
-    respondToInvitation: publicProcedure
-    .input(z.object({
-      invitationId: z.number(),
-      status: z.nativeEnum(StatusType),
-    }))
+  respondToInvitation: publicProcedure
+    .input(
+      z.object({
+        invitationId: z.number(),
+        status: z.nativeEnum(StatusType),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.session?.user?.id;
-      if (!userId) throw new TRPCError({ code: "UNAUTHORIZED", message: "User not authenticated" });
+      if (!userId)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
 
       return handle(async () => {
         const invitation = await prisma.invitation.findUnique({
@@ -175,16 +197,18 @@ export const eventRouter = createTRPCRouter({
         });
       });
     }),
-    
-    updateEvent: publicProcedure
-    .input(z.object({
-      eventId:    z.number(),
-      title:      z.string().nullable(),
-      description:z.string().nullable(),
-      date:       z.string().nullable(),
-      time:       z.string().nullable(),
-      location:   z.string().nullable(),
-    }))
+
+  updateEvent: publicProcedure
+    .input(
+      z.object({
+        eventId: z.number(),
+        title: z.string().nullable(),
+        description: z.string().nullable(),
+        date: z.string().nullable(),
+        time: z.string().nullable(),
+        location: z.string().nullable(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { eventId, title, description, date, time, location } = input;
       return ctx.db.event.update({
@@ -192,8 +216,8 @@ export const eventRouter = createTRPCRouter({
         data: {
           title,
           description,
-          date:       date ? new Date(date) : undefined,
-          time:       time ? new Date(`${date}T${time}`) : undefined,
+          date: date ? new Date(date) : undefined,
+          time: time ? new Date(`${date}T${time}`) : undefined,
           location,
         },
       });

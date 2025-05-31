@@ -15,7 +15,7 @@ type InvitePageProps = {
   } | null;
 };
 
-export default function InvitePage({ event }: InvitePageProps) {
+export default function InvitePage({ event }: Readonly<InvitePageProps>) {
   if (!event) {
     return (
       <div className="p-6">
@@ -56,7 +56,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const eventRecord = await prisma.event.findFirst({
     where: { token: token },
-    select: { token: true },
   });
 
   if (!eventRecord) {
