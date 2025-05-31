@@ -14,7 +14,6 @@ export const eventRouter = createTRPCRouter({
           description: true,
           location: true,
           date: true,
-          time: true,
           pictureUrl: true,
           createdByUsername: true,
           user: {
@@ -59,24 +58,12 @@ export const eventRouter = createTRPCRouter({
         role: "planner" as const,
       };
 
-      // Format date and time
-      const formatDate = (date: Date | null) => {
-        if (!date) return "";
-        return date.toLocaleDateString(); // Returns date in MM/DD/YYYY format (or local format)
-      };
-
-      const formatTime = (time: Date | null) => {
-        if (!time) return "";
-        return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Returns time in HH:MM format
-      };
-
       return {
         id: event.id,
         title: event.title ?? "",
         description: event.description ?? "",
         location: event.location ?? "",
-        date: formatDate(event.date),
-        time: formatTime(event.time),
+        date: String(event.date),
         pictureUrl: event.pictureUrl ?? "/api/placeholder/300/200",
         planner,
         guests,

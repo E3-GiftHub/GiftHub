@@ -55,24 +55,30 @@ const EventView: React.FC<EventViewProps> = ({
                 className={styles.eventImage}
               />
 
-              {/* Event Info Grid */}
+              {/* Event Info Grid: Date, Time and Location */}
               <div className={styles.infoGrid}>
                 <div className={styles.infoCard}>
                   <div className={styles.infoLabel}>
                     <Clock className={styles.icon} />
-                    <span>Time</span>
+                    <span>Date</span>
                   </div>
-                  <span className={styles.infoValue}>{eventData.time}</span>
+                  <span className={styles.infoValue}>{eventData.date}</span>
                 </div>
 
                 <div className={styles.infoCard}>
-                  <span className={styles.infoLabel}>Date</span>
-                  <div className={styles.infoValue}>{eventData.date}</div>
+                  <div className={styles.infoLabel}>
+                    <MapPin className={styles.icon} />
+                    <span>Location</span>
+                  </div>
+                  <span className={styles.infoValue}>{eventData.location}</span>
                 </div>
 
-                <div className={styles.infoCard}>
-                  <span className={styles.infoLabel}>Goal</span>
-                  <div className={styles.infoValue}>${1 /* todo change */}</div>
+                {/* Description */}
+                <div className={styles.descriptionCard}>
+                  <h3 className={styles.descriptionTitle}>Description</h3>
+                  <p className={styles.descriptionText}>
+                    {eventData.description}
+                  </p>
                 </div>
 
                 <button
@@ -82,23 +88,6 @@ const EventView: React.FC<EventViewProps> = ({
                   <Image className={styles.icon} />
                   <span>Media</span>
                 </button>
-              </div>
-
-              {/* Location */}
-              <div className={styles.locationCard}>
-                <div className={styles.locationLabel}>
-                  <MapPin className={styles.icon} />
-                  <span>Location</span>
-                </div>
-                <p className={styles.locationText}>{eventData.location}</p>
-              </div>
-
-              {/* Description */}
-              <div className={styles.descriptionCard}>
-                <h3 className={styles.descriptionTitle}>Description</h3>
-                <p className={styles.descriptionText}>
-                  {eventData.description}
-                </p>
               </div>
 
               {/* Action Buttons - Moved under description */}
