@@ -149,7 +149,6 @@ model Event {
   description String?
   location    String?
   date        DateTime?
-  time        DateTime?
   pictureUrl  String?
   token       String?
 
