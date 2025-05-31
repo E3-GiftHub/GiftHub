@@ -172,13 +172,12 @@ model Event {
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
-  id       Int           @id @default(autoincrement())
-  eventId  Int
-  itemId   Int           @default(-1) // deleted item
-  userNote String? // additional note
-  priority PriorityType?
-
-  transferCompleted Boolean @default(false)
+  id                Int           @id @default(autoincrement())
+  eventId           Int
+  itemId            Int           @default(-1) // deleted item
+  userNote          String? // additional note
+  priority          PriorityType?
+  transferCompleted Boolean
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -193,7 +192,6 @@ model EventArticle {
 
   @@index([eventId])
   @@index([itemId])
-  @@index([transferCompleted])
 }
 
 model Item {
