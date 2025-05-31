@@ -8,16 +8,8 @@ import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
 
-import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-
-import { calendarRouter } from "./routers/calendarRouter";
-
-import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
-
-import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
-
+import { authRouter } from "./routers/authRouter";
 import { stripeRouter } from "~/server/api/routers/stripeRouter";
-
 import { userRouter } from "~/server/api/routers/userRouter"; // presupunând că fișierul se numește userRouter.ts și este în același director 'routers'
 
 /**
