@@ -37,7 +37,7 @@ export default function EventViewPage() {
     { enabled: Boolean(id) && !isNaN(eventId) },
   );
 
-  // FUNCTIONS
+  //! FUNCTIONS
   const handleReport = (reason: string) => {
     console.log("Event reported:", reason);
     alert(`Event reported for: ${reason}`);
@@ -46,6 +46,20 @@ export default function EventViewPage() {
   const handleViewWishlist = () => {
     void router.push(`/wishlist?eventId=${eventId}`);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDoesShowMedia(false);
+        setShowUploadModal(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   //! GET MEDIA
   useEffect(() => {
@@ -100,7 +114,7 @@ export default function EventViewPage() {
               guests: eventData.guests,
             }}
             onContribute={() => {
-              void router.push(`/payment?eventId=${eventId}`);
+              router.push(`/payment?eventId=${eventId}`);
             }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
@@ -118,7 +132,7 @@ export default function EventViewPage() {
           )}
 
           {/* THE UPLOADING MODAL */}
-          {/*showUploadModal && (
+          {showUploadModal && (
             <div className={styles.modalBackdrop}>
               <div className={styles.modal}>
                 <h3 className={styles.modalTitle}>Upload Media</h3>
@@ -144,7 +158,7 @@ export default function EventViewPage() {
                 </button>
               </div>
             </div>
-          )*/}
+          )}
         </main>
       </div>
       <Footer />
