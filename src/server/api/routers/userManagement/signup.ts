@@ -14,7 +14,7 @@ export const signupRouter = createTRPCRouter({
   signup: publicProcedure
     .input(signupSchema)
     .mutation(async ({ input, ctx }) => {
-      const { email, password } = input;
+      const { username, email, password } = input;
 
       if (input.password !== input.confirmPassword) {
         throw new TRPCError({
@@ -44,7 +44,9 @@ export const signupRouter = createTRPCRouter({
           password: hashPasswd,
           fname: null,
           lname: null,
+          id: input.username,
           //stripeConnectId: null,
+
           pictureUrl: "/UserImages/default_pgp.svg",
         },
       });

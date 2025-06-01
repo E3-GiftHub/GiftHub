@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import React from "react";
 
 export default function UserProfile() {
-  const { data: user, isLoading, error } = api.user.getCurrentUser.useQuery();
+  const { data: user, isLoading, error } = api.profile.user.get.useQuery();
 
   // Log *immediately* after getting the hook data, to capture all states
   console.log("UserProfile: tRPC query result", { user, isLoading, error });
@@ -47,11 +47,11 @@ export default function UserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        username={user.username}
+        username={user.id ?? "not set"}
         fname={user.fname ?? "not set"}
         lname={user.lname ?? "not set"}
         email={user.email ?? "not set"}
-        iban={user.iban ?? "not set"}
+        //iban={user.iban ?? "not set"}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
 
       />

@@ -8,23 +8,24 @@ import { api } from "~/trpc/react";
 export default function EditUserProfile() {
   const router = useRouter();
 
-  const { data: user, isLoading: userLoading, error: userError } = api.user.getCurrentUser.useQuery();
+  const { data: user, isLoading: userLoading, error: userError } = api.profile.user.get.useQuery();
 
-  const updateUserMutation = api.user.updateUser.useMutation();
+  const updateUserMutation = api.profile.user.update.useMutation();
 
   const handleSave = async (
     newFname: string,
     newLname: string,
     _newUsername: string,
     newEmail: string,
-    newIban: string
+    //newIban: string
   ) => {
     updateUserMutation.mutate(
       {
         fname: newFname,
         lname: newLname,
         email: newEmail,
-        iban: newIban,
+        username: _newUsername,
+        //iban: newIban,
       },
       {
         onSuccess: () => {
@@ -73,11 +74,11 @@ export default function EditUserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <EditUserProfileUI
-        username={user.username}
+        username={user.id ?? ""}
         fname={user.fname ?? ""}
         lname={user.lname ?? ""}
         email={user.email ?? ""}
-        IBAN={user.iban ?? ""}
+        //IBAN={user.iban ?? ""}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}

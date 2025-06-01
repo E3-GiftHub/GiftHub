@@ -128,7 +128,7 @@ export default function EditUserProfileUI({
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading || disableUsernameEditing} // <-- disable username input if prop true
+              disabled={loading} // <-- disable username input if prop true
             />
           </div>
 
