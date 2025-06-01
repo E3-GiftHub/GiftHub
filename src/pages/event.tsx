@@ -2,6 +2,7 @@ import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react"; // <-- FIXED: use the React hooks client
 import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
@@ -13,6 +14,10 @@ import { UploadButton } from "~/utils/uploadthing";
 
 export default function EventViewPage() {
   const router = useRouter();
+  //const { data: session, status } = useSession();
+  //console.log("cacatule");
+  //console.log(session?.user);
+
   const [doesShowMedia, setDoesShowMedia] = useState(false);
   const [mediaArray, setMediaArray] = useState<MediaHeader[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(true);
@@ -38,9 +43,25 @@ export default function EventViewPage() {
   );
 
   //! FUNCTIONS
-  const handleReport = (reason: string) => {
-    console.log("Event reported:", reason);
-    alert(`Event reported for: ${reason}`);
+  const handleReport = async (reason: string) => {
+    if (status !== "authenticated") return;
+
+    try {
+      const res = await fetch("/api/event-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          //username: session.user?.id,
+          eventId: eventId,
+          reason: reason,
+        }),
+      });
+
+      console.log(res);
+      alert(`Event reported for: ${reason}`);
+    } catch (error) {
+      console.error("Failed to load guests", error);
+    }
   };
 
   const handleViewWishlist = () => {
