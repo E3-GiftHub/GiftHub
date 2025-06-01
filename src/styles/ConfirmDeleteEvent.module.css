@@ -49,7 +49,10 @@
 }
 
 .deleteMainButton {
-    flex: 1;
+    position: absolute;
+    right: 1rem; /* ✅ Moves button to the right */
+    top: 50%;
+    transform: translateY(-50%); /* ✅ Ensures vertical alignment */
     padding: 0.6rem 1rem;
     background-color: #e74c3c;
     border: none;

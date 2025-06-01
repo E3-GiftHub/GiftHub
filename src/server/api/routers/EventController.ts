@@ -73,27 +73,49 @@ export const eventRouter = createTRPCRouter({
     ),
 */
   removeEvent: publicProcedure
-    .input(z.object({ eventId: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      const userId = ctx.session?.user?.id;
-      if (!userId)
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-
-      return handle(async () => {
-        const event = await prisma.event.findUnique({
-          where: { id: input.eventId },
-        });
-
-        if (!event || event.createdByUsername !== userId) {
-          throw new Error("Not authorized to remove this event");
-        }
-
-        await eventPlanner.removeEvent(input.eventId);
+  .input(z.object({ eventId: z.number() }))
+  .mutation(async ({ input, ctx }) => {
+    const userId = ctx.session?.user?.id;
+    if (!userId)
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
       });
-    }),
+
+    return handle(async () => {
+      const event = await prisma.event.findUnique({
+        where: { id: input.eventId },
+      });
+
+      console.log("event.createdByUsername =", event?.createdByUsername);
+      console.log("session.user.id =", userId);
+
+
+      if (!event || event.createdByUsername !== userId) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+      }
+
+      // ❌ Check for EventArticles
+      const articleCount = await prisma.eventArticle.count({
+        where: { eventId: input.eventId },
+      });
+
+      if (articleCount > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot delete event with associated articles.",
+        });
+      }
+
+      // ✅ Safe to delete
+      await prisma.event.delete({
+        where: { id: input.eventId },
+      });
+
+      return { success: true };
+    });
+  }),
+
 
   sendInvitation: publicProcedure
     .input(z.object({ eventId: z.number(), guestId: z.string() }))

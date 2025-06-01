@@ -59,6 +59,8 @@ function GuestListPreview({
 export default function EventView() {
   // update events
   const updateEventMutation = api.event.updateEvent.useMutation();
+  const deleteEventMutation = api.event.removeEvent.useMutation();
+
 
   // get the event id
   const router = useRouter();
@@ -348,11 +350,17 @@ export default function EventView() {
 
        {showDeleteModal && (
                 <DeleteEventModal
-                    onConfirm={() => {
+                    onConfirm={async () => {
+                      try {
+                        await deleteEventMutation.mutateAsync({ eventId: parsedId });
+                        alert("Event deleted successfully.");
+                        router.push("/");
+                      } catch (err: any) {
+                        console.error("Failed to delete event:", err);
+                        alert(err.message || "Could not delete event.");
+                      } finally {
                         setShowDeleteModal(false);
-                        // aici poți pune logica reală de ștergere
-                        console.log("Eveniment șters");
-                        router.push("/"); // sau navigate elsewhere
+                      }
                     }}
                     onCancel={() => setShowDeleteModal(false)}
                 />
