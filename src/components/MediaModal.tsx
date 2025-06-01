@@ -20,7 +20,6 @@ export default function MediaModal({
   onClose,
 }: Readonly<MediaModalProps>) {
   if (isLoading) return <p>Loading ... </p>;
-
   return (
     <div className={styles.editMediaModalWrapper}>
       <div className={styles.editMediaModalContent}>
@@ -38,8 +37,8 @@ export default function MediaModal({
         <div className={styles.editMediaGrid}>
           {media.length > 0 ? (
             media.map((item) => (
-              <div key={item.id} className={styles.editMediaHeader}>
-                <Image
+              <div key={item.id} className={styles.editMediaItem}>
+                <img
                   src={item.url}
                   alt={item.caption ?? `Media ${item.id}`}
                   width={120}

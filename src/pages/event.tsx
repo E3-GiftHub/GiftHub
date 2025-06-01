@@ -118,7 +118,7 @@ export default function EventViewPage() {
           )}
 
           {/* THE UPLOADING MODAL */}
-          {showUploadModal && (
+          {/*showUploadModal && (
             <div className={styles.modalBackdrop}>
               <div className={styles.modal}>
                 <h3 className={styles.modalTitle}>Upload Media</h3>
@@ -135,7 +135,6 @@ export default function EventViewPage() {
                   }}
                 />
 
-                {/* CLOSES THE UPLOADING MODAL */}
                 <button
                   className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
                   onClick={() => setShowUploadModal(false)}
@@ -145,7 +144,7 @@ export default function EventViewPage() {
                 </button>
               </div>
             </div>
-          )}
+          )*/}
         </main>
       </div>
       <Footer />
