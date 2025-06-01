@@ -6,12 +6,15 @@ import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
+import DeleteEventModal from "../components/DeleteEventModal";
+
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import { UploadButton } from "~/utils/uploadthing";
 import Footer from "../components/Footer";
 import "./../styles/globals.css";
 import { type GuestHeader } from "~/models/GuestHeader";
+
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -69,6 +72,8 @@ export default function EventView() {
   const eventId = Number(idParam) ?? 0;
   console.log("Event id: ", eventId);
   const parsedId = parseId(id) ?? 0;
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   //! AICI FACEM ROST DE GUESTS
   const [showGuestModal, setShowGuestModal] = useState(false);
@@ -341,6 +346,18 @@ export default function EventView() {
         </div>
       )}
 
+       {showDeleteModal && (
+                <DeleteEventModal
+                    onConfirm={() => {
+                        setShowDeleteModal(false);
+                        // aici poți pune logica reală de ștergere
+                        console.log("Eveniment șters");
+                        router.push("/"); // sau navigate elsewhere
+                    }}
+                    onCancel={() => setShowDeleteModal(false)}
+                />
+            )}
+
       {showMediaModal && (
         <EditMediaModal
           media={mediaData.data ?? []}
@@ -390,6 +407,7 @@ export default function EventView() {
               }
               onKeyDown={(e) => handleKeyDown(e, "title")}
               autoFocus
+              
             />
           ) : (
             <h2
@@ -402,6 +420,14 @@ export default function EventView() {
               {formData.title}
             </h2>
           )}
+
+          {/* Delete Event Button */}
+          <button
+            className={styles.deleteMainButton}
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Delete Event
+          </button>
         </div>
 
         <div className={styles.wrapper}>
