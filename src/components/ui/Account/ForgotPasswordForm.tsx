@@ -11,12 +11,13 @@ export default function ForgotPasswordForm() {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/auth/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const response = await fetch("/api/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const data = await response.json();
 
             if (response.ok) {
@@ -45,9 +46,7 @@ export default function ForgotPasswordForm() {
             <div className={styles.middle}>
                 <form className={styles.formContainer} onSubmit={handleSubmit}>
                     <div className={styles.formGroup}>
-                        <label htmlFor="email" className={styles.inputTitle}>
-                            Email
-                        </label>
+                        <label htmlFor="email" className={styles.inputTitle}>Email</label>
                         <input
                             id="email"
                             type="email"
@@ -58,10 +57,7 @@ export default function ForgotPasswordForm() {
                             required
                         />
                     </div>
-
-                    <button type="submit" className={styles.primaryButton}>
-                        Confirm
-                    </button>
+                    <button type="submit" className={styles.primaryButton}>Confirm</button>
                 </form>
 
                 {message && <p className={styles.successMessage}>{message}</p>}

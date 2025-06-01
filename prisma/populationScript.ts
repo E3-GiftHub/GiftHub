@@ -75,6 +75,9 @@ async function createUsers() {
   const users = [];
 
   for (let i = 1; i <= 20; i++) {
+    const tokenExpiresDate = new Date();
+    tokenExpiresDate.setDate(tokenExpiresDate.getDate() + 1);
+
     const user = await prisma.user.create({
       data: {
         username: `user${i}`,
@@ -85,6 +88,8 @@ async function createUsers() {
         stripeConnectId: `RO${Math.floor(Math.random() * 10000000000000000)}`,
         pictureUrl: `picture${i}.jpg`,
         emailVerified: new Date(),
+        emailToken: `token_${Math.random().toString(36).substring(2, 15)}`,
+        tokenExpires: tokenExpiresDate,
       },
     });
 
@@ -93,6 +98,7 @@ async function createUsers() {
 
   return users;
 }
+
 
 async function createRetailers() {
   const retailerNames = [
@@ -287,7 +293,6 @@ async function createInvitations(users: User[], events: Event[]) {
             repliedAt,
           },
         });
-
         invitations.push(invitation);
       }
     }
