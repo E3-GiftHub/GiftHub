@@ -3,6 +3,7 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import "src/styles/globals.css";
+import {useUploadThing} from "~/utils/uploadthing";
 import { useRouter } from "next/router";
 import ContainerSVG from '@/assets/UserImages/Containers/Container.svg';
 

@@ -5,6 +5,8 @@ import clsx from 'clsx';
 import "src/styles/globals.css";
 import { useRouter } from 'next/router';
 import { signOut } from 'next-auth/react';
+import {useUploadThing} from "~/utils/uploadthing";
+import {toast} from "sonner";
 import { api } from "src/trpc/react";// Assuming this is your TRPC hook location
 
 interface UserProfileProps {
@@ -61,6 +63,7 @@ export default function UserProfileUI({
                                       }: Readonly<UserProfileProps>) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
+  const { startUpload } = useUploadThing("profilePicture");
   const router = useRouter();
 
   useEffect(() => {
@@ -69,20 +72,46 @@ export default function UserProfileUI({
 
   const renderContent = (content: string) => (loading ? '\u00A0' : content);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          setPreviewUrl(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    // const file = event.target.files?.[0];
+    // if (file) {
+    //   const reader = new FileReader();
+    //   reader.onloadend = () => {
+    //     if (reader.result) {
+    //       setPreviewUrl(reader.result as string);
+    //     }
+    //   };
+    //   reader.readAsDataURL(file);
+    //
+    //   if (onPhotoChange) {
+    //     onPhotoChange(file);
+    //   }
+    // }
 
-      if (onPhotoChange) {
-        onPhotoChange(file);
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.result) {
+        setPreviewUrl(reader.result as string);
       }
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const res = await startUpload([file]);
+      if (res?.[0]?.url) {
+        setPreviewUrl(res[0].url);
+        if (onPhotoChange) {
+          onPhotoChange(file);
+        }
+      }
+    } catch (error) {
+      toast.error("Error uploading profile picture");
+      console.error(error);
     }
   };
 

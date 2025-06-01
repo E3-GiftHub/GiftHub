@@ -1,6 +1,8 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { getSession } from "next-auth/react";
+//import { getSession } from "next-auth/react";
+import getServerSession from "next-auth"
 import { db } from "~/server/db";
+import { authConfig } from "~/server/auth/config";
 
 const f = createUploadthing();
 
@@ -11,8 +13,8 @@ export const aFileRouter = {
       maxFileCount: 1,
     },
   })
-    .middleware(async (req) => {
-      const session = await getSession({ req });
+    .middleware(async (req: any) => {
+      const session =  getServerSession(authConfig);
 
       if (!session || !session.user) {
         throw new Error("Unauthorized");
@@ -29,7 +31,7 @@ export const aFileRouter = {
         },
         data: {
           pictureUrl: file.url,
-        }
+        },
       });
     }),
 } satisfies FileRouter;
