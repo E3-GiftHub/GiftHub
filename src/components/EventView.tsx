@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Clock, MapPin, Users, Image, Flag } from "lucide-react";
 import styles from "../styles/EventView.module.css";
-import type { EventData, EventViewProps } from "~/models/EventData";
+import type { EventViewProps } from "~/models/EventData";
 
 const EventView: React.FC<EventViewProps> = ({
   eventData,
@@ -19,14 +19,6 @@ const EventView: React.FC<EventViewProps> = ({
       setShowReportModal(false);
       setReportReason("");
     }
-  };
-
-  const handleViewWishlist = () => {
-    onViewWishlist?.();
-  };
-
-  const handleMediaView = () => {
-    onMediaView?.();
   };
 
   return (
@@ -81,10 +73,7 @@ const EventView: React.FC<EventViewProps> = ({
                   </p>
                 </div>
 
-                <button
-                  onClick={handleMediaView}
-                  className={styles.infoCardButton}
-                >
+                <button onClick={onMediaView} className={styles.infoCardButton}>
                   <Image className={styles.icon} />
                   <span>Media</span>
                 </button>
@@ -93,7 +82,7 @@ const EventView: React.FC<EventViewProps> = ({
               {/* Action Buttons - Moved under description */}
               <div className={styles.actionButtons}>
                 <button
-                  onClick={handleViewWishlist}
+                  onClick={onViewWishlist}
                   className={styles.wishlistButton}
                 >
                   View Wishlist

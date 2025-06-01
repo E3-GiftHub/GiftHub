@@ -1,14 +1,22 @@
+import styles from "../styles/EventView.module.css";
+import buttonStyles from "../styles/Button.module.css";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { api } from "~/trpc/react"; // <-- FIXED: use the React hooks client
 import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
+import MediaModal from "~/components/MediaModal";
 import Footer from "~/components/Footer";
-import styles from "../styles/EventView.module.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { MediaHeader } from "~/models/MediaHeader";
+import { UploadButton } from "~/utils/uploadthing";
 
 export default function EventViewPage() {
   const router = useRouter();
+  const [doesShowMedia, setDoesShowMedia] = useState(false);
+  const [mediaArray, setMediaArray] = useState<MediaHeader[]>([]);
+  const [loadingMedia, setLoadingMedia] = useState(true);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -29,37 +37,42 @@ export default function EventViewPage() {
     { enabled: Boolean(id) && !isNaN(eventId) },
   );
 
-  const handleContribute = () => {
-    void router.push(`/payment?eventId=${eventId}`);
+  // FUNCTIONS
+  const handleReport = (reason: string) => {
+    console.log("Event reported:", reason);
+    alert(`Event reported for: ${reason}`);
   };
 
   const handleViewWishlist = () => {
     void router.push(`/wishlist?eventId=${eventId}`);
   };
 
-  const handleMediaView = () => {
-    void router.push(`/media?eventId=${eventId}`);
-  };
+  //! GET MEDIA
+  useEffect(() => {
+    if (!router.isReady || !id) return;
 
-  const handleReport = (reason: string) => {
-    console.log("Event reported:", reason);
-    alert(`Event reported for: ${reason}`);
-  };
+    (async () => {
+      try {
+        const res = await fetch(`./api/media-query?eventId=${eventId}`);
+        const data = (await res.json()) as MediaHeader[];
+        setMediaArray(data);
+      } catch (error) {
+        console.error("Failed to load media", error);
+      } finally {
+        setLoadingMedia(false);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  }, [eventId]);
 
-  if (!id || isNaN(eventId)) {
-    return <p>Invalid or missing event ID.</p>;
+  //! RENDER ALL DATA
+  if (!id || !eventData || isNaN(eventId) || error) {
+    return <p>error: Invalid event ID - {error?.message}</p>;
   }
 
   if (isLoading) {
     return <p>Loading event...</p>;
-  }
-
-  if (error) {
-    return <p>Error loading event: {error.message}</p>;
-  }
-
-  if (!eventData) {
-    return <p>Event not found.</p>;
   }
 
   return (
@@ -86,11 +99,51 @@ export default function EventViewPage() {
               planner: eventData.planner,
               guests: eventData.guests,
             }}
-            onContribute={handleContribute}
+            onContribute={void router.push(`/payment?eventId=${eventId}`)}
             onViewWishlist={handleViewWishlist}
-            onMediaView={handleMediaView}
+            onMediaView={() => setDoesShowMedia(true)}
             onReport={handleReport}
           />
+
+          {/* MEDIA MODAL WITH A BUTTON TO UPLOAD */}
+          {doesShowMedia && (
+            <MediaModal
+              isLoading={loadingMedia}
+              media={mediaArray}
+              onUpload={() => setShowUploadModal(true)}
+              onClose={() => setDoesShowMedia(false)}
+            />
+          )}
+
+          {/* THE UPLOADING MODAL */}
+          {showUploadModal && (
+            <div className={styles.modalBackdrop}>
+              <div className={styles.modal}>
+                <h3 className={styles.modalTitle}>Upload Media</h3>
+                <UploadButton
+                  endpoint="imageUploader"
+                  input={{ eventId }}
+                  onClientUploadComplete={(res) => {
+                    console.log("Files:", res);
+                    alert("Upload completed");
+                    setShowUploadModal(false);
+                  }}
+                  onUploadError={(err: Error) => {
+                    alert(`Error: ${err.message}`);
+                  }}
+                />
+
+                {/* CLOSES THE UPLOADING MODAL */}
+                <button
+                  className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+                  onClick={() => setShowUploadModal(false)}
+                  style={{ marginTop: "1rem" }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
       <Footer />
