@@ -25,7 +25,9 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
-  const [userStripeAccountId, setUserStripeAccountId] = useState<string | null | undefined>(undefined);
+  const [userStripeAccountId, setUserStripeAccountId] = useState<
+    string | null | undefined
+  >(undefined);
 
   const profileRef = useRef<HTMLLIElement>(null);
   const router = useRouter();
@@ -35,25 +37,23 @@ const Navbar = () => {
     isLoading: isLoadingUser,
     isError: isUserQueryError,
     error: userQueryError,
-    refetch: refetchUser
-  } = api.user.getSelf.useQuery(
-      undefined,
-      {
-        enabled: isLoggedIn && !isLandingPage,
-        retry: false,
-      }
-  );
-
-  const stripeDashboardLinkMutation = api.stripe.createDashboardLoginLink.useMutation({
-    onSuccess: (data) => {
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
-    },
-    onError: (error) => {
-      alert(`Stripe Dashboard Error: ${error.message}`);
-    },
+    refetch: refetchUser,
+  } = api.user.getSelf.useQuery(undefined, {
+    enabled: isLoggedIn && !isLandingPage,
+    retry: false,
   });
+
+  const stripeDashboardLinkMutation =
+    api.stripe.createDashboardLoginLink.useMutation({
+      onSuccess: (data) => {
+        if (data.url) {
+          window.open(data.url, "_blank");
+        }
+      },
+      onError: (error) => {
+        alert(`Stripe Dashboard Error: ${error.message}`);
+      },
+    });
 
   const handleStripeDashboardClick = () => {
     stripeDashboardLinkMutation.mutate();
@@ -76,7 +76,12 @@ const Navbar = () => {
 
   useEffect(() => {
     if (isLoggedIn && !isLandingPage) {
-      if (userStripeAccountId === undefined && !isLoadingUser && !isUserQueryError && !currentUser) {
+      if (
+        userStripeAccountId === undefined &&
+        !isLoadingUser &&
+        !isUserQueryError &&
+        !currentUser
+      ) {
         refetchUser();
       }
     } else {
@@ -84,14 +89,22 @@ const Navbar = () => {
         setUserStripeAccountId(null);
       }
     }
-  }, [isLoggedIn, isLandingPage, userStripeAccountId, currentUser, isLoadingUser, isUserQueryError, refetchUser, setUserStripeAccountId]);
-
+  }, [
+    isLoggedIn,
+    isLandingPage,
+    userStripeAccountId,
+    currentUser,
+    isLoadingUser,
+    isUserQueryError,
+    refetchUser,
+    setUserStripeAccountId,
+  ]);
 
   useEffect(() => {
     const updatePageState = () => {
       const { pathname, hash } = window.location;
       const isLanding =
-          pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
+        pathname === "/" && (hash === "" || hash === "#" || hash === undefined);
       setIsLandingPage(isLanding);
 
       const url = window.location.href;
@@ -106,7 +119,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener("hashchange", updatePageState);
       router.events?.off("routeChangeComplete", updatePageState);
-    }
+    };
   }, [router.events]);
 
   useEffect(() => {
@@ -114,8 +127,8 @@ const Navbar = () => {
       const target = event.target as HTMLElement;
 
       if (
-          !target.closest(`.${styles["nav-links"]}`) &&
-          !target.closest(`.${styles.hamburger}`)
+        !target.closest(`.${styles["nav-links"]}`) &&
+        !target.closest(`.${styles.hamburger}`)
       ) {
         setMenuOpen(false);
       }
@@ -131,111 +144,116 @@ const Navbar = () => {
     };
   }, []);
 
-  const showStripeButton = isLoggedIn && !isLoadingUser && !!userStripeAccountId && !isLandingPage && !isUserQueryError;
+  const showStripeButton =
+    isLoggedIn &&
+    !isLoadingUser &&
+    !!userStripeAccountId &&
+    !isLandingPage &&
+    !isUserQueryError;
 
   return (
-      <nav
-          className={`${styles.navbar} ${
-              isLandingPage ? styles["special-navbar"] : ""
-          }`}
-      >
-        <div className={styles["navbar-left"]}>
-          <Link href="/">
-            <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+    <nav
+      className={`${styles.navbar} ${
+        isLandingPage ? styles["special-navbar"] : ""
+      }`}
+    >
+      <div className={styles["navbar-left"]}>
+        <Link href="/">
+          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+        </Link>
+      </div>
+
+      {!isLoggedIn ? (
+        <div className={styles["login-wrapper"]}>
+          <Link href="/api/auth/signin" className={styles["login-button"]}>
+            <FaUser />
+            <FaArrowRight />
+            Login
           </Link>
         </div>
+      ) : (
+        <>
+          <button
+            className={styles.hamburger}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            <FaBars />
+          </button>
 
-        { !isLoggedIn ? (
-            <div className={styles["login-wrapper"]}>
-              <Link href="/api/auth/signin" className={styles["login-button"]}>
-                <FaUser />
-                <FaArrowRight />
-                Login
-              </Link>
-            </div>
-        ) : (
-            <>
-              <button
-                  className={styles.hamburger}
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  aria-label="Toggle navigation menu"
-              >
-                <FaBars />
-              </button>
+          {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
 
-              {menuOpen && <div className={styles["sidebar-overlay"]}></div>}
-
-              <ul
-                  className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
-              >
-                {showStripeButton && (
-                    <li>
-                      <button
-                          onClick={handleStripeDashboardClick}
-                          className={styles["nav-button-stripe"]}
-                          disabled={stripeDashboardLinkMutation.isPending}
-                          title="Access your Stripe Dashboard"
-                      >
-                        <FaExternalLinkAlt />
-                        <span>Stripe Dashboard</span>
-                      </button>
-                    </li>
-                )}
-                <li>
-                  <Link
-                      href="/home#"
-                      className={
-                        activePage === "home" ? styles["nav-link-active"] : ""
-                      }
-                  >
-                    <FaHome /> Home
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                      href="/inbox#"
-                      className={
-                        activePage === "inbox" ? styles["nav-link-active"] : ""
-                      }
-                  >
-                    <FaInbox /> Inbox
-                  </Link>
-                </li>
-                <li
-                    ref={profileRef}
-                    className={`${styles["profile-dropdown"]} ${
-                        profileOpen ? styles.open : ""
-                    }`}
+          <ul
+            className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
+          >
+            {showStripeButton && (
+              <li>
+                <button
+                  onClick={handleStripeDashboardClick}
+                  className={styles["nav-button-stripe"]}
+                  disabled={stripeDashboardLinkMutation.isPending}
+                  title="Access your Stripe Dashboard"
                 >
-                  <Link
-                      href="#"
-                      className={styles["profile-main-button"]}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setProfileOpen(!profileOpen);
-                      }}
-                  >
-                    <FaUser /> Profile
-                  </Link>
-                  <div className={styles["dropdown-content"]}>
-                    <Link href="/profile#">
-                      <FaUserEdit /> Edit Profile
-                    </Link>
-                    <Link
-                        href="/#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          void signOut({ callbackUrl: "/" });
-                        }}
-                    >
-                      <FaSignOutAlt /> Logout
-                    </Link>
-                  </div>
-                </li>
-              </ul>
-            </>
-        )  }
-      </nav>
+                  <FaExternalLinkAlt />
+                  <span>Stripe Dashboard</span>
+                </button>
+              </li>
+            )}
+            <li>
+              <Link
+                href="/home#"
+                className={
+                  activePage === "home" ? styles["nav-link-active"] : ""
+                }
+              >
+                <FaHome /> Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/inbox#"
+                className={
+                  activePage === "inbox" ? styles["nav-link-active"] : ""
+                }
+              >
+                <FaInbox /> Inbox
+              </Link>
+            </li>
+            <li
+              ref={profileRef}
+              className={`${styles["profile-dropdown"]} ${
+                profileOpen ? styles.open : ""
+              }`}
+            >
+              <Link
+                href="#"
+                className={styles["profile-main-button"]}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setProfileOpen(!profileOpen);
+                }}
+              >
+                <FaUser /> Profile
+              </Link>
+              <div className={styles["dropdown-content"]}>
+                <Link href="/profile#">
+                  <FaUserEdit /> Edit Profile
+                </Link>
+                <Link
+                  href="/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    void signOut({ callbackUrl: "/" });
+                  }}
+                >
+                  <FaSignOutAlt /> Logout
+                </Link>
+              </div>
+            </li>
+          </ul>
+        </>
+      )}
+    </nav>
   );
 };
 
