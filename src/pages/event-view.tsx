@@ -270,21 +270,35 @@ export default function EventView() {
   };
 
   const handleCancel = () => {
-    if (!pendingField) return; // If no field is being edited, exit
+    if (!pendingField) return;
 
     setShowConfirm(false);
-    setPendingField(null); // Exit edit mode
-    setTempValue(""); // Clear temporary input value
+    setPendingField(null);
+    setTempValue("");
 
-    // Safely revert only fields that exist in formData
-    // todo redo this code
     setFormData((prev) => ({
       ...prev,
-      [pendingField]:
-        eventData /*[pendingField as keyof typeof formData]*/ ??
-        prev[pendingField],
+      [pendingField]: (() => {
+        if (!eventData) return prev[pendingField];
+
+        switch (pendingField) {
+          case "title":
+            return eventData.title ?? "";
+          case "description":
+            return eventData.description ?? "";
+          case "location":
+            return eventData.location ?? "";
+          case "date":
+            return eventData.date ? new Date(eventData.date).toISOString().split("T")[0] : "";
+          case "time":
+            return eventData.date ? new Date(eventData.date).toTimeString().slice(0, 5) : "";
+          default:
+            return prev[pendingField];
+        }
+      })(),
     }));
   };
+
 
   return (
     <div className={styles.pageWrapper}>
