@@ -40,11 +40,11 @@ export default function ForgotPasswordForm() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setMessage(null);
-        setErrors(null);
-        if (!validateForm()) {
+        const isValid = validateForm(); // validateForm sets errors internally
+        if (!isValid) {
+            // Errors have already been set by validateForm, so just return
             return;
         }
-        requestResetMutation.mutate({ email });
     };
 
     return (
