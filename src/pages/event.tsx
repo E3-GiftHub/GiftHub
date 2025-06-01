@@ -99,7 +99,9 @@ export default function EventViewPage() {
               planner: eventData.planner,
               guests: eventData.guests,
             }}
-            onContribute={void router.push(`/payment?eventId=${eventId}`)}
+            onContribute={() => {
+              void router.push(`/payment?eventId=${eventId}`);
+            }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
             onReport={handleReport}
