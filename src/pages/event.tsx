@@ -12,8 +12,9 @@ export default function EventViewPage() {
 
   useEffect(() => {
     if (!router.isReady) return;
-    const { eventId } = router.query;
-    console.log("Router is ready, id:", eventId);
+    const { eventIdTemp } = router.query;
+    if (!eventIdTemp) return;
+    console.log("Router is ready, id:", eventIdTemp);
   }, [router.isReady]);
 
   const { id } = router.query;
@@ -29,14 +30,11 @@ export default function EventViewPage() {
   );
 
   const handleContribute = () => {
-    /*
-    void router.push("/payment?eventIdD=x");
-    void router.push("/payment?articleId=x");
-    */
+    void router.push(`/payment?eventId=${eventId}`);
   };
 
   const handleViewWishlist = () => {
-    void router.push("/wishlist");
+    void router.push(`/wishlist?eventId=${eventId}`);
   };
 
   const handleMediaView = () => {
