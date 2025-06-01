@@ -6,6 +6,7 @@ export interface TrendingItem {
   pret: string;
   state: ItemState;
   imageUrl?: string;
+  transferCompleted?: boolean;
   contribution?: {
     current: number;
     total: number;

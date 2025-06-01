@@ -53,8 +53,13 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   });
 
   useEffect(() => {
-    if(data)
-      setTrendingItems(data);
+    if(data) {
+      const updatedItems = data.map(item => ({
+        ...item,
+         transferCompleted: item.transferCompleted === null ? false : item.transferCompleted,
+      }));
+      setTrendingItems(updatedItems);
+    }
   }, [data]);
 
   // Show loading while router isn't ready or data is loading

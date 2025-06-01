@@ -7,15 +7,29 @@ export const itemRouter = createTRPCRouter({
   getAll: publicProcedure
     .input(z.object({ eventId: z.number(), username: z.string() }))
     .query(async ({ input }) => {
-      // Get all items for the event
+      // Get all items for the event, explicitly select transferCompleted as nullable
       const eventArticles = await db.eventArticle.findMany({
         where: { eventId: input.eventId },
-        include: { item: true },
+        include: {
+          item: {
+            select: {
+              id: true,
+              name: true,
+              price: true
+            }
+          }
+        }
       });
+
+      // Fix: replace null with false
+      const fixedArticles = eventArticles.map(article => ({
+        ...article,
+        transferCompleted: article.transferCompleted ?? false,
+      }));
 
       // For each item, get mark for user and sum of contributions
       const items = await Promise.all(
-        eventArticles.map(async (ea: (typeof eventArticles)[number]) => {
+        fixedArticles.map(async (ea: (typeof fixedArticles)[number]) => {
           // Check if the user marked as bought (external)
           const mark = await db.mark.findFirst({
             where: {
@@ -50,11 +64,14 @@ export const itemRouter = createTRPCRouter({
             state = "contributing";
           }
 
+          // Handle transferCompleted explicitly as nullable
           return {
             id: ea.itemId,
             nume: ea.item?.name ?? "",
             pret: ea.item?.price?.toString() ?? "",
             state,
+            // Convert null to undefined explicitly
+            transferCompleted: ea.transferCompleted === null ? undefined : ea.transferCompleted,
             contribution: {
               current: Number(contributionSum._sum.cashAmount ?? 0),
               total: Number(ea.item?.price ?? 0),
