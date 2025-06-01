@@ -42,19 +42,26 @@
   gap: 1.5rem;
 }
 
+
 @media (min-width: 1024px) {
   .mainGrid {
     grid-template-columns: 2fr 1fr;
+    align-items: stretch;
   }
+
 }
 
 .leftColumn {
   display: flex;
+  height: 100%;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .eventCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
@@ -138,13 +145,13 @@
   background: rgba(55, 48, 163, 0.5);
   border-radius: 0.75rem;
   padding: 1rem;
-  margin-bottom: 1.5rem; /* Match gap between sections */
+  grid-column: 1 / -1;
 }
 
 .descriptionTitle {
   color: white;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
 .descriptionText {
@@ -154,12 +161,16 @@
 }
 
 .rightColumn {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
 .guestCard {
+   height: 100%;
+  display: flex;
+  flex-direction: column;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 1rem;
@@ -202,12 +213,13 @@
   align-items: center;
   padding: 0.75rem;
   padding-right: 3rem; /* added this, trust me */
-  background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
   border-radius: 0.5rem;
+  background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
+  cursor: pointer;
 }
 
 .plannerCard:hover {
-  background: rgba(120, 0, 225, 0.627);
+  background: linear-gradient(90deg, #7c3aed 0%, #4338ca 100%);
 }
 
 .plannerImage {

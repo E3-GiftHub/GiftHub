@@ -73,14 +73,9 @@ const EventView: React.FC<EventViewProps> = ({
                     {eventData.description}
                   </p>
                 </div>
-
-                <button onClick={onMediaView} className={styles.infoCardButton}>
-                  <Image className={styles.icon} />
-                  <span>Media</span>
-                </button>
               </div>
 
-              {/* Action Buttons - Moved under description */}
+              {/* Action Buttons - Now includes Media */}
               <div className={styles.actionButtons}>
                 <button
                   onClick={onViewWishlist}
@@ -94,6 +89,11 @@ const EventView: React.FC<EventViewProps> = ({
                   className={styles.contributeButton}
                 >
                   Contribute
+                </button>
+
+                <button onClick={onMediaView} className={styles.infoCardButton}>
+                  <Image className={styles.icon} />
+                  <span>Media</span>
                 </button>
               </div>
             </div>
