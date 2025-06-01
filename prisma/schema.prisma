@@ -171,12 +171,12 @@ model Event {
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
-  id       Int           @id @default(autoincrement())
-  eventId  Int
-  itemId   Int           @default(-1) // deleted item
-  userNote String? // additional note
-  priority PriorityType?
-  // transferCompleted Boolean
+  id                Int           @id @default(autoincrement())
+  eventId           Int
+  itemId            Int           @default(-1) // deleted item
+  userNote          String? // additional note
+  priority          PriorityType?
+  transferCompleted Boolean? // sent from our stripe to the Planner stripe
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -185,9 +185,9 @@ model EventArticle {
   item  Item  @relation(fields: [itemId], references: [id], onDelete: SetDefault)
 
   // @@id([eventId, itemId]) //! an item can be added ++ times
-  Mark         Mark[]
-  Contribution Contribution[]
-  StripeLink   StripeLink[]
+  marks         Mark[]
+  contributions Contribution[]
+  paymentLinks  StripeLink[]
 
   @@index([eventId])
   @@index([itemId])

@@ -2,6 +2,8 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { MarkType } from "@prisma/client";
+
+// todo integarate with the payment team
 export const contributionsRouter = createTRPCRouter({
   getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
     /*
