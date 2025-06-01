@@ -75,7 +75,7 @@ export const eventRouter = createTRPCRouter({
   removeEvent: publicProcedure
   .input(z.object({ eventId: z.number() }))
   .mutation(async ({ input, ctx }) => {
-    const userId = ctx.session?.user?.id;
+    const userId = ctx.session?.user?.name;
     if (!userId)
       throw new TRPCError({
         code: "UNAUTHORIZED",
