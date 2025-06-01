@@ -14,7 +14,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
 }
 
 .title {
@@ -93,21 +92,31 @@
 }
 
 .infoCardButton {
-  background: rgba(79, 70, 229, 0.5);
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  color: white;
   border: none;
   border-radius: 0.5rem;
   padding: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.1s ease, background 0.2s;
   width: 100%;
 }
 
 .infoCardButton:hover {
-  background: rgba(79, 70, 229, 0.7);
+  transform: scale(1.05);
+}
+
+.infoCardButton:active {
+  transform: scale(1);
 }
 
 .infoLabel {
@@ -216,12 +225,13 @@
   border-radius: 0.5rem;
   background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
   cursor: pointer;
-  width: 100%; /* Make button full width of parent */
+  transition: box-shadow ease 0.5s;
+  width: 100%; 
   box-sizing: border-box;
 }
 
 .plannerCard:hover {
-  background: linear-gradient(90deg, #7c3aed 0%, #4338ca 100%);
+  box-shadow: 0 0 15px rgba(255,255,255, 0.2);
 }
 
 .plannerImage {
@@ -249,7 +259,7 @@
 }
 
 .guestsList {
-  max-height: 28rem;
+  max-height: 30rem;
   min-height: 12rem;
   overflow-y: auto;
   scrollbar-width: none; /* Hide scrollbar for Firefox */
@@ -292,35 +302,55 @@
 }
 
 .wishlistButton {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
   width: 100%;
-  background: #2563eb;
+}
+
+.wishlistButton:hover {
+  transform: scale(1.02);
+}
+
+.wishlistButton:active {
+  transform: scale(1);
+}
+
+.contributeButton {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
   color: white;
   font-weight: 500;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.wishlistButton:hover {
-  background: #1d4ed8;
-}
-
-.contributeButton {
+  transition: transform 0.1s ease, background 0.2s;
   width: 100%;
-  background: rgba(55, 48, 163, 0.6);
-  color: white;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid #4f46e5;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .contributeButton:hover {
-  background: rgba(55, 48, 163, 0.8);
+  transform: scale(1.02);
+}
+
+.contributeButton:active {
+  transform: scale(1);
 }
 
 .modal {
