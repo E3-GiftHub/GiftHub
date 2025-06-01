@@ -6,19 +6,6 @@
   overflow: hidden;
 }
 
-/*.signUpBox {
-  display: flex;
-  flex-direction: row;
-  background-color: #2E236B;
-  border-radius: 15px;
-  min-width: 900px;
-  max-width: 72em;
-  width: 75vw;
-  max-height: 49em;
-  height: 75vh;
-  box-sizing: border-box;
-}*/
-
 .signUpBox {
   display: flex;
   flex-direction: row;
@@ -329,80 +316,13 @@
   font-size: 0.9rem;
 }
 
-
-/*.alternativeButtons{
-  display:flex;
-  flex-direction: row;
-  gap: 1em;
-}
-
-.discordButton{
-  padding: 0.6em 0.5em;
-  background: linear-gradient(90deg,rgba(88, 101, 242, 1) 0%, rgba(65, 78, 237, 1) 50%, rgba(64, 78, 237, 1) 100%);
-  width: 13em;
-  height: 2.4em;
-  border-radius: 10px;
-  outline: none;
-  border: none;
-  color: white;
+.forgotPasswordMessage{
+  color: #FFFFFF;
   font-size: 1.1em;
-  font-weight: 600;
-  transition: transform 0.5s ease;
-  overflow: hidden;
-  box-sizing: border-box;
-  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: center;
 }
-
-.discordButton:hover {
-  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
-}
-
-.discordButton:active {
-  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
-}
-
-.discordIcon {
-  height: 25px;
-  width: 25px;
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 9px 3px 0;
-  background-color: transparent;
-}
-
-.googleButton{
-  padding: 0.6em 0.5em;
-  background: white;
-  width: 13em;
-  height: 2.4em;
-  border-radius: 10px;
-  outline: none;
-  border: none;
-  color: #444;
-  font-size: 1.1em;
-  font-weight: 600;
-  transition: transform 0.1s ease;
-  overflow: hidden;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-.googleButton:hover {
-  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
-}
-
-.googleButton:active {
-  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
-}
-
-.googleIcon {
-  height: 25px;
-  width: 25px;
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 9px 3px 0;
-  background-color: transparent;
-}*/
 
 .footer {
   color: rgba(255, 255, 255, 0.5);
@@ -425,20 +345,6 @@
 .secondaryButton:hover {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
-
-/*@media (max-width: 1250px) {
-  .alternativeButtons{
-    flex-direction: column;
-  }
-
-  .discordButton{
-    width: 16em;
-  }
-
-  .googleButton{
-    width:16em;
-  }
-}*/
 
 @media (max-width: 1000px) {
 
@@ -465,12 +371,6 @@
     padding-top: 0;
     overflow-y: auto;
   }
-
-  /*.formContainer {
-    gap: .5em;
-    margin-top: -.5em;
-  }*/
-
 
   .primaryButton {
     margin-top: 3em;
