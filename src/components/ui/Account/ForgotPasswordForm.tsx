@@ -1,39 +1,30 @@
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import Link from "next/link";
+import {api} from "~/trpc/react";
 
 export default function ForgotPasswordForm() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        try {
-          const response = await fetch("/api/forgot-password", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const data = await response.json();
-
-            if (response.ok) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-                setMessage(data.message);
-                setError(null);
-            } else {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-                setError(data.message ?? "Something went wrong.");
-                setMessage(null);
-            }
-        } catch (err) {
-            console.error("Error:", err);
-            setError("Failed to send reset email.");
+    const requestResetMutation = api.auth.resetRequest.requestReset.useMutation({
+        onSuccess: (data) => {
+            setMessage(data.message);
+            setError(null);
+        },
+        onError: (err) => {
+            setError(err.message || "Something went wrong.");
             setMessage(null);
         }
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setMessage(null);
+        setError(null);
+
+        requestResetMutation.mutate({ email });
     };
 
     return (
