@@ -35,6 +35,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!router.isReady) return;
+    if (status !== "authenticated") return;
     const { articleid, eventid } = router.query;
     if (typeof articleid === "string") {
       setIdType("eventArticle");
@@ -63,33 +64,33 @@ export default function CheckoutPage() {
     }
 
     fetch(`/api/payment/details?${params.toString()}`)
-        .then(async (res) => {
-          if (!res.ok) {
-            const error = await res.text();
-            console.error("Failed to fetch payment details:", error);
-            throw new Error(error || "Unknown error");
-          }
-          return res.json() as Promise<PaymentDetails>;
-        })
-        .then((data) => {
-          setDetails(data);
+      .then(async (res) => {
+        if (!res.ok) {
+          const error = await res.text();
+          console.error("Failed to fetch payment details:", error);
+          throw new Error(error || "Unknown error");
+        }
+        return res.json() as Promise<PaymentDetails>;
+      })
+      .then((data) => {
+        setDetails(data);
 
-          if (
-              idType === "eventArticle" &&
-              data.itemPrice != null &&
-              data.alreadyContributed != null
-          ) {
-            const rem = data.itemPrice - data.alreadyContributed;
-            setRemainingAmount(rem > 0 ? rem : 0);
-          } else {
-            setRemainingAmount(null);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setDetails(null);
+        if (
+          idType === "eventArticle" &&
+          data.itemPrice != null &&
+          data.alreadyContributed != null
+        ) {
+          const rem = data.itemPrice - data.alreadyContributed;
+          setRemainingAmount(rem > 0 ? rem : 0);
+        } else {
           setRemainingAmount(null);
-        });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setDetails(null);
+        setRemainingAmount(null);
+      });
   }, [idType, idValue]);
 
   const handleCheckout = async () => {
@@ -129,6 +130,7 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: session.user.id,
           id: idValue,
           idType,
           amount,
@@ -153,122 +155,117 @@ export default function CheckoutPage() {
 
   if (!router.isReady || status === "loading" || details === null) {
     return (
-        <div className={styles.container}>
-          <Navbar />
-          <div className={styles.card}>
-            <p>Loading…</p>
-          </div>
-          <Footer />
+      <div className={styles.container}>
+        <Navbar />
+        <div className={styles.card}>
+          <p>Loading…</p>
         </div>
+        <Footer />
+      </div>
     );
   }
 
   return (
-      <div className={styles.container}>
-        <Navbar />
-        <div className={styles.card}>
-          <h2 className={styles.orderId}>
-            Order id #14385683458738543
-          </h2>
+    <div className={styles.container}>
+      <Navbar />
+      <div className={styles.card}>
+        <h2 className={styles.orderId}>Order id #14385683458738543</h2>
 
-          {idType === "eventArticle" ? (
-              <div style={{ marginBottom: "20px" }}>
-                <p>
-                  <strong>Item:</strong> {details.itemName}
-                </p>
-                <p>
-                  <strong>Original Price:</strong> {details.itemPrice} RON
-                </p>
-                <p>
-                  <strong>Already Contributed:</strong>{" "}
-                  {details.alreadyContributed} RON
-                </p>
-                <p>
-                  <strong>Remaining to Contribute:</strong>{" "}
-                  {remainingAmount} RON
-                </p>
-              </div>
-          ) : (
-              <div style={{ marginBottom: "20px" }}>
-                <p>
-                  <strong>Event:</strong> {details.eventName}
-                </p>
-                <p>
-                  <strong>Planner:</strong> {details.eventPlanner}
-                </p>
-              </div>
-          )}
-
+        {idType === "eventArticle" ? (
           <div style={{ marginBottom: "20px" }}>
-            <label
-                htmlFor="contributionAmountInput"
-                style={{
-                  marginRight: "10px",
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-            >
-              {idType === "eventArticle"
-                  ? "Contribution Amount (RON):"
-                  : "Purchase Amount (RON):"}
-            </label>
-            <input
-                id="contributionAmountInput"
-                type="number"
-                value={contributionAmount}
-                onChange={(e) => setContributionAmount(e.target.value)}
-                placeholder="Enter amount"
-                className={styles.contributionInput}
-                min="1"
-                {...(idType === "eventArticle" && remainingAmount !== null
-                    ? { max: remainingAmount }
-                    : {})}
-                disabled={isCheckingOut}
-            />
+            <p>
+              <strong>Item:</strong> {details.itemName}
+            </p>
+            <p>
+              <strong>Original Price:</strong> {details.itemPrice} RON
+            </p>
+            <p>
+              <strong>Already Contributed:</strong> {details.alreadyContributed}{" "}
+              RON
+            </p>
+            <p>
+              <strong>Remaining to Contribute:</strong> {remainingAmount} RON
+            </p>
           </div>
+        ) : (
+          <div style={{ marginBottom: "20px" }}>
+            <p>
+              <strong>Event:</strong> {details.eventName}
+            </p>
+            <p>
+              <strong>Planner:</strong> {details.eventPlanner}
+            </p>
+          </div>
+        )}
 
-          <div className={styles.tableHeader}>
+        <div style={{ marginBottom: "20px" }}>
+          <label
+            htmlFor="contributionAmountInput"
+            style={{
+              marginRight: "10px",
+              display: "block",
+              marginBottom: "5px",
+            }}
+          >
+            {idType === "eventArticle"
+              ? "Contribution Amount (RON):"
+              : "Purchase Amount (RON):"}
+          </label>
+          <input
+            id="contributionAmountInput"
+            type="number"
+            value={contributionAmount}
+            onChange={(e) => setContributionAmount(e.target.value)}
+            placeholder="Enter amount"
+            className={styles.contributionInput}
+            min="1"
+            {...(idType === "eventArticle" && remainingAmount !== null
+              ? { max: remainingAmount }
+              : {})}
+            disabled={isCheckingOut}
+          />
+        </div>
+
+        <div className={styles.tableHeader}>
           <span>
             {idType === "eventArticle" ? "Contribute to Item" : "Event"}
           </span>
-          </div>
+        </div>
 
-          <div className={styles.eventRowAlt}>
-            <Image
-                src="/cake.png"
-                alt="Birthday Cake"
-                width={100}
-                height={100}
-                className={styles.image}
-            />
-            <div className={styles.eventDetails}>
-              {idType === "eventArticle" ? (
-                  <>
-                <span>
-                  Wish‐list Item for Event #{details.parentEventId}
-                </span>
-                    <span>Item: {details.itemName}</span>
-                  </>
-              ) : (
-                  <>
-                    <span>{details.eventName}</span>
-                    <span>Planner: {details.eventPlanner}</span>
-                  </>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.checkoutBtnWrapper}>
-            <button
-                className={styles.checkoutBtn}
-                onClick={handleCheckout}
-                disabled={isCheckingOut}
-            >
-              {isCheckingOut ? "Processing…" : "CHECKOUT"}
-            </button>
+        <div className={styles.eventRowAlt}>
+          <Image
+            src="/cake.png"
+            alt="Birthday Cake"
+            width={100}
+            height={100}
+            className={styles.image}
+          />
+          <div className={styles.eventDetails}>
+            {idType === "eventArticle" ? (
+              <>
+                <span>Wish‐list Item for Event #{details.parentEventId}</span>
+                <span>Item: {details.itemName}</span>
+              </>
+            ) : (
+              <>
+                <span>{details.eventName}</span>
+                <span>Planner: {details.eventPlanner}</span>
+              </>
+            )}
           </div>
         </div>
-        <Footer />
+
+        <div className={styles.checkoutBtnWrapper}>
+          <button
+            className={styles.checkoutBtn}
+            onClick={handleCheckout}
+            disabled={isCheckingOut}
+          >
+            {isCheckingOut ? "Processing…" : "CHECKOUT"}
+          </button>
+        </div>
       </div>
+      <Footer />
+    </div>
   );
 }
