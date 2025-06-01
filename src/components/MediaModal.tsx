@@ -1,7 +1,5 @@
 "use client";
-
 import React from "react";
-import Image from "next/image";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import type { MediaHeader } from "~/models/MediaHeader";

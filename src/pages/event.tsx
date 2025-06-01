@@ -1,22 +1,22 @@
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
-import Head from "next/head";
+
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { UploadButton } from "~/utils/uploadthing";
 import { api } from "~/trpc/react"; // <-- FIXED: use the React hooks client
+
+import Head from "next/head";
 import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
 import MediaModal from "~/components/MediaModal";
 import Footer from "~/components/Footer";
-import { useEffect, useState } from "react";
 import type { MediaHeader } from "~/models/MediaHeader";
-import { UploadButton } from "~/utils/uploadthing";
 
 export default function EventViewPage() {
   const router = useRouter();
-  //const { data: session, status } = useSession();
-  //console.log("cacatule");
-  //console.log(session?.user);
+  const { data: session, status } = useSession();
 
   const [doesShowMedia, setDoesShowMedia] = useState(false);
   const [mediaArray, setMediaArray] = useState<MediaHeader[]>([]);
@@ -47,11 +47,11 @@ export default function EventViewPage() {
     if (status !== "authenticated") return;
 
     try {
-      const res = await fetch("/api/event-report", {
+      const res = await fetch("./api/event-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          //username: session.user?.id,
+          username: session.user?.name ?? "",
           eventId: eventId,
           reason: reason,
         }),
