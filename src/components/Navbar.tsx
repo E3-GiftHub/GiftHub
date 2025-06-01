@@ -145,7 +145,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {isLandingPage && !isLoggedIn ? (
+        { !isLoggedIn ? (
             <div className={styles["login-wrapper"]}>
               <Link href="/api/auth/signin" className={styles["login-button"]}>
                 <FaUser />
@@ -153,7 +153,7 @@ const Navbar = () => {
                 Login
               </Link>
             </div>
-        ) : isLoggedIn ? (
+        ) : (
             <>
               <button
                   className={styles.hamburger}
@@ -234,7 +234,7 @@ const Navbar = () => {
                 </li>
               </ul>
             </>
-        ) : null }
+        )  }
       </nav>
   );
 };

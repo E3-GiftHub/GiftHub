@@ -1,12 +1,12 @@
 // File: /pages/api/stripe/contribute.ts
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "app/api/auth/[...nextauth]";
+
 import { createCheckoutLink } from "@/server/services/payment";
 
-type Data =
-    | { url: string }
-    | { error: string };
+type Data = { url: string } | { error: string };
 
 export default async function handler(
     req: NextApiRequest,
@@ -16,16 +16,16 @@ export default async function handler(
         return res.status(405).json({ error: "Method not allowed" });
     }
 
-    // 1. Verify that the user is logged in
-    const session = await getSession({ req });
-    if (!session || !session.user || !session.user.id) {
+    // 1) Verify user session (server‐side)
+    const session = await getServerSession(req, res, authOptions);
+    if (!session?.user?.id) {
         return res
             .status(401)
             .json({ error: "Authentication required to create a checkout link." });
     }
     const purchaserUsername = session.user.id as string;
 
-    // 2. Parse & validate body
+    // 2) Parse & validate body
     const { id, idType, amount, isContribute } = req.body as {
         id: number;
         idType: "eventArticle" | "event";
@@ -43,7 +43,7 @@ export default async function handler(
     }
 
     try {
-        // 3. Call your helper to create the Stripe payment link.
+        // 3) Create Stripe checkout link
         const { url } = await createCheckoutLink(
             id,
             idType,
@@ -54,8 +54,8 @@ export default async function handler(
         return res.status(200).json({ url });
     } catch (err: any) {
         console.error("Error in createCheckoutLink:", err);
-        return res.status(500).json({
-            error: err.message || "Internal server error.",
-        });
+        return res
+            .status(500)
+            .json({ error: err.message || "Internal server error." });
     }
 }
