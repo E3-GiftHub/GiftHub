@@ -103,17 +103,16 @@ const EventView: React.FC<EventViewProps> = ({
           <div className={styles.rightColumn}>
             {/* Guest List */}
             <div className={styles.guestCard}>
-              <div className={styles.guestHeader}>
-                <h3 className={styles.guestTitle}>Attendees</h3>
-                <div className={styles.guestCount}>
-                  <Users className={styles.icon} />
-                  <span>{eventData.guests.length + 1}</span>
-                </div>
-              </div>
 
               {/* Event Planner */}
               <div className={styles.plannerSection}>
-                <h4 className={styles.sectionTitle}>Event Planner</h4>
+                  <div className={styles.plannerTitleSection}>
+                    <h4 className={styles.sectionTitle}>Event Planner</h4>
+                    <div className={styles.guestCount}>
+                      <Users className={styles.icon} />
+                      <span>{eventData.guests.length + 1}</span>
+                    </div>
+                  </div>
                 <button
                   className={styles.plannerCard}
                   onClick={() => onViewProfile?.(eventData.planner.id)}
