@@ -64,6 +64,10 @@ export default function EventViewPage() {
     }
   };
 
+  const handleViewProfile = (username: string) => {
+    void router.push(`/view-profile?username=${username}`);
+  };
+
   const handleViewWishlist = () => {
     void router.push(`/wishlist?eventId=${eventId}`);
   };
@@ -140,6 +144,7 @@ export default function EventViewPage() {
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
             onReport={handleReport}
+            onViewProfile={handleViewProfile}
           />
 
           {/* MEDIA MODAL WITH A BUTTON TO UPLOAD */}

@@ -21,4 +21,5 @@ export interface EventViewProps {
   onViewWishlist?: () => void;
   onMediaView?: () => void;
   onReport?: (reason: string) => void;
+  onViewProfile?: (username: string) => void;
 }

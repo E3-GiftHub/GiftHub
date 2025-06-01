@@ -9,6 +9,7 @@ const EventView: React.FC<EventViewProps> = ({
   onViewWishlist,
   onMediaView,
   onReport,
+  onViewProfile,
 }) => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -113,7 +114,10 @@ const EventView: React.FC<EventViewProps> = ({
               {/* Event Planner */}
               <div className={styles.plannerSection}>
                 <h4 className={styles.sectionTitle}>Event Planner</h4>
-                <div className={styles.plannerCard}>
+                <button
+                  className={styles.plannerCard}
+                  onClick={() => onViewProfile?.(eventData.planner.id)}
+                >
                   <img
                     src={eventData.planner.profilePicture}
                     alt={eventData.planner.name}
@@ -125,7 +129,7 @@ const EventView: React.FC<EventViewProps> = ({
                     </p>
                     <p className={styles.plannerRole}>Organizer</p>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Guests */}
@@ -133,14 +137,18 @@ const EventView: React.FC<EventViewProps> = ({
                 <h4 className={styles.sectionTitle}>Guests</h4>
                 <div className={styles.guestsList}>
                   {eventData.guests.map((guest) => (
-                    <div key={guest.id} className={styles.guestItem}>
+                    <button
+                      key={guest.id}
+                      className={styles.guestItem}
+                      onClick={() => onViewProfile?.(guest.id)}
+                    >
                       <img
                         src={guest.profilePicture}
                         alt={guest.name}
                         className={styles.guestImage}
                       />
                       <p className={styles.guestName}>{guest.name}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>

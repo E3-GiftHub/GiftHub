@@ -25,5 +25,7 @@ export default async function handler(
     },
   });
 
+  if (!media) return res.status(404).json({ error: "Media not found" });
+
   return res.status(200).json(media);
 }
