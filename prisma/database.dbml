@@ -42,7 +42,9 @@ TABLE User {
   fname STRING
   lname STRING
   password STRING
-  stripeConnectId STRING
+  stripeConnectId STRING // NOT UNIQUE: only one null value allowed
+  emailToken STRING // NOT UNIQUE: only one null value allowed
+  tokenExpires DATETIME
   pictureUrl STRING
 
   emailVerified DATETIME
@@ -66,7 +68,6 @@ TABLE Event {
   description STRING
   location STRING
   date DATETIME
-  time DATETIME
   pictureUrl STRING
   token STRING
 
