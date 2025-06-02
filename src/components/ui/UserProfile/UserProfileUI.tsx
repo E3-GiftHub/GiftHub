@@ -123,7 +123,7 @@ export default function UserProfileUI({
     }
   };
 
-  const deleteUserMutation = api.user.deleteUser.useMutation();
+  const deleteUserMutation = api.profile.user.delete.useMutation();
 
   const handleDelete = async () => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
