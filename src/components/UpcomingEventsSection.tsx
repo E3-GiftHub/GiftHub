@@ -7,8 +7,10 @@ import ContainerEventTitle from "~/components/ui/ContainerEventTitle";
 import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import Calendar from "~/components/ui/Calendar";
 import { api } from "~/trpc/react";
-import Modal from "~/components/Modal";
+import Modal from "~/components/ModalEvents";
 import React, { useState } from "react";
+import Link from "next/link";
+import styles from "~/styles/HomePageStyle.module.css";
 
 const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -43,15 +45,19 @@ const UpcomingEventsSection: React.FC = () => {
          <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </div>
 
-      {trimmedEvents.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
+      {trimmedEvents.map((event) => (
+        <Link href={`/event?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
+          <ContainerEventRow eventData={event} />
+        </Link>
       ))}
 
       <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Invitations">
-        {eventsData.map((event, index) => (
-          <ContainerEventRow key={index} eventData={event} />
+        {eventsData.map((event) => (
+          <Link href={`/event?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
+            <ContainerEventRow eventData={event} />
+          </Link>
         ))}
       </Modal>
     </Container>
