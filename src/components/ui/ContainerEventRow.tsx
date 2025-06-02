@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import styles from "src/styles/ContainerEventRow.module.css";
 import "src/styles/globals.css";
 import { FaCalendar } from "react-icons/fa";
@@ -23,11 +22,8 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
   });
 
   return (
-    <Link
-      href={`/event-view?id=${eventData.id}`}
-      className={styles["event-row-wrapper"]}
-    >
-      <div className={styles["left-column"]}>
+    <div className={styles["event-row-wrapper"]}>
+      <div className={styles["left-column"]} >
         <img
           className={styles.thumbnail}
           src={eventData.photo ?? "/placeholder.jpg"}
@@ -44,7 +40,7 @@ const ContainerEventRow: React.FC<ContainerEventRowProps> = ({ eventData }) => {
           {eventData.location}
         </p>
       </div>
-    </Link>
+    </div>
   );
 };
 

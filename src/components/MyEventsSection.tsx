@@ -9,9 +9,11 @@ import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
 import { api } from "~/trpc/react";
-import Modal from "~/components/ModalEventHome";
+import Modal from "~/components/ModalEvents";
 import { useState } from "react";
 import { router } from "next/client";
+import Link from "next/link";
+
 
 const MyEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -35,24 +37,31 @@ const MyEventsSection: React.FC = () => {
 
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
+
       <ContainerEventTitle title={"My events"} />
-      {trimmedEvents.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
+      
+      {trimmedEvents.map((event) => (
+        <Link href={`/event-view?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
+          <ContainerEventRow eventData={event} />
+        </Link>
       ))}
-      <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
-        {eventsData.map((event, index) => (
-          <ContainerEventRow key={index} eventData={event} />
+        {eventsData.map((event) => (
+          <Link href={`/event-view?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
+            <ContainerEventRow eventData={event} />
+          </Link>
         ))}
       </Modal>
 
       <div className={styles["buttons-wrapper"]}>
+        <SeeMoreButton onClick={openModal} />
         <ButtonComponent
           text={"Add new event"}
           style={ButtonStyle.PRIMARY}
           onClick={() => router.push("event-create")}
         />
+       
       </div>
     </Container>
   );
