@@ -13,7 +13,7 @@ export const invitesNotificationRouter = createTRPCRouter({
             include: {
                 event: {
                     select: {
-                        description: true,
+                        title: true,
                         createdByUsername: true,
                         pictureUrl: true,
                     },
@@ -46,9 +46,9 @@ export const invitesNotificationRouter = createTRPCRouter({
         // Format the response
         return invitations.map((inv) => ({
             id: inv.id,
-            description: inv.event?.description ?? "",
+            title: inv.event?.title ?? "",
             type: "invitation",
-            link: `/invite#${inv.id}`,
+            link: `/event-invitation?id=${inv.id}`,
             firstName: creatorMap[inv.event?.createdByUsername ?? ""]?.fname ?? "",
             lastName: creatorMap[inv.event?.createdByUsername ?? ""]?.lname ?? "",
             profilePicture: inv.event?.pictureUrl ?? "",

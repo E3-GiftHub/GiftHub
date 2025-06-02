@@ -1,9 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { MarkType } from "@prisma/client";
 
-// todo integarate with the payment team
 export const contributionsRouter = createTRPCRouter({
   getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
     /*
@@ -27,7 +24,7 @@ export const contributionsRouter = createTRPCRouter({
         },
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true } },
+        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
         event: { select: { title: true, id: true } },
         item: { select: { name: true } },
       },
@@ -38,10 +35,10 @@ export const contributionsRouter = createTRPCRouter({
         ? `${contribution.guest.fname} contributed ${contribution.cashAmount.toString()} lei to your gift`
         : `${contribution.guest.fname} contributed an unspecified amount to your gift`,
       type: "event",
-      link: `/event${contribution.event?.id}#`,
+      link: `/event?id=${contribution.event?.id}`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
-      profilePicture: "databasepic/profilepic.png",
+      profilePicture: contribution.guest.pictureUrl ?? "",
       notificationDate: contribution.createdAt.toISOString(),
     }));
   }),
@@ -69,19 +66,19 @@ export const contributionsRouter = createTRPCRouter({
         type: MarkType.PURCHASED,
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true } },
+        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
         event: { select: { title: true, id: true } },
         item: { select: { name: true, price: true } },
       },
     });
 
-    return purchasedItems.map((mark, index) => ({
+    return purchasedItems.map((mark) => ({
       text: `${mark.guest.fname} bought an item from your wishlist`,
       type: "event",
-      link: `/event${mark.event?.id}#`,
+      link: `/event?id=${mark.event?.id}`,
       firstName: mark.guest.fname,
       lastName: mark.guest.lname,
-      profilePicture: "databasepic/profilepic.png",
+      profilePicture: mark.guest.pictureUrl ?? "",
       notificationDate: mark.createdAt.toISOString(),
     }));
   }),
