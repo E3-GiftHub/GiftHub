@@ -145,12 +145,12 @@
 .email {
     font-size: 1.2em;
     color: #aaa;
-    margin: 0;
+    margin: 12px 0 0 0;
 }
 
 .buttonContainer {
     display: flex;
-    margin-top: 15px;
+    /*margin-top: 15px;*/
     /*gap: 16px;*/
 }
 

@@ -5,21 +5,18 @@ import { clsx } from 'clsx';
 import "src/styles/globals.css";
 import {useUploadThing} from "~/utils/uploadthing";
 import { useRouter } from "next/router";
-import ContainerSVG from '@/assets/UserImages/Containers/Container.svg';
 
 interface EditUserProfileProps {
   username?: string;
   fname?: string;
   lname?: string;
   email?: string;
-  IBAN?: string;
   avatarUrl?: string;
   onSave?: (
     newFname: string,
     newLname: string,
     newUsername: string,
     newEmail: string,
-    newIban: string
   ) => void;
   onResetPassword?: () => void;
   loading?: boolean;
@@ -60,7 +57,6 @@ export default function EditUserProfileUI({
                                             email = "",
                                             fname = "",
                                             lname = "",
-                                            IBAN = "",
                                             avatarUrl,
                                             onSave,
                                             onResetPassword,
@@ -71,7 +67,6 @@ export default function EditUserProfileUI({
   const [emailInput, setEmailInput] = useState(email);
   const [fnameInput, setFnameInput] = useState(fname);
   const [lnameInput, setLnameInput] = useState(lname);
-  const [ibanInput, setIbanInput] = useState(IBAN);
   const [emailError, setEmailError] = useState("");
 
   useEffect(() => {
@@ -79,8 +74,7 @@ export default function EditUserProfileUI({
     setEmailInput(email);
     setFnameInput(fname);
     setLnameInput(lname);
-    setIbanInput(IBAN);
-  }, [username, email, fname, lname, IBAN]);
+  }, [username, email, fname, lname]);
 
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -95,7 +89,7 @@ export default function EditUserProfileUI({
 
   const handleSave = () => {
     if (onSave && !emailError) {
-      onSave(fnameInput, lnameInput, usernameInput, emailInput, ibanInput);
+      onSave(fnameInput, lnameInput, usernameInput, emailInput);
     }
   };
 
@@ -176,19 +170,17 @@ export default function EditUserProfileUI({
             {emailError && <div className={styles.errorMessage}>{emailError}</div>}
           </div>
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="iban" className={styles.inputLabel}>
-              {/* IBAN */}
-            </label>
-            <input
-              id="iban"
-              type="text"
-              value={ibanInput}
-              onChange={(e) => setIbanInput(e.target.value)}
-              className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading}
-            />
-          </div>
+          {/*<div className={styles.inputGroup}>*/}
+          {/*  <label htmlFor="iban" className={styles.inputLabel}>*/}
+          {/*    /!* IBAN *!/*/}
+          {/*  </label>*/}
+          {/*  <input*/}
+          {/*    id="iban"*/}
+          {/*    type="text"*/}
+          {/*    className={clsx(styles.inputField, loading && styles.loading)}*/}
+          {/*    disabled={loading}*/}
+          {/*  />*/}
+          {/*</div>*/}
 
           <div className={styles.buttonContainer}>
             <ProfileButton
