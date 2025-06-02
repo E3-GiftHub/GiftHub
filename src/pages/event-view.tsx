@@ -45,7 +45,7 @@ function GuestListPreview({
       {guests.slice(0, 10).map((guest) => (
         <div className={styles.guestItem} 
           key={guest.username}
-          onClick={() => router.push(`/view-profile/${guest.username}`)}
+          onClick={() => router.push(`/view-profile?username=${guest.username}`)}
           style={{ cursor: "pointer" }}>
           <img
             className={styles.guestImage}

@@ -3,37 +3,53 @@ import Navbar from "~/components/Navbar";
 import ViewUserProfileUI from "~/components/ui/UserProfile/ViewUserProfileUI";
 import { mockUser } from "~/components/ui/UserProfile/mockUser";
 import type { GetServerSideProps } from "next";
+import { db as prisma } from "~/server/db";
+
 
 // Define the expected structure for the user object
 interface User {
     username: string;
     email?: string;
-    picture?: string;
+    fname?: string;
+    lname?: string;
+    pictureUrl?: string;
 }
 
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   try {
-//     const username = "john_doe"; // Replace with actual username
-//     console.log("Fetching user with username:", username);
-//     const res = await fetch(`http://localhost:3000/api/user/get?username=${username}`);
-//
-//     if (!res.ok) throw new Error("Failed to fetch user");
-//
-//     // Explicitly type the response as User
-//     const user = (await res.json()) as User; // Ensure the response matches the User type
-//
-//     console.log("Fetched user data:", user); // Debugging log
-//
-//     return {
-//       props: { user },
-//     };
-//   } catch (err) {
-//     console.error("Error loading user:", err);
-//     return {
-//       notFound: true,
-//     };
-//   }
-// };
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const username = context.query.username;
+
+
+    if (typeof username !== "string") {
+      return { notFound: true };
+    }
+    console.log("Fetching user with username:", username);
+    
+    const user = await prisma.user.findUnique({
+      where: { username },
+      select: {
+        username: true,
+        email: true,
+        fname: true,
+        lname: true,
+        pictureUrl: true,
+      },
+    });
+
+    if (!user) return { notFound: true };
+
+    console.log("Fetched user data:", user); // Debugging log
+
+    return {
+      props: { user },
+    };
+  } catch (err) {
+    console.error("Error loading user:", err);
+    return {
+      notFound: true,
+    };
+  }
+};
 
 export default function UserProfile({ user }: { user: User }) {
     const handleDelete = async () => {
@@ -73,13 +89,11 @@ export default function UserProfile({ user }: { user: User }) {
         <div className={styles["landing-page"]}>
             <Navbar />
             <ViewUserProfileUI
-                key={mockUser.id}
-                username={mockUser.username}
-                fname={mockUser.fname}
-                lname={mockUser.lname}
-                email={mockUser.email}
-                iban={mockUser.iban}
-                avatarUrl={mockUser.picture}
+                username={user.username}
+                fname={user.fname}
+                lname={user.lname}
+                email={user.email}
+                avatarUrl={user.pictureUrl}
             />
             <div className={styles["empty-space"]}></div>
         </div>
