@@ -13,7 +13,7 @@ export const contributionsRouter = createTRPCRouter({
         },
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } }, // Adăugat pictureUrl
+        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
         event: { select: { title: true, id: true } },
         item: { select: { name: true } },
       },
@@ -27,7 +27,7 @@ export const contributionsRouter = createTRPCRouter({
       link: `/event?id=${contribution.event?.id}`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
-      profilePicture: contribution.guest.pictureUrl || "databasepic/profilepic.png", // Folosește pictureUrl din DB sau fallback
+      profilePicture: contribution.guest.pictureUrl || "databasepic/profilepic.png",
       notificationDate: contribution.createdAt.toISOString(),
     }));
   }),
@@ -43,7 +43,7 @@ export const contributionsRouter = createTRPCRouter({
         type: MarkType.PURCHASED,
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } }, // Adăugat pictureUrl
+        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
         event: { select: { title: true, id: true } },
         item: { select: { name: true, price: true } },
       },
@@ -55,7 +55,7 @@ export const contributionsRouter = createTRPCRouter({
       link: `/event?id=${mark.event?.id}`,
       firstName: mark.guest.fname,
       lastName: mark.guest.lname,
-      profilePicture: mark.guest.pictureUrl || "databasepic/profilepic.png", // Folosește pictureUrl din DB sau fallback
+      profilePicture: mark.guest.pictureUrl || "databasepic/profilepic.png",
       notificationDate: mark.createdAt.toISOString(),
     }));
   }),
