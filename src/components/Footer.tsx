@@ -50,7 +50,7 @@ const Footer = () => {
           </a>
 
           <a
-            href="https://www.instagram.com/gifthub_app?igsh=azdtcWQ4dm16bzdy&utm_source=ig_contact_invite"
+            href=""
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"

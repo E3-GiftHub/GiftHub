@@ -1,18 +1,39 @@
+import "~/styles/globals.css";
 import { type AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { type Session } from "next-auth";
 import { TRPCReactProvider } from "~/trpc/react";
+import { Geist } from "next/font/google";
+import Head from "next/head";
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
 
 const MyApp = ({
   Component,
   pageProps,
 }: AppProps<{ session: Session | null }>) => {
   return (
-    <SessionProvider session={pageProps.session}>
-      <TRPCReactProvider>
-        <Component {...pageProps} />
-      </TRPCReactProvider>
-    </SessionProvider>
+    <>
+      <Head>
+        <title>GiftHub</title>
+        <meta
+          name="description"
+          content="For the love of events, parties, birthdays and more!"
+        />
+        <link rel="icon" href="/logo.png" />
+      </Head>
+
+      <div className={geist.variable}>
+        <SessionProvider session={pageProps.session}>
+          <TRPCReactProvider>
+            <Component {...pageProps} />
+          </TRPCReactProvider>
+        </SessionProvider>
+      </div>
+    </>
   );
 };
 

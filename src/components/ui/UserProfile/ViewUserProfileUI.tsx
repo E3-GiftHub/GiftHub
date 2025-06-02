@@ -3,18 +3,11 @@ import styles from "src/styles/UserProfile/UserProfile.module.css";
 import Image from "next/image";
 import clsx from "clsx";
 import "src/styles/globals.css";
-import { router } from "next/client";
-import { useRouter } from "next/router"; // Corrected router import
+import type { Profile } from "~/models/Profile";
 
 interface UserProfileProps {
-  username?: string;
-  fname?: string;
-  lname?: string;
-  avatarUrl?: string;
+  profile: Profile;
   onReport?: () => void;
-  loading?: boolean;
-  email?: string;
-  iban?: string;
 }
 
 const ProfileButton = ({
@@ -55,14 +48,8 @@ const ProfileButton = ({
 );
 
 export default function ViewUserProfileUI({
-  username = "",
-  fname = "",
-  lname = "",
-  avatarUrl,
+  profile,
   onReport,
-  loading = false,
-  email,
-  iban,
 }: Readonly<UserProfileProps>) {
   const [modalOpen, setModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -88,54 +75,46 @@ export default function ViewUserProfileUI({
     setSubmitted(true);
   };
 
-  const renderContent = (content: string) => (loading ? "\u00A0" : content);
-
   return (
     <>
       <div className={styles.pageWrapper}>
         <div className={styles.profileCard}>
           <div className={styles.avatarSection}>
             <div className={styles.avatarWrapper}>
-              <div
-                className={clsx(styles.avatarCircle, loading && styles.loading)}
-              >
-                {!loading && avatarUrl && (
-                  <Image
-                    src={avatarUrl}
-                    width={200}
-                    height={200}
-                    className={styles.avatarImage}
-                    alt={"User avatar"}
-                  />
-                )}
+              <div className={clsx(styles.avatarCircle /*styles.loading*/)}>
+                <img
+                  src={profile.pictureUrl ?? ""}
+                  width={200}
+                  height={200}
+                  className={styles.avatarImage}
+                  alt={"User avatar"}
+                />
               </div>
             </div>
           </div>
 
           <div className={styles.userInfo}>
-            <h2 className={clsx(styles.username, loading && styles.loading)}>
-              {renderContent(username)}
+            <h2 className={clsx(styles.username /*styles.loading*/)}>
+              {profile.username}
             </h2>
             <div className={styles.nameContainer}>
               <p
                 className={clsx(
                   styles.nameField,
-                  styles.fname,
-                  loading && styles.loading,
+                  styles.fname /*styles.loading*/,
                 )}
               >
-                {renderContent(fname)}
+                {profile.fname === null ? "null" : profile.fname}
                 &nbsp;&nbsp;&nbsp;&nbsp;|
               </p>
               <p
                 className={clsx(
                   styles.nameField,
-                  styles.lname,
-                  loading && styles.loading,
+                  styles.lname /*styles.loading*/,
                 )}
               >
                 &nbsp;
-                {renderContent(lname)}
+                {profile.lname === null ? "null" : profile.fname}
               </p>
             </div>
 
@@ -143,7 +122,7 @@ export default function ViewUserProfileUI({
               <ProfileButton
                 iconSrc="illustrations/report.svg"
                 alt="Report account"
-                loading={loading}
+                loading={false}
                 onClick={handleReportClick}
               >
                 Report account
@@ -162,7 +141,7 @@ export default function ViewUserProfileUI({
           aria-label="Close modal"
           onKeyDown={(e) => {
             // Support Enter/Space to close overlay
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === "Enter" || e.key === " ") {
               handleClose();
             }
           }}

@@ -51,4 +51,32 @@ export const invitationsRouter = createTRPCRouter({
         };
       });
   }),
+  acceptInvitation: publicProcedure.input(z.object({ eventId: z.number(), guestUsername: z.string() })).mutation(async ({ ctx, input }) => {
+    const invitation = await ctx.db.invitation.updateMany({
+      where: {
+        eventId: input.eventId,
+        guestUsername: input.guestUsername,
+      },
+      data: {
+        status: "ACCEPTED",
+        repliedAt: new Date(),
+      },
+    });
+    if (invitation.count === 0) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Invitation not found" });
+    }
+    return { success: true };
+  }),
+  getInvitationForUserEvent: publicProcedure.input(z.object({ eventId: z.number(), guestUsername: z.string() })).query(async ({ ctx, input }) => {
+    const invitation = await ctx.db.invitation.findFirst({
+      where: {
+        eventId: input.eventId,
+        guestUsername: input.guestUsername,
+      },
+      select: {
+        status: true,
+      },
+    });
+    return invitation; // null if not found, otherwise { status: ... }
+  }),
 });

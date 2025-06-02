@@ -2,86 +2,51 @@ import styles from "~/styles/UserProfile/UserProfile.module.css";
 import Navbar from "~/components/Navbar";
 import ViewUserProfileUI from "~/components/ui/UserProfile/ViewUserProfileUI";
 import { mockUser } from "~/components/ui/UserProfile/mockUser";
-import type { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import type { Profile } from "~/models/Profile";
 
-// Define the expected structure for the user object
-interface User {
-    username: string;
-    email?: string;
-    picture?: string;
-}
+export default function UserProfile() {
+  const router = useRouter();
+  const [userProfile, setUserProfile] = useState<Profile>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   try {
-//     const username = "john_doe"; // Replace with actual username
-//     console.log("Fetching user with username:", username);
-//     const res = await fetch(`http://localhost:3000/api/user/get?username=${username}`);
-//
-//     if (!res.ok) throw new Error("Failed to fetch user");
-//
-//     // Explicitly type the response as User
-//     const user = (await res.json()) as User; // Ensure the response matches the User type
-//
-//     console.log("Fetched user data:", user); // Debugging log
-//
-//     return {
-//       props: { user },
-//     };
-//   } catch (err) {
-//     console.error("Error loading user:", err);
-//     return {
-//       notFound: true,
-//     };
-//   }
-// };
+  useEffect(() => {
+    if (!router.isReady) return;
+    const { userTemp } = router.query;
+    if (!userTemp) return;
+    console.log("Router is ready, id:", userTemp);
+  }, [router.isReady]);
 
-export default function UserProfile({ user }: { user: User }) {
-    const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete your account?")) return;
+  //! GET ALL THE USER DATA
+  const { username } = router.query;
+  useEffect(() => {
+    if (!router.isReady || !username) return;
 
-        try {
-            const res = await fetch("/api/user/delete", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ username: user.username }),
-            });
+    (async () => {
+      try {
+        const res = await fetch(
+          `./api/user/profile-query?username=${username}`,
+        );
+        const data = (await res.json()) as Profile;
+        setUserProfile(data);
+      } catch (error) {
+        console.error("Failed to load media", error);
+      } finally {
+        setIsLoading(false);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  }, [username]);
 
-            // Use type assertion here as well
-            const data = (await res.json()) as { message?: string; error?: string };
+  if (isLoading || !userProfile) return <p> Loading ... </p>;
 
-            if (!res.ok) {
-                alert("Failed to delete: " + (data.error ?? "Unknown error"));
-                return;
-            }
-
-            alert("Account deleted successfully");
-            window.location.href = "/";
-        } catch (err) {
-            console.error("Unexpected error during deletion:", err);
-            alert("An error occurred while deleting your account.");
-        }
-    };
-
-    // const handleEditPhoto = async () => {
-    //   // You can implement this function to edit the user's avatar
-    //   alert("Edit photo functionality is not yet implemented.");
-    // };
-
-    return (
-        <div className={styles["landing-page"]}>
-            <Navbar />
-            <ViewUserProfileUI
-                key={mockUser.id}
-                username={mockUser.username}
-                fname={mockUser.fname}
-                lname={mockUser.lname}
-                email={mockUser.email}
-                iban={mockUser.iban}
-                avatarUrl={mockUser.picture}
-            />
-            <div className={styles["empty-space"]}></div>
-        </div>
-    );
+  return (
+    <div className={styles["landing-page"]}>
+      <Navbar />
+      <ViewUserProfileUI profile={userProfile} />
+      <div className={styles["empty-space"]}></div>
+    </div>
+  );
 }
