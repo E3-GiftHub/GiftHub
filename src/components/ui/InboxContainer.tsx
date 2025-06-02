@@ -44,7 +44,7 @@ const notifications: InboxNotificationResponse[] = [
   })),
   ...invitations.map((n) => ({
     id: n.id,
-    text: n.description,
+    text: "You received an invitation to " + n.title,
     type: n.type as "event" | "invitation",
     link: n.link,
     firstName: n.firstName ?? "",
