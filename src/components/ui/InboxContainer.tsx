@@ -70,7 +70,7 @@ const notifications: InboxNotificationResponse[] = [
   const totalCount = notifications.length;
 
   const handleNotificationClick = (_id: string | number, link: string) => {
-    window.location.href = `http://localhost:3000${link}`;
+    window.location.href = `${link}`;
   };
 
   return (

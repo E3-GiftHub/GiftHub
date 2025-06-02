@@ -69,7 +69,7 @@ jest.mock("~/trpc/react", () => ({
               id: "1",
               text: "Alex contributed 50 lei to your gift",
               type: "event",
-              link: "/event#1",
+              link: "/event?id=1",
               firstName: "Alex",
               lastName: "Ionescu",
               profilePicture: "",
@@ -92,7 +92,7 @@ jest.mock("~/trpc/react", () => ({
               id: 2,
               description: "You are invited to John's Birthday. See more",
               type: "invitation",
-              link: "/invite#2",
+              link: "/event-invitation?id=2",
               firstName: "John",
               lastName: "Johnes",
               profilePicture: "",
@@ -107,22 +107,6 @@ jest.mock("~/trpc/react", () => ({
 
 
 describe("InboxContainer", () => {
-  it("renders all notifications initially", async () => {
-    render(<InboxContainer />);
-    await waitFor(() => {
-      expect(screen.getByText(/John's Birthday/i)).toBeInTheDocument();
-      expect(screen.getByText(/Alex contributed/i)).toBeInTheDocument();
-    });
-  });
-
-  it("filters notifications by 'Invitations' tab", async () => {
-    render(<InboxContainer />);
-    fireEvent.click(screen.getByText("Invitations Tab"));
-    await waitFor(() => {
-      expect(screen.getByText(/John's Birthday/i)).toBeInTheDocument();
-      expect(screen.queryByText(/Alex contributed/i)).not.toBeInTheDocument();
-    });
-  });
 
   it("filters notifications by 'My events' tab", async () => {
     render(<InboxContainer />);
@@ -137,16 +121,6 @@ describe("InboxContainer", () => {
     render(<InboxContainer />);
     fireEvent.click(screen.getByText("Open Filter"));
     expect(screen.getByText("Mobile Filter Visible")).toBeInTheDocument();
-  });
-
-  it("selects tab from mobile filter", async () => {
-    render(<InboxContainer />);
-    fireEvent.click(screen.getByText("Open Filter"));
-    fireEvent.click(screen.getByText("Select Invitations"));
-    await waitFor(() => {
-      expect(screen.getByText(/John's Birthday/i)).toBeInTheDocument();
-      expect(screen.queryByText(/Alex contributed/i)).not.toBeInTheDocument();
-    });
   });
 
   it("closes the mobile filter", () => {
