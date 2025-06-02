@@ -9,6 +9,7 @@ import Calendar from "~/components/ui/Calendar";
 import { api } from "~/trpc/react";
 import Modal from "~/components/Modal";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -44,14 +45,18 @@ const UpcomingEventsSection: React.FC = () => {
       </div>
 
       {trimmedEvents.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
+        <Link href={`/event?id=${event.id}`}>
+          <ContainerEventRow key={index} eventData={event} />
+        </Link>
       ))}
 
       <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Invitations">
         {eventsData.map((event, index) => (
-          <ContainerEventRow key={index} eventData={event} />
+          <Link href={`/event?id=${event.id}`}>
+            <ContainerEventRow key={index} eventData={event} />
+          </Link>
         ))}
       </Modal>
     </Container>

@@ -11,6 +11,7 @@ import React from "react";
 import { api } from "~/trpc/react";
 import Modal from "~/components/Modal";
 import { useState } from "react";
+import Link from "next/link";
 
 
 const MyEventsSection: React.FC = () => {
@@ -37,13 +38,18 @@ const MyEventsSection: React.FC = () => {
     <Container borderStyle={ContainerBorderStyle.TOP}>
       <ContainerEventTitle title={"My events"} />
       {trimmedEvents.map((event, index) => (
-        <ContainerEventRow key={index} eventData={event} />
+        <Link href={`/event-view?id=${event.id}`}>
+          <ContainerEventRow key={index} eventData={event} />
+        </Link>
       ))}
+
       <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
         {eventsData.map((event, index) => (
-          <ContainerEventRow key={index} eventData={event} />
+          <Link href={`/event-view?id=${event.id}`}>
+            <ContainerEventRow key={index} eventData={event} />
+          </Link>
         ))}
       </Modal>
 
