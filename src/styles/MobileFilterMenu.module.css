@@ -1,0 +1,64 @@
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+.menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  background-color: #0a0a23;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  border-radius: 0; 
+  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+  margin: 0; 
+  box-sizing: border-box;
+}
+
+
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+
+.menuItem {
+  background: none;
+  border: none;
+  color: #c8abd6;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+
+.menuItem:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+
+.active {
+  font-weight: bold;
+  color: white; 
+}
