@@ -1,5 +1,5 @@
 import {createRouteHandler} from "uploadthing/next";
-import {aFileRouter} from "~/server/api/uploadthing";
+import {aFileRouter} from "~/app/api/uploadthing/core";
 
 export const{GET, POST} = createRouteHandler({
   router: aFileRouter,
