@@ -9,7 +9,7 @@ import styles from "~/styles/HomePageStyle.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
 import { api } from "~/trpc/react";
-import Modal from "~/components/Modal";
+import Modal from "~/components/ModalEvents";
 import { useState } from "react";
 import Link from "next/link";
 

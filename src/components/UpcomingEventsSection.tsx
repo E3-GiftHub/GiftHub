@@ -7,7 +7,7 @@ import ContainerEventTitle from "~/components/ui/ContainerEventTitle";
 import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import Calendar from "~/components/ui/Calendar";
 import { api } from "~/trpc/react";
-import Modal from "~/components/Modal";
+import Modal from "~/components/ModalEvents";
 import React, { useState } from "react";
 import Link from "next/link";
 
