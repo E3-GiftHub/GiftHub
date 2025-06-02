@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db as prisma } from "~/server/db";
 
+// allow description to be null
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -8,20 +9,21 @@ export default async function handler(
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const { username, eventId, reason } = req.body ?? {};
+  const { reporter, userId, reason, description } = req.body ?? {};
   if (
-    "" === username ||
-    typeof username !== "string" ||
-    typeof eventId !== "number" ||
+    "" === reporter ||
+    typeof reporter !== "string" ||
+    typeof userId !== "string" ||
     typeof reason !== "string"
   )
     return res.status(400).json({ error: "Invalid request body" });
 
-  await prisma.eventReport.create({
+  await prisma.userReport.create({
     data: {
-      reportedByUsername: username,
-      reportedId: eventId,
+      reportedByUsername: reporter,
+      reportedUsername: userId,
       reason: reason,
+      description: description,
     },
   });
 
