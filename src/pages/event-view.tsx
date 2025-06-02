@@ -459,6 +459,18 @@ export default function EventView() {
                 src={eventData.pictureUrl ?? undefined}
                 alt="the visual representation of the event"
               />
+              <UploadButton
+                endpoint="eventPfpUploader"
+                input={{ eventId: eventId }}
+                onClientUploadComplete={(res) => {
+                  console.log("Banner upload success:", res);
+                  router.reload(); // Refresh to show updated banner
+                }}
+                onUploadError={(err: Error) => {
+                  console.error("Banner upload error:", err);
+                  alert("Failed to upload banner");
+                }}
+              />
             </div>
             {/* Data + Locația */}
             <div className={styles.infoBox}>

@@ -12,6 +12,10 @@ export type OurFileRouter = {
     input:  { eventId: number };
     output: { uploadedBy: string };
   };
+  eventPfpUploader: {
+    input: { eventId: number };
+    output: { uploadedBy: string };
+  };
 };
 
 // ─── 2. Creezi helper-ul, injectând tipul definit ───
@@ -46,4 +50,26 @@ export const ourFileRouter = {
       });
       return { uploadedBy: metadata.userId };
     }),
+    
+  eventPfpUploader: f(
+    { image: { maxFileSize: "4MB", maxFileCount: 1 } }
+  )
+    .input(z.object({ eventId: z.number() }))
+    .middleware(async ({ req, input }) => {
+      const user = auth(req);
+      if (!user) throw new Error("Unauthorized");
+
+      return { userId: user.id, eventId: input.eventId };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await prisma.event.update({
+        where: { id: metadata.eventId },
+        data: {
+          pictureUrl: file.ufsUrl, // assuming Event has `pictureUrl` field
+        },
+      });
+
+      return { uploadedBy: metadata.userId };
+    }),
+
 } satisfies FileRouter;
