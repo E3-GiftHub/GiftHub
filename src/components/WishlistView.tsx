@@ -3,6 +3,7 @@ import styles from '../styles/wishlistcomponent.module.css';
 import { api } from '~/trpc/react';
 import type { TrendingItem } from '../models/WishlistEventGuest';
 import type { WishlistProps } from '../models/WishlistEventGuest';
+import NotInvited from './notinvited';
 import { useRouter } from 'next/router';
 
 const USERNAME = 'user2';
@@ -111,11 +112,7 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   // nu pending gen e nonchalant king nu poate el raspunde...
   if (!isInvited) {
     return (
-      <div className={styles.notInvitedContainer}>
-        <div className={styles.notInvitedText}>
-          Sorry, you are not invited to this event :(
-        </div>
-      </div>
+      <NotInvited/>
     );
   }
   //self explanatory :P
