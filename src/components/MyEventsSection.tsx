@@ -36,19 +36,21 @@ const MyEventsSection: React.FC = () => {
 
   return (
     <Container borderStyle={ContainerBorderStyle.TOP}>
+
       <ContainerEventTitle title={"My events"} />
-      {trimmedEvents.map((event, index) => (
-        <Link href={`/event-view?id=${event.id}`}>
-          <ContainerEventRow key={index} eventData={event} />
+      
+      {trimmedEvents.map((event) => (
+        <Link href={`/event-view?id=${event.id}`} key={event.id}>
+          <ContainerEventRow eventData={event} />
         </Link>
       ))}
 
       <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
-        {eventsData.map((event, index) => (
-          <Link href={`/event-view?id=${event.id}`}>
-            <ContainerEventRow key={index} eventData={event} />
+        {eventsData.map((event) => (
+          <Link href={`/event-view?id=${event.id}`} key={event.id}>
+            <ContainerEventRow eventData={event} />
           </Link>
         ))}
       </Modal>

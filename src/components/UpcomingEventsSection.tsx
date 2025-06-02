@@ -44,18 +44,18 @@ const UpcomingEventsSection: React.FC = () => {
          <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </div>
 
-      {trimmedEvents.map((event, index) => (
-        <Link href={`/event?id=${event.id}`}>
-          <ContainerEventRow key={index} eventData={event} />
+      {trimmedEvents.map((event) => (
+        <Link href={`/event?id=${event.id}`} key={event.id}>
+          <ContainerEventRow eventData={event} />
         </Link>
       ))}
 
       <SeeMoreButton onClick={openModal} />
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Invitations">
-        {eventsData.map((event, index) => (
-          <Link href={`/event?id=${event.id}`}>
-            <ContainerEventRow key={index} eventData={event} />
+        {eventsData.map((event) => (
+          <Link href={`/event?id=${event.id}`} key={event.id}>
+            <ContainerEventRow eventData={event} />
           </Link>
         ))}
       </Modal>
