@@ -25,6 +25,7 @@ const getItemImage = (item: TrendingItem) => {
 
 const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
+  const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const router = useRouter();
 
   const {
@@ -52,8 +53,14 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
     enabled: !!eventId
   });
 
+  // verificam daca invitatia este accepted sau pending
+  const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
+    { eventId: Number(eventId), guestUsername: USERNAME },
+    { enabled: !!eventId }
+  );
+
   useEffect(() => {
-    if(data) {
+    if (data) {
       const updatedItems = data.map(item => ({
         ...item,
          transferCompleted: item.transferCompleted === null ? false : item.transferCompleted,
@@ -62,16 +69,31 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (invitationData) {
+      setIsInvited(invitationData.status === 'ACCEPTED'); //doar accepted! fara nonchalant kings :P 
+    } else if (invitationData === null) {
+      setIsInvited(false);
+    }
+  }, [invitationData]);
+
   const isUserInvited = (eventData: any, username: string) => {
     if (!eventData) return false;
-    // Check if the user is the planner
+    //verificam daca userul este plannerrrrr
     if (eventData.planner?.username === username) return true;
-    // Check if the user is in the guests list
-    return eventData.guests?.some((guest: any) => guest.username === username);
+    //aici verificam daca este in guest list (verificand daca obj eventdata.guests este un array si daca username-ul este in el)
+    if (Array.isArray(eventData.guests)) {
+      return eventData.guests.some((guest: any) => {
+        if (guest.username) return guest.username === username;
+        if (guest.user?.username) return guest.user.username === username;
+        return false;
+      });
+    }
+    return false;
   };
 
-  // Show loading while router isn't ready or data is loading
-  if (!router.isReady || isLoading || isEventLoading) {
+  // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
+  if (!router.isReady || isLoading || isEventLoading || isInvitationLoading || isInvited === null) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
@@ -79,15 +101,15 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
     );
   }
 
-  // Only show no event ID error after router is ready
+  // cinvea incearca sa acceseze wishlist-ul fara eventid
   if(!eventId) return <div>No event ID provided</div>;
   
-  // Show error if event doesn't exist
+  // cineva incearca sa acceseze wishlist ul unui event care nu exista
   if(!eventData && !isLoading) return <div>Event not found</div>;
 
-  // Check if user is invited
-  // Show a prettier message if not invited
-  if (!isUserInvited(eventData, USERNAME)) {
+  // verificam daca userul este invitat SI A ACCEPTAT!!!!!
+  // nu pending gen e nonchalant king nu poate el raspunde...
+  if (!isInvited) {
     return (
       <div className={styles.notInvitedContainer}>
         <div className={styles.notInvitedText}>
@@ -96,7 +118,7 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
       </div>
     );
   }
-  
+  //self explanatory :P
   if(isError)
     return <div>Failed to load items.</div>;
 
@@ -146,7 +168,7 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
         }
       });
     } else {
-      // For contributions, always allow new contributions if not fully funded
+      // pentru usecaseul in care se doreste sa se faca cheta, se poate contribuii cat de mult posibil
       const currentAmount = Number(item.contribution?.current) || 0;
       const totalAmount = Number(item.pret);
       

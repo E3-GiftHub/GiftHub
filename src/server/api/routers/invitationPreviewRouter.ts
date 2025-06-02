@@ -67,4 +67,16 @@ export const invitationsRouter = createTRPCRouter({
     }
     return { success: true };
   }),
+  getInvitationForUserEvent: publicProcedure.input(z.object({ eventId: z.number(), guestUsername: z.string() })).query(async ({ ctx, input }) => {
+    const invitation = await ctx.db.invitation.findFirst({
+      where: {
+        eventId: input.eventId,
+        guestUsername: input.guestUsername,
+      },
+      select: {
+        status: true,
+      },
+    });
+    return invitation; // null if not found, otherwise { status: ... }
+  }),
 });
