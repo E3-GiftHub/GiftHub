@@ -25,7 +25,6 @@ export const eventRouter = createTRPCRouter({
         title: z.string().min(1, "Title is required"),
         description: z.string(),
         date: z.date(),
-        time: z.date(),
         location: z.string().min(1, "Location is required"),
       }),
     )
@@ -226,8 +225,7 @@ export const eventRouter = createTRPCRouter({
         eventId: z.number(),
         title: z.string().nullable(),
         description: z.string().nullable(),
-        date: z.string().nullable(),
-        time: z.string().nullable(),
+        date: z.date(),
         location: z.string().nullable(),
       }),
     )
@@ -238,7 +236,7 @@ export const eventRouter = createTRPCRouter({
         data: {
           title,
           description,
-          date: date ? new Date(date) : undefined,
+          date: date,
           location,
         },
       });

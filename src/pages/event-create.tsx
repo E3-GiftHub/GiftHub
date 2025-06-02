@@ -47,8 +47,7 @@ export default function Page() {
       title,
       description,
       location,
-      date: new Date(date),
-      time: fullDateTime,
+      date: fullDateTime,
     });
   };
 

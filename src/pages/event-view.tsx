@@ -36,12 +36,17 @@ function GuestListPreview({
   eventId,
   guests,
 }: Readonly<GuestListPreviewProps>) {
+    const router = useRouter();
+
   if (loading) return <div>Loading guests...</div>;
 
   return (
     <div className={styles.guestList}>
       {guests.slice(0, 10).map((guest) => (
-        <div className={styles.guestItem} key={guest.username}>
+        <div className={styles.guestItem} 
+          key={guest.username}
+          onClick={() => router.push(`/view-profile/${guest.username}`)}
+          style={{ cursor: "pointer" }}>
           <img
             className={styles.guestImage}
             src={guest.pictureUrl ?? ""}
@@ -258,13 +263,14 @@ export default function EventView() {
     setPendingField(null);
     setShowConfirm(false);
 
+    const combinedDateTime = new Date(`${formData.date}T${formData.time}`);
+
     const payload = {
       eventId: eventId,
       title: pendingField === "title" ? tempValue : formData.title,
       description:
         pendingField === "description" ? tempValue : formData.description,
-      date: pendingField === "date" ? tempValue : formData.date,
-      time: pendingField === "time" ? tempValue : formData.time,
+      date: combinedDateTime,
       location: pendingField === "location" ? tempValue : formData.location,
     };
 
