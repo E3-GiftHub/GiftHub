@@ -11,7 +11,10 @@ import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificat
 import { guestRouter } from "~/server/api/routers/GuestRouter";
 import { ebayRouter } from "~/server/api/routers/EbayRouter"
 import { mediaRouter } from "~/server/api/routers/mediaRouter";
+import { userRouter } from "./routers/profileManagenemt/user";
 import { authRouter } from "~/server/api/routers/authRouter";
+import { profileRouter } from "~/server/api/routers/profileRouter";
+
 /**
  * This is the primary router for your server.
  *
@@ -19,9 +22,10 @@ import { authRouter } from "~/server/api/routers/authRouter";
  */
 export const appRouter = createTRPCRouter({
   //post: postRouter,
-   auth: authRouter,
+  auth: authRouter,
   wishlist: wishlistRouter,
   invitation: invitationRouter,
+  profile: profileRouter,
   calendar: calendarRouter,
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
@@ -32,6 +36,7 @@ export const appRouter = createTRPCRouter({
   media: mediaRouter,
   event: eventRouter,
   guest: guestRouter,
+  user: userRouter,
 });
 
 // export type definition of API
