@@ -45,8 +45,6 @@ const MyEventsSection: React.FC = () => {
         </Link>
       ))}
 
-      <SeeMoreButton onClick={openModal} />
-
       <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
         {eventsData.map((event) => (
           <Link href={`/event-view?id=${event.id}`} key={event.id}>
@@ -56,6 +54,7 @@ const MyEventsSection: React.FC = () => {
       </Modal>
 
       <div className={styles["buttons-wrapper"]}>
+        <SeeMoreButton onClick={openModal} />
         <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
       </div>
     </Container>
