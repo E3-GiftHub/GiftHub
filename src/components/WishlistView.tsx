@@ -62,6 +62,14 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
     }
   }, [data]);
 
+  const isUserInvited = (eventData: any, username: string) => {
+    if (!eventData) return false;
+    // Check if the user is the planner
+    if (eventData.planner?.username === username) return true;
+    // Check if the user is in the guests list
+    return eventData.guests?.some((guest: any) => guest.username === username);
+  };
+
   // Show loading while router isn't ready or data is loading
   if (!router.isReady || isLoading || isEventLoading) {
     return (
@@ -76,6 +84,18 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   
   // Show error if event doesn't exist
   if(!eventData && !isLoading) return <div>Event not found</div>;
+
+  // Check if user is invited
+  // Show a prettier message if not invited
+  if (!isUserInvited(eventData, USERNAME)) {
+    return (
+      <div className={styles.notInvitedContainer}>
+        <div className={styles.notInvitedText}>
+          Sorry, you are not invited to this event :(
+        </div>
+      </div>
+    );
+  }
   
   if(isError)
     return <div>Failed to load items.</div>;

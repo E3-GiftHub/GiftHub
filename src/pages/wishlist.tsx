@@ -17,10 +17,6 @@ const WishlistPage: React.FC = () => {
     <div className={styles.giftHubPage}>
       <Head>
         <title>GiftHub</title>
-        <meta
-          name="description"
-          content="Gift Hub wishlist demonstration page"
-        />
       </Head>
       <Navbar />
       <main className={styles.mainContent}>
