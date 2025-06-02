@@ -1,7 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { MarkType } from "@prisma/client";
+
 export const contributionsRouter = createTRPCRouter({
   getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
     const userIdentifier = ctx.session!.user!.name!;
@@ -27,7 +26,7 @@ export const contributionsRouter = createTRPCRouter({
       link: `/event?id=${contribution.event?.id}`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
-      profilePicture: contribution.guest.pictureUrl || "databasepic/profilepic.png",
+      profilePicture: contribution.guest.pictureUrl ?? "databasepic/profilepic.png",
       notificationDate: contribution.createdAt.toISOString(),
     }));
   }),
@@ -49,13 +48,13 @@ export const contributionsRouter = createTRPCRouter({
       },
     });
 
-    return purchasedItems.map((mark, index) => ({
+    return purchasedItems.map((mark) => ({
       text: `${mark.guest.fname} bought an item from your wishlist`,
       type: "event",
       link: `/event?id=${mark.event?.id}`,
       firstName: mark.guest.fname,
       lastName: mark.guest.lname,
-      profilePicture: mark.guest.pictureUrl || "databasepic/profilepic.png",
+      profilePicture: mark.guest.pictureUrl ?? "databasepic/profilepic.png",
       notificationDate: mark.createdAt.toISOString(),
     }));
   }),
