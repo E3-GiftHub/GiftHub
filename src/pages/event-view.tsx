@@ -361,7 +361,7 @@ export default function EventView() {
               try {
                 await deleteEventMutation.mutateAsync({ eventId: parsedId });
                 alert("Event deleted successfully.");
-                router.push("/");
+                void router.push("/");
               } catch (err) {
                 console.error("Failed to delete event:", err);
                 const message =
