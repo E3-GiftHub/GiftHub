@@ -26,7 +26,7 @@ export const contributionsRouter = createTRPCRouter({
       link: `/event?id=${contribution.event?.id}`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
-      profilePicture: contribution.guest.pictureUrl ?? "databasepic/profilepic.png",
+      profilePicture: contribution.guest.pictureUrl ?? "",
       notificationDate: contribution.createdAt.toISOString(),
     }));
   }),
@@ -54,7 +54,7 @@ export const contributionsRouter = createTRPCRouter({
       link: `/event?id=${mark.event?.id}`,
       firstName: mark.guest.fname,
       lastName: mark.guest.lname,
-      profilePicture: mark.guest.pictureUrl ?? "databasepic/profilepic.png",
+      profilePicture: mark.guest.pictureUrl ?? "",
       notificationDate: mark.createdAt.toISOString(),
     }));
   }),
