@@ -1,53 +1,23 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "src/styles/UserProfile/UserProfile.module.css";
-import Image from "next/image";
 import clsx from "clsx";
 import "src/styles/globals.css";
 import type { Profile } from "~/models/Profile";
+import ProfileReportButton from "./ProfileReportButton";
 
 interface UserProfileProps {
+  reporter: string | null;
   profile: Profile;
-  onReport?: () => void;
+  onReport: (
+    reporter: string | null,
+    reported: string | null,
+    reason: string | null,
+    description: string | null,
+  ) => void;
 }
 
-const ProfileButton = ({
-  iconSrc,
-  alt,
-  children,
-  onClick,
-  loading,
-}: {
-  iconSrc: string;
-  alt: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-  loading?: boolean;
-}) => (
-  <button
-    className={clsx(
-      styles.button,
-      styles.buttonDanger,
-      loading && styles.loading,
-    )}
-    onClick={onClick}
-    disabled={loading}
-  >
-    {!loading && (
-      <>
-        <Image
-          src={iconSrc}
-          alt={alt}
-          width={20}
-          height={20}
-          className={styles.icon}
-        />
-        {children}
-      </>
-    )}
-  </button>
-);
-
 export default function ViewUserProfileUI({
+  reporter,
   profile,
   onReport,
 }: Readonly<UserProfileProps>) {
@@ -119,14 +89,14 @@ export default function ViewUserProfileUI({
             </div>
 
             <div className={styles.buttonContainer}>
-              <ProfileButton
+              <ProfileReportButton
                 iconSrc="illustrations/report.svg"
                 alt="Report account"
                 loading={false}
                 onClick={handleReportClick}
               >
                 Report account
-              </ProfileButton>
+              </ProfileReportButton>
             </div>
           </div>
         </div>
@@ -187,7 +157,17 @@ export default function ViewUserProfileUI({
                 )}
 
                 <div className={styles.buttonContainerReport}>
-                  <button type="submit" className={styles.buttonSubmitReport}>
+                  <button
+                    onClick={() => {
+                      onReport(
+                        reporter,
+                        profile.username,
+                        reportReason,
+                        otherReason,
+                      );
+                    }}
+                    className={styles.buttonSubmitReport}
+                  >
                     Submit Report
                   </button>
                   <button
