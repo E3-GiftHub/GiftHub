@@ -14,8 +14,6 @@ export const signupRouter = createTRPCRouter({
   signup: publicProcedure
     .input(signupSchema)
     .mutation(async ({ input, ctx }) => {
-      const { username, email, password } = input;
-
       if (input.password !== input.confirmPassword) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -25,7 +23,7 @@ export const signupRouter = createTRPCRouter({
 
       const existingUser = await ctx.db.user.findFirst({
         where: {
-          OR: [{ email: email }],
+          OR: [{ username: input.username }],
         },
       });
 
@@ -36,17 +34,16 @@ export const signupRouter = createTRPCRouter({
         });
       }
 
-      const hashPasswd = await bcrypt.hash(password, 10);
+      const hashPasswd = await bcrypt.hash(input.password, 10);
 
       await ctx.db.user.create({
         data: {
-          email,
+          username: input.username,
+          email: input.email,
           password: hashPasswd,
           fname: null,
           lname: null,
-          id: input.username,
-          //stripeConnectId: null,
-
+          stripeConnectId: null,
           pictureUrl: "/UserImages/default_pgp.svg",
         },
       });

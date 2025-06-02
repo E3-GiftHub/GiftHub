@@ -2,7 +2,6 @@
   "moduleResolution": "node",
   "compilerOptions": {
     /* Base Options: */
-    "types" : ["next-auth"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2022",
@@ -48,6 +47,8 @@
     ".next/types/**/*.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "types/**/*.d.ts"
+
   ],
   "exclude": [
     "node_modules",

@@ -10,4 +10,6 @@ export const mockUser: Omit<User, "createdAt" | "updatedAt"> = {
   pictureUrl: "UserImages/default_pfp.svg",
   emailVerified: null,
   id: null,
+  emailToken: null,
+  tokenExpires: null,
 };

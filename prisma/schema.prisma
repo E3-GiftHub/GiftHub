@@ -91,13 +91,15 @@ model VerificationToken {
 //! implemented components - main data
 
 model User {
-    username        String  @id @unique @default(cuid())
-    email           String? @unique
-    id              String? @unique
+    username        String    @id @unique @default(cuid())
+    email           String?   @unique
+    id              String?   @unique
     fname           String?
     lname           String?
     password        String? // stored with hash obviously
-    stripeConnectId String? @unique
+    stripeConnectId String? // NOT UNIQUE: only one null value allowed
+    emailToken      String? // NOT UNIQUE: only one null value allowed
+    tokenExpires    DateTime?
     pictureUrl      String?
 
     emailVerified DateTime?
@@ -151,10 +153,10 @@ model Event {
     pictureUrl  String?
     token       String?
 
-    createdByUsername String
+    createdByUsername String   @default("DELETED_USER")
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
-    user              User     @relation(fields: [createdByUsername], references: [username])
+    user              User     @relation(fields: [createdByUsername], references: [username], onDelete: SetDefault)
 
     invitations Invitation[]
 
@@ -170,11 +172,12 @@ model Event {
 
 // junction TABLE for event-specific wishlist entry
 model EventArticle {
-    id       Int           @id @default(autoincrement())
-    eventId  Int
-    itemId   Int           @default(-1) // deleted item
-    userNote String? // additional note
-    priority PriorityType?
+    id                Int           @id @default(autoincrement())
+    eventId           Int
+    itemId            Int           @default(-1) // deleted item
+    userNote          String? // additional note
+    priority          PriorityType?
+    transferCompleted Boolean? // sent from our stripe to the Planner stripe
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -183,9 +186,9 @@ model EventArticle {
     item  Item  @relation(fields: [itemId], references: [id], onDelete: SetDefault)
 
     // @@id([eventId, itemId]) //! an item can be added ++ times
-    Mark         Mark[]
-    Contribution Contribution[]
-    StripeLink   StripeLink[]
+    marks         Mark[]
+    contributions Contribution[]
+    paymentLinks  StripeLink[]
 
     @@index([eventId])
     @@index([itemId])
@@ -263,9 +266,9 @@ model StripeLink {
     updatedAt DateTime @updatedAt
 
     guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-    event   Event?        @relation(fields: [eventId], references: [id])
-    article EventArticle? @relation(fields: [articleId], references: [id])
-    Item    Item?         @relation(fields: [itemId], references: [id])
+    event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    Item    Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
     @@index([eventId, articleId, status])
 }
@@ -284,9 +287,9 @@ model Contribution {
     //! updated only if SetDefault
 
     guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-    event   Event?       @relation(fields: [eventId], references: [id])
-    article EventArticle @relation(fields: [articleId], references: [id])
-    item    Item?        @relation(fields: [itemId], references: [id])
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Restrict)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Restrict)
 
     ContributionNotification ContributionNotification[]
 
