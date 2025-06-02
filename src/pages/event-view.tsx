@@ -354,23 +354,28 @@ export default function EventView() {
         </div>
       )}
 
-       {showDeleteModal && (
-                <DeleteEventModal
-                    onConfirm={async () => {
-                      try {
-                        await deleteEventMutation.mutateAsync({ eventId: parsedId });
-                        alert("Event deleted successfully.");
-                        router.push("/");
-                      } catch (err: any) {
-                        console.error("Failed to delete event:", err);
-                        alert(err.message || "Could not delete event.");
-                      } finally {
-                        setShowDeleteModal(false);
-                      }
-                    }}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
+      {showDeleteModal && (
+        <DeleteEventModal
+          onConfirm={() => {
+            void (async () => {
+              try {
+                await deleteEventMutation.mutateAsync({ eventId: parsedId });
+                alert("Event deleted successfully.");
+                router.push("/");
+              } catch (err) {
+                console.error("Failed to delete event:", err);
+                const message =
+                  err instanceof Error ? err.message : "Could not delete event.";
+                alert(message ?? "Could not delete event.");
+              } finally {
+                setShowDeleteModal(false);
+              }
+            })();
+          }}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
+
 
       {showMediaModal && (
         <EditMediaModal
