@@ -38,13 +38,12 @@ export default function ForgotPasswordForm() {
     };
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setMessage(null);
-        const isValid = validateForm(); // validateForm sets errors internally
-        if (!isValid) {
-            // Errors have already been set by validateForm, so just return
-            return;
-        }
+      e.preventDefault();
+      setMessage(null);
+      const isValid = validateForm();
+      if (isValid) {
+        requestResetMutation.mutate({ email });
+      }
     };
 
     return (
@@ -66,7 +65,6 @@ export default function ForgotPasswordForm() {
                             className={styles.inputTitle}
                         >
                             Email{" "}
-                            {errors?.email && (<span className={styles.errorText}>{errors.email}</span>)}
                         </label>
                         <input
                             id="email"
@@ -77,9 +75,10 @@ export default function ForgotPasswordForm() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                      {errors?.email && (<div className={styles.errorText} role={"alert"}>{errors.email}</div>)}
                     </div>
-                    {message && <p className={styles.forgotPasswordMessage}>{message}</p>}
-                    {errors?.server && <p className={styles.forgotPasswordMessage}>{errors.server}</p>}
+                    {message && <p className={styles.forgotPasswordMessage} role={"alert"}>{message}</p>}
+                    {errors?.server && <p className={styles.forgotPasswordMessage} role={"alert"}>{errors.server}</p>}
                 </form>
             </div>
 

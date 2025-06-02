@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
+import React, {useState} from "react";
+import {useRouter} from "next/router";
 import styles from "../../../styles/Account.module.css";
 import Link from "next/link";
-import { api } from "~/trpc/react";
+import {api} from "~/trpc/react";
 
 const getResetPasswordValidationMessages = () => ({
     passwordRequired: "Password is required",
@@ -18,7 +18,7 @@ const resetPasswordValidationMessages = getResetPasswordValidationMessages();
 
 export default function ResetPasswordForm() {
     const router = useRouter();
-    const { token } = router.query;
+    const {token} = router.query;
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -112,8 +112,8 @@ export default function ResetPasswordForm() {
                     <div className={styles.formGroup}>
                         <label htmlFor="password" className={styles.inputTitle}>
                             Password{" "}
-                            {errors?.password && (<span className={styles.errorText}>{errors.password}</span>)}
                         </label>
+                      {errors?.password && (<div className={styles.errorText} role={"alert"}>{errors.password}</div>)}
                         <div className={styles.passwordInput}>
                             <input
                                 type={showPassword ? "text" : "password"}
@@ -140,13 +140,9 @@ export default function ResetPasswordForm() {
                     {/* Confirm password input */}
                     <div className={styles.formGroup}>
                         <label htmlFor="confirmPassword" className={styles.inputTitle}>Confirm password
-                            {errors?.confirmPassword && (
-                                <span className={styles.errorText}>
-                                    {errors.password}
-                                </span>
-                            )}
                         </label>
-                        <div className={styles.passwordInput}>
+                      {errors?.confirmPassword && (<div className={styles.errorText} role={"alert"}>{errors.confirmPassword}</div>)}
+                      <div className={styles.passwordInput}>
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Confirm your new password"
@@ -176,7 +172,8 @@ export default function ResetPasswordForm() {
             </div>
 
             <div className={styles.bottom}>
-                <button type="submit" form="resetPassword" className={styles.primaryButton} disabled={resetPasswordMutation.isPending}>
+                <button type="submit" form="resetPassword" className={styles.primaryButton}
+                        disabled={resetPasswordMutation.isPending}>
                     {resetPasswordMutation.isPending ? "Resetting..." : "Reset password"}
                 </button>
 
