@@ -10,6 +10,10 @@
   overflow-x: hidden;
 }
 
+.container-wraper{
+  width:100%;
+}
+
 .homepage-containers-wrapper {
   display: flex;
   flex-direction: row;

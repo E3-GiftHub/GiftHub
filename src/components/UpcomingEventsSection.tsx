@@ -10,6 +10,7 @@ import { api } from "~/trpc/react";
 import Modal from "~/components/ModalEvents";
 import React, { useState } from "react";
 import Link from "next/link";
+import styles from "~/styles/HomePageStyle.module.css";
 
 const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -45,7 +46,7 @@ const UpcomingEventsSection: React.FC = () => {
       </div>
 
       {trimmedEvents.map((event) => (
-        <Link href={`/event?id=${event.id}`} key={event.id}>
+        <Link href={`/event?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
           <ContainerEventRow eventData={event} />
         </Link>
       ))}
@@ -54,7 +55,7 @@ const UpcomingEventsSection: React.FC = () => {
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Invitations">
         {eventsData.map((event) => (
-          <Link href={`/event?id=${event.id}`} key={event.id}>
+          <Link href={`/event?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
             <ContainerEventRow eventData={event} />
           </Link>
         ))}

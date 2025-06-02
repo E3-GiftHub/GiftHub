@@ -40,14 +40,14 @@ const MyEventsSection: React.FC = () => {
       <ContainerEventTitle title={"My events"} />
       
       {trimmedEvents.map((event) => (
-        <Link href={`/event-view?id=${event.id}`} key={event.id}>
+        <Link href={`/event-view?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
           <ContainerEventRow eventData={event} />
         </Link>
       ))}
 
       <Modal isOpen={showModal} onClose={closeModal} title="All My Events">
         {eventsData.map((event) => (
-          <Link href={`/event-view?id=${event.id}`} key={event.id}>
+          <Link href={`/event-view?id=${event.id}`} key={event.id} className={styles["container-wraper"]}>
             <ContainerEventRow eventData={event} />
           </Link>
         ))}
