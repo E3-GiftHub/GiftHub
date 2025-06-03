@@ -140,7 +140,7 @@ const Navbar = () => {
               </Link>
               <div className={styles["dropdown-content"]}>
                 <Link href="/profile#">
-                  <FaUserEdit /> Edit Profile
+                  <FaUserEdit /> Profile
                 </Link>
                 <Link
                   href="/#"
