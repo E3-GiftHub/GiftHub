@@ -552,16 +552,40 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
-/* file picker wrapper */
-.fileInputWrapper {
+.uploadingState {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+  padding: 2rem;
   gap: 1rem;
-  width: 100%;
-  max-width: 24rem;      /* same as captionInput */
-  justify-content: space-between;
-  margin-bottom: 1rem;
+}
+
+.uploadSpinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.uploadingText {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Update the captionInput to show disabled state */
+.captionInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* hide the native file‐input */
@@ -616,13 +640,4 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-}
-
-.fileInputWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 24rem;
-  margin: 0 auto;
 }
