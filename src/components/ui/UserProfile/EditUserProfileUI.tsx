@@ -171,28 +171,20 @@ export default function EditUserProfileUI({
                 />
               )}
             </div>
-            {/*<button
-              className={clsx(
-                styles.editAvatarButton,
-                loading && styles.loading,
-              )}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading}
-              aria-label="Edit avatar"
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-              data-testid="file-input"
-            />*/}
             <UploadButton
+              className={styles.customUploadButton}
               endpoint="profilePfpUploader"
               input={{username: usernameInput}}
               onClientUploadComplete={onUploadComplete}
               onUploadError={onUploadError}
+              appearance={{
+                button: {
+                  display: "none",
+                },
+                allowedContent: {
+                  display: "none",
+                },
+              }}
               />
           </div>
         </div>
