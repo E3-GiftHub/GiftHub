@@ -15,14 +15,14 @@ export const itemRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
-              price: true
-            }
-          }
-        }
+              price: true,
+            },
+          },
+        },
       });
 
       // Fix: replace null with false
-      const fixedArticles = eventArticles.map(article => ({
+      const fixedArticles = eventArticles.map((article) => ({
         ...article,
         transferCompleted: article.transferCompleted ?? false,
       }));
@@ -71,7 +71,7 @@ export const itemRouter = createTRPCRouter({
             pret: ea.item?.price?.toString() ?? "",
             state,
             // Convert null to undefined explicitly
-            transferCompleted: ea.transferCompleted === null ? undefined : ea.transferCompleted,
+            transferCompleted: ea.transferCompleted ?? undefined,
             contribution: {
               current: Number(contributionSum._sum.cashAmount ?? 0),
               total: Number(ea.item?.price ?? 0),

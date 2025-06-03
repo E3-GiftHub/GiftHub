@@ -9,6 +9,7 @@ import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
 
 import { authRouter } from "./routers/authRouter";
+import { userRouter } from "~/server/api/routers/userRouter";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
   invitationsNotification: invitesNotificationRouter,
+  user: userRouter,
 });
 
 // export type definition of API

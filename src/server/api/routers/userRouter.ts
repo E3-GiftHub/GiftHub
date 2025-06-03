@@ -5,9 +5,12 @@ import { TRPCError } from "@trpc/server";
 export const userRouter = createTRPCRouter({
   getSelf: protectedProcedure.query(async ({ ctx }) => {
     // PENTRU WISHLIST SA VEDEM DACA USERUL E INVITAT LA UN EVENT :DDDDDDD
-    const username = (ctx.session.user as any).username;
+    const username = ctx.session.user.name;
     if (!username) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: "Username not found in session." });
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Username not found in session.",
+      });
     }
 
     const user = await ctx.db.user.findUnique({

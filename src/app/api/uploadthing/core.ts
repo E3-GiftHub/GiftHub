@@ -32,7 +32,7 @@ export const ourFileRouter = {
     )
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
-        throw new UploadThingError("invalid session");
+        throw new Error("UploadThingError: invalid session");
       }
 
       return {
@@ -60,7 +60,7 @@ export const ourFileRouter = {
     .input(z.object({ username: z.string(), eventId: z.number() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
-        throw new UploadThingError("invalid session");
+        throw new Error("UploadThingError: invalid session");
       }
 
       const event = await prisma.event.findUnique({
@@ -69,7 +69,7 @@ export const ourFileRouter = {
       });
 
       if (!event || event.createdByUsername !== input.username) {
-        throw new UploadThingError("unauthorized user");
+        throw new Error("UploadThingError: unauthorized user");
       }
 
       return { eventId: input.eventId };
@@ -87,7 +87,7 @@ export const ourFileRouter = {
     .input(z.object({ username: z.string() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
-        throw new UploadThingError("invalid session");
+        throw new Error("UploadThingError: invalid session");
       }
 
       const user = await prisma.user.findUnique({
@@ -96,7 +96,7 @@ export const ourFileRouter = {
       });
 
       if (!user) {
-        throw new UploadThingError("not existing user");
+        throw new Error("UploadThingError: not existing user");
       }
 
       return { username: input.username };

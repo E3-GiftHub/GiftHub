@@ -5,7 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const username: string = String(req.query.username);
+  const username = String(req.query.username);
   if (!username) return res.status(400).json({ error: "Missing parameters" });
 
   const user = await db.user.findUnique({

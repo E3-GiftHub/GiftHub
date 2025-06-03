@@ -32,7 +32,7 @@ export default function EventViewPage() {
   }, [router.isReady]);
 
   const { id } = router.query;
-  const eventId: number = Number(id);
+  const eventId = Number(id);
 
   const {
     data: eventData,
@@ -143,8 +143,8 @@ export default function EventViewPage() {
               planner: eventData.planner,
               guests: eventData.guests,
             }}
-            onContribute={() => {
-              router.push(`/contribution-direct?eventId=${eventId}`);
+            onContribute={async () => {
+              await router.push(`/contribution-direct?eventId=${eventId}`);
             }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
