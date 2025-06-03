@@ -5,6 +5,18 @@ import type { StatusPayment } from "@prisma/client";
 import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 
+type StripeError = Stripe.errors.StripeError;
+
+function isStripeError(error: unknown): error is StripeError {
+  return (
+    error instanceof Error &&
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    typeof (error as { type: unknown }).type === 'string'
+  );
+}
+
 export async function createCheckoutLink(
   id: number,
   idType: "eventArticle" | "event",
@@ -124,11 +136,12 @@ export async function createCheckoutLink(
             : `Event #${eventId} – Planner: ${plannerUsername}`,
       },
     });
-  } catch (priceErr: any) {
+  } catch (priceErr) {
     console.error("Stripe Price creation error:", priceErr);
-    throw new Error(
-      `Failed to create Stripe Price: ${priceErr.message || priceErr.toString()}`
-    );
+    if (isStripeError(priceErr)) {
+      throw new Error(`Stripe error: ${priceErr.message}`);
+    }
+    throw new Error("Failed to create Stripe Price");
   }
 
   const paymentLinkParams: Stripe.PaymentLinkCreateParams = {
@@ -160,11 +173,12 @@ export async function createCheckoutLink(
   let link: Stripe.PaymentLink;
   try {
     link = await stripe.paymentLinks.create(paymentLinkParams);
-  } catch (stripeErr: any) {
+  } catch (stripeErr) {
     console.error("Stripe PaymentLink creation error:", stripeErr);
-    throw new Error(
-      `Failed to create Stripe Payment Link: ${stripeErr.message || stripeErr.toString()}`
-    );
+    if (isStripeError(stripeErr)) {
+      throw new Error(`Stripe error: ${stripeErr.message}`);
+    }
+    throw new Error("Failed to create Stripe Payment Link");
   }
 
   try {
@@ -182,11 +196,12 @@ export async function createCheckoutLink(
         status: "PENDING" as StatusPayment,
       },
     });
-  } catch (prismaErr: any) {
+  } catch (prismaErr) {
     console.error("Prisma stripeLink.create error:", prismaErr);
-    throw new Error(
-      `Failed to save StripeLink in database: ${prismaErr.message || prismaErr.toString()}`
-    );
+    if (prismaErr instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new Error(`Database error: ${prismaErr.message}`);
+    }
+    throw new Error("Failed to save payment link in database");
   }
 
   return {

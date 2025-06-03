@@ -1,7 +1,18 @@
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "~/server/db"; // Your Prisma client or DB utility
 import * as bcrypt from "bcrypt";
+
+// Extend the User type to include our custom fields
+interface CustomUser extends User {
+  username?: string;
+}
+
+// Extend the JWT type to include our custom fields
+interface CustomToken {
+  id?: string;
+  username?: string;
+}
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -76,8 +87,9 @@ export const authConfig: NextAuthConfig = {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
         token.id = user.id; // Add the user ID to the JWT
-        // Use user['username'] to avoid TS error, since we know it's present from authorize
-        token.username = (user as any).username || user.name;
+        // Cast user to CustomUser and use nullish coalescing
+        const customUser = user as CustomUser;
+        token.username = customUser.username ?? user.name;
       }
       // `account` and `profile` are available when using OAuth providers
       return token;
@@ -90,8 +102,8 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.id as string;
       }
       if (session.user && token.username) {
-        // Use index signature to avoid TS error
-        (session.user as any).username = token.username as string;
+        // Cast session.user to CustomUser for type safety
+        (session.user as CustomUser).username = token.username as string;
       }
       return session;
     },

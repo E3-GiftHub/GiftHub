@@ -19,6 +19,18 @@ interface PaymentDetails {
   eventPlanner?: string;
 }
 
+interface StripeContributeRequest {
+  userId: string;
+  amount: number;
+  articleId?: number;
+  eventId?: number;
+}
+
+interface StripeContributeResponse {
+  url?: string;
+  error?: string;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -109,7 +121,7 @@ export default function CheckoutPage() {
       alert("You must be signed in to proceed.");
       return;
     }
-    const purchaserUsername = session.user.name as string;
+    const purchaserUsername = session.user.name;
 
     const amount = Number(contributionAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -133,7 +145,7 @@ export default function CheckoutPage() {
     setIsCheckingOut(true);
 
     try {
-      const body: any = {
+      const body: StripeContributeRequest = {
         userId: purchaserUsername,
         amount,
       };
@@ -148,11 +160,12 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = await response.json();
+      
+      const data = await response.json() as StripeContributeResponse;
       if (response.ok && data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || "Failed to initiate checkout. Please try again.");
+        alert(data.error ?? "Failed to initiate checkout. Please try again.");
         console.error("Stripe Checkout Error:", data);
       }
     } catch (err) {

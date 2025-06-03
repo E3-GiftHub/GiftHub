@@ -9,6 +9,14 @@ import { Prisma } from "@prisma/client";
 // Import your ContributionsTransfer service
 import { processEventItemContributions } from "@/server/services/ContributionsTransfer";
 
+// Helper type for Stripe webhook events
+type StripeWebhookEvent = Stripe.Event;
+
+// Helper for type checking errors
+function isStripeError(err: unknown): err is Error & { type: string } {
+  return err instanceof Error && "type" in err;
+}
+
 // 1. Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
@@ -32,7 +40,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  // Only allow POST
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).end("Method Not Allowed");
@@ -42,8 +49,8 @@ export default async function handler(
   let buf: Buffer;
   try {
     buf = await buffer(req);
-  } catch (err: any) {
-    console.error("Error reading raw body:", err);
+  } catch (err: unknown) {
+    console.error("Error reading raw body:", err instanceof Error ? err.message : err);
     return res.status(400).json({ received: false });
   }
 
@@ -55,19 +62,28 @@ export default async function handler(
   }
 
   // 3. Parse & verify the event
-  let event: any;
+  let event: StripeWebhookEvent;
   try {
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-  } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
+  } catch (err: unknown) {
+    if (isStripeError(err)) {
+      console.error("Webhook signature verification failed:", err.message);
+    } else {
+      console.error("Unknown error during webhook verification:", err);
+    }
     return res.status(400).json({ received: false });
   }
 
   // 4. Handle relevant event types
-  switch (event.type as string) {
+  const eventType = event.type;
+  switch (eventType) {
     // ────── When a Checkout Session completes (i.e. Payment Link was paid) ──────
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session: Stripe.Checkout.Session = event.data.object;
+      if (!('payment_link' in session)) {
+        console.error("Missing payment_link in session data");
+        break;
+      }
       const paymentLinkId = session.payment_link as string | undefined;
 
       console.log("🔔 checkout.session.completed for Payment Link:", paymentLinkId);
@@ -189,7 +205,11 @@ export default async function handler(
 
     // ────── When a Checkout Session expires (i.e. Payment Link expired) ──────
     case "checkout.session.expired": {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session: Stripe.Checkout.Session = event.data.object;
+      if (!('payment_link' in session)) {
+        console.error("Missing payment_link in session data");
+        break;
+      }
       const paymentLinkId = session.payment_link as string | undefined;
 
       console.log("🔔 checkout.session.expired for Payment Link:", paymentLinkId);
@@ -281,7 +301,7 @@ export default async function handler(
 
     // ────── All other event types ──────
     default:
-      console.log(`⚪️  Unhandled event type: ${event.type}`);
+      console.log(`⚪️  Unhandled event type: ${eventType}`);
   }
 
   // 5. Acknowledge receipt

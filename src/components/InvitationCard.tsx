@@ -15,9 +15,8 @@ export default function InvitationCard({
   invitationId: number;
   onAccept?: () => void;
   onDecline?: () => void;
-}) {
-  // luam userul curent care foloseste acm pagina
-  const { data: currentUser } = api.user.get.useQuery();
+}) {  // luam userul curent care foloseste acm pagina
+  const { data: currentUser } = api.user.getSelf.useQuery();
 
   // aici luam idul invitatiei
   const invitationQuery = api.invitationPreview.getInvitationById.useQuery(

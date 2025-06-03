@@ -28,8 +28,7 @@ export async function processEventItemContributions(eventId: number): Promise<vo
       user: { select: { stripeConnectId: true } },
     },
   });
-
-  if (!eventData || !eventData.user) {
+  if (!eventData?.user) {
     console.error(`Event ID ${eventId} or planner not found for item price processing.`);
     throw new Error('Event or event planner not found for item price processing.');
   }
@@ -73,10 +72,8 @@ export async function processEventItemContributions(eventId: number): Promise<vo
 
   for (const eventArticle of eventArticles) {
     const articleId = eventArticle.id;
-    const itemDetails = eventArticle.item;
-
-    if (!itemDetails || itemDetails.price === null || itemDetails.price === undefined) {
-      console.warn(`Skipping article ${articleId} (Item: ${itemDetails?.id}, Name: ${itemDetails?.name || 'N/A'}) for event ${eventId} (item price processing): Item or price missing.`);
+    const itemDetails = eventArticle.item;    if (!itemDetails?.price) {
+      console.warn(`Skipping article ${articleId} (Item: ${itemDetails?.id}, Name: ${itemDetails?.name ?? 'N/A'}) for event ${eventId} (item price processing): Item or price missing.`);
       continue;
     }
     const itemPriceNumber = itemDetails.price.toNumber();
@@ -116,7 +113,7 @@ export async function processEventItemContributions(eventId: number): Promise<vo
           currency: 'ron',
           destination: plannerStripeConnectId,
           transfer_group: `EVENT#${eventId}_ARTICLE_FULLPRICE#${articleId}`,
-          description: `Full payment for item '${itemDetails.name || itemDetails.id}' (Article ID: ${articleId}, Event ID: ${eventId})`,
+          description: `Full payment for item '${itemDetails.name ?? itemDetails.id}' (Article ID: ${articleId}, Event ID: ${eventId})`,
           metadata: { eventId: eventId.toString(), articleId: articleId.toString(), itemId: itemDetails.id.toString(), type: "full_price_fulfillment" },
         }, { idempotencyKey });
         console.log(`Successfully transferred ${itemPriceCents / 100} RON (full item price) to planner ${plannerStripeConnectId} for article ${articleId}.`);
@@ -161,8 +158,7 @@ export async function endOfEventTransfer(eventId: number): Promise<void> {
       },
     },
   });
-
-  if (!eventData || !eventData.user) {
+  if (!eventData?.user) {
     console.error(`Event with ID ${eventId} or its planner not found for end-of-event transfer.`);
     // If event/planner not found, cannot proceed.
     throw new Error('Event or event planner not found for end-of-event transfer.');
@@ -221,7 +217,7 @@ export async function endOfEventTransfer(eventId: number): Promise<void> {
   // 4. Iterate over each article to transfer its specific collected contributions.
   for (const article of articlesToProcess) {
     const articleId = article.id;
-    const itemName = article.item?.name || `Item ID ${article.item?.id || 'N/A'}`;
+    const itemName = article.item?.name ?? `Item ID ${article.item?.id ?? 'N/A'}`;
 
     // 4a. Aggregate total contributions for THIS specific article.
     const contributionsAggregation = await prisma.contribution.aggregate({
@@ -234,7 +230,7 @@ export async function endOfEventTransfer(eventId: number): Promise<void> {
     });
 
     const collectedDecimalOrNull = contributionsAggregation._sum.cashAmount;
-    let numericCollectedAmount: number = 0;
+    let numericCollectedAmount = 0;
 
     if (collectedDecimalOrNull) {
       numericCollectedAmount = typeof collectedDecimalOrNull === 'number' ? collectedDecimalOrNull : collectedDecimalOrNull.toNumber();

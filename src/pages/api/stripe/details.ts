@@ -77,12 +77,11 @@ export default async function handler(
           ? `${plannerUser.fname} ${plannerUser.lname}`
           : plannerUser.username;
 
-      return res.status(200).json({
-        itemName: article.item.name || undefined,
+      return res.status(200).json({        itemName: article.item.name ?? undefined,
         itemPrice,
         alreadyContributed: contribSum,
         parentEventId: article.event.id,
-        eventName: article.event.title || undefined,
+        eventName: article.event.title ?? undefined,
         eventPlanner: plannerName,
       });
     } catch (e) {
@@ -118,10 +117,8 @@ export default async function handler(
       const plannerName =
         event.user.fname && event.user.lname
           ? `${event.user.fname} ${event.user.lname}`
-          : event.user.username;
-
-      return res.status(200).json({
-        eventName: event.title || undefined,
+          : event.user.username;      return res.status(200).json({
+        eventName: event.title ?? undefined,
         eventPlanner: plannerName,
       });
     } catch (e) {

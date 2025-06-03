@@ -89,11 +89,10 @@ export default async function handler(
       );
 
       return res.status(200).json({ url });
-    }
-  } catch (err: any) {
+    }  } catch (err) {
     console.error("Error in createCheckoutLink:", err);
-    return res
-      .status(500)
-      .json({ error: err.message ?? "Internal server error." });
+    const statusCode = err instanceof Error && err.message.includes("not found") ? 404 : 500;
+    const errorMessage = err instanceof Error ? err.message : "Internal server error";
+    return res.status(statusCode).json({ error: errorMessage });
   }
 }

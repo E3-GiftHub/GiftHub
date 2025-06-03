@@ -12,6 +12,7 @@ import { userRouter as profileUserRouter } from "./routers/profileManagenemt/use
 import { userRouter } from "./routers/userRouter";
 import { authRouter } from "~/server/api/routers/authRouter";
 import { profileRouter } from "~/server/api/routers/profileRouter";
+import { stripeRouter } from "./routers/stripeRouter";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   invitationsNotification: invitesNotificationRouter,
   user: userRouter,
   email: emailRouter,
+  stripe: stripeRouter,
 });
 
 // export type definition of API

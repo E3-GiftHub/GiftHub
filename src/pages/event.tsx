@@ -32,9 +32,8 @@ export default function EventViewPage() {
     if (!eventIdTemp) return;
     console.log("Router is ready, id:", eventIdTemp);
   }, [router.isReady]);
-
   const { id } = router.query;
-  const eventId: number = Number(id);
+  const eventId = Number(id);
 
   const {
     data: eventData,
@@ -179,10 +178,9 @@ export default function EventViewPage() {
               location: eventData.location,
               date: eventData.date,
               planner: eventData.planner,
-              guests: eventData.guests,
-            }}
+              guests: eventData.guests,            }}
             onContribute={() => {
-              router.push(`/payment?eventid=${eventId}`);
+              void router.push(`/payment?eventid=${eventId}`);
             }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}

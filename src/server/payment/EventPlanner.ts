@@ -22,12 +22,10 @@ export class EventPlanner {
       throw new EventManagementException(
         `User with username '${data.createdBy}' not found.`
       );
-    }
-
-    let userWithStripe: User = user;
+    }    let userWithStripe: User = user;
 
     if (!userWithStripe.stripeConnectId) {
-      const userEmailForStripe = userWithStripe.email ? userWithStripe.email : undefined;
+      const userEmailForStripe = userWithStripe.email ?? undefined;
 
       const accountObject = await stripe.accounts.create({
         type: "express",
