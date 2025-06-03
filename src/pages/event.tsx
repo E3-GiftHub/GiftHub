@@ -72,7 +72,7 @@ export default function EventViewPage() {
   };
 
   const handleViewWishlist = () => {
-    void router.push(`/wishlist?eventId=${eventId}`);
+    void router.push(`/wishlist-view?eventId=${eventId}`);
   };
 
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function EventViewPage() {
               guests: eventData.guests,
             }}
             onContribute={() => {
-              router.push(`/payment?eventId=${eventId}`);
+              router.push(`/contribution-direct?eventId=${eventId}`);
             }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
