@@ -24,7 +24,6 @@ describe('UserProfileUI', () => {
         fname="John"
         lname="Doe"
         email="john@example.com"
-        iban="DE89 3704 0044 0532 0130 00"
         avatarUrl="/avatar.jpg"
       />
     );
@@ -33,7 +32,6 @@ describe('UserProfileUI', () => {
     expect(screen.getByText('John')).toBeInTheDocument();
     expect(screen.getByText('Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByText('DE89 3704 0044 0532 0130 00')).toBeInTheDocument();
     expect(screen.getByAltText('')).toHaveAttribute('src', '/avatar.jpg');
   });
 
@@ -72,7 +70,7 @@ describe('UserProfileUI', () => {
   });
 
   it('displays loading placeholders when loading is true', () => {
-    render(<UserProfileUI username="john" fname="John" lname="Doe" email="john@example.com" iban="IBAN" loading />);
+    render(<UserProfileUI username="john" fname="John" lname="Doe" email="john@example.com" loading />);
 
     const heading = screen.getByRole('heading', { level: 2 });
     expect(heading.textContent).toBe('\u00A0');
@@ -80,19 +78,5 @@ describe('UserProfileUI', () => {
     expect(nameFields.length).toBeGreaterThanOrEqual(3);
     const buttons = screen.getAllByRole('button');
     buttons.forEach(btn => expect(btn).toBeDisabled());
-  });
-
-  it('calls onPhotoChange when a file is selected', async () => {
-    const onPhotoChange = jest.fn();
-    render(<UserProfileUI onPhotoChange={onPhotoChange} />);
-    screen.getByLabelText('Edit avatar', { selector: 'button' });
-// simulate click to open file input
-    const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
-    const fileInput = screen.getByTestId('file-input');
-
-    Object.defineProperty(fileInput, 'files', { value: [file] });
-    fireEvent.change(fileInput);
-
-    await waitFor(() => expect(onPhotoChange).toHaveBeenCalledWith(file));
   });
 });

@@ -1,68 +1,25 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "src/styles/UserProfile/UserProfile.module.css";
-import Image from "next/image";
 import clsx from "clsx";
 import "src/styles/globals.css";
-import { router } from "next/client";
-import { useRouter } from "next/router"; // Corrected router import
+import type { Profile } from "~/models/Profile";
+import ProfileReportButton from "./ProfileReportButton";
 
 interface UserProfileProps {
-  username?: string;
-  fname?: string;
-  lname?: string;
-  avatarUrl?: string;
-  onReport?: () => void;
-  loading?: boolean;
-  email?: string;
-  iban?: string;
+  reporter: string | null;
+  profile: Profile;
+  onReport: (
+    reporter: string | null,
+    reported: string | null,
+    reason: string | null,
+    description: string | null,
+  ) => void;
 }
 
-const ProfileButton = ({
-  iconSrc,
-  alt,
-  children,
-  onClick,
-  loading,
-}: {
-  iconSrc: string;
-  alt: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-  loading?: boolean;
-}) => (
-  <button
-    className={clsx(
-      styles.button,
-      styles.buttonDanger,
-      loading && styles.loading,
-    )}
-    onClick={onClick}
-    disabled={loading}
-  >
-    {!loading && (
-      <>
-        <Image
-          src={iconSrc}
-          alt={alt}
-          width={20}
-          height={20}
-          className={styles.icon}
-        />
-        {children}
-      </>
-    )}
-  </button>
-);
-
 export default function ViewUserProfileUI({
-  username = "",
-  fname = "",
-  lname = "",
-  avatarUrl,
+  reporter,
+  profile,
   onReport,
-  loading = false,
-  email,
-  iban,
 }: Readonly<UserProfileProps>) {
   const [modalOpen, setModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -88,66 +45,58 @@ export default function ViewUserProfileUI({
     setSubmitted(true);
   };
 
-  const renderContent = (content: string) => (loading ? "\u00A0" : content);
-
   return (
     <>
       <div className={styles.pageWrapper}>
         <div className={styles.profileCard}>
           <div className={styles.avatarSection}>
             <div className={styles.avatarWrapper}>
-              <div
-                className={clsx(styles.avatarCircle, loading && styles.loading)}
-              >
-                {!loading && avatarUrl && (
-                  <Image
-                    src={avatarUrl}
-                    width={200}
-                    height={200}
-                    className={styles.avatarImage}
-                    alt={"User avatar"}
-                  />
-                )}
+              <div className={clsx(styles.avatarCircle /*styles.loading*/)}>
+                <img
+                  src={profile.pictureUrl ?? ""}
+                  width={200}
+                  height={200}
+                  className={styles.avatarImage}
+                  alt={"User avatar"}
+                />
               </div>
             </div>
           </div>
 
           <div className={styles.userInfo}>
-            <h2 className={clsx(styles.username, loading && styles.loading)}>
-              {renderContent(username)}
+            <h2 className={clsx(styles.username /*styles.loading*/)}>
+              {profile.username}
             </h2>
             <div className={styles.nameContainer}>
               <p
                 className={clsx(
                   styles.nameField,
-                  styles.fname,
-                  loading && styles.loading,
+                  styles.fname /*styles.loading*/,
                 )}
               >
-                {renderContent(fname)}
+                {profile.fname === null ? "null" : profile.fname}
                 &nbsp;&nbsp;&nbsp;&nbsp;|
               </p>
               <p
                 className={clsx(
                   styles.nameField,
-                  styles.lname,
-                  loading && styles.loading,
+                  styles.lname /*styles.loading*/,
                 )}
               >
                 &nbsp;
-                {renderContent(lname)}
+                {profile.lname === null ? "null" : profile.fname}
               </p>
             </div>
 
             <div className={styles.buttonContainer}>
-              <ProfileButton
+              <ProfileReportButton
                 iconSrc="illustrations/report.svg"
                 alt="Report account"
-                loading={loading}
+                loading={false}
                 onClick={handleReportClick}
               >
                 Report account
-              </ProfileButton>
+              </ProfileReportButton>
             </div>
           </div>
         </div>
@@ -162,7 +111,7 @@ export default function ViewUserProfileUI({
           aria-label="Close modal"
           onKeyDown={(e) => {
             // Support Enter/Space to close overlay
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === "Enter" || e.key === " ") {
               handleClose();
             }
           }}
@@ -208,7 +157,17 @@ export default function ViewUserProfileUI({
                 )}
 
                 <div className={styles.buttonContainerReport}>
-                  <button type="submit" className={styles.buttonSubmitReport}>
+                  <button
+                    onClick={() => {
+                      onReport(
+                        reporter,
+                        profile.username,
+                        reportReason,
+                        otherReason,
+                      );
+                    }}
+                    className={styles.buttonSubmitReport}
+                  >
                     Submit Report
                   </button>
                   <button

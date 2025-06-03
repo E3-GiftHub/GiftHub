@@ -5,12 +5,18 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
+
+
 const config = {
-    images: {
-    domains: [
-      "b6i98qhrlj.ufs.sh",
-    ],
-  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.ufs.sh",
+      }
+    ]
+  }
 };
 
 export default config;
+

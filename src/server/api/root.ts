@@ -17,6 +17,7 @@ import { userRouter } from "./routers/profileManagenemt/user";
 import { authRouter } from "~/server/api/routers/authRouter";
 import { profileRouter } from "~/server/api/routers/profileRouter";
 
+
 /**
  * This is the primary router for your server.
  *
@@ -53,5 +54,5 @@ export type AppRouter = typeof appRouter;
  * const res = await trpc.post.all();
  *       ^? inferred Post[]
  */
-//export const createCaller = createCallerFactory<AppRouter>(appRouter);
-export const createCaller = appRouter.createCaller;
+export const createCaller = createCallerFactory(appRouter);
+

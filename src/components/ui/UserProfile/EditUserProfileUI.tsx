@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
+import {UploadButton} from "~/utils/uploadthing";
 import "src/styles/globals.css";
-import {useUploadThing} from "~/utils/uploadthing";
+
+// import {useUploadThing} from "~/utils/uploadthing";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
+import { jest } from "@jest/globals";
 
 interface EditUserProfileProps {
   username?: string;
@@ -20,21 +24,24 @@ interface EditUserProfileProps {
   ) => void;
   onResetPassword?: () => void;
   loading?: boolean;
-  disableUsernameEditing?: boolean; // <-- new prop added here
+  disableUsernameEditing?: boolean;
+  onPhotoChange?: (file: File) => void;
 }
 
 const ProfileButton = ({
-                         iconSrc,
-                         alt,
-                         children,
-                         onClick,
-                         loading,
-                         disabled,
-                       }: {
+  iconSrc,
+  alt,
+  children,
+  onClick,
+  onPhotoChange,
+  loading,
+  disabled,
+}: {
   iconSrc: string;
   alt: string;
   children: React.ReactNode;
   onClick?: () => void;
+  onPhotoChange?: (file: File) => void;
   loading?: boolean;
   disabled?: boolean;
 }) => (
@@ -45,7 +52,13 @@ const ProfileButton = ({
   >
     {!loading && (
       <>
-        <Image src={iconSrc} alt={alt} width={18} height={18} className={styles.icon} />
+        <Image
+          src={iconSrc}
+          alt={alt}
+          width={18}
+          height={18}
+          className={styles.icon}
+        />
         {children}
       </>
     )}
@@ -53,21 +66,54 @@ const ProfileButton = ({
 );
 
 export default function EditUserProfileUI({
-                                            username = "",
-                                            email = "",
-                                            fname = "",
-                                            lname = "",
-                                            avatarUrl,
-                                            onSave,
-                                            onResetPassword,
-                                            loading = false,
-                                            disableUsernameEditing = false, // default false
-                                          }: Readonly<EditUserProfileProps>) {
+  username = "",
+  email = "",
+  fname = "",
+  lname = "",
+  avatarUrl,
+  onSave,
+  onResetPassword,
+  loading = false,
+  disableUsernameEditing = false,
+  onPhotoChange,
+}: Readonly<EditUserProfileProps>) {
   const [usernameInput, setUsernameInput] = useState(username);
   const [emailInput, setEmailInput] = useState(email);
   const [fnameInput, setFnameInput] = useState(fname);
   const [lnameInput, setLnameInput] = useState(lname);
   const [emailError, setEmailError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.result) {
+        setPreviewUrl(reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+
+    // Call onPhotoChange with the selected file
+    if (onPhotoChange) {
+      onPhotoChange(file);
+    }
+
+    try {
+      /*const res await startUpload([file]);
+      if (res?.[0]?.url) {
+        setPreviewUrl(res[0].url);
+      }
+          */
+    } catch (error) {
+      toast.error("Error uploading profile picture");
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     setUsernameInput(username);
@@ -84,7 +130,9 @@ export default function EditUserProfileUI({
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmailInput(value);
-    setEmailError(validateEmail(value) ? "" : "Please enter a valid email address");
+    setEmailError(
+      validateEmail(value) ? "" : "Please enter a valid email address",
+    );
   };
 
   const handleSave = () => {
@@ -93,12 +141,26 @@ export default function EditUserProfileUI({
     }
   };
 
+  const onUploadComplete = (res: {url: string}[]) => {
+    if(res[0]?.url) {
+      setPreviewUrl(res[0].url);
+    }
+    alert("Upload complete");
+  }
+
+  const onUploadError = (error: Error) => {
+    console.error(error);
+    alert("Upload error");
+  }
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
+            <div
+              className={clsx(styles.avatarCircle, loading && styles.loading)}
+            >
               {!loading && avatarUrl && (
                 <Image
                   src={avatarUrl}
@@ -109,6 +171,21 @@ export default function EditUserProfileUI({
                 />
               )}
             </div>
+            <UploadButton
+              className={styles.customUploadButton}
+              endpoint="profilePfpUploader"
+              input={{username: usernameInput}}
+              onClientUploadComplete={onUploadComplete}
+              onUploadError={onUploadError}
+              appearance={{
+                button: {
+                  opacity: 0,
+                },
+                allowedContent: {
+                  display: "none",
+                },
+              }}
+              />
           </div>
         </div>
 
@@ -120,10 +197,11 @@ export default function EditUserProfileUI({
             <input
               id="username"
               type="text"
+              placeholder="username..."
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading} // <-- disable username input if prop true
+              disabled={loading || disableUsernameEditing}
             />
           </div>
 
@@ -134,6 +212,7 @@ export default function EditUserProfileUI({
             <input
               id="fname"
               type="text"
+              placeholder="FirstName..."
               value={fnameInput}
               onChange={(e) => setFnameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
@@ -148,6 +227,7 @@ export default function EditUserProfileUI({
             <input
               id="lname"
               type="text"
+              placeholder="LastName..."
               value={lnameInput}
               onChange={(e) => setLnameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
@@ -162,25 +242,16 @@ export default function EditUserProfileUI({
             <input
               id="email"
               type="email"
+              placeholder="yourNewEmail@..com."
               value={emailInput}
               onChange={handleEmailChange}
               className={clsx(styles.inputField, loading && styles.loading)}
               disabled={loading}
             />
-            {emailError && <div className={styles.errorMessage}>{emailError}</div>}
+            {emailError && (
+              <div className={styles.errorMessage}>{emailError}</div>
+            )}
           </div>
-
-          {/*<div className={styles.inputGroup}>*/}
-          {/*  <label htmlFor="iban" className={styles.inputLabel}>*/}
-          {/*    /!* IBAN *!/*/}
-          {/*  </label>*/}
-          {/*  <input*/}
-          {/*    id="iban"*/}
-          {/*    type="text"*/}
-          {/*    className={clsx(styles.inputField, loading && styles.loading)}*/}
-          {/*    disabled={loading}*/}
-          {/*  />*/}
-          {/*</div>*/}
 
           <div className={styles.buttonContainer}>
             <ProfileButton

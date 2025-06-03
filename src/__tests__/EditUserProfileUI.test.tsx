@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EditUserProfileUI from '~/components/ui/UserProfile/EditUserProfileUI';
 
@@ -11,7 +11,6 @@ describe('EditUserProfileUI', () => {
     fname: 'First',
     lname: 'Last',
     email: 'test@example.com',
-    IBAN: 'DE1234567890',
     avatarUrl: '/avatar.jpg',
     onSave: mockOnSave,
     onResetPassword: mockOnResetPassword,
@@ -28,7 +27,6 @@ describe('EditUserProfileUI', () => {
     expect(screen.getByDisplayValue('First')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Last')).toBeInTheDocument();
     expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('DE1234567890')).toBeInTheDocument();
     expect(screen.getByRole('img')).toHaveAttribute('src', '/avatar.jpg');
     expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reset password/i })).toBeInTheDocument();
@@ -67,7 +65,7 @@ describe('EditUserProfileUI', () => {
     fireEvent.change(screen.getByDisplayValue('testuser'), { target: { value: 'newuser' } });
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
 
-    expect(mockOnSave).toHaveBeenCalledWith('First', 'Last', 'newuser', 'test@example.com', 'DE1234567890');
+    expect(mockOnSave).toHaveBeenCalledWith('First', 'Last', 'newuser', 'test@example.com');
   });
 
   test('does not call onSave when email is invalid', () => {
@@ -104,7 +102,6 @@ describe('EditUserProfileUI', () => {
         fname="NewFirst"
         lname="NewLast"
         email="new@example.com"
-        IBAN="FR0987654321"
       />
     );
 
@@ -112,12 +109,25 @@ describe('EditUserProfileUI', () => {
     expect(screen.getByDisplayValue('NewFirst')).toBeInTheDocument();
     expect(screen.getByDisplayValue('NewLast')).toBeInTheDocument();
     expect(screen.getByDisplayValue('new@example.com')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('FR0987654321')).toBeInTheDocument();
   });
 
   test('handles empty initial values', () => {
     render(<EditUserProfileUI />);
     expect(screen.getByRole('textbox', { name: /username/i })).toHaveValue('');
     expect(screen.getByRole('textbox', { name: /email/i })).toHaveValue('');
+  });
+
+  test('calls onPhotoChange when a file is selected', async () => {
+    const onPhotoChange = jest.fn();
+    render(<EditUserProfileUI onPhotoChange={onPhotoChange} />);
+    screen.getByLabelText('Edit avatar', { selector: 'button' });
+
+    const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
+    const fileInput = screen.getByTestId('file-input');
+
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fireEvent.change(fileInput);
+
+    await waitFor(() => expect(onPhotoChange).toHaveBeenCalledWith(file));
   });
 });

@@ -1,13 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
-import styles from 'src/styles/UserProfile/UserProfile.module.css';
-import Image from 'next/image';
-import clsx from 'clsx';
+import React, { useRef, useState, useEffect } from "react";
+import styles from "src/styles/UserProfile/UserProfile.module.css";
+import Image from "next/image";
+import clsx from "clsx";
 import "src/styles/globals.css";
-import { useRouter } from 'next/router';
-import { signOut } from 'next-auth/react';
-import {useUploadThing} from "~/utils/uploadthing";
-import {toast} from "sonner";
-import { api } from "src/trpc/react";// Assuming this is your TRPC hook location
+import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
+import { UploadButton } from "~/utils/uploadthing";
+import { toast } from "sonner";
+import { api } from "src/trpc/react"; // Assuming this is your TRPC hook location
 
 interface UserProfileProps {
   username?: string;
@@ -18,17 +18,16 @@ interface UserProfileProps {
   avatarUrl?: string;
   onDelete?: () => void;
   onEdit?: () => void;
-  onPhotoChange?: (file: File) => void;
   loading?: boolean;
 }
 
 const ProfileButton = ({
-                         iconSrc,
-                         alt,
-                         children,
-                         onClick,
-                         loading,
-                       }: {
+  iconSrc,
+  alt,
+  children,
+  onClick,
+  loading,
+}: {
   iconSrc: string;
   alt: string;
   children: React.ReactNode;
@@ -42,7 +41,13 @@ const ProfileButton = ({
   >
     {!loading && (
       <>
-        <Image src={iconSrc} alt={alt} width={18} height={18} className={styles.icon} />
+        <Image
+          src={iconSrc}
+          alt={alt}
+          width={18}
+          height={18}
+          className={styles.icon}
+        />
         {children}
       </>
     )}
@@ -50,101 +55,60 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-                                        username = "",
-                                        fname = "",
-                                        lname = "",
-                                        email = "",
-                                        iban = "",
-                                        avatarUrl,
-                                        onDelete,
-                                        onEdit,
-                                        onPhotoChange,
-                                        loading = false,
-                                      }: Readonly<UserProfileProps>) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  username = "",
+  fname = "",
+  lname = "",
+  email = "",
+  iban = "",
+  avatarUrl,
+  onDelete,
+  onEdit,
+    loading = false,
+}: Readonly<UserProfileProps>) {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
-  const { startUpload } = useUploadThing("profilePicture");
+  // const { startUpload } = useUploadThing("profilePicture");
   const router = useRouter();
 
   useEffect(() => {
     setPreviewUrl(avatarUrl);
   }, [avatarUrl]);
 
-  const renderContent = (content: string) => (loading ? '\u00A0' : content);
-
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    // const file = event.target.files?.[0];
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = () => {
-    //     if (reader.result) {
-    //       setPreviewUrl(reader.result as string);
-    //     }
-    //   };
-    //   reader.readAsDataURL(file);
-    //
-    //   if (onPhotoChange) {
-    //     onPhotoChange(file);
-    //   }
-    // }
-
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (reader.result) {
-        setPreviewUrl(reader.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
-
-    try {
-      const res = await startUpload([file]);
-      if (res?.[0]?.url) {
-        setPreviewUrl(res[0].url);
-        if (onPhotoChange) {
-          onPhotoChange(file);
-        }
-      }
-    } catch (error) {
-      toast.error("Error uploading profile picture");
-      console.error(error);
-    }
-  };
+  const renderContent = (content: string) => (loading ? "\u00A0" : content);
 
   const handleEdit = async () => {
     if (onEdit) {
       onEdit();
     } else {
-      await router.push("/editprofile");
+      await router.push("/profile-edit");
     }
   };
 
-  //const deleteUserMutation = api.user.deleteUser.useMutation();
+  const deleteUserMutation = api.profile.user.delete.useMutation();
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    /*if (!confirmed) return;
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone.",
+    );
+    if (!confirmed) return;
 
     try {
       await deleteUserMutation.mutateAsync();
-      await signOut({ callbackUrl: "/" });
+      document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+      await signOut({ redirectTo: "/" });
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("An unexpected error occurred while deleting your account.");
     }*/
   };
 
-
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
-            <div className={clsx(styles.avatarCircle, loading && styles.loading)}>
+            <div
+              className={clsx(styles.avatarCircle, loading && styles.loading)}
+            >
               {!loading && previewUrl && (
                 <Image
                   src={previewUrl}
@@ -155,20 +119,6 @@ export default function UserProfileUI({
                 />
               )}
             </div>
-
-            <button
-              className={clsx(styles.editAvatarButton, loading && styles.loading)}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading}
-              aria-label="Edit avatar"
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
           </div>
         </div>
 
@@ -177,11 +127,23 @@ export default function UserProfileUI({
             {renderContent(username)}
           </h2>
           <div className={styles.nameContainer}>
-            <p className={clsx(styles.nameField, styles.fname, loading && styles.loading)}>
+            <p
+              className={clsx(
+                styles.nameField,
+                styles.fname,
+                loading && styles.loading,
+              )}
+            >
               {renderContent(fname)}&nbsp;&nbsp;&nbsp;&nbsp;|
             </p>
-            <p className={clsx(styles.nameField, styles.lname, loading && styles.loading)}>
-              &nbsp;&nbsp;{renderContent(lname)}
+            <p
+              className={clsx(
+                styles.nameField,
+                styles.lname,
+                loading && styles.loading,
+              )}
+            >
+              &nbsp;{renderContent(lname)}
             </p>
           </div>
           <p className={clsx(styles.email, loading && styles.loading)}>
