@@ -22,6 +22,10 @@ export const env = createEnv({
     STRIPE_SECRET_KEY:    z.string(),
     STRIPE_WEBHOOK_SECRET: z.string(),
     DOMAIN_URL:            z.string().url(),
+    SMTP_HOST: z.string(),
+    SMTP_PORT: z.string(), 
+    SMTP_USER: z.string().email(),
+    SMTP_PASS: z.string(),
   },
 
   /**
@@ -47,6 +51,10 @@ export const env = createEnv({
     STRIPE_SECRET_KEY:     process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     DOMAIN_URL:            process.env.DOMAIN_URL,
+    SMTP_HOST: process.env.SMTP_HOST,
+    SMTP_PORT: process.env.SMTP_PORT,
+    SMTP_USER: process.env.SMTP_USER,
+    SMTP_PASS: process.env.SMTP_PASS,
   },
 
   /**

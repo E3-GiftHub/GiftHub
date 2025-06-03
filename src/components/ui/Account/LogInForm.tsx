@@ -2,8 +2,6 @@ import {signIn} from "next-auth/react";
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
-
-// import { api } from "~/trpc/react";
 import Link from "next/link";
 
 export default function LogInForm() {
@@ -146,7 +144,7 @@ export default function LogInForm() {
             </div>
           </div>
           <p className={styles.forgotPassword}>
-            <Link href="/forgotpassword" className={styles.forgotPassword}>
+            <Link href="/forgot-password" className={styles.forgotPassword}>
               Forgot password?
             </Link>
           </p>

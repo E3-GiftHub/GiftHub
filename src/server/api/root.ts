@@ -7,6 +7,7 @@ import { eventRouter } from "./routers/eventRouter";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
+import { emailRouter } from "~/server/api/routers/emailRouter";
 
 import { authRouter } from "./routers/authRouter";
 import { stripeRouter } from "~/server/api/routers/stripeRouter";
@@ -34,6 +35,8 @@ export const appRouter = createTRPCRouter({
   invitationsNotification: invitesNotificationRouter,
   stripe: stripeRouter,
   user: userRouter,
+  email: emailRouter,
+
 });
 
 // export type definition of API
