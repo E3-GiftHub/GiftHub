@@ -123,11 +123,11 @@ export default function UserProfileUI({
     }
   };
 
-  const deleteUserMutation = api.user.deleteUser.useMutation();
+  //const deleteUserMutation = api.user.deleteUser.useMutation();
 
   const handleDelete = async () => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (!confirmed) return;
+    /*if (!confirmed) return;
 
     try {
       await deleteUserMutation.mutateAsync();
@@ -135,7 +135,7 @@ export default function UserProfileUI({
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("An unexpected error occurred while deleting your account.");
-    }
+    }*/
   };
 
 
