@@ -1,6 +1,9 @@
-"use client";
+import {
+  generateUploadButton,
+  generateUploadDropzone,
+} from "@uploadthing/react";
 
-import {generateReactHelpers} from "@uploadthing/react";
-import type {OurFileRouter} from "~/app/api/uploadthing/core";
+import type { ourFileRouter } from "~/app/api/uploadthing/core";
 
-export const {useUploadThing, uploadFiles} = generateReactHelpers<OurFileRouter>();
+export const UploadButton = generateUploadButton<typeof ourFileRouter>();
+export const UploadDropzone = generateUploadDropzone<typeof ourFileRouter>();
