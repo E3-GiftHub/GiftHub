@@ -1,18 +1,17 @@
 import styles from "../styles/EventView.module.css";
 import loadingStyles from "../styles/wishlistcomponent.module.css";
-import buttonStyles from "../styles/Button.module.css";
 
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { UploadButton } from "~/utils/uploadthing";
-import { api } from "~/trpc/react";
+import { api } from "~/trpc/react"; // <-- FIXED: use the React hooks client
 
 import Head from "next/head";
 import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
 import MediaModal from "~/components/MediaModal";
 import Footer from "~/components/Footer";
+import UploadModal from "~/components/UploadMediaModal";
 import type { MediaHeader } from "~/models/MediaHeader";
 import NotInvited from "@/components/notinvited";
 
@@ -183,11 +182,9 @@ export default function EventViewPage() {
               guests: eventData.guests,
             }}
             onContribute={() => {
-              router.push(`/contribution-direct?eventId=${eventId}`);
+              router.push(`/payment?eventId=${eventId}`);
             }}
-            onViewWishlist={() => {
-              router.push(`/wishlist-view?eventId=${eventId}`);
-            }}
+            onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
             onReport={handleReport}
             onViewProfile={handleViewProfile}
@@ -204,70 +201,18 @@ export default function EventViewPage() {
           )}
 
           {/* THE UPLOADING MODAL */}
-          {showUploadModal && (
-            <div className={styles.modalBackdrop}>
-              <div className={styles.uploadModal}>
-                <h3 className={styles.modalTitle}>Upload Media</h3>
-                <input
-                  type="text"
-                  className={styles.captionInput}
-                  placeholder="Enter caption"
-                  value={captionInput}
-                  onChange={(e) => setCaptionInput(e.target.value)}
-                />
-                <div className={styles.fileInputWrapper}>
-                  <UploadButton
-                    endpoint="imageUploader"
-                    input={{
-                      username: session?.user?.name ?? "",
-                      eventId,
-                      caption: captionInput,
-                    }}
-                    onClientUploadComplete={() => {
-                      alert("Upload completed");
-                      setShowUploadModal(false);
-                      setCaptionInput("");
-                    }}
-                    onUploadError={(err) => alert(`Error: ${err.message}`)}
-                    appearance={{
-                      button: {
-                        background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-                        boxShadow: "0 4px 15px rgba(139, 92, 246, 0.3)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "0.75rem",
-                        padding: "0.75rem 1.5rem",
-                        fontSize: "1rem",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        width: "100%",
-                        minHeight: "48px",
-                        transition: "all 0.2s ease",
-                      },
-                      allowedContent: {
-                        display: "none",
-                      },
-                    }}
-                    content={{
-                      button: "Choose Image",
-                      allowedContent: "",
-                    }}
-                  />
-                </div>
-                <div className={styles.uploadActions}>
-                  <button
-                    className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                    onClick={() => {
-                      setShowUploadModal(false);
-                      setCaptionInput("");
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          <UploadModal
+            showUploadModal={showUploadModal}
+            captionInput={captionInput}
+            isUploading={isUploading}
+            eventId={eventId}
+            onClose={handleUploadClose}
+            onCaptionChange={setCaptionInput}
+            onUploadBegin={handleUploadBegin}
+            onUploadComplete={handleUploadComplete}
+            onUploadError={handleUploadError}
+            onRefetchMedia={refetchMedia}
+          />
         </main>
       </div>
       <Footer />
