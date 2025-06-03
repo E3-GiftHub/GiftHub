@@ -24,6 +24,7 @@ export default function EventViewPage() {
   const [mediaArray, setMediaArray] = useState<MediaHeader[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [captionInput, setCaptionInput] = useState("");
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -166,32 +167,71 @@ export default function EventViewPage() {
           {/* THE UPLOADING MODAL */}
           {showUploadModal && (
             <div className={styles.modalBackdrop}>
-              <div className={styles.modal}>
+              <div className={styles.uploadModal}>
                 <h3 className={styles.modalTitle}>Upload Media</h3>
-                <UploadButton
-                  endpoint="imageUploader"
-                  input={{
-                    username: session?.user?.name ?? "",
-                    eventId: eventId,
-                    caption: "varza", //todo ask for user input here
-                  }}
-                  onClientUploadComplete={(res) => {
-                    console.log("Files:", res);
-                    alert("Upload completed");
-                    setShowUploadModal(false);
-                  }}
-                  onUploadError={(err: Error) => {
-                    alert(`Error: ${err.message}`);
-                  }}
+
+                {/* Caption */}
+                <input
+                  type="text"
+                  className={styles.captionInput}
+                  placeholder="Enter caption"
+                  value={captionInput}
+                  onChange={(e) => setCaptionInput(e.target.value)}
                 />
 
-                <button
-                  className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                  onClick={() => setShowUploadModal(false)}
-                  style={{ marginTop: "1rem" }}
-                >
-                  Cancel
-                </button>
+                {/* File picker (UploadButton) */}
+                <div className={styles.fileInputWrapper}>
+                  <UploadButton
+                    endpoint="imageUploader"
+                    input={{
+                      username: session?.user?.name ?? "",
+                      eventId,
+                      caption: captionInput,
+                    }}
+                    onClientUploadComplete={(res) => {
+                      alert("Upload completed");
+                      setShowUploadModal(false);
+                      setCaptionInput("");
+                    }}
+                    onUploadError={(err) => alert(`Error: ${err.message}`)}
+                    appearance={{
+                      button: {
+                        background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                        boxShadow: "0 4px 15px rgba(139, 92, 246, 0.3)",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "0.75rem",
+                        padding: "0.75rem 1.5rem",
+                        fontSize: "1rem",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        width: "100%",
+                        minHeight: "48px",
+                        transition: "all 0.2s ease",
+                      },
+                      allowedContent: {
+                        display: "none",
+                      },
+                    }}
+                    content={{
+                      button: "Choose Image",
+                      allowedContent: "",
+                    }}
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className={styles.uploadActions}>
+                  <button
+                    className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+                    onClick={() => {
+                      setShowUploadModal(false);
+                      setCaptionInput("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           )}
