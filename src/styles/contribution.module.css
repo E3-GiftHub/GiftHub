@@ -9,9 +9,16 @@
 .giftHubPage main {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 60px 20px 20px;
+}
+.notInvitedWrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
 }
 
 .contentWrapper {
@@ -199,4 +206,8 @@
   .customAmountInput {
     padding: 10px 14px;
   }
+}
+
+.footer {
+  margin-top: auto;
 }
