@@ -13,3 +13,4 @@ Say goodbye to awkward gift planning - this platform makes it easy to give and r
 ## 🤝 Contributing
 
 Contributions, ideas, and feedback are welcome! Feel free to open an issue to discuss improvements.
+
