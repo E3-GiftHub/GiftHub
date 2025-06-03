@@ -14,6 +14,6 @@ export interface TrendingItem {
 }
 
 export interface WishlistProps {
-  contribution: () => void;
+  contribution: (articleId: number) => void;
   eventId?: string | string[];
 }

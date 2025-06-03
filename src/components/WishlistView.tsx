@@ -188,9 +188,8 @@ const Wishlist: React.FC<WishlistProps> = ({
       );
     } else {
       const currentAmount = Number(item.contribution?.current) || 0;
-      const totalAmount = Number(item.pret);
-      if (currentAmount < totalAmount && contribution) {
-        contribution();
+      const totalAmount = Number(item.pret);      if (currentAmount < totalAmount && contribution) {
+        contribution(id);
       }
     }
   };
