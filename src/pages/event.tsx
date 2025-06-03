@@ -67,7 +67,7 @@ export default function EventViewPage() {
   };
 
   const handleViewProfile = (username: string) => {
-    void router.push(`/view-profile?username=${username}`);
+    void router.push(`/profile-view?username=${username}`);
   };
 
   const handleViewWishlist = () => {
