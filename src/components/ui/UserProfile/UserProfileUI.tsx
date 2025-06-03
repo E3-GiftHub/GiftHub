@@ -18,7 +18,6 @@ interface UserProfileProps {
   avatarUrl?: string;
   onDelete?: () => void;
   onEdit?: () => void;
-  onPhotoChange?: (file: File) => void;
   loading?: boolean;
 }
 
@@ -64,10 +63,8 @@ export default function UserProfileUI({
   avatarUrl,
   onDelete,
   onEdit,
-  onPhotoChange,
-  loading = false,
+    loading = false,
 }: Readonly<UserProfileProps>) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
   // const { startUpload } = useUploadThing("profilePicture");
   const router = useRouter();
@@ -77,50 +74,6 @@ export default function UserProfileUI({
   }, [avatarUrl]);
 
   const renderContent = (content: string) => (loading ? "\u00A0" : content);
-
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    // const file = event.target.files?.[0];
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = () => {
-    //     if (reader.result) {
-    //       setPreviewUrl(reader.result as string);
-    //     }
-    //   };
-    //   reader.readAsDataURL(file);
-    //
-    //   if (onPhotoChange) {
-    //     onPhotoChange(file);
-    //   }
-    // }
-
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (reader.result) {
-        setPreviewUrl(reader.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
-
-    try {
-      /*const res await startUpload([file]);
-      if (res?.[0]?.url) {
-        setPreviewUrl(res[0].url);
-        if (onPhotoChange) {
-          onPhotoChange(file);
-        }
-      }
-          */
-    } catch (error) {
-      toast.error("Error uploading profile picture");
-      console.error(error);
-    }
-  };
 
   const handleEdit = async () => {
     if (onEdit) {
@@ -166,23 +119,6 @@ export default function UserProfileUI({
                 />
               )}
             </div>
-
-            <button
-              className={clsx(
-                styles.editAvatarButton,
-                loading && styles.loading,
-              )}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={loading}
-              aria-label="Edit avatar"
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
           </div>
         </div>
 
