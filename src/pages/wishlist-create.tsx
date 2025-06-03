@@ -79,22 +79,53 @@ export default function CreateWishlist() {
     router.back();
   };
 
-  const handleAddToWishlist = (item: {
-    name: string;
-    photo: string;
-    price: string;
-    quantity: number;
-  }) => {
-    if (!mockWishlists.has(eventId as string)) {
-      mockWishlists.set(eventId as string, { items: [] });
+  const { mutateAsync: addItemToWishlist } = api.wishlist.addItem.useMutation();
+
+const handleAddToWishlist = async (item: {
+  name: string;
+  photo: string;
+  price: string;
+  quantity: number;
+}) => {
+  try {
+
+    // 1. First, save the item into the `Item` table (this logic needs an endpoint if not already present)
+    const itemResponse = await fetch("/api/item-create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: item.name,
+        description: "", // optional
+        imagesUrl: item.photo,
+        price: (item.price ?? "").split(" ")[0],
+      }),
+    });
+
+    const result = await itemResponse.json();
+    console.log("🪵 /api/item-create result:", result);
+    const itemId = result.itemId;
+    if (!itemId) {
+      throw new Error("Item creation failed. No ID returned.");
     }
-    const wishlist = mockWishlists.get(eventId as string);
-    if (wishlist) {
-      wishlist.items.push(item);
-      console.log("Added item to wishlist:", item);
-    }
-    closeModal();
-  };
+
+        // 2. Add to wishlist (EventArticle)
+        await addItemToWishlist({
+          eventId: Number(eventId),
+          item: {
+            itemId,
+            quantity: item.quantity,
+            priority: "LOW",
+          },
+        });
+
+        console.log("Item added to wishlist in DB");
+        closeModal();
+        router.back(); // optional
+      } catch (err) {
+        console.error("❌ Failed to add item to wishlist", err);
+      }
+    };
+
 
   return (
     <div className={styles.pageWrapper}>

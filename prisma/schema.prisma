@@ -201,6 +201,7 @@ model Item {
 
     retailerId Int?
     retailer   Retailer? @relation(fields: [retailerId], references: [id], onDelete: SetNull)
+    quantity     Int      @default(1) 
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
