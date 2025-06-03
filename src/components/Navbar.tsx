@@ -243,7 +243,11 @@ const Navbar = () => {
                   href="/#"
                   onClick={(e) => {
                     e.preventDefault();
-                    void signOut({ callbackUrl: "/" });
+                    document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+                    void signOut({
+                      redirectTo: "/"
+                    });
+
                   }}
                 >
                   <FaSignOutAlt /> Logout

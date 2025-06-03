@@ -7,10 +7,17 @@ import { eventRouter } from "./routers/eventRouter";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
+import { emailRouter } from "~/server/api/routers/emailRouter";
+<<<<<<< HEAD
 
 import { authRouter } from "./routers/authRouter";
 import { stripeRouter } from "~/server/api/routers/stripeRouter";
 import { userRouter } from "~/server/api/routers/userRouter"; // presupunând că fișierul se numește userRouter.ts și este în același director 'routers'
+=======
+import { userRouter } from "./routers/profileManagenemt/user";
+import { authRouter } from "~/server/api/routers/authRouter";
+import { profileRouter } from "~/server/api/routers/profileRouter";
+>>>>>>> 5ba3b99c7b5f4037fc89fc33c2e5cb4bd5b1ca81
 
 /**
 
@@ -24,6 +31,7 @@ import { userRouter } from "~/server/api/routers/userRouter"; // presupunând c�
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
+  profile: profileRouter,
   calendar: calendarRouter,
   eventPreview: upcomingEventsRouter,
   invitationPreview: invitationsRouter,
@@ -32,8 +40,12 @@ export const appRouter = createTRPCRouter({
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
   invitationsNotification: invitesNotificationRouter,
+<<<<<<< HEAD
   stripe: stripeRouter,
+=======
+>>>>>>> 5ba3b99c7b5f4037fc89fc33c2e5cb4bd5b1ca81
   user: userRouter,
+  email: emailRouter,
 });
 
 // export type definition of API
@@ -55,3 +67,4 @@ export type AppRouter = typeof appRouter;
  */
 
 export const createCaller = createCallerFactory(appRouter);
+

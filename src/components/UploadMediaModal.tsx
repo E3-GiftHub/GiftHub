@@ -4,16 +4,16 @@ import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
 interface UploadModalProps {
-  showUploadModal: boolean;
-  captionInput: string;
-  isUploading: boolean;
-  eventId: number;
-  onClose: () => void;
-  onCaptionChange: (caption: string) => void;
-  onUploadBegin: () => void;
-  onUploadComplete: () => void;
-  onUploadError: (error: Error) => void;
-  onRefetchMedia: () => void; // Add this new prop
+  readonly showUploadModal: boolean;
+  readonly captionInput: string;
+  readonly isUploading: boolean;
+  readonly eventId: number;
+  readonly onClose: () => void;
+  readonly onCaptionChange: (caption: string) => void;
+  readonly onUploadBegin: () => void;
+  readonly onUploadComplete: () => void;
+  readonly onUploadError: (error: Error) => void;
+  readonly onRefetchMedia: () => void;
 }
 
 export default function UploadModal({
@@ -26,7 +26,7 @@ export default function UploadModal({
   onUploadBegin,
   onUploadComplete,
   onUploadError,
-  onRefetchMedia, // Add this
+  onRefetchMedia,
 }: UploadModalProps) {
   const { data: session } = useSession();
 
@@ -38,7 +38,7 @@ export default function UploadModal({
 
   const handleUploadComplete = () => {
     onUploadComplete();
-    onRefetchMedia(); // Call refetch after upload completes
+    onRefetchMedia(); 
   };
 
   return (
@@ -72,7 +72,7 @@ export default function UploadModal({
                 caption: captionInput,
               }}
               onUploadBegin={onUploadBegin}
-              onClientUploadComplete={handleUploadComplete} // Use our wrapper function
+              onClientUploadComplete={handleUploadComplete}
               onUploadError={onUploadError}
               appearance={{
                 button: {

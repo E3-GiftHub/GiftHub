@@ -100,7 +100,7 @@ model User {
     stripeConnectId String? // NOT UNIQUE: only one null value allowed
     emailToken      String? // NOT UNIQUE: only one null value allowed
     tokenExpires    DateTime?
-    pictureUrl      String?
+    pictureUrl      String?   @default("/UserImages/default_pfp.svg")
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -150,7 +150,7 @@ model Event {
     location    String?
     date        DateTime?
     time        DateTime?
-    pictureUrl  String?
+    pictureUrl  String?   @default("/UserImages/default_pfp.svg")
     token       String?
 
     createdByUsername String   @default("DELETED_USER")
