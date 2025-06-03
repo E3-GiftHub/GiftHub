@@ -580,7 +580,7 @@ export default function EventView() {
               </button>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                onClick={() => router.push(`/wishlist-create?eventId=${eventId}`)}
+                onClick={() => router.push(`/wishlist?eventId=${eventId}`)}
               >
                 View Wishlist
               </button>

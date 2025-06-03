@@ -11,13 +11,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { id, ...safeData } = req.body;
     try{
+        const existingItem = await db.item.findFirst({
+        where: {
+            name : safeData.name,
+            price: safeData.price,
+            description: safeData.description,
+            },
+         });
+
+    if (existingItem) {
+      console.log("📦 Existing item reused:", existingItem.id);
+      return res.status(200).json({ itemId: existingItem.id });
+    }
+
         const newItem = await db.item.create({
         data: {
             name: safeData.name,
             description: safeData.description,
             imagesUrl: safeData.imagesUrl,
             price: safeData.price,
-        },
+            },
         });
 
     console.log("✅ Item created:", newItem);
