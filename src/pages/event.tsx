@@ -106,13 +106,11 @@ export default function EventViewPage() {
   }, [eventId]);
 
   //! RENDER ALL DATA
-  if (!id || !eventData || isNaN(eventId) || error) {
-    return <p>error: Invalid event ID - {error?.message}</p>;
-  }
+  if (!session?.user) return <p>Please login first...</p>;
+  if (isLoading) return <p>Loading event...</p>;
 
-  if (isLoading) {
-    return <p>Loading event...</p>;
-  }
+  if (error || !id || !eventData)
+    return <p>error: Invalid event ID - {error?.message}</p>;
 
   return (
     <>
@@ -164,7 +162,11 @@ export default function EventViewPage() {
                 <h3 className={styles.modalTitle}>Upload Media</h3>
                 <UploadButton
                   endpoint="imageUploader"
-                  input={{ eventId }}
+                  input={{
+                    username: session?.user?.name ?? "",
+                    eventId: eventId,
+                    caption: "varza", //todo ask for user input here
+                  }}
                   onClientUploadComplete={(res) => {
                     console.log("Files:", res);
                     alert("Upload completed");

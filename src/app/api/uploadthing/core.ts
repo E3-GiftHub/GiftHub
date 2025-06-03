@@ -1,47 +1,99 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { PrismaClient } from "@prisma/client";
+import { db as prisma } from "~/server/db";
 import { z } from "zod";
 
-const prisma = new PrismaClient();
-const auth = (req: Request) => ({ id: "user1" }); // fake auth
-
-// ─── 1. Definești forma de „input” și „output” pentru fiecare routeSlug ───
 export type OurFileRouter = {
   imageUploader: {
-    input: { eventId: number };
-    output: { uploadedBy: string };
+    input: { username: string; eventId: number; caption: string };
+    output: { url: string };
+  };
+  eventPfpUploader: {
+    input: { username: string; eventId: number };
+    output: { url: string };
+  };
+  profilePfpUploader: {
+    input: { username: string };
+    output: { url: string };
   };
 };
 
-// ─── 2. Creezi helper-ul, injectând tipul definit ───
 const f = createUploadthing<OurFileRouter>();
 
-// ─── 3. Construiești router-ul pur și simplu, apoi îl satisfaci cu FileRouter ───
+//! client ensures auth
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-    // validez input-ul cu Zod:
-    .input(z.object({ eventId: z.number() }))
-    .middleware(async ({ req, input }) => {
-      const user = auth(req);
-      if (!user) throw new Error("Unauthorized");
-
-      // la acest punct, `input.eventId` e garantat de Zod
-      return { userId: user.id, eventId: input.eventId };
+    .input(
+      z.object({
+        username: z.string(),
+        eventId: z.number(),
+        caption: z.string(),
+      }),
+    )
+    .middleware(async ({ input }) => {
+      return {
+        username: input.username,
+        eventId: input.eventId,
+        caption: input.caption,
+      };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      // metadata.userId + metadata.eventId sunt aici tipizate
       await prisma.media.create({
         data: {
-          uploaderUsername: metadata.userId,
+          uploaderUsername: metadata.username,
           eventId: metadata.eventId,
           url: file.ufsUrl,
-          caption: "",
-          mediaType: file.type,
-          fileType: file.name.split(".").pop() ?? "unknown",
+          caption: metadata.caption,
+          mediaType: "image",
+          fileType: file.type,
           fileSize: file.size,
         },
       });
-      return { uploadedBy: metadata.userId };
+      return { url: file.ufsUrl };
+    }),
+
+  eventPfpUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .input(z.object({ username: z.string(), eventId: z.number() }))
+    .middleware(async ({ input }) => {
+      const event = await prisma.event.findUnique({
+        where: { id: input.eventId },
+        select: { createdByUsername: true },
+      });
+
+      if (!event || event.createdByUsername !== input.username) {
+        throw new UploadThingError("Unauthorized");
+      }
+
+      return { eventId: input.eventId };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await prisma.event.update({
+        where: { id: metadata.eventId },
+        data: { pictureUrl: file.ufsUrl },
+      });
+      return { url: file.ufsUrl };
+    }),
+
+  // pass to this the username from the session! the same is assumed above
+  profilePfpUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .input(z.object({ username: z.string() }))
+    .middleware(async ({ input }) => {
+      const user = await prisma.user.findUnique({
+        where: { username: input.username },
+        select: { username: true },
+      });
+
+      if (!user) {
+        throw new UploadThingError("NOT EXISTING USER");
+      }
+
+      return { username: input.username };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      await prisma.user.update({
+        where: { username: metadata.username },
+        data: { pictureUrl: file.ufsUrl },
+      });
+      return { url: file.ufsUrl };
     }),
 } satisfies FileRouter;
