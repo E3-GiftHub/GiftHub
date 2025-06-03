@@ -229,6 +229,7 @@
 
 .buttonContainer {
     gap: 3.6rem;
+    margin-top: 10px;
 }
 
 .button:disabled {
