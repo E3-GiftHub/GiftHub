@@ -5,7 +5,12 @@ import ForgotPasswordForm from "~/components/ui/Account/ForgotPasswordForm";
 import { jest } from '@jest/globals';
 
 // Mock Link
-jest.mock('next/link', () => ({ children }: any) => <>{children}</>);
+jest.mock('next/link', () => {
+  const Link = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+  Link.displayName = 'MockNextLink';
+  return Link;
+});
+
 
 // Define mutate options type
 type MutateOptions = {
@@ -14,9 +19,8 @@ type MutateOptions = {
 };
 
 // Create mock mutate function (typed)
-const mutateMock = jest.fn(
-  (_: { email: string }, options: MutateOptions) => {}
-);
+const mutateMock = jest.fn<() => void>();
+
 
 
 // Mock useMutation hook
