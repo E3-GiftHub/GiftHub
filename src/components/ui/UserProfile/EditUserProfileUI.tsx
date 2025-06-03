@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
+import {UploadButton} from "~/utils/uploadthing";
 import "src/styles/globals.css";
 
 // import {useUploadThing} from "~/utils/uploadthing";
@@ -142,6 +143,18 @@ export default function EditUserProfileUI({
     }
   };
 
+  const onUploadComplete = (res: {url: string}[]) => {
+    if(res[0]?.url) {
+      setPreviewUrl(res[0].url);
+    }
+    alert("Upload complete");
+  }
+
+  const onUploadError = (error: Error) => {
+    console.error(error);
+    alert("Upload error");
+  }
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.profileCard}>
@@ -158,7 +171,7 @@ export default function EditUserProfileUI({
                 />
               )}
             </div>
-            <button
+            {/*<button
               className={clsx(
                 styles.editAvatarButton,
                 loading && styles.loading,
@@ -173,7 +186,13 @@ export default function EditUserProfileUI({
               accept="image/*"
               style={{ display: "none" }}
               onChange={handleFileChange}
-            />
+            />*/}
+            <UploadButton
+              endpoint="profilePfpUploader"
+              input={{username: usernameInput}}
+              onClientUploadComplete={onUploadComplete}
+              onUploadError={onUploadError}
+              />
           </div>
         </div>
 
