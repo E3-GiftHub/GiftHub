@@ -1,3 +1,4 @@
+// File: /pages/api/stripe/details.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
@@ -18,10 +19,8 @@ export default async function handler(
 ) {
   const { articleid, eventid } = req.query;
 
-  // Helper to send a 400 Bad Request
   const badRequest = (msg: string) => res.status(400).json({ error: msg });
 
-  // If “articleid” is provided, return details for an EventArticle
   if (typeof articleid === "string") {
     const articleId = parseInt(articleid, 10);
     if (isNaN(articleId)) {
@@ -29,11 +28,32 @@ export default async function handler(
     }
 
     try {
-      // 1) Fetch the EventArticle, include its Item to get price/name
       const article = await prisma.eventArticle.findUnique({
         where: { id: articleId },
         include: {
-          item: true, // to read item.name / item.price
+          item: {
+            select: {
+              name: true,
+              price: true,
+            },
+          },
+          event: {
+            select: {
+              id: true,
+              title: true,
+              createdByUsername: true,
+              user: {
+                select: {
+                  fname: true,
+                  lname: true,
+                  username: true,
+                },
+              },
+            },
+          },
+          contributions: {
+            select: { cashAmount: true },
+          },
         },
       });
 
@@ -41,35 +61,29 @@ export default async function handler(
         return res.status(404).json({ error: "EventArticle not found" });
       }
 
-      // 2) Sum up all past contributions for this article
-      const contribSum = await prisma.contribution.aggregate({
-        where: { articleId: articleId },
-        _sum: { cashAmount: true },
-      });
+      const contribSum = article.contributions.reduce(
+        (sum, c) => sum + Number(c.cashAmount),
+        0
+      );
 
-      // Convert Prisma Decimal (or null) into a regular number
-      const alreadyContributed =
-        contribSum._sum.cashAmount !== null
-          ? parseFloat(contribSum._sum.cashAmount.toString())
-          : 0;
-
-      // If item.price is null, set itemPrice to undefined; otherwise convert Decimal → number
       const itemPrice =
         article.item.price !== null
           ? parseFloat(article.item.price.toString())
           : undefined;
 
-      const remaining =
-        itemPrice !== undefined
-          ? Math.max(itemPrice - alreadyContributed, 0)
-          : undefined;
+      const plannerUser = article.event.user;
+      const plannerName =
+        plannerUser.fname && plannerUser.lname
+          ? `${plannerUser.fname} ${plannerUser.lname}`
+          : plannerUser.username;
 
       return res.status(200).json({
         itemName: article.item.name || undefined,
         itemPrice,
-        alreadyContributed,
-        parentEventId: article.eventId,
-        // eventName & eventPlanner are not needed here
+        alreadyContributed: contribSum,
+        parentEventId: article.event.id,
+        eventName: article.event.title || undefined,
+        eventPlanner: plannerName,
       });
     } catch (e) {
       console.error("Error fetching EventArticle details:", e);
@@ -77,7 +91,6 @@ export default async function handler(
     }
   }
 
-  // If “eventid” is provided, return basic Event info
   if (typeof eventid === "string") {
     const eventId = parseInt(eventid, 10);
     if (isNaN(eventId)) {
@@ -85,7 +98,6 @@ export default async function handler(
     }
 
     try {
-      // 1) Fetch the Event and include its creator’s User record
       const event = await prisma.event.findUnique({
         where: { id: eventId },
         include: {
@@ -103,7 +115,6 @@ export default async function handler(
         return res.status(404).json({ error: "Event not found" });
       }
 
-      // Build a “planner” string: prefer “First Last” if available, otherwise use username
       const plannerName =
         event.user.fname && event.user.lname
           ? `${event.user.fname} ${event.user.lname}`
@@ -112,7 +123,6 @@ export default async function handler(
       return res.status(200).json({
         eventName: event.title || undefined,
         eventPlanner: plannerName,
-        // itemName / itemPrice / alreadyContributed / parentEventId are not needed here
       });
     } catch (e) {
       console.error("Error fetching Event details:", e);
@@ -120,8 +130,5 @@ export default async function handler(
     }
   }
 
-  // If neither query parameter is present, return 400
-  return badRequest(
-    "Missing or invalid query parameter (articleid or eventid)",
-  );
+  return badRequest("Missing or invalid query parameter (articleid or eventid)");
 }

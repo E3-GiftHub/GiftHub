@@ -1,8 +1,9 @@
 // File: /pages/api/stripe/contribute.ts
-
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import { createCheckoutLink } from "@/server/services/payment";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 type Data = { url: string } | { error: string };
 
@@ -14,35 +15,81 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const purchaserUsername: string = String(req.query.userId);
-
-  // 2) Parse & validate body
-  const { id, idType, amount, isContribute } = req.body as {
-    id: number;
-    idType: "eventArticle" | "event";
+  const {
+    userId,
+    articleId,
+    eventId,
+    amount,
+  } = req.body as {
+    userId: string;
+    articleId?: number;
+    eventId?: number;
     amount: number;
-    isContribute: boolean;
   };
 
   if (
-    typeof id !== "number" ||
-    (idType !== "eventArticle" && idType !== "event") ||
+    typeof userId !== "string" ||
     typeof amount !== "number" ||
-    typeof isContribute !== "boolean"
+    ((articleId === undefined && eventId === undefined) ||
+    (articleId !== undefined && typeof articleId !== "number") ||
+    (eventId !== undefined && typeof eventId !== "number"))
   ) {
     return res.status(400).json({ error: "Invalid request body." });
   }
 
+  const purchaserUsername = userId;
+
   try {
-    // 3) Create Stripe checkout link
-    const { url } = await createCheckoutLink(
-      id,
-      idType,
-      amount,
-      isContribute,
-      purchaserUsername,
-    );
-    return res.status(200).json({ url });
+    if (articleId !== undefined) {
+      const eventArticle = await prisma.eventArticle.findUnique({
+        where: { id: articleId },
+        select: { id: true },
+      });
+
+      if (!eventArticle) {
+        return res
+          .status(400)
+          .json({ error: `EventArticle with id=${articleId} not found.` });
+      }
+
+      const { url } = await createCheckoutLink(
+        eventArticle.id,
+        "eventArticle",
+        amount,
+        true,
+        purchaserUsername,
+      );
+
+      return res.status(200).json({ url });
+    } else {
+      const evtId = eventId!;
+      const eventRow = await prisma.event.findUnique({
+        where: { id: evtId },
+        select: {
+          id: true,
+          createdByUsername: true,
+          user: { select: { stripeConnectId: true } },
+        },
+      });
+      if (!eventRow) {
+        return res.status(400).json({ error: `Event with id=${evtId} not found.` });
+      }
+      if (!eventRow.user.stripeConnectId) {
+        return res
+          .status(400)
+          .json({ error: `Event planner "${eventRow.createdByUsername}" does not have a Connect account.` });
+      }
+
+      const { url } = await createCheckoutLink(
+        evtId,
+        "event",
+        amount,
+        false,
+        purchaserUsername,
+      );
+
+      return res.status(200).json({ url });
+    }
   } catch (err: any) {
     console.error("Error in createCheckoutLink:", err);
     return res

@@ -1,4 +1,4 @@
-// File: /pages/payment.tsx
+// File: contribution-item.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -27,8 +27,8 @@ export default function CheckoutPage() {
   const [contributionAmount, setContributionAmount] = useState("");
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const [idType, setIdType] = useState<"eventArticle" | "event" | null>(null);
-  const [idValue, setIdValue] = useState<number | null>(null);
+  const [articleId, setArticleId] = useState<number | null>(null);
+  const [eventId, setEventId] = useState<number | null>(null);
 
   const [details, setDetails] = useState<PaymentDetails | null>(null);
   const [remainingAmount, setRemainingAmount] = useState<number | null>(null);
@@ -37,106 +37,117 @@ export default function CheckoutPage() {
     if (!router.isReady) return;
     if (status !== "authenticated") return;
     const { articleid, eventid } = router.query;
+
     if (typeof articleid === "string") {
-      setIdType("eventArticle");
-      setIdValue(parseInt(articleid, 10));
-    } else if (typeof eventid === "string") {
-      setIdType("event");
-      setIdValue(parseInt(eventid, 10));
+      setArticleId(parseInt(articleid, 10));
     } else {
-      setIdType(null);
-      setIdValue(null);
+      setArticleId(null);
     }
-  }, [router.isReady, router.query]);
+
+    if (typeof eventid === "string") {
+      setEventId(parseInt(eventid, 10));
+    } else {
+      setEventId(null);
+    }
+  }, [router.isReady, router.query, status]);
 
   useEffect(() => {
-    if (!idType || idValue === null) {
+    if (articleId !== null) {
+      fetch(`/api/stripe/details?articleid=${articleId}`)
+        .then(async (res) => {
+          if (!res.ok) {
+            const error = await res.text();
+            console.error("Failed to fetch payment details:", error);
+            throw new Error(error || "Unknown error");
+          }
+          return res.json() as Promise<PaymentDetails>;
+        })
+        .then((data) => {
+          setDetails(data);
+
+          if (
+            data.itemPrice != null &&
+            data.alreadyContributed != null
+          ) {
+            const rem = data.itemPrice - data.alreadyContributed;
+            setRemainingAmount(rem > 0 ? rem : 0);
+          } else {
+            setRemainingAmount(null);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          setDetails(null);
+          setRemainingAmount(null);
+        });
+    } else if (eventId !== null) {
+      fetch(`/api/stripe/details?eventid=${eventId}`)
+        .then(async (res) => {
+          if (!res.ok) {
+            const error = await res.text();
+            console.error("Failed to fetch event details:", error);
+            throw new Error(error || "Unknown error");
+          }
+          return res.json() as Promise<PaymentDetails>;
+        })
+        .then((data) => {
+          setDetails(data);
+          setRemainingAmount(null);
+        })
+        .catch((err) => {
+          console.error(err);
+          setDetails(null);
+          setRemainingAmount(null);
+        });
+    } else {
       setDetails(null);
       setRemainingAmount(null);
-      return;
     }
-
-    const params = new URLSearchParams();
-    if (idType === "eventArticle") {
-      params.set("articleid", idValue.toString());
-    } else {
-      params.set("eventid", idValue.toString());
-    }
-
-    fetch(`/api/payment/details?${params.toString()}`)
-      .then(async (res) => {
-        if (!res.ok) {
-          const error = await res.text();
-          console.error("Failed to fetch payment details:", error);
-          throw new Error(error || "Unknown error");
-        }
-        return res.json() as Promise<PaymentDetails>;
-      })
-      .then((data) => {
-        setDetails(data);
-
-        if (
-          idType === "eventArticle" &&
-          data.itemPrice != null &&
-          data.alreadyContributed != null
-        ) {
-          const rem = data.itemPrice - data.alreadyContributed;
-          setRemainingAmount(rem > 0 ? rem : 0);
-        } else {
-          setRemainingAmount(null);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setDetails(null);
-        setRemainingAmount(null);
-      });
-  }, [idType, idValue]);
+  }, [articleId, eventId]);
 
   const handleCheckout = async () => {
-    if (status !== "authenticated" || !session?.user?.id) {
+    if (status !== "authenticated" || !session?.user?.name) {
       alert("You must be signed in to proceed.");
       return;
     }
-    const purchaserUsername = session.user.id as string;
+    const purchaserUsername = session.user.name as string;
 
     const amount = Number(contributionAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid contribution/purchase amount.");
+      alert("Please enter a valid amount.");
       return;
     }
 
-    if (idType === "eventArticle" && remainingAmount !== null) {
+    if (articleId !== null && remainingAmount !== null) {
       if (amount > remainingAmount) {
         alert(`You can only contribute up to ${remainingAmount} RON.`);
         return;
       }
     }
 
-    if (!idType || idValue === null || !details) {
+    if ((articleId === null && eventId === null) || !details) {
       alert("Cannot proceed: missing or invalid payment details.");
-      console.error("Missing idType/idValue/details:", {
-        idType,
-        idValue,
-        details,
-      });
+      console.error("Missing articleId/eventId/details:", { articleId, eventId, details });
       return;
     }
 
     setIsCheckingOut(true);
 
     try {
+      const body: any = {
+        userId: purchaserUsername,
+        amount,
+      };
+      if (articleId !== null) {
+        body.articleId = articleId;
+      } else {
+        body.eventId = eventId!;
+      }
+
       const response = await fetch("/api/stripe/contribute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: session.user.id,
-          id: idValue,
-          idType,
-          amount,
-          isContribute: idType === "eventArticle",
-          // ← we have removed `eventId` here
-        }),
+        body: JSON.stringify(body),
       });
       const data = await response.json();
       if (response.ok && data.url) {
@@ -171,22 +182,32 @@ export default function CheckoutPage() {
       <div className={styles.card}>
         <h2 className={styles.orderId}>Order id #14385683458738543</h2>
 
-        {idType === "eventArticle" ? (
-          <div style={{ marginBottom: "20px" }}>
-            <p>
-              <strong>Item:</strong> {details.itemName}
-            </p>
-            <p>
-              <strong>Original Price:</strong> {details.itemPrice} RON
-            </p>
-            <p>
-              <strong>Already Contributed:</strong> {details.alreadyContributed}{" "}
-              RON
-            </p>
-            <p>
-              <strong>Remaining to Contribute:</strong> {remainingAmount} RON
-            </p>
-          </div>
+        {articleId !== null ? (
+          <>
+            <div style={{ marginBottom: "20px" }}>
+              <p>
+                <strong>Event:</strong> {details.eventName}
+              </p>
+              <p>
+                <strong>Planner:</strong> {details.eventPlanner}
+              </p>
+            </div>
+
+            <div style={{ marginBottom: "20px" }}>
+              <p>
+                <strong>Item:</strong> {details.itemName}
+              </p>
+              <p>
+                <strong>Original Price:</strong> {details.itemPrice} RON
+              </p>
+              <p>
+                <strong>Already Contributed:</strong> {details.alreadyContributed} RON
+              </p>
+              <p>
+                <strong>Remaining to Contribute:</strong> {remainingAmount} RON
+              </p>
+            </div>
+          </>
         ) : (
           <div style={{ marginBottom: "20px" }}>
             <p>
@@ -207,7 +228,7 @@ export default function CheckoutPage() {
               marginBottom: "5px",
             }}
           >
-            {idType === "eventArticle"
+            {articleId !== null
               ? "Contribution Amount (RON):"
               : "Purchase Amount (RON):"}
           </label>
@@ -219,7 +240,7 @@ export default function CheckoutPage() {
             placeholder="Enter amount"
             className={styles.contributionInput}
             min="1"
-            {...(idType === "eventArticle" && remainingAmount !== null
+            {...(articleId !== null && remainingAmount !== null
               ? { max: remainingAmount }
               : {})}
             disabled={isCheckingOut}
@@ -228,7 +249,7 @@ export default function CheckoutPage() {
 
         <div className={styles.tableHeader}>
           <span>
-            {idType === "eventArticle" ? "Contribute to Item" : "Event"}
+            {articleId !== null ? "Contribute to Item" : "Purchase Event"}
           </span>
         </div>
 
@@ -241,7 +262,7 @@ export default function CheckoutPage() {
             className={styles.image}
           />
           <div className={styles.eventDetails}>
-            {idType === "eventArticle" ? (
+            {articleId !== null ? (
               <>
                 <span>Wish‐list Item for Event #{details.parentEventId}</span>
                 <span>Item: {details.itemName}</span>
