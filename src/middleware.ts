@@ -10,11 +10,13 @@ export const config = {
   matcher: [
     "/home",
     "/inbox",
-    "/view-profile",
+    "/profile",
+    "/profile-edit",
+    "/profile-view",
     "/event-invitation",
     "/event", // guest
-    "/wishlist", // guest
     "/event-view", // planner
+    "/wishlist-view", // guest
     "/wishlist-create", // planner
     "/contribution-item",
     "/contribution-direct",
