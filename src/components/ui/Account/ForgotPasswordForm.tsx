@@ -3,13 +3,11 @@ import styles from "../../../styles/Account.module.css";
 import Link from "next/link";
 import {api} from "~/trpc/react";
 
-// eslint-disable-next-line security/detect-hardcoded-credentials
 const getForgotPasswordValidationMessages = () => ({
-  emailRequired: "Email address is required",
-  emailInvalid: "Invalid email address format",
-  serverError: "An unexpected error occurred. Please try again.",
+    emailRequired: "Email address is required",
+    emailInvalid: "Invalid email address format",
+    serverError: "An unexpected error occurred. Please try again.",
 });
-
 const forgotPasswordValidationMessages = getForgotPasswordValidationMessages();
 
 export default function ForgotPasswordForm() {
