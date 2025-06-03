@@ -47,7 +47,7 @@ export default function UserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        username={user.id ?? "not set"}
+        username={user.username ?? "not set"}
         fname={user.fname ?? "not set"}
         lname={user.lname ?? "not set"}
         email={user.email ?? "not set"}

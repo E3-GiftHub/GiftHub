@@ -74,7 +74,7 @@ export default function EditUserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <EditUserProfileUI
-        username={user.id ?? ""}
+        username={user.username ?? ""}
         fname={user.fname ?? ""}
         lname={user.lname ?? ""}
         email={user.email ?? ""}
