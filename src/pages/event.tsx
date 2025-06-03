@@ -1,4 +1,5 @@
 import styles from "../styles/EventView.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
 import { useRouter } from "next/router";
@@ -106,10 +107,16 @@ export default function EventViewPage() {
   }, [eventId]);
 
   //! RENDER ALL DATA
-  if (!session?.user) return <p>Please login first...</p>;
-  if (isLoading) return <p>Loading event...</p>;
+  if (isLoading) {
+    return (
+      <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner}></div>
+      </div>
+    );
+  }
 
-  if (error || !id || !eventData)
+  if (!isLoading && !session?.user) return <p>Please login first...</p>;
+  if ((!isLoading && error) || !id || !eventData)
     return <p>error: Invalid event ID - {error?.message}</p>;
 
   return (
