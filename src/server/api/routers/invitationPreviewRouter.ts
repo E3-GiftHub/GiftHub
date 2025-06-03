@@ -77,6 +77,16 @@ export const invitationsRouter = createTRPCRouter({
         status: true,
       },
     });
-    return invitation; // null if not found, otherwise { status: ... }
+    return invitation; // v a returna null (undefined) daca nu exista invitatie :(
+  }),
+  getInvitationById: publicProcedure.input(z.object({ invitationId: z.number() })).query(async ({ ctx, input }) => {
+    const invitation = await ctx.db.invitation.findUnique({
+      where: { id: input.invitationId },
+      include: { event: true },
+    });
+    if (!invitation) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Invitation not found" });
+    }
+    return invitation;
   }),
 });
