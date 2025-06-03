@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import "src/styles/globals.css";
-import {useUploadThing} from "~/utils/uploadthing";
+// import {useUploadThing} from "~/utils/uploadthing";
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 
 interface EditUserProfileProps {
   username?: string;
@@ -28,6 +29,7 @@ const ProfileButton = ({
                          alt,
                          children,
                          onClick,
+                         onPhotoChange,
                          loading,
                          disabled,
                        }: {
@@ -35,6 +37,7 @@ const ProfileButton = ({
   alt: string;
   children: React.ReactNode;
   onClick?: () => void;
+  onPhotoChange?: (file: File) => void;
   loading?: boolean;
   disabled?: boolean;
 }) => (
@@ -68,6 +71,51 @@ export default function EditUserProfileUI({
   const [fnameInput, setFnameInput] = useState(fname);
   const [lnameInput, setLnameInput] = useState(lname);
   const [emailError, setEmailError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    // const file = event.target.files?.[0];
+    // if (file) {
+    //   const reader = new FileReader();
+    //   reader.onloadend = () => {
+    //     if (reader.result) {
+    //       setPreviewUrl(reader.result as string);
+    //     }
+    //   };
+    //   reader.readAsDataURL(file);
+    //
+    //   if (onPhotoChange) {
+    //     onPhotoChange(file);
+    //   }
+    // }
+
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.result) {
+        setPreviewUrl(reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      /*const res await startUpload([file]);
+      if (res?.[0]?.url) {
+        setPreviewUrl(res[0].url);
+        if (onPhotoChange) {
+          onPhotoChange(file);
+        }
+      }
+          */
+    } catch (error) {
+      toast.error("Error uploading profile picture");
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     setUsernameInput(username);
@@ -110,6 +158,22 @@ export default function EditUserProfileUI({
               )}
             </div>
           </div>
+          <button
+            className={clsx(
+              styles.editAvatarButton,
+              loading && styles.loading,
+            )}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading}
+            aria-label="Edit avatar"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
         </div>
 
         <div className={styles.userInfoedit}>
