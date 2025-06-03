@@ -3,19 +3,8 @@ import {useRouter} from "next/router";
 import styles from "../../../styles/Account.module.css";
 import Link from "next/link";
 import {api} from "~/trpc/react";
-
-const getResetPasswordValidationMessages = () => ({
-    passwordRequired: "Password is required",
-    passwordMinLength: "Password must be at least 8 characters",
-    passwordStrengthDigit: "Password must contain at least one digit",
-    passwordStrengthLowercase: "Password must contain at least one lowercase letter",
-    passwordStrengthUppercase: "Password must contain at least one uppercase letter",
-    passwordMismatch: "Passwords do not match",
-    tokenInvalid: "Invalid or missing reset token. Please use the link from your email.",
-    serverError: "An unexpected error occurred. Please try again.",
-});
-const resetPasswordValidationMessages = getResetPasswordValidationMessages();
-
+import { resetPasswordMessages } from "~/models/messages";
+const resetPasswordValidationMessages = resetPasswordMessages;
 export default function ResetPasswordForm() {
     const router = useRouter();
     const {token} = router.query;
