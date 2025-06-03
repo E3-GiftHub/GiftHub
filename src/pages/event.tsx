@@ -13,6 +13,7 @@ import Navbar from "~/components/Navbar";
 import MediaModal from "~/components/MediaModal";
 import Footer from "~/components/Footer";
 import type { MediaHeader } from "~/models/MediaHeader";
+import NotInvited from "@/components/notinvited";
 
 export default function EventViewPage() {
   const router = useRouter();
@@ -129,7 +130,7 @@ export default function EventViewPage() {
         <main>
           <EventView
             eventData={{
-              id: String(eventData.id), // <-- Fix: convert number to string
+              id: String(eventData.id),
               title: eventData.title,
               picture: eventData.pictureUrl,
               description: eventData.description,
