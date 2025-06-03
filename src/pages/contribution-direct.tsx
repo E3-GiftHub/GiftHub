@@ -25,7 +25,7 @@ const ContributionPage: React.FC = () => {
     },
     { 
       enabled: !!eventIdNumber && !!username,
-      retry: false // Prevent unnecessary retries
+      retry: false
     }
   );
 

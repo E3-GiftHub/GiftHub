@@ -481,6 +481,7 @@
   padding: 1rem 0;
   max-height: 60vh;
   grid-template-columns: repeat(4, 1fr);
+  scrollbar-width: none;
 }
 
 .editMediaItem img {
