@@ -44,7 +44,7 @@ const notifications: InboxNotificationResponse[] = [
   })),
   ...invitations.map((n) => ({
     id: n.id,
-    text: n.description,
+    text: "You received an invitation to " + n.title,
     type: n.type as "event" | "invitation",
     link: n.link,
     firstName: n.firstName ?? "",
@@ -69,10 +69,9 @@ const notifications: InboxNotificationResponse[] = [
 
   const totalCount = notifications.length;
 
- const handleNotificationClick = (_id: string | number, link: string) => {
-  window.location.href = link;
-};
-
+  const handleNotificationClick = (_id: string | number, link: string) => {
+    window.location.href = `${link}`;
+  };
 
   return (
     <CustomContainer>
