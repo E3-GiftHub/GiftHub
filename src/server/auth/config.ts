@@ -31,6 +31,12 @@ export const authConfig: NextAuthConfig = {
           where: {
             email: email,
           },
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            password: true,
+          },
         });
 
         if (!user) {
@@ -71,7 +77,7 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = user.id; // Add the user ID to the JWT
         // Use user['username'] to avoid TS error, since we know it's present from authorize
-        token.username = (user as any).username ?? user.name;
+        //token.username = user.username;
       }
       // `account` and `profile` are available when using OAuth providers
       return token;
@@ -83,10 +89,7 @@ export const authConfig: NextAuthConfig = {
       if (session.user && token.id) {
         session.user.id = token.id as string;
       }
-      if (session.user && token.username) {
-        // Use index signature to avoid TS error
-        (session.user as any).username = token.username as string;
-      }
+
       return session;
     },
   },

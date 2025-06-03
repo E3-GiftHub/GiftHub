@@ -2,6 +2,7 @@ import {createTRPCRouter, protectedProcedure} from "~/server/api/trpc";
 import {UTApi} from "uploadthing/server";
 import {z} from "zod";
 
+const utapi = new UTApi();
 
 export const profilePictureRouter = createTRPCRouter({
   upload: protectedProcedure
@@ -9,14 +10,14 @@ export const profilePictureRouter = createTRPCRouter({
       key: z.string(),
     }))
     .mutation(async ({input, ctx}) => {
-      if(!input.key.includes(ctx.session.user.id)){
+      if(!input.key.includes(ctx.session.user.id!)){
         throw new Error("Unauthorized file access");
       }
 
       const fileUrl = `${process.env.AUTH_URL}/api/uploadthing/${input.key}`;
       const updatedUser = await ctx.db.user.update({
         where: {
-          username: ctx.session.user.id,
+          username: ctx.session.user.id as string,
         },
         data: {
           pictureUrl: fileUrl,
@@ -46,7 +47,7 @@ export const profilePictureRouter = createTRPCRouter({
       const key = user.pictureUrl.split("/")[1];
 
       try{
-        await UTApi.deleteFiles(key);
+        //await utapi.deleteFiles(key);
 
         await ctx.db.user.update({
           where: {

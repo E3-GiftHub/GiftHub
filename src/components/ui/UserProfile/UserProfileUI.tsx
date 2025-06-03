@@ -126,7 +126,7 @@ export default function UserProfileUI({
     if (onEdit) {
       onEdit();
     } else {
-      await router.push("/editprofile");
+      await router.push("/profile-edit");
     }
   };
 
