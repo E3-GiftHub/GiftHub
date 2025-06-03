@@ -75,45 +75,52 @@ export const eventRouter = createTRPCRouter({
   .input(z.object({ eventId: z.number() }))
   .mutation(async ({ input, ctx }) => {
     const userId = ctx.session?.user?.name;
-    if (!userId)
+
+    if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "User not authenticated",
       });
+    }
 
-    return handle(async () => {
-      const event = await prisma.event.findUnique({
-        where: { id: input.eventId },
-      });
-
-      console.log("event.createdByUsername =", event?.createdByUsername);
-      console.log("session.user.id =", userId);
-
-
-      if (!event || event.createdByUsername !== userId) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
-      }
-
-      // ❌ Check for EventArticles
-      const articleCount = await prisma.eventArticle.count({
-        where: { eventId: input.eventId },
-      });
-
-      if (articleCount > 0) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Cannot delete event with associated articles.",
-        });
-      }
-
-      // ✅ Safe to delete
-      await prisma.event.delete({
-        where: { id: input.eventId },
-      });
-
-      return { success: true };
+    const event = await prisma.event.findUnique({
+      where: { id: input.eventId },
     });
+
+    if (!event || event.createdByUsername !== userId) {
+      return {
+        success: false,
+        message: "Not authorized to delete this event.",
+      };
+    }
+
+    const hasLockedArticles = await prisma.eventArticle.findFirst({
+      where: {
+        eventId: input.eventId,
+        OR: [
+          { marks: { some: { type: "PURCHASED" } } },
+          { contributions: { some: {} } },
+        ],
+      },
+    });
+
+    if (hasLockedArticles) {
+      return {
+        success: false,
+        message: "Cannot delete event: items are purchased or contributed to.",
+      };
+    }
+
+    await prisma.event.delete({
+      where: { id: input.eventId },
+    });
+
+    return {
+      success: true,
+      message: "Event deleted successfully.",
+    };
   }),
+
 
 
   sendInvitation: publicProcedure

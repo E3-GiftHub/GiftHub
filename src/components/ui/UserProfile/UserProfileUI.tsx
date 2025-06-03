@@ -98,7 +98,7 @@ export default function UserProfileUI({
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("An unexpected error occurred while deleting your account.");
-    }*/
+    }
   };
 
   return (

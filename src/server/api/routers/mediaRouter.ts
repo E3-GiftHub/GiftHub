@@ -12,6 +12,7 @@ export const mediaRouter = createTRPCRouter({
         select: {
           id: true,
           url: true,
+          caption: true,
         },
       });
     }),

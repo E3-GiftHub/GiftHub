@@ -142,6 +142,9 @@
 
           {/* Search Results */}
           {isLoading && <p className={styles.searchLabel}>Searching...</p>}
+          {!isLoading && debouncedSearchTerm.length > 1 && searchResults.length === 0 && (
+             <p className={styles.searchLabel}>No items found :(</p>
+          )}
 
             {searchResults.length > 0 && (
               <div className={styles.itemGrid}>

@@ -14,6 +14,8 @@ import { UploadButton } from "~/utils/uploadthing";
 import Footer from "../components/Footer";
 import "./../styles/globals.css";
 import { type GuestHeader } from "~/models/GuestHeader";
+import { useSession } from "next-auth/react";
+
 
 
 function parseId(param: string | string[] | undefined): number | null {
@@ -45,7 +47,7 @@ function GuestListPreview({
       {guests.slice(0, 10).map((guest) => (
         <div className={styles.guestItem} 
           key={guest.username}
-          onClick={() => router.push(`/view-profile?username=${guest.username}`)}
+          onClick={() => router.push(`/profile-view?username=${guest.username}`)}
           style={{ cursor: "pointer" }}>
           <img
             className={styles.guestImage}
@@ -69,6 +71,11 @@ export default function EventView() {
 
   // get the event id
   const router = useRouter();
+  const { data: session } = useSession();
+  const username = session?.user?.name ?? "anonymous";
+
+  const [captionInput, setCaptionInput] = useState("");
+
 
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
@@ -359,7 +366,13 @@ export default function EventView() {
           onConfirm={() => {
             void (async () => {
               try {
-                await deleteEventMutation.mutateAsync({ eventId: parsedId });
+                const res = await deleteEventMutation.mutateAsync({ eventId: parsedId });
+                // ✅ New: Show warning if deletion not allowed
+                  if (!res.success) {
+                    alert(res.message ?? "Cannot delete this event.");
+                    return;
+                  }
+
                 alert("Event deleted successfully.");
                 void router.push("/");
               } catch (err) {
@@ -390,9 +403,23 @@ export default function EventView() {
         <div className={styles.modalBackdrop}>
           <div className={styles.modal}>
             <h3 className={styles.modalTitle}>Upload Media</h3>
+
+            {/* Caption Input */}
+            <input
+              type="text"
+              placeholder="Enter caption"
+              className={styles.captionInput} // Optional: create styling if needed
+              value={captionInput}
+              onChange={(e) => setCaptionInput(e.target.value)}
+            />
+
             <UploadButton
               endpoint="imageUploader"
-              input={{ eventId }}
+              input={{
+                username: username, // or however you store the logged-in user
+                eventId: eventId,
+                caption: captionInput,
+              }}
               onClientUploadComplete={(res) => {
                 console.log("Files:", res);
                 alert("Upload completed");
@@ -461,7 +488,10 @@ export default function EventView() {
               />
               <UploadButton
                 endpoint="eventPfpUploader"
-                input={{ eventId: eventId }}
+                input={{
+                username: username, // or however you store the logged-in user
+                eventId: eventId,
+              }}
                 onClientUploadComplete={(res) => {
                   console.log("Banner upload success:", res);
                   router.reload(); // Refresh to show updated banner

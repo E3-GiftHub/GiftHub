@@ -94,6 +94,7 @@
   background-color: #cbb1dc;
   color: #1e1e1e;
   font-size: 1rem;
+  resize: none;
 }
 
 .form textarea {

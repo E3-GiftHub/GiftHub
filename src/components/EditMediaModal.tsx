@@ -8,7 +8,7 @@ import buttonStyles from "../styles/Button.module.css";
 interface MediaItem {
   id: number;
   url: string;
-  caption?: string;
+  caption?: string | null;
 }
 
 interface EditMediaModalProps {

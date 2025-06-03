@@ -496,3 +496,27 @@
     transition: background-color 0.3s ease;
     z-index: 10;
 }
+
+.captionInput {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  padding: 0.75rem 1rem;
+  margin: 0 auto 1.5rem; /* centers + spacing below */
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #a45eeb, #6b1ed9);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.caption {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #fff;
+  font-weight: 500;
+  width: 100%;
+}
