@@ -14,15 +14,13 @@
 //   interface Session extends DefaultSession {
 //     user: {
 //       id: string;
+//       username?: string; // <-- Add username to session type
 //       // ...other properties
-//       // role: UserRole;
 //     } & DefaultSession["user"];
 //   }
-//
-//   // interface User {
-//   //   // ...other properties
-//   //   // role: UserRole;
-//   // }
+//   interface User {
+//     username?: string; // <-- Add username to user type
+//   }
 // }
 //
 // /**
@@ -115,8 +113,7 @@ export const authConfig: NextAuthConfig = {
           id: user.id,
           name: user.username, // Or user.name, adjust based on your User model
           email: user.email,
-          // You can add any other properties you want to be available
-          // in the `user` object passed to the `jwt` callback.
+          username: user.username, // <-- Add this line
         };
       },
     }),
@@ -127,8 +124,8 @@ export const authConfig: NextAuthConfig = {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
         token.id = user.id; // Add the user ID to the JWT
-        // You can add other custom claims to the token here
-        // token.username = user.username; // if user object has username
+        // Use user['username'] to avoid TS error, since we know it's present from authorize
+        token.username = (user as any).username || user.name;
       }
       // `account` and `profile` are available when using OAuth providers
       return token;
@@ -140,9 +137,10 @@ export const authConfig: NextAuthConfig = {
       if (session.user && token.id) {
         session.user.id = token.id as string;
       }
-      // if (session.user && token.username) {
-      //   session.user.username = token.username as string;
-      // }
+      if (session.user && token.username) {
+        // Use index signature to avoid TS error
+        (session.user as any).username = token.username as string;
+      }
       return session;
     },
   },

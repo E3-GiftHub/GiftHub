@@ -1,23 +1,52 @@
 import { api } from "~/trpc/react";
+import { useRouter } from "next/router";
 import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
-
-const EVENT_ID = 13;
-const GUEST_USERNAME = "user2";
+import NotInvited from "./notinvited";
 
 export default function InvitationCard({
   onAccept,
   onDecline,
-  eventId = EVENT_ID,
-  guestUsername = GUEST_USERNAME,
+  guestUsername: propGuestUsername,
 }: Pick<
   InvitationProps,
   "onAccept" | "onDecline" | "eventId" | "guestUsername"
 >) {
+  const router = useRouter();
+  const eventId = Number(router.query.id);
+  // Get current user from tRPC (session-based)
+  const { data: currentUser } = api.user.getSelf.useQuery();
+  const guestUsername = propGuestUsername ?? currentUser?.username ?? "";
+
   const acceptInvitation = api.invitationPreview.acceptInvitation.useMutation();
-  const { data: eventData, isLoading: isEventLoading } =
-    api.event.getById.useQuery({ id: eventId });
+  const eventQuery = api.event.getById.useQuery({ id: eventId });
+  const eventData = eventQuery.data;
+  const isEventLoading = eventQuery.isLoading;
+
+  // Invitation check
+  const invitationQuery = api.invitationPreview.getInvitationForUserEvent.useQuery(
+    { eventId: Number(eventId), guestUsername },
+    { enabled: !!eventId && !!guestUsername }
+  );
+  const invitationData = invitationQuery.data;
+  const isInvitationLoading = invitationQuery.isLoading;
+
+  if (isEventLoading || isInvitationLoading) {
+    // Center spinner on the whole page, not just the card
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
+  }
+
+  if (!invitationData || invitationData.status === "ACCEPTED") {
+    //todo sa trimitem mesajul corespunzator 
+    // gen : "ai acceptat deja invitatia"
+    //pt momentan apare doar ca nu esti invitat(chiar daca esti si ai acceptat deja)
+    return  <NotInvited />
+  }
 
   const handleAccept = () => {
     acceptInvitation.mutate({ eventId, guestUsername });
@@ -35,7 +64,7 @@ export default function InvitationCard({
   };
 
   return (
-    <div className={styles.container}>
+    
       <div className={styles.envelope}>
         <div className={styles.envelopeBack}></div>
         <div className={styles.card}>
@@ -82,6 +111,5 @@ export default function InvitationCard({
         <div className={`${styles.flap} ${styles.flapLeft}`}></div>
         <div className={`${styles.flap} ${styles.flapRight}`}></div>
       </div>
-    </div>
   );
 }

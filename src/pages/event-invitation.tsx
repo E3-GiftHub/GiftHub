@@ -13,9 +13,9 @@ export default function DemoPage() {
       </Head>
       <div className={styles.giftHubPage}>
         <Navbar />
-        <main>
-          <InvitationCard />
-        </main>
+          <div className={styles.invitationContainer}>
+            <InvitationCard />
+          </div>
         <Footer />
       </div>
     </>

@@ -1,11 +1,3 @@
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 79.9vh;
-  background-color: #2f2464;
-
-}
 
 .envelope {
   position: relative;
@@ -39,19 +31,19 @@
   clip-path: polygon(0 0, 50% 100%, 100% 0);
   background-color: #e8e8e0;
   transform-origin: top;
-  z-index: 1; /* Lower z-index for open state */
-  transform: rotateX(180deg); /* Always rotated (open) */
+  z-index: 1;
+  transform: rotateX(180deg);
   z-index: 1;
 }
 
 .flapTopOpen {
   transform: rotateX(180deg);
-  z-index: 1; /* Lower z-index when open */
+  z-index: 1;
 }
 
 .flapLeft {
-  width: 225px; /* Increased from 175px */
-  height: 140px; /* Increased from 110px */
+  width: 225px; 
+  height: 140px;
   left: 0;
   bottom: 0;
   transform: scaleX(-1) rotate(180deg);
@@ -175,6 +167,30 @@
 .acceptButton:hover {
   background-color: #3b2c7a;
 }
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  width: 100%;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #c8abd6;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 @media (max-width: 500px) { /* Updated from 400px to match new envelope size */
   .envelope {

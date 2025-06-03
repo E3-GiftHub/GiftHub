@@ -6,8 +6,6 @@ import type { WishlistProps } from '../models/WishlistEventGuest';
 import NotInvited from './notinvited';
 import { useRouter } from 'next/router';
 
-const USERNAME = 'user2';
-
 // Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
@@ -20,25 +18,32 @@ const getItemImage = (item: TrendingItem) => {
     return item.imageUrl;
   }
   //altfel foloseste una de aici  gen de mai sus
-  const imageIndex = item.id % productImages.length;
-  return productImages[imageIndex];
+  else {
+    const imageIndex = item.id % productImages.length;
+    return productImages[imageIndex];
+  }
 };
 
-const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
+const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId }) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
   const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const router = useRouter();
+
+  const eventId = propEventId ?? (typeof router.query.eventId === 'string' ? router.query.eventId : Array.isArray(router.query.eventId) ? router.query.eventId[0] : undefined);
+
+  const { data: currentUser, isLoading: isLoadingUser } = api.user.getSelf.useQuery();
+  const username = currentUser?.username;
 
   const {
     data,
     isLoading,
     isError,
     refetch
-  } = api.item.getAll.useQuery({ 
-    eventId: eventId ? Number(eventId) : 0, 
-    username: USERNAME 
+  } = api.item.getAll.useQuery({
+    eventId: eventId ? Number(eventId) : 0,
+    username: username ?? ""
   }, {
-    enabled: !!eventId
+    enabled: !!eventId && !!username && !isLoadingUser
   });
 
   const setMark = api.item.setMark.useMutation({
@@ -48,16 +53,15 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   const {
     data: eventData,
     isLoading: isEventLoading
-  } = api.event.getById.useQuery({ 
+  } = api.event.getById.useQuery({
     id: eventId ? Number(eventId) : 0
   }, {
     enabled: !!eventId
   });
 
-  // verificam daca invitatia este accepted sau pending
   const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
-    { eventId: Number(eventId), guestUsername: USERNAME },
-    { enabled: !!eventId }
+    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { enabled: !!eventId && !!username && !isLoadingUser }
   );
 
   useEffect(() => {
@@ -73,104 +77,101 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId }) => {
   useEffect(() => {
     if (invitationData) {
       setIsInvited(invitationData.status === 'ACCEPTED'); //doar accepted! fara nonchalant kings :P 
-    } else if (invitationData === null) {
+    } 
+    else if (invitationData === null) {
       setIsInvited(false);
     }
   }, [invitationData]);
 
-  const isUserInvited = (eventData: any, username: string) => {
-    if (!eventData) return false;
-    //verificam daca userul este plannerrrrr
-    if (eventData.planner?.username === username) return true;
-    //aici verificam daca este in guest list (verificand daca obj eventdata.guests este un array si daca username-ul este in el)
-    if (Array.isArray(eventData.guests)) {
-      return eventData.guests.some((guest: any) => {
-        if (guest.username) return guest.username === username;
-        if (guest.user?.username) return guest.user.username === username;
-        return false;
-      });
-    }
-    return false;
-  };
-
   // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
-  if (!router.isReady || isLoading || isEventLoading || isInvitationLoading || isInvited === null) {
+  if (!router.isReady || isLoading || isEventLoading || isInvitationLoading || isInvited === null || isLoadingUser || !username) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
       </div>
     );
   }
-
-  // cinvea incearca sa acceseze wishlist-ul fara eventid
-  if(!eventId) return <div>No event ID provided</div>;
-  
-  // cineva incearca sa acceseze wishlist ul unui event care nu exista
-  if(!eventData && !isLoading) return <div>Event not found</div>;
-
-  // verificam daca userul este invitat SI A ACCEPTAT!!!!!
-  // nu pending gen e nonchalant king nu poate el raspunde...
-  if (!isInvited) {
-    return (
-      <NotInvited/>
-    );
+  else {
+    if (!eventId) {
+      return <div>No event ID provided</div>;
+    }
+    else {
+      if (!eventData && !isLoading) {
+        return <div>Event not found</div>;
+      }
+      else {
+        if (!isInvited) {
+          return <NotInvited/>;
+        }
+        else {
+          if (isError) {
+            return <div>Failed to load items.</div>;
+          }
+        }
+      }
+    }
   }
-  //self explanatory :P
-  if(isError)
-    return <div>Failed to load items.</div>;
 
   const getButtonClass = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
-    if((buttonType === 'contribute' && item.state === 'contributing') ||
-      (buttonType === 'external' && item.state === 'external'))
+    if ((buttonType === 'contribute' && item.state === 'contributing') ||
+      (buttonType === 'external' && item.state === 'external')) {
       return `${styles.buttonPressed}`;
-    return '';
+    }
+    else {
+      return '';
+    }
   };
 
   const getButtonText = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
-    if(buttonType === 'contribute') {
+    if (buttonType === 'contribute') {
       return 'Contribute';
     }
-    if(buttonType === 'external')
-      return item.state === 'external' ? 'Bought' : 'Mark Bought';
-    return '';
+    else {
+      if (buttonType === 'external') {
+        return item.state === 'external' ? 'Bought' : 'Mark Bought';
+      }
+      else {
+        return '';
+      }
+    }
   };
 
   const handleButtonAction = (id: number, action: 'contributing' | 'external') => {
     const item = trendingItems.find((i) => i.id === id);
-    if(!item) return;
-
-    if (action === 'external') {
-      // For external purchases, update local state immediately
-      const newType = item.state === 'external' ? 'none' : 'external';
-      
-      // Update local state optimistically
-      setTrendingItems((prev) =>
-        prev.map((it) =>
-          it.id === id ? { ...it, state: newType } : it
-        )
-      );
-
-      setMark.mutate({
-        eventId: Number(eventId),
-        articleId: id,
-        username: USERNAME,
-        type: newType,
-      }, {
-        onError: () => {
-          setTrendingItems((prev) =>
-            prev.map((it) =>
-              it.id === id ? { ...it, state: item.state } : it
-            )
-          );
+    if (!item) {
+      return;
+    }
+    else {
+      if (action === 'external') {
+        const newType = item.state === 'external' ? 'none' : 'external';
+        setTrendingItems((prev) =>
+          prev.map((it) =>
+            it.id === id ? { ...it, state: newType } : it
+          )
+        );
+        setMark.mutate({
+          eventId: Number(eventId),
+          articleId: id,
+          username: username,
+          type: newType,
+        }, {
+          onError: () => {
+            setTrendingItems((prev) =>
+              prev.map((it) =>
+                it.id === id ? { ...it, state: item.state } : it
+              )
+            );
+          }
+        });
+      }
+      else {
+        const currentAmount = Number(item.contribution?.current) || 0;
+        const totalAmount = Number(item.pret);
+        if (currentAmount < totalAmount) {
+          if (contribution) {
+            contribution();
+          }
         }
-      });
-    } else {
-      // pentru usecaseul in care se doreste sa se faca cheta, se poate contribuii cat de mult posibil
-      const currentAmount = Number(item.contribution?.current) || 0;
-      const totalAmount = Number(item.pret);
-      
-      if (currentAmount < totalAmount) { 
-        contribution?.();
       }
     }
   };

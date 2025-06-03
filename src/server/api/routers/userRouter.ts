@@ -4,12 +4,14 @@ import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   getSelf: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.session.user.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "User identifier not found in session." });
+    // PENTRU WISHLIST SA VEDEM DACA USERUL E INVITAT LA UN EVENT :DDDDDDD
+    const username = (ctx.session.user as any).username;
+    if (!username) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Username not found in session." });
     }
 
     const user = await ctx.db.user.findUnique({
-      where: { username: ctx.session.user.id },
+      where: { username },
       select: {
         stripeConnectId: true,
         //id: true,
@@ -21,7 +23,7 @@ export const userRouter = createTRPCRouter({
     if (!user) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "User not found with the provided identifier from session.",
+        message: "User not found with the provided username from session.",
       });
     }
     return user;
