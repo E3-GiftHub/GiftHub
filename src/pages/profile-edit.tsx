@@ -30,7 +30,7 @@ export default function EditUserProfile() {
       {
         onSuccess: () => {
           alert("Profile updated successfully!");
-          router.push("/profile");
+          void router.push("/profile");
         },
         onError: (error) => {
           alert("Update failed: " + error.message);

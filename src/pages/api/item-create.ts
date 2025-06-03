@@ -1,6 +1,11 @@
 import { db } from "~/server/db";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+type ItemCreateResponse = {
+  itemId: number;
+};
+
+
 // 1. Define a type for incoming data
 interface ItemRequestBody {
   id?: number;

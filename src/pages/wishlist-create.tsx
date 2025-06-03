@@ -23,6 +23,17 @@
     shortDescription?: string;
   }
 
+  type ItemCreateResponse = {
+  itemId: number;
+};
+
+type WishlistInputItem = {
+  name: string;
+  photo: string;
+  price: string;
+  quantity: number;
+};
+
 
   export default function CreateWishlist() {
     const router = useRouter();
@@ -63,12 +74,7 @@
 
     const { mutateAsync: addItemToWishlist } = api.wishlist.addItem.useMutation();
 
-  const handleAddToWishlist = async (item: {
-    name: string;
-    photo: string;
-    price: string;
-    quantity: number;
-  }) => {
+  const handleAddToWishlist = async (item: WishlistInputItem) => {
     try {
 
       // 1. First, save the item into the `Item` table (this logic needs an endpoint if not already present)
@@ -83,7 +89,7 @@
         }),
       });
 
-      const result = await itemResponse.json();
+      const result = await itemResponse.json() as ItemCreateResponse;
       console.log("🪵 /api/item-create result:", result);
       const itemId = result.itemId;
       if (!itemId) {
