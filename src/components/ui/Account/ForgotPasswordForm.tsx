@@ -55,10 +55,12 @@ export default function ForgotPasswordForm() {
 
             <div className={styles.middle}>
                 <form
-                    id="forgotPasswordForm"
-                    className={styles.formContainer}
-                    onSubmit={handleSubmit}
-                >
+  id="forgotPasswordForm"
+  data-testid="forgot-password-form"
+  className={styles.formContainer}
+  onSubmit={handleSubmit}
+>
+
                     <div className={styles.formGroup}>
                         <label
                             htmlFor="email"
