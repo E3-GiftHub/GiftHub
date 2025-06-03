@@ -29,7 +29,7 @@ export const requestResetRouter = createTRPCRouter({
       },
     });
 
-    const resetLink = `http://localhost:3000//reset-password?token=${token}`;
+    const resetLink = `https://gifthub-five.vercel.app//reset-password?token=${token}`;
     console.log("Generated reset link:", resetLink);
 
     await sendEmail({
