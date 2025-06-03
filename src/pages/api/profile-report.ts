@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db as prisma } from "~/server/db";
 
+type RequestBodyRePf = {
+  reporter: string;
+  userId: string;
+  reason: string;
+  description: string;
+};
+
 // allow description to be null
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +16,7 @@ export default async function handler(
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const { reporter, userId, reason, description } = req.body ?? {};
+  const { reporter, userId, reason, description } = req.body as RequestBodyRePf;
   if (
     "" === reporter ||
     typeof reporter !== "string" ||

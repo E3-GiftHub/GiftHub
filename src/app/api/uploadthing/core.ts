@@ -32,6 +32,7 @@ export const ourFileRouter = {
     )
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new UploadThingError("invalid session");
       }
 
@@ -60,6 +61,7 @@ export const ourFileRouter = {
     .input(z.object({ username: z.string(), eventId: z.number() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new UploadThingError("invalid session");
       }
 
@@ -69,6 +71,7 @@ export const ourFileRouter = {
       });
 
       if (!event || event.createdByUsername !== input.username) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new UploadThingError("unauthorized user");
       }
 
@@ -87,6 +90,7 @@ export const ourFileRouter = {
     .input(z.object({ username: z.string() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new UploadThingError("invalid session");
       }
 
@@ -96,6 +100,7 @@ export const ourFileRouter = {
       });
 
       if (!user) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new UploadThingError("not existing user");
       }
 
