@@ -1,37 +1,49 @@
-// src/pages/api/item-create.ts
-import { db } from "~/server/db"; // or wherever your prisma instance is
+import { db } from "~/server/db";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+// 1. Define a type for incoming data
+interface ItemRequestBody {
+  id?: number;
+  name: string;
+  description?: string;
+  imagesUrl?: string;
+  price?: number;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  console.log("Incoming body:", req.body); // debug
+  // 2. Safely cast the body to the defined type
+  const body = req.body as ItemRequestBody;
 
-    const { id, ...safeData } = req.body;
-    try{
-        const existingItem = await db.item.findFirst({
-        where: {
-            name : safeData.name,
-            price: safeData.price,
-            description: safeData.description,
-            },
-         });
+  const { name, description, imagesUrl, price } = body;
+
+  try {
+    // 3. Check for existing item
+    const existingItem = await db.item.findFirst({
+      where: {
+        name,
+        price,
+        description,
+      },
+    });
 
     if (existingItem) {
       console.log("📦 Existing item reused:", existingItem.id);
       return res.status(200).json({ itemId: existingItem.id });
     }
 
-        const newItem = await db.item.create({
-        data: {
-            name: safeData.name,
-            description: safeData.description,
-            imagesUrl: safeData.imagesUrl,
-            price: safeData.price,
-            },
-        });
+    // 4. Create new item
+    const newItem = await db.item.create({
+      data: {
+        name,
+        description,
+        imagesUrl,
+        price,
+      },
+    });
 
     console.log("✅ Item created:", newItem);
     return res.status(200).json({ itemId: newItem.id });
