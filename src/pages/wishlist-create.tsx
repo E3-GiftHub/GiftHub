@@ -117,7 +117,7 @@
           <main className={styles.main}>
             <div className={styles.titleContainer}>
               <h1 className={styles.title}>
-                Create Wishlist for Event {eventId}
+                Add Item to the Wishlist for Event {eventId}
               </h1>
             </div>
 
