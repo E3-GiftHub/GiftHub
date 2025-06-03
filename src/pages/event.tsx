@@ -144,7 +144,7 @@ export default function EventViewPage() {
               guests: eventData.guests,
             }}
             onContribute={() => {
-              router.push(`/payment?eventId=${eventId}`);
+              router.push(`/contribution-direct?eventId=${eventId}`);
             }}
             onViewWishlist={handleViewWishlist}
             onMediaView={() => setDoesShowMedia(true)}
