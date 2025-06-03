@@ -4,7 +4,6 @@ import { api } from "~/trpc/react";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
 import NotInvited from "./notinvited";
 import { useRouter } from "next/router";
-import LoadingSpinner from "./loadingspinner";
 
 // Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
@@ -39,7 +38,6 @@ const Wishlist: React.FC<WishlistProps> = ({
       : Array.isArray(router.query.eventId)
         ? router.query.eventId[0]
         : undefined);
-
   const { data: currentUser, isLoading: isLoadingUser } =
     api.user.getSelf.useQuery();
   const username = currentUser?.username;
@@ -78,8 +76,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     if (data) {
       const updatedItems = data.map((item) => ({
         ...item,
-        transferCompleted:
-          item.transferCompleted === null ? false : item.transferCompleted,
+        transferCompleted: item.transferCompleted ?? false,
       }));
       setTrendingItems(updatedItems);
     }
@@ -103,7 +100,11 @@ const Wishlist: React.FC<WishlistProps> = ({
     isLoadingUser ||
     !username
   ) {
-    return <LoadingSpinner />;
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
   } else {
     if (!eventId) {
       return <div>No event ID provided</div>;
@@ -156,45 +157,39 @@ const Wishlist: React.FC<WishlistProps> = ({
     action: "contributing" | "external",
   ) => {
     const item = trendingItems.find((i) => i.id === id);
-    if (!item) {
-      return;
+    if (!item) return;
+
+    if (action === "external") {
+      // Optimistically update UI first
+      const newType = item.state === "external" ? "none" : "external";
+      setTrendingItems((prev) =>
+        prev.map((it) => (it.id === id ? { ...it, state: newType } : it)),
+      );
+      
+      // Then make the server call
+      setMark.mutate(
+        {
+          eventId: Number(eventId),
+          articleId: id,
+          username: username,
+          type: newType,
+        },
+        {
+          onError: () => {
+            // Revert on error
+            setTrendingItems((prev) =>
+              prev.map((it) =>
+                it.id === id ? { ...it, state: item.state } : it,
+              ),
+            );
+          },
+        },
+      );
     } else {
-      if (action === "external") {
-        const newType = item.state === "external" ? "none" : "external";
-        setTrendingItems((prev) =>
-          prev.map((it) =>
-            it.id === id ? { ...it, state: newType } : it,
-          ),
-        );
-        setMark.mutate(
-          {
-            eventId: Number(eventId),
-            articleId: id,
-            username: username,
-            type: newType,
-          },
-          {
-            onError: () => {
-              setTrendingItems((prev) =>
-                prev.map((it) =>
-                  it.id === id ? { ...it, state: item.state } : it,
-                ),
-              );
-            },
-            onSuccess: () => {
-              // Refetch to ensure state is in sync with backend
-              refetch();
-            },
-          },
-        );
-      } else {
-        const currentAmount = Number(item.contribution?.current) || 0;
-        const totalAmount = Number(item.pret);
-        if (currentAmount < totalAmount) {
-          if (contribution) {
-            contribution();
-          }
-        }
+      const currentAmount = Number(item.contribution?.current) || 0;
+      const totalAmount = Number(item.pret);
+      if (currentAmount < totalAmount && contribution) {
+        contribution();
       }
     }
   };

@@ -13,16 +13,6 @@ import { userRouter } from "./routers/userRouter";
 import { authRouter } from "~/server/api/routers/authRouter";
 import { profileRouter } from "~/server/api/routers/profileRouter";
 
-/**
-
- * This is the primary router for your server.
-
- *
-
- * All routers added in /api/routers should be manually added here.
-
- */
-
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   profile: profileRouter,

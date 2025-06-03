@@ -9,16 +9,9 @@
 .giftHubPage main {
   flex: 1;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 60px 20px 20px;
-}
-.notInvitedWrapper{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
 }
 
 .contentWrapper {
@@ -158,16 +151,6 @@
   background-color: #6a5ab0;
 }
 
-.payButtonDisabled {
-  background-color: rgba(68, 56, 119, 0.5);
-  cursor: not-allowed;
-
-}
-.payButtonDisabled:hover {
-  background-color: rgba(68, 56, 119, 0.5);
-}
-
-
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .contributionContainer {
@@ -206,8 +189,4 @@
   .customAmountInput {
     padding: 10px 14px;
   }
-}
-
-.footer {
-  margin-top: auto;
 }

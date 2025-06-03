@@ -11,7 +11,6 @@ export default function UserProfile() {
   const { data: session, status } = useSession();
 
   const [userProfile, setUserProfile] = useState<Profile>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!router.isReady || status !== "authenticated") return;
@@ -34,8 +33,6 @@ export default function UserProfile() {
         setUserProfile(data);
       } catch (error) {
         console.error("Failed to load media", error);
-      } finally {
-        setIsLoading(false);
       }
     })().catch((err) => {
       console.error("Unexpected error in useEffect:", err);
@@ -69,7 +66,7 @@ export default function UserProfile() {
     }
   };
 
-  if (isLoading || !userProfile) return <p> Loading ... </p>;
+  if (!userProfile) return <p> Loading ... </p>;
 
   return (
     <div className={styles["landing-page"]}>

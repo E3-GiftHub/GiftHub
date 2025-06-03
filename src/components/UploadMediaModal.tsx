@@ -38,7 +38,7 @@ export default function UploadModal({
 
   const handleUploadComplete = () => {
     onUploadComplete();
-    onRefetchMedia(); 
+    onRefetchMedia();
   };
 
   return (

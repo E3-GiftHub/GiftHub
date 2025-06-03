@@ -8,9 +8,10 @@ import { useRouter } from "next/router";
 const WishlistViewPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
+  const eventId = id as string;
 
   const handleContribute = () => {
-    void router.push("/payment?articleid=" + id);
+    void router.push(`/payment?articleid=${eventId}`);
   };
 
   return (

@@ -91,7 +91,8 @@ const EventView: React.FC<EventViewProps> = ({
                   Contribute
                 </button>
 
-                <button onClick={onMediaView} className={styles.mediaCardButton}>
+                <button onClick={onMediaView} className={styles.infoCardButton}>
+                  <Image className={styles.icon} />
                   <span>Media</span>
                 </button>
               </div>

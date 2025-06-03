@@ -17,14 +17,14 @@ export default function DemoPage() {
       </Head>
       <div className={styles.giftHubPage}>
         <Navbar />
-          <div className={styles.invitationContainer}>
-            {invitationId !== undefined && (  
+        <div className={styles.invitationContainer}>
+          {invitationId !== undefined && (
             //posibil idul as fie invalid
             //sau un baiat foarte sneaky sa introduca
             //id=asf (ceea ce este incorect si INVALID)
-              <InvitationCard invitationId={invitationId} />
-            )}
-          </div>
+            <InvitationCard invitationId={invitationId} />
+          )}
+        </div>
         <Footer />
       </div>
     </>

@@ -22,5 +22,4 @@ export interface EventViewProps {
   onMediaView?: () => void;
   onReport?: (reason: string) => void;
   onViewProfile?: (username: string) => void;
-  isLoading?: boolean;
 }

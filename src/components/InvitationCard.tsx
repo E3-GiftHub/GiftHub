@@ -4,7 +4,7 @@ import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
 import NotInvited from "./notinvited";
-import LoadingSpinner from "./loadingspinner";
+import LoadingSpinner from "./loadingspiner";
 import React from "react";
 
 export default function InvitationCard({
@@ -16,13 +16,13 @@ export default function InvitationCard({
   onAccept?: () => void;
   onDecline?: () => void;
 }) {
-  // luam userul curent care foloseste acm pagina 
-  const { data: currentUser } = api.user.getSelf.useQuery();
+  // luam userul curent care foloseste acm pagina
+  const { data: currentUser } = api.user.get.useQuery();
 
   // aici luam idul invitatiei
   const invitationQuery = api.invitationPreview.getInvitationById.useQuery(
     { invitationId },
-    { enabled: !!invitationId }
+    { enabled: !!invitationId },
   );
   const invitationData = invitationQuery.data;
   const isInvitationLoading = invitationQuery.isLoading;
@@ -36,17 +36,20 @@ export default function InvitationCard({
   const acceptInvitation = api.invitationPreview.acceptInvitation.useMutation();
   const router = useRouter();
 
- if (isInvitationLoading) {
+  if (isInvitationLoading) {
     return <LoadingSpinner />;
   }
 
   const handleAccept = () => {
     if (eventData?.id && guestUsername) {
-      acceptInvitation.mutate({ eventId: eventData.id, guestUsername }, {
-        onSuccess: () => {
-          router.push(`/event?id=${eventData.id}`);
+      acceptInvitation.mutate(
+        { eventId: eventData.id, guestUsername },
+        {
+          onSuccess: () => {
+            void router.push(`/event?id=${eventData.id}`);
+          },
         },
-      });
+      );
       onAccept?.();
     }
   };
@@ -55,7 +58,11 @@ export default function InvitationCard({
     onDecline?.();
   };
 
-  if (!invitationData || invitationData.status === "ACCEPTED" || (currentUser && invitationData.guestUsername !== currentUser.username)) {
+  if (
+    !invitationData ||
+    invitationData.status === "ACCEPTED" ||
+    (currentUser && invitationData.guestUsername !== currentUser.username)
+  ) {
     return <NotInvited />;
   }
 
@@ -76,8 +83,8 @@ export default function InvitationCard({
                 {isEventLoading
                   ? ""
                   : eventData?.date
-                  ? new Date(eventData.date).toLocaleString()
-                  : ""}
+                    ? new Date(eventData.date).toLocaleString()
+                    : ""}
               </span>
             </div>
             <div className={styles.detailItem}>
@@ -107,6 +114,4 @@ export default function InvitationCard({
       <div className={`${styles.flap} ${styles.flapRight}`}></div>
     </div>
   );
-
-  
 }

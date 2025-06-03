@@ -15,14 +15,14 @@ export const itemRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
-              price: true
-            }
-          }
-        }
+              price: true,
+            },
+          },
+        },
       });
 
       // Fix: replace null with false
-      const fixedArticles = eventArticles.map(article => ({
+      const fixedArticles = eventArticles.map((article) => ({
         ...article,
         transferCompleted: article.transferCompleted ?? false,
       }));
@@ -34,7 +34,7 @@ export const itemRouter = createTRPCRouter({
           const mark = await db.mark.findFirst({
             where: {
               eventId: input.eventId,
-              articleId: ea.id, // FIX: use eventArticle id, not itemId
+              articleId: ea.itemId,
               markerUsername: input.username,
             },
           });
@@ -42,7 +42,7 @@ export const itemRouter = createTRPCRouter({
           const hasContributed = await db.contribution.findFirst({
             where: {
               eventId: input.eventId,
-              articleId: ea.id, // FIX: use eventArticle id, not itemId
+              articleId: ea.itemId,
               guestUsername: input.username,
             },
           });
@@ -51,7 +51,7 @@ export const itemRouter = createTRPCRouter({
           const contributionSum = await db.contribution.aggregate({
             where: {
               eventId: input.eventId,
-              articleId: ea.id, // FIX: use eventArticle id, not itemId
+              articleId: ea.itemId,
             },
             _sum: { cashAmount: true },
           });
@@ -66,12 +66,12 @@ export const itemRouter = createTRPCRouter({
 
           // Handle transferCompleted explicitly as nullable
           return {
-            id: ea.id, // Use the unique eventArticle id!
+            id: ea.itemId,
             nume: ea.item?.name ?? "",
             pret: ea.item?.price?.toString() ?? "",
             state,
             // Convert null to undefined explicitly
-            transferCompleted: ea.transferCompleted === null ? undefined : ea.transferCompleted,
+            transferCompleted: ea.transferCompleted ?? undefined,
             contribution: {
               current: Number(contributionSum._sum.cashAmount ?? 0),
               total: Number(ea.item?.price ?? 0),

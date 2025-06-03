@@ -10,8 +10,6 @@ export const config = {
   matcher: [
     "/home",
     "/inbox",
-    "/profile",
-    "/profile-edit",
     "/profile-view",
     "/event-invitation",
     "/event", // guest
