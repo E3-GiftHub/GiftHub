@@ -8,6 +8,8 @@ import { eventRouter } from "~/server/api/routers/EventController";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
+import { emailRouter } from "~/server/api/routers/emailRouter";
+
 import { guestRouter } from "~/server/api/routers/GuestRouter";
 import { ebayRouter } from "~/server/api/routers/EbayRouter"
 import { mediaRouter } from "~/server/api/routers/mediaRouter";
@@ -37,6 +39,8 @@ export const appRouter = createTRPCRouter({
   event: eventRouter,
   guest: guestRouter,
   user: userRouter,
+  email: emailRouter,
+
 });
 
 // export type definition of API
