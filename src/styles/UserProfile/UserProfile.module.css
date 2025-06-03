@@ -54,10 +54,10 @@
     left: 0;
 }
 
-.editAvatarButton {
+.customUploadButton {
     position: absolute;
-    bottom: 10%;
-    right: 15%;
+    bottom: 14%;
+    right: 11%;
     width: 3.5em;
     height: 3.5em;
     border-radius: 50%;
@@ -67,11 +67,62 @@
     transform: translate(30%, 30%);
     transition: transform 0.2s ease;
     z-index: 1;
+
 }
 
-.editAvatarButton:hover {
+.customUploadButton:hover {
     transform: translate(30%, 30%) scale(1.2);
 }
+
+/*!* Custom styling for UploadButton *!*/
+/*.customUploadButton {*/
+/*    position: absolute !important;*/
+/*    bottom: 14% !important;*/
+/*    right: 11% !important;*/
+/*    width: 3.5em !important;*/
+/*    height: 3.5em !important;*/
+/*    border-radius: 50% !important;*/
+/*    background: url('/UserImages/buttons/change_pfp.svg') center/contain !important;*/
+/*    border: none !important;*/
+/*    cursor: pointer !important;*/
+/*    transform: translate(30%, 30%) !important;*/
+/*    transition: transform 0.2s ease !important;*/
+/*    z-index: 1 !important;*/
+/*    padding: 0 !important;*/
+/*    overflow: hidden !important;*/
+/*}*/
+
+
+/*.customUploadButton:hover {*/
+/*    transform: translate(30%, 30%) scale(1.2) !important;*/
+
+/*}*/
+
+/*.customUploadButton button,*/
+/*.customUploadButton > * {*/
+/*    width: 100% !important;*/
+/*    height: 100% !important;*/
+/*    background: transparent !important;*/
+/*    border: none !important;*/
+/*    color: transparent !important;*/
+/*    padding: 0 !important;*/
+/*    margin: 0 !important;*/
+/*    opacity: 0 !important;*/
+/*}*/
+
+/*!* This hides any text content inside the button *!*/
+/*.customUploadButton span,*/
+/*.customUploadButton p,*/
+/*.customUploadButton div {*/
+/*    display: none !important;*/
+/*}*/
+
+/*!* Loading state for custom button *!*/
+/*.customUploadButton.loading {*/
+/*    animation: loadingPulse 1.5s infinite !important;*/
+/*    background-color: #e0e0e0 !important;*/
+/*    pointer-events: none !important;*/
+/*}*/
 
 /* Loading states */
 @keyframes loadingPulse {
@@ -145,12 +196,12 @@
 .email {
     font-size: 1.2em;
     color: #aaa;
-    margin: 0;
+    margin: 12px 0 0 0;
 }
 
 .buttonContainer {
     display: flex;
-    margin-top: 15px;
+    /*margin-top: 15px;*/
     /*gap: 16px;*/
 }
 
@@ -229,6 +280,7 @@
 
 .buttonContainer {
     gap: 3.6rem;
+    margin-top: 10px;
 }
 
 .button:disabled {

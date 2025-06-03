@@ -1,76 +1,18 @@
-// import { PrismaAdapter } from "@auth/prisma-adapter";
-// import { type DefaultSession, type NextAuthConfig } from "next-auth";
-// import DiscordProvider from "next-auth/providers/discord";
-//
-// import { db } from "~/server/db";
-//
-// /**
-//  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
-//  * object and keep type safety.
-//  *
-//  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
-//  */
-// declare module "next-auth" {
-//   interface Session extends DefaultSession {
-//     user: {
-//       id: string;
-//       // ...other properties
-//       // role: UserRole;
-//     } & DefaultSession["user"];
-//   }
-//
-//   // interface User {
-//   //   // ...other properties
-//   //   // role: UserRole;
-//   // }
-// }
-//
-// /**
-//  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
-//  *
-//  * @see https://next-auth.js.org/configuration/options
-//  */
-// export const authConfig = {
-//   providers: [
-//     DiscordProvider,
-//     /**
-//      * ...add more providers here.
-//      *
-//      * Most other providers require a bit more work than the Discord provider. For example, the
-//      * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-//      * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-//      *
-//      * @see https://next-auth.js.org/providers/github
-//      */
-//   ],
-//   adapter: PrismaAdapter(db),
-//   callbacks: {
-//     session: ({ session, user }) => ({
-//       ...session,
-//       user: {
-//         ...session.user,
-//         id: user.id,
-//       },
-//     }),
-//   },
-// } satisfies NextAuthConfig;
-
-
-
-
-// src/server/auth/config.ts
-import type { NextAuthConfig } from "next-auth"; // Use NextAuthConfig for better type safety with Auth.js v5+
+import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "~/server/db"; // Your Prisma client or DB utility
 import * as bcrypt from "bcrypt";
-
 
 export const authConfig: NextAuthConfig = {
   providers: [
     CredentialsProvider({
       name: "credentials", // Can be any name, used on the default sign-in page
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "jsmith@example.com" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "jsmith@example.com",
+        },
         password: { label: "Password", type: "password" },
       },
       // @ts-expect-error nush boss e greu
@@ -89,6 +31,12 @@ export const authConfig: NextAuthConfig = {
           where: {
             email: email,
           },
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            password: true,
+          },
         });
 
         if (!user) {
@@ -97,7 +45,9 @@ export const authConfig: NextAuthConfig = {
         }
 
         if (!user.password) {
-          console.error(`Authorize: User ${email} found but has no password set (e.g., OAuth user)`);
+          console.error(
+            `Authorize: User ${email} found but has no password set (e.g., OAuth user)`,
+          );
           return null;
         }
 
@@ -115,8 +65,7 @@ export const authConfig: NextAuthConfig = {
           id: user.id,
           name: user.username, // Or user.name, adjust based on your User model
           email: user.email,
-          // You can add any other properties you want to be available
-          // in the `user` object passed to the `jwt` callback.
+          username: user.username, // <-- Add this line
         };
       },
     }),
@@ -127,8 +76,8 @@ export const authConfig: NextAuthConfig = {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
         token.id = user.id; // Add the user ID to the JWT
-        // You can add other custom claims to the token here
-        // token.username = user.username; // if user object has username
+        // Use user['username'] to avoid TS error, since we know it's present from authorize
+        //token.username = user.username;
       }
       // `account` and `profile` are available when using OAuth providers
       return token;
@@ -140,21 +89,19 @@ export const authConfig: NextAuthConfig = {
       if (session.user && token.id) {
         session.user.id = token.id as string;
       }
-      // if (session.user && token.username) {
-      //   session.user.username = token.username as string;
-      // }
+
       return session;
     },
   },
   cookies: {
-    sessionToken:{
+    sessionToken: {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-      }
-    }
+      },
+    },
   },
   pages: {
     signIn: "/login", // Path to your custom login page
@@ -172,6 +119,8 @@ export const authConfig: NextAuthConfig = {
   // The secret is used to sign and encrypt JWTs, and for CSRF protection.
   // Ensure this is set in your environment variables for production.
   secret: process.env.AUTH_SECRET,
+
+  trustHost: true,
 
   // For NextAuth.js v5 (now officially Auth.js) when deploying to some platforms (like Vercel)
   // or when using a reverse proxy, you might need to set `trustHost`.
