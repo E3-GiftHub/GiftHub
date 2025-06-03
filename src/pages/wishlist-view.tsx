@@ -10,7 +10,7 @@ const WishlistViewPage: React.FC = () => {
   const { id } = router.query;
 
   const handleContribute = () => {
-    void router.push("/contribution-item?id=" + id);
+    void router.push("/payment?articleid=" + id);
   };
 
   return (
