@@ -438,20 +438,6 @@
   height: 1rem;
 }
 
-/* UPLOAD */
-.modalBackdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
 /* EDIT/VIEW Media Modal - PLANNER AND GUESTS */
 .editMediaModalWrapper {
   position: fixed;
@@ -529,4 +515,114 @@
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+}
+
+/* UPLOAD MODAL POPUP */
+.uploadModal {
+  background: #3f2a82;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.uploadModal .modalTitle {
+  margin: 0;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+/* UPLOAD MEDIA caption input */
+.captionInput {
+  width: 100%;
+  max-width: 28rem;
+  align-self: center;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #a45eeB, #6b1ed9);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* file picker wrapper */
+.fileInputWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  max-width: 24rem;      /* same as captionInput */
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+/* hide the native file‐input */
+.fileInputWrapper input[type="file"] {
+  display: none;
+}
+
+/* style the UploadButton’s <label> */
+.fileInputWrapper > label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 12px rgba(208, 195, 254, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+}
+.fileInputWrapper > label:hover {
+  transform: scale(1.02);
+}
+
+/* hide UploadThing’s filename badge */
+.fileInputWrapper > div[data-element="allowed-content"] {
+  display: none;
+}
+
+/* action buttons row */
+.uploadActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* backdrop */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.fileInputWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto;
 }
