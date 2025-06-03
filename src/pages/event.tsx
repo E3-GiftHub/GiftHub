@@ -1,11 +1,9 @@
 import styles from "../styles/EventView.module.css";
 import loadingStyles from "../styles/wishlistcomponent.module.css";
-import buttonStyles from "../styles/Button.module.css";
 
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { UploadButton } from "~/utils/uploadthing";
 import { api } from "~/trpc/react"; // <-- FIXED: use the React hooks client
 
 import Head from "next/head";
@@ -13,6 +11,7 @@ import EventView from "~/components/EventView";
 import Navbar from "~/components/Navbar";
 import MediaModal from "~/components/MediaModal";
 import Footer from "~/components/Footer";
+import UploadModal from "~/components/UploadMediaModal";
 import type { MediaHeader } from "~/models/MediaHeader";
 
 export default function EventViewPage() {
@@ -23,6 +22,8 @@ export default function EventViewPage() {
   const [mediaArray, setMediaArray] = useState<MediaHeader[]>([]);
   const [loadingMedia, setLoadingMedia] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [captionInput, setCaptionInput] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -66,7 +67,7 @@ export default function EventViewPage() {
   };
 
   const handleViewProfile = (username: string) => {
-    void router.push(`/profile-view?username=${username}`);
+    void router.push(`/view-profile?username=${username}`);
   };
 
   const handleViewWishlist = () => {
@@ -105,6 +106,41 @@ export default function EventViewPage() {
       console.error("Unexpected error in useEffect:", err);
     });
   }, [eventId]);
+
+  // to refresh media after upload is completed
+  const refetchMedia = async () => {
+    setLoadingMedia(true);
+    try {
+      const res = await fetch(`./api/media-query?eventId=${eventId}`);
+      const data = (await res.json()) as MediaHeader[];
+      setMediaArray(data);
+    } catch (error) {
+      console.error("Failed to refetch media", error);
+    } finally {
+      setLoadingMedia(false);
+    }
+  };
+
+  const handleUploadClose = () => {
+    setShowUploadModal(false);
+    setCaptionInput("");
+    setIsUploading(false);
+  };
+
+  const handleUploadBegin = () => {
+    setIsUploading(true);
+  };
+
+  const handleUploadComplete = () => {
+    setIsUploading(false);
+    setShowUploadModal(false);
+    setCaptionInput("");
+  };
+
+  const handleUploadError = (err: Error) => {
+    setIsUploading(false);
+    alert(`Error: ${err.message}`);
+  };
 
   //! RENDER ALL DATA
   if (isLoading) {
@@ -163,37 +199,18 @@ export default function EventViewPage() {
           )}
 
           {/* THE UPLOADING MODAL */}
-          {showUploadModal && (
-            <div className={styles.modalBackdrop}>
-              <div className={styles.modal}>
-                <h3 className={styles.modalTitle}>Upload Media</h3>
-                <UploadButton
-                  endpoint="imageUploader"
-                  input={{
-                    username: session?.user?.name ?? "",
-                    eventId: eventId,
-                    caption: "varza", //todo ask for user input here
-                  }}
-                  onClientUploadComplete={(res) => {
-                    console.log("Files:", res);
-                    alert("Upload completed");
-                    setShowUploadModal(false);
-                  }}
-                  onUploadError={(err: Error) => {
-                    alert(`Error: ${err.message}`);
-                  }}
-                />
-
-                <button
-                  className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-                  onClick={() => setShowUploadModal(false)}
-                  style={{ marginTop: "1rem" }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
+          <UploadModal
+            showUploadModal={showUploadModal}
+            captionInput={captionInput}
+            isUploading={isUploading}
+            eventId={eventId}
+            onClose={handleUploadClose}
+            onCaptionChange={setCaptionInput}
+            onUploadBegin={handleUploadBegin}
+            onUploadComplete={handleUploadComplete}
+            onUploadError={handleUploadError}
+            onRefetchMedia={refetchMedia}
+          />
         </main>
       </div>
       <Footer />

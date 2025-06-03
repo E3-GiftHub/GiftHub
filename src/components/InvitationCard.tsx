@@ -4,6 +4,7 @@ import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
 import NotInvited from "./notinvited";
+import LoadingSpinner from "./loadingspiner";
 import React from "react";
 
 export default function InvitationCard({
@@ -15,13 +16,13 @@ export default function InvitationCard({
   onAccept?: () => void;
   onDecline?: () => void;
 }) {
-  // luam userul curent care foloseste acm pagina 
-  const { data: currentUser } = api.user.getSelf.useQuery();
+  // luam userul curent care foloseste acm pagina
+  const { data: currentUser } = api.user.get.useQuery();
 
   // aici luam idul invitatiei
   const invitationQuery = api.invitationPreview.getInvitationById.useQuery(
     { invitationId },
-    { enabled: !!invitationId }
+    { enabled: !!invitationId },
   );
   const invitationData = invitationQuery.data;
   const isInvitationLoading = invitationQuery.isLoading;
@@ -33,22 +34,22 @@ export default function InvitationCard({
   const guestUsername = invitationData?.guestUsername;
 
   const acceptInvitation = api.invitationPreview.acceptInvitation.useMutation();
+  const router = useRouter();
 
   if (isInvitationLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
-    );
-  }
-
-  if (!invitationData || invitationData.status === "ACCEPTED") {
-    return <NotInvited />;
+    return <LoadingSpinner />;
   }
 
   const handleAccept = () => {
     if (eventData?.id && guestUsername) {
-      acceptInvitation.mutate({ eventId: eventData.id, guestUsername });
+      acceptInvitation.mutate(
+        { eventId: eventData.id, guestUsername },
+        {
+          onSuccess: () => {
+            void router.push(`/event?id=${eventData.id}`);
+          },
+        },
+      );
       onAccept?.();
     }
   };
@@ -56,6 +57,14 @@ export default function InvitationCard({
   const handleDecline = () => {
     onDecline?.();
   };
+
+  if (
+    !invitationData ||
+    invitationData.status === "ACCEPTED" ||
+    (currentUser && invitationData.guestUsername !== currentUser.username)
+  ) {
+    return <NotInvited />;
+  }
 
   return (
     <div className={styles.envelope}>
@@ -74,8 +83,8 @@ export default function InvitationCard({
                 {isEventLoading
                   ? ""
                   : eventData?.date
-                  ? new Date(eventData.date).toLocaleString()
-                  : ""}
+                    ? new Date(eventData.date).toLocaleString()
+                    : ""}
               </span>
             </div>
             <div className={styles.detailItem}>

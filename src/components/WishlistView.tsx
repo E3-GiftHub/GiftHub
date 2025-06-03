@@ -40,7 +40,7 @@ const Wishlist: React.FC<WishlistProps> = ({
         : undefined);
 
   const { data: currentUser, isLoading: isLoadingUser } =
-    api.user.getSelf.useQuery();
+    api.user.get.useQuery();
   const username = currentUser?.username;
 
   const { data, isLoading, isError, refetch } = api.item.getAll.useQuery(
@@ -77,8 +77,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     if (data) {
       const updatedItems = data.map((item) => ({
         ...item,
-        transferCompleted:
-          item.transferCompleted === null ? false : item.transferCompleted,
+        transferCompleted: item.transferCompleted ?? false,
       }));
       setTrendingItems(updatedItems);
     }

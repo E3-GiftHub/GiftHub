@@ -9,7 +9,7 @@
 .wishlistContainer {
   width: 100%;
   max-width: 1200px;
-  background-color: #312E81; /* indigo-900 */
+  background-color: #312e81; /* indigo-900 */
   border-radius: 0.5rem;
   padding: 1.5rem;
   color: white;
@@ -35,13 +35,13 @@
   flex-grow: 1;
   padding: 0.5rem;
   border-radius: 0.5rem 0 0 0.5rem;
-  background-color: #E0E7FF; /* indigo-100 */
-  color: #1F2937; /* gray-800 */
+  background-color: #e0e7ff; /* indigo-100 */
+  color: #1f2937; /* gray-800 */
   border: 0;
 }
 
 .searchButton {
-  background-color: #E0E7FF; /* indigo-100 */
+  background-color: #e0e7ff; /* indigo-100 */
   border-radius: 0 0.5rem 0.5rem 0;
   padding: 0.5rem;
   display: flex;
@@ -52,7 +52,7 @@
 .searchIcon {
   height: 1.25rem;
   width: 1.25rem;
-  color: #4B5563; /* gray-600 */
+  color: #4b5563; /* gray-600 */
 }
 
 .filterSection {
@@ -70,9 +70,10 @@
   gap: 0.5rem;
 }
 
-.categoryButton, .retailerButton {
-  background-color: #E0E7FF; /* indigo-200 */
-  color: #312E81; /* indigo-900 */
+.categoryButton,
+.retailerButton {
+  background-color: #e0e7ff; /* indigo-200 */
+  color: #312e81; /* indigo-900 */
   border-radius: 0.5rem;
   padding: 0.25rem 1rem;
   font-size: 0.75rem;
@@ -80,7 +81,7 @@
 }
 
 .selectedRetailer {
-  background-color: #A5B4FC; 
+  background-color: #a5b4fc;
   font-weight: 700;
 }
 
@@ -134,14 +135,14 @@
 
 /* Contribution progress overlay */
 .itemImage {
-  background-color: #E0E7FF; /* indigo-200 */
+  background-color: #e0e7ff; /* indigo-200 */
   border-radius: 0.5rem;
   height: 7rem;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #818CF8; /* indigo-400 */
+  color: #818cf8; /* indigo-400 */
   font-weight: 500;
   position: relative; /* For positioning the overlay */
   overflow: hidden; /* For the progress indicator */
@@ -163,9 +164,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  opacity: 0; 
+  opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s ease,
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   color: white;
   border-radius: 0;
   z-index: 10;
@@ -187,7 +191,9 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s; /* Delayed animation */
+  transition:
+    opacity 0.3s ease 0.1s,
+    transform 0.3s ease 0.1s; /* Delayed animation */
 }
 
 .contributionProgress {
@@ -200,12 +206,14 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
   transform: scaleX(0.9);
-  transition: opacity 0.3s ease 0.2s, transform 0.3s ease 0.2s; /* More delayed */
+  transition:
+    opacity 0.3s ease 0.2s,
+    transform 0.3s ease 0.2s; /* More delayed */
 }
 
 .contributionBar {
   height: 100%;
-  background: linear-gradient(90deg, #9333EA, #C084FC);
+  background: linear-gradient(90deg, #9333ea, #c084fc);
   border-radius: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   transform-origin: left;
@@ -221,7 +229,9 @@
   border-radius: 1rem;
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.3s ease 0.3s, transform 0.3s ease 0.3s; /* Most delayed */
+  transition:
+    opacity 0.3s ease 0.3s,
+    transform 0.3s ease 0.3s; /* Most delayed */
 }
 
 /* Add these new styles to animate the elements when the overlay appears */
@@ -243,7 +253,8 @@
   padding: 0 0.25rem;
 }
 
-.itemName, .itemPrice {
+.itemName,
+.itemPrice {
   font-size: 0.75rem;
 }
 
@@ -268,9 +279,9 @@
   flex: 1;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  border: 1px solid #E0E7FF;
-  background-color: #E0E7FF;
-  color: #1F2937;
+  border: 1px solid #e0e7ff;
+  background-color: #e0e7ff;
+  color: #1f2937;
   font-size: 0.875rem;
 }
 
@@ -284,21 +295,21 @@
 }
 
 .contributeSubmitButton {
-  background-color: #818CF8;
+  background-color: #818cf8;
   color: white;
 }
 
 .contributeCancelButton {
-  background-color: #E0E7FF;
-  color: #4338CA;
+  background-color: #e0e7ff;
+  color: #4338ca;
 }
 
 .contributeSubmitButton:hover {
-  background-color: #6366F1;
+  background-color: #6366f1;
 }
 
 .contributeCancelButton:hover {
-  background-color: #C7D2FE;
+  background-color: #c7d2fe;
 }
 
 /* Refined button styles with responsive sizing */
@@ -308,10 +319,11 @@
   border-radius: 32px;
   padding: 0.35rem 0;
   font-size: 0.75rem;
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   font-weight: 500;
@@ -321,9 +333,9 @@
   min-width: 0;
   position: relative;
   transform: translateY(0);
-  display: flex;                /* Add this */
-  align-items: center;          /* Add this */
-  justify-content: center;      /* Add this */
+  display: flex; /* Add this */
+  align-items: center; /* Add this */
+  justify-content: center; /* Add this */
 }
 
 /* Media queries for responsive sizing */
@@ -342,11 +354,11 @@
 }
 
 .contributeButton {
-  background-color: #8B5CF6; /* Purple color for contribute */
+  background-color: #8b5cf6; /* Purple color for contribute */
 }
 
 .externalButton {
-  background-color: #6366F1; /* Indigo color for external */
+  background-color: #6366f1; /* Indigo color for external */
 }
 
 .contributeButton:hover:not(:disabled),
@@ -357,11 +369,11 @@
 }
 
 .contributeButton:hover:not(:disabled) {
-  background-color: #7C3AED; /* Darker purple on hover */
+  background-color: #7c3aed; /* Darker purple on hover */
 }
 
 .externalButton:hover:not(:disabled) {
-  background-color: #4F46E5; /* Darker indigo on hover */
+  background-color: #4f46e5; /* Darker indigo on hover */
 }
 
 /* Disabled button style */
@@ -373,11 +385,11 @@
 }
 
 .contributeButton {
-  background-color: #8B5CF6; /* Purple color for contribute */
+  background-color: #8b5cf6; /* Purple color for contribute */
 }
 
 .externalButton {
-  background-color: #6366F1; /* Indigo color for external */
+  background-color: #6366f1; /* Indigo color for external */
 }
 
 .contributeButton:hover:not(:disabled),
@@ -389,7 +401,7 @@
 
 /* Pressed button effect */
 .buttonPressed {
-  background-color: #4338CA !important; 
+  background-color: #4338ca !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   transform: translateY(1px) !important;
   border: 2px solid rgba(255, 255, 255, 0.4) !important;
@@ -402,27 +414,4 @@
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
-}
-
-.loadingContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  width: 100%;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #c8abd6;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
