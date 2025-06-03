@@ -179,7 +179,7 @@ export default function EditUserProfileUI({
               onUploadError={onUploadError}
               appearance={{
                 button: {
-                  display: "none",
+                  opacity: 0,
                 },
                 allowedContent: {
                   display: "none",

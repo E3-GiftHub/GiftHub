@@ -17,7 +17,7 @@ export const profilePictureRouter = createTRPCRouter({
       const fileUrl = `${process.env.AUTH_URL}/api/uploadthing/${input.key}`;
       const updatedUser = await ctx.db.user.update({
         where: {
-          username: ctx.session.user.id as string,
+          username: ctx.session.user.id!,
         },
         data: {
           pictureUrl: fileUrl,

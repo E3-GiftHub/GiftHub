@@ -28,7 +28,7 @@ export default function UserProfile() {
     (async () => {
       try {
         const res = await fetch(
-          `./api/user/profile-query?username=${username}`,
+          `./api/user/profile-query?username=${username as string}`,
         );
         const data = (await res.json()) as Profile;
         setUserProfile(data);
