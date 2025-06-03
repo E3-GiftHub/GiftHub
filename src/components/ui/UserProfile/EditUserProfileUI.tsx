@@ -3,6 +3,7 @@ import styles from 'src/styles/UserProfile/UserProfile.module.css';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import "src/styles/globals.css";
+
 // import {useUploadThing} from "~/utils/uploadthing";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
@@ -157,23 +158,23 @@ export default function EditUserProfileUI({
                 />
               )}
             </div>
+            <button
+              className={clsx(
+                styles.editAvatarButton,
+                loading && styles.loading,
+              )}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              aria-label="Edit avatar"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
           </div>
-          <button
-            className={clsx(
-              styles.editAvatarButton,
-              loading && styles.loading,
-            )}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-            aria-label="Edit avatar"
-          />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
         </div>
 
         <div className={styles.userInfoedit}>
