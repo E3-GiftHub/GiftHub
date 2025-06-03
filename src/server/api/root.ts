@@ -8,16 +8,10 @@ import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
 // import { purchasedItemsRouter } from "~/server/api/routers/purchasedContributionRouter";
 import { invitesNotificationRouter } from "~/server/api/routers/invitesNotificationRouter";
 import { emailRouter } from "~/server/api/routers/emailRouter";
-<<<<<<< HEAD
-
-import { authRouter } from "./routers/authRouter";
-import { stripeRouter } from "~/server/api/routers/stripeRouter";
-import { userRouter } from "~/server/api/routers/userRouter"; // presupunând că fișierul se numește userRouter.ts și este în același director 'routers'
-=======
-import { userRouter } from "./routers/profileManagenemt/user";
+import { userRouter as profileUserRouter } from "./routers/profileManagenemt/user";
+import { userRouter } from "./routers/userRouter";
 import { authRouter } from "~/server/api/routers/authRouter";
 import { profileRouter } from "~/server/api/routers/profileRouter";
->>>>>>> 5ba3b99c7b5f4037fc89fc33c2e5cb4bd5b1ca81
 
 /**
 
@@ -40,10 +34,6 @@ export const appRouter = createTRPCRouter({
   contributions: contributionsRouter,
   purchasedItems: contributionsRouter,
   invitationsNotification: invitesNotificationRouter,
-<<<<<<< HEAD
-  stripe: stripeRouter,
-=======
->>>>>>> 5ba3b99c7b5f4037fc89fc33c2e5cb4bd5b1ca81
   user: userRouter,
   email: emailRouter,
 });
