@@ -44,50 +44,48 @@ export default function AddToWishlistModal({
   return (
     <div className={modalStyles.modalOverlay}>
       <div className={modalStyles.modalContent}>
-        <h2 className={modalStyles.modalTitle}>Add to Wishlist</h2>
-
-        <div>
+        <h2 className={modalStyles.modalTitleAdd}>Add to Wishlist</h2>
+        <div className={modalStyles.product}>
           <img
-            src={itemPhoto}
-            alt={itemName}
-            className={modalStyles.modalImage}
-          />
-          <h3 className={modalStyles.modalItemName}>{itemName}</h3>
-          <p className={modalStyles.modalItemPrice}>{itemPrice}</p>
-          {itemDescription && (
-            <p className={modalStyles.modalItemDescription}>
-              {itemDescription}
-            </p>
-          )}
-        </div>
+              src={itemPhoto}
+              alt={itemName}
+              className={modalStyles.modalImage}
+            />
 
-        <div>
-          <label htmlFor="quantity" className={modalStyles.quantityLabel}>
-            Quantity:
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className={modalStyles.quantityInput}
-          />
-        </div>
-
-        <div className={modalStyles.modalButtons}>
-          <button
-            className={`${styles.button} ${styles["button-secondary"]}`}
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button
-            className={`${styles.button} ${styles["button-primary"]}`}
-            onClick={handleAddToWishlist}
-          >
-            Add to Wishlist
-          </button>
+          <div className={modalStyles.productInfo}>
+            <h3 className={modalStyles.modalItemName}>{itemName}</h3>
+            <p className={modalStyles.modalItemPrice}>{itemPrice}</p>
+            {itemDescription && (
+              <p className={modalStyles.modalItemDescription}>
+                {itemDescription}
+              </p>
+            )}
+            <div>
+            <label htmlFor="quantity" className={modalStyles.quantityLabel}>
+              Quantity:
+            </label>
+            <input type="number" id="quantity"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className={modalStyles.quantityInput}
+              />
+            </div>
+            <div className={modalStyles.modalButtons}>
+              <button
+                className={`${styles.button} ${styles["button-secondary"]}`}
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${styles.button} ${styles["button-secondary"]}`}
+                onClick={handleAddToWishlist}
+              >
+                Add to Wishlist
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

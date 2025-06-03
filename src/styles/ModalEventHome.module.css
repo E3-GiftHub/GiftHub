@@ -38,3 +38,43 @@
     font-family: Jura, "sans-serif";
     font-size: 1.5rem;
   }
+
+  .modalButtons{
+    margin-top: 20px;
+    display: flex;
+    gap:20px;
+  }
+  .product{
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    justify-content: center;
+  }
+  .productInfo{
+    display: flex;
+    flex-direction: column;
+  }
+  .modalTitleAdd{
+    justify-self: center;
+  }
+  .modalImage{
+    width: 35%;
+    height: auto;
+  }
+  .quantityInput{
+    margin-left: 15px;
+    width: 15%;
+  }
+
+  @media (max-width: 600px) {
+    .product{
+      flex-direction: column;
+      justify-self: center;
+      align-self: center;
+    }
+    .modalImage{
+      justify-self: center;
+      align-self: center;
+      width: 50%;
+    }
+  }

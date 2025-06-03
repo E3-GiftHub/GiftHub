@@ -158,7 +158,7 @@ const handleAddToWishlist = async (item: {
           </div>
 
           {/* Search Results */}
-          {isLoading && <p>Searching...</p>}
+          {isLoading && <p className={styles.searchLabel}>Searching...</p>}
 
           {searchResults.length > 0 && (
             <div className={styles.itemGrid}>

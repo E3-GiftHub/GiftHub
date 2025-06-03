@@ -7,7 +7,6 @@
   flex-direction: column;
   padding-bottom: 9vh;
 }
-
 .container {
   width: clamp(320px, 95%, 1367px);
   border-radius: 15px;
@@ -79,6 +78,10 @@
   font-family: "Poppins", sans-serif;
 }
 
+.searchLabel{
+  justify-self: center;
+}
+
 .buttonGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -102,6 +105,7 @@
   padding: clamp(0.5rem, 1.5vw, 0.75rem);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: clamp(0.5rem, 1.5vw, 0.75rem);
 }
 
