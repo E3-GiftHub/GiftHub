@@ -3,37 +3,48 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import * as bcrypt from "bcrypt";
 
 const updatePasswordSchema = z.object({
-  email: z.string().email(),
+  token: z.string(),
   password: z.string().min(8),
   confirmPassword: z.string().min(8),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "PASSWORDS DON'T MATCH",
+  message: "Passwords don't match.",
   path: ["confirmPassword"],
 });
-
 
 export const updatePasswordRouter = createTRPCRouter({
   update: publicProcedure
     .input(updatePasswordSchema)
     .mutation(async ({ input, ctx }) => {
-      const user = await ctx.db.user.findUnique({
-        where:{
-          email: input.email,
+      const user = await ctx.db.user.findFirst({
+        where: {
+          emailToken: input.token,
         }
-      })
+      });
 
-      if(!user){
-        throw new Error("User not found");
+      if (!user?.emailToken || !user.tokenExpires) {
+        console.error("Password reset attempt: Invalid token or no user found for token.", { token: input.token, userExists: !!user });
+        throw new Error("Invalid or expired password reset link.");
+      }
+
+      if (user.tokenExpires < new Date()) {
+        console.error("Password reset attempt: Token expired for user:", user.email);
+        await ctx.db.user.update({
+          where: { email: user.email! }, // <-- ADDED '!' HERE
+          data: { emailToken: null, tokenExpires: null },
+        });
+        throw new Error("Password reset link has expired. Please request a new one."); // Corrected new Error
       }
 
       const hashPasswd = await bcrypt.hash(input.password, 10);
-
-      const updatedUser = await ctx.db.user.update({
-        where:{email: input.email},
-        data: {password: hashPasswd},
+      await ctx.db.user.update({
+        where: { email: user.email! },
+        data: {
+          password: hashPasswd,
+          emailToken: null,
+          tokenExpires: null,
+        },
       });
-
-      return{
+      return {
         success: true,
       };
     }),
