@@ -46,13 +46,13 @@ export const requestResetRouter = createTRPCRouter({
                 margin-bottom: 0;
                 margin-top: 0;
                 padding: 0.8em 1.2em;
-                background: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
+                background-color: radial-gradient(circle at bottom right, #a078e4 0%, #8d80ec 57%, #738bf8 100%);
                 width: 11em;
                 height: 3em;
                 border-radius: 10px;
                 outline: none;
                 border: none;
-                color: white;
+                color: #370062;
                 font-size: 1.1em;
                 font-weight: 600;
                 transition: transform 0.1s ease;
