@@ -179,12 +179,13 @@ export default function EditUserProfileUI({
 
         <div className={styles.userInfoedit}>
           <div className={styles.inputGroup}>
-            <label htmlFor="username" className={styles.inputLabel}>
+            <label htmlFor="username"  className={styles.inputLabel}>
               {/* Username */}
             </label>
             <input
               id="username"
               type="text"
+              placeholder="username..."
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
@@ -199,6 +200,7 @@ export default function EditUserProfileUI({
             <input
               id="fname"
               type="text"
+              placeholder="FirstName..."
               value={fnameInput}
               onChange={(e) => setFnameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
@@ -213,6 +215,7 @@ export default function EditUserProfileUI({
             <input
               id="lname"
               type="text"
+              placeholder="LastName..."
               value={lnameInput}
               onChange={(e) => setLnameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
@@ -227,6 +230,7 @@ export default function EditUserProfileUI({
             <input
               id="email"
               type="email"
+              placeholder="yourNewEmail@..com."
               value={emailInput}
               onChange={handleEmailChange}
               className={clsx(styles.inputField, loading && styles.loading)}
