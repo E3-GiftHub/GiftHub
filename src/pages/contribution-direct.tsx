@@ -8,13 +8,16 @@ import { useRouter } from "next/router";
 
 const ContributionPage: React.FC = () => {
   const router = useRouter();
+  const { eventId } = router.query;
+  const eventIdStr = Array.isArray(eventId) ? eventId[0] : eventId;
 
   const handleWishlist = () => {
-    void router.push("/wishlist");
+    void router.push(`/wishlist-view?eventId=${eventIdStr}`);
   };
 
   const handlePay = () => {
-    void window.open("https://google.com", "_blank");
+    console.log("am apasat pay si trebuie sa ma duca la payment cu eventid:", eventIdStr);
+    void router.push(`/payment-succes?eventId=${eventIdStr}`);
   };
 
   return (

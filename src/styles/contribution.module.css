@@ -151,6 +151,16 @@
   background-color: #6a5ab0;
 }
 
+.payButtonDisabled {
+  background-color: rgba(68, 56, 119, 0.5);
+  cursor: not-allowed;
+
+}
+.payButtonDisabled:hover {
+  background-color: rgba(68, 56, 119, 0.5);
+}
+
+
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .contributionContainer {

@@ -5,12 +5,12 @@ import Footer from "~/components/Footer";
 import styles from "../styles/WishlistView.module.css";
 import { useRouter } from "next/router";
 
-const WishlistPage: React.FC = () => {
+const WishlistViewPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
 
   const handleContribute = () => {
-    void router.push("/payment");
+    void router.push("/contribution-item?id=" + id);
   };
 
   return (
@@ -27,4 +27,4 @@ const WishlistPage: React.FC = () => {
   );
 };
 
-export default WishlistPage;
+export default WishlistViewPage;

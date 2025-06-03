@@ -3,8 +3,8 @@ import styles from "../styles/contribution.module.css";
 import type { ContributionProps } from "../models/ContributionData";
 
 const predefinedAmounts: string[][] = [
-  ["7.4", "74", "747", "7474"],
-  ["744", "740", "7400", "704"],
+  ["10", "15", "20", "25"],
+  ["50", "100", "150", "200"],
 ];
 
 const Contribution: React.FC<ContributionProps> = ({ wishlist, pay }) => {
@@ -71,7 +71,7 @@ const Contribution: React.FC<ContributionProps> = ({ wishlist, pay }) => {
           Go to the wishlist
         </button>
         <button
-          className={styles.payButton}
+          className={`${styles.payButton} ${!getSelectedValue() ? styles.payButtonDisabled : ''}`}
           onClick={handlePayClick}
           disabled={!getSelectedValue()}
         >
