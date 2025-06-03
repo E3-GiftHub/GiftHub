@@ -44,6 +44,12 @@ export default function EventViewPage() {
     { enabled: Boolean(id) && !isNaN(eventId) },
   );
 
+  const { data: invitationData, isLoading: isInvitationLoading } =
+    api.invitationPreview.getInvitationForUserEvent.useQuery(
+      { eventId: Number(eventId), guestUsername: session?.user?.name ?? "" },
+      { enabled: !!eventId && !!session?.user?.name && !isLoading },
+    );
+
   //! FUNCTIONS
   const handleReport = async (reason: string) => {
     if (status !== "authenticated") return;
@@ -144,7 +150,10 @@ export default function EventViewPage() {
   };
 
   //! RENDER ALL DATA
-  if (isLoading) {
+  if (!isLoading && !session?.user) return <p>Please login first...</p>;
+
+  // Show loading spinner while either event or invitation data is loading
+  if (isLoading || isInvitationLoading) {
     return (
       <div className={loadingStyles.loadingContainer}>
         <div className={loadingStyles.spinner}></div>
@@ -152,9 +161,30 @@ export default function EventViewPage() {
     );
   }
 
-  if (!isLoading && !session?.user) return <p>Please login first...</p>;
-  if ((!isLoading && error) || !id || !eventData)
-    return <p>error: Invalid event ID - {error?.message}</p>;
+  // Check for errors or missing data after loading
+  if (error || !id || !eventData) {
+    return (
+      <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner}></div>
+      </div>
+    );
+  }
+
+  // Check if user is invited
+  if (invitationData?.status !== "ACCEPTED") {
+    return (      
+      <>
+        <Head>
+          <title>Event View - GiftHub</title>
+        </Head>
+        <Navbar />
+        <div className={styles.containerNotInvited}>
+          <NotInvited />
+        </div>
+        <Footer />
+      </>
+    )
+  }
 
   return (
     <>
