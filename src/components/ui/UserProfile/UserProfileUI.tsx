@@ -140,7 +140,8 @@ export default function UserProfileUI({
 
     try {
       await deleteUserMutation.mutateAsync();
-      await signOut({ callbackUrl: "/" });
+      document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+      await signOut({ redirectTo: "/" });
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("An unexpected error occurred while deleting your account.");

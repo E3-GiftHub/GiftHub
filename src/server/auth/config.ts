@@ -120,6 +120,8 @@ export const authConfig: NextAuthConfig = {
   // Ensure this is set in your environment variables for production.
   secret: process.env.AUTH_SECRET,
 
+  trustHost: true,
+
   // For NextAuth.js v5 (now officially Auth.js) when deploying to some platforms (like Vercel)
   // or when using a reverse proxy, you might need to set `trustHost`.
   // trustHost: true, // Be mindful of security implications if your proxy setup isn't secure.
