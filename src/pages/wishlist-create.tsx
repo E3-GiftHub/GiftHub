@@ -140,8 +140,8 @@
               </div>
             </div>
 
-            {/* Search Results */}
-            {isLoading && <p>Searching...</p>}
+          {/* Search Results */}
+          {isLoading && <p className={styles.searchLabel}>Searching...</p>}
 
             {searchResults.length > 0 && (
               <div className={styles.itemGrid}>

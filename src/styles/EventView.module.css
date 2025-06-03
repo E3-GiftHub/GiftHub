@@ -191,6 +191,8 @@
   background-repeat: no-repeat;
   border-radius: 15px;
   display: flex;
+  flex-direction: column;
+  gap: 20px;
   align-items: center;
   justify-content: center;
   padding: 2rem;
