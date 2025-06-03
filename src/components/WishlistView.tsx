@@ -10,18 +10,18 @@ import { useRouter } from "next/router";
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
     "/illustrations/account_visual.png",
-    "/illustrations/babyShower.svg",
+    "/illustrations/babyShower.svg", 
     "/illustrations/birthdayParty.svg",
   ];
-  //daca produsu are o imagine, o pune pe aia
+  
+  // If the product has an image URL, use it
   if (item.imageUrl) {
     return item.imageUrl;
   }
-  //altfel foloseste una de aici  gen de mai sus
-  else {
-    const imageIndex = item.id % productImages.length;
-    return productImages[imageIndex];
-  }
+  
+  // Otherwise, use a fallback image based on item ID
+  const fallbackIndex = item.id % productImages.length;
+  return productImages[fallbackIndex];
 };
 
 const Wishlist: React.FC<WishlistProps> = ({

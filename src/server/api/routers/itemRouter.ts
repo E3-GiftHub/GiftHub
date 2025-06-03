@@ -16,6 +16,7 @@ export const itemRouter = createTRPCRouter({
               id: true,
               name: true,
               price: true,
+              imagesUrl: true,
             },
           },
         },
@@ -70,7 +71,7 @@ export const itemRouter = createTRPCRouter({
             nume: ea.item?.name ?? "",
             pret: ea.item?.price?.toString() ?? "",
             state,
-            // Convert null to undefined explicitly
+            imageUrl: ea.item?.imagesUrl ?? undefined,
             transferCompleted: ea.transferCompleted ?? undefined,
             contribution: {
               current: Number(contributionSum._sum.cashAmount ?? 0),
