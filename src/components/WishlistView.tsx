@@ -5,6 +5,7 @@ import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
 import NotInvited from "./notinvited";
 import { useRouter } from "next/router";
 
+//?????? ce comit viseaza git??????
 // Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
