@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import styles from '../styles/wishlistcomponent.module.css';
-import { api } from '~/trpc/react';
-import type { TrendingItem } from '../models/WishlistEventGuest';
-import type { WishlistProps } from '../models/WishlistEventGuest';
-import NotInvited from './notinvited';
-import { useRouter } from 'next/router';
+import React, { useState, useEffect } from "react";
+import styles from "../styles/wishlistcomponent.module.css";
+import { api } from "~/trpc/react";
+import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
+import NotInvited from "./notinvited";
+import { useRouter } from "next/router";
 
 // Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
-    '/illustrations/account_visual.png',
-    '/illustrations/babyShower.svg',
-    '/illustrations/birthdayParty.svg',
+    "/illustrations/account_visual.png",
+    "/illustrations/babyShower.svg",
+    "/illustrations/birthdayParty.svg",
   ];
   //daca produsu are o imagine, o pune pe aia
   if (item.imageUrl) {
@@ -24,51 +23,62 @@ const getItemImage = (item: TrendingItem) => {
   }
 };
 
-const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId }) => {
+const Wishlist: React.FC<WishlistProps> = ({
+  contribution,
+  eventId: propEventId,
+}) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
   const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const router = useRouter();
 
-  const eventId = propEventId ?? (typeof router.query.eventId === 'string' ? router.query.eventId : Array.isArray(router.query.eventId) ? router.query.eventId[0] : undefined);
+  const eventId =
+    propEventId ??
+    (typeof router.query.eventId === "string"
+      ? router.query.eventId
+      : Array.isArray(router.query.eventId)
+        ? router.query.eventId[0]
+        : undefined);
 
-  const { data: currentUser, isLoading: isLoadingUser } = api.user.getSelf.useQuery();
+  const { data: currentUser, isLoading: isLoadingUser } =
+    api.user.getSelf.useQuery();
   const username = currentUser?.username;
 
-  const {
-    data,
-    isLoading,
-    isError,
-    refetch
-  } = api.item.getAll.useQuery({
-    eventId: eventId ? Number(eventId) : 0,
-    username: username ?? ""
-  }, {
-    enabled: !!eventId && !!username && !isLoadingUser
-  });
+  const { data, isLoading, isError, refetch } = api.item.getAll.useQuery(
+    {
+      eventId: eventId ? Number(eventId) : 0,
+      username: username ?? "",
+    },
+    {
+      enabled: !!eventId && !!username && !isLoadingUser,
+    },
+  );
 
   const setMark = api.item.setMark.useMutation({
     onSuccess: () => void refetch(),
   });
 
-  const {
-    data: eventData,
-    isLoading: isEventLoading
-  } = api.event.getById.useQuery({
-    id: eventId ? Number(eventId) : 0
-  }, {
-    enabled: !!eventId
-  });
+  const { data: eventData, isLoading: isEventLoading } =
+    api.event.getById.useQuery(
+      {
+        id: eventId ? Number(eventId) : 0,
+      },
+      {
+        enabled: !!eventId,
+      },
+    );
 
-  const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
-    { eventId: Number(eventId), guestUsername: username ?? "" },
-    { enabled: !!eventId && !!username && !isLoadingUser }
-  );
+  const { data: invitationData, isLoading: isInvitationLoading } =
+    api.invitationPreview.getInvitationForUserEvent.useQuery(
+      { eventId: Number(eventId), guestUsername: username ?? "" },
+      { enabled: !!eventId && !!username && !isLoadingUser },
+    );
 
   useEffect(() => {
     if (data) {
-      const updatedItems = data.map(item => ({
+      const updatedItems = data.map((item) => ({
         ...item,
-         transferCompleted: item.transferCompleted === null ? false : item.transferCompleted,
+        transferCompleted:
+          item.transferCompleted === null ? false : item.transferCompleted,
       }));
       setTrendingItems(updatedItems);
     }
@@ -76,34 +86,37 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId 
 
   useEffect(() => {
     if (invitationData) {
-      setIsInvited(invitationData.status === 'ACCEPTED'); //doar accepted! fara nonchalant kings :P 
-    } 
-    else if (invitationData === null) {
+      setIsInvited(invitationData.status === "ACCEPTED"); //doar accepted! fara nonchalant kings :P
+    } else if (invitationData === null) {
       setIsInvited(false);
     }
   }, [invitationData]);
 
   // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
-  if (!router.isReady || isLoading || isEventLoading || isInvitationLoading || isInvited === null || isLoadingUser || !username) {
+  if (
+    !router.isReady ||
+    isLoading ||
+    isEventLoading ||
+    isInvitationLoading ||
+    isInvited === null ||
+    isLoadingUser ||
+    !username
+  ) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.spinner}></div>
       </div>
     );
-  }
-  else {
+  } else {
     if (!eventId) {
       return <div>No event ID provided</div>;
-    }
-    else {
+    } else {
       if (!eventData && !isLoading) {
         return <div>Event not found</div>;
-      }
-      else {
+      } else {
         if (!isInvited) {
-          return <NotInvited/>;
-        }
-        else {
+          return <NotInvited />;
+        } else {
           if (isError) {
             return <div>Failed to load items.</div>;
           }
@@ -112,59 +125,66 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId 
     }
   }
 
-  const getButtonClass = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
-    if ((buttonType === 'contribute' && item.state === 'contributing') ||
-      (buttonType === 'external' && item.state === 'external')) {
+  const getButtonClass = (
+    item: TrendingItem,
+    buttonType: "contribute" | "external",
+  ) => {
+    if (
+      (buttonType === "contribute" && item.state === "contributing") ||
+      (buttonType === "external" && item.state === "external")
+    ) {
       return `${styles.buttonPressed}`;
-    }
-    else {
-      return '';
-    }
-  };
-
-  const getButtonText = (item: TrendingItem, buttonType: 'contribute' | 'external') => {
-    if (buttonType === 'contribute') {
-      return 'Contribute';
-    }
-    else {
-      if (buttonType === 'external') {
-        return item.state === 'external' ? 'Bought' : 'Mark Bought';
-      }
-      else {
-        return '';
-      }
+    } else {
+      return "";
     }
   };
 
-  const handleButtonAction = (id: number, action: 'contributing' | 'external') => {
+  const getButtonText = (
+    item: TrendingItem,
+    buttonType: "contribute" | "external",
+  ) => {
+    if (buttonType === "contribute") {
+      return "Contribute";
+    } else {
+      if (buttonType === "external") {
+        return item.state === "external" ? "Bought" : "Mark Bought";
+      } else {
+        return "";
+      }
+    }
+  };
+
+  const handleButtonAction = (
+    id: number,
+    action: "contributing" | "external",
+  ) => {
     const item = trendingItems.find((i) => i.id === id);
     if (!item) {
       return;
-    }
-    else {
-      if (action === 'external') {
-        const newType = item.state === 'external' ? 'none' : 'external';
+    } else {
+      if (action === "external") {
+        const newType = item.state === "external" ? "none" : "external";
         setTrendingItems((prev) =>
-          prev.map((it) =>
-            it.id === id ? { ...it, state: newType } : it
-          )
+          prev.map((it) => (it.id === id ? { ...it, state: newType } : it)),
         );
-        setMark.mutate({
-          eventId: Number(eventId),
-          articleId: id,
-          username: username,
-          type: newType,
-        }, {
-          onError: () => {
-            setTrendingItems((prev) =>
-              prev.map((it) =>
-                it.id === id ? { ...it, state: item.state } : it
-              )
-            );
-          }
-        });
-      }
-      else {
+        setMark.mutate(
+          {
+            eventId: Number(eventId),
+            articleId: id,
+            username: username,
+            type: newType,
+          },
+          {
+            onError: () => {
+              setTrendingItems((prev) =>
+                prev.map((it) =>
+                  it.id === id ? { ...it, state: item.state } : it,
+                ),
+              );
+            },
+          },
+        );
+      } else {
         const currentAmount = Number(item.contribution?.current) || 0;
         const totalAmount = Number(item.pret);
         if (currentAmount < totalAmount) {
@@ -180,7 +200,8 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId 
     <div className={styles.container}>
       <div className={styles.wishlistContainer}>
         <h1 className={styles.title}>
-          Wishlist View for {isEventLoading ? '...' : eventData?.title ?? eventId}
+          Wishlist View for{" "}
+          {isEventLoading ? "..." : (eventData?.title ?? eventId)}
         </h1>
         <div className={styles.itemsContainer}>
           <div className={styles.itemsGrid}>
@@ -192,21 +213,29 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId 
                     alt={item.nume}
                     className={styles.actualItemImage}
                   />
-                  {item.state === 'contributing' && item.contribution && (
+                  {item.state === "contributing" && item.contribution && (
                     <div className={styles.contributionOverlay}>
                       <div className={styles.contributionText}>
                         {item.contribution.total > 0
-                          ? Math.round((item.contribution.current / item.contribution.total) * 100)
-                          : 0}%
+                          ? Math.round(
+                              (item.contribution.current /
+                                item.contribution.total) *
+                                100,
+                            )
+                          : 0}
+                        %
                       </div>
                       <div className={styles.contributionProgress}>
                         <div
                           className={styles.contributionBar}
-                          style={{ transform: `scaleX(${item.contribution.total > 0 ? item.contribution.current / item.contribution.total : 0})` }}
+                          style={{
+                            transform: `scaleX(${item.contribution.total > 0 ? item.contribution.current / item.contribution.total : 0})`,
+                          }}
                         ></div>
                       </div>
                       <div className={styles.contributionAmount}>
-                        ${item.contribution.current} of ${item.contribution.total}
+                        ${item.contribution.current} of $
+                        {item.contribution.total}
                       </div>
                     </div>
                   )}
@@ -218,18 +247,26 @@ const Wishlist: React.FC<WishlistProps> = ({ contribution, eventId: propEventId 
                 <div className={styles.buttonsContainer}>
                   <div className={styles.actionButtonsRow}>
                     <button
-                      className={`${styles.contributeButton} ${getButtonClass(item, 'contribute')}`}
-                      onClick={() => handleButtonAction(item.id, 'contributing')}
-                      disabled={item.state === 'external' || setMark.status === 'pending'}
+                      className={`${styles.contributeButton} ${getButtonClass(item, "contribute")}`}
+                      onClick={() =>
+                        handleButtonAction(item.id, "contributing")
+                      }
+                      disabled={
+                        item.state === "external" ||
+                        setMark.status === "pending"
+                      }
                     >
-                      {getButtonText(item, 'contribute')}
+                      {getButtonText(item, "contribute")}
                     </button>
                     <button
-                      className={`${styles.externalButton} ${getButtonClass(item, 'external')}`}
-                      onClick={() => handleButtonAction(item.id, 'external')}
-                      disabled={item.state === 'contributing' || setMark.status === 'pending'}
+                      className={`${styles.externalButton} ${getButtonClass(item, "external")}`}
+                      onClick={() => handleButtonAction(item.id, "external")}
+                      disabled={
+                        item.state === "contributing" ||
+                        setMark.status === "pending"
+                      }
                     >
-                      {getButtonText(item, 'external')}
+                      {getButtonText(item, "external")}
                     </button>
                   </div>
                 </div>

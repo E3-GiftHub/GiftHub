@@ -16,8 +16,8 @@ export const config = {
     "/wishlist", // guest
     "/event-view", // planner
     "/wishlist-create", // planner
-    "/contribution",
-    "/payment",
+    "/contribution-item",
+    "/contribution-direct",
     "/payment-failure",
     "/payment-success",
   ],
