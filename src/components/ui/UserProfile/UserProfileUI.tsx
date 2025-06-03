@@ -143,7 +143,7 @@ export default function UserProfileUI({
                 loading && styles.loading,
               )}
             >
-              &nbsp;&nbsp;{renderContent(lname)}
+              &nbsp;{renderContent(lname)}
             </p>
           </div>
           <p className={clsx(styles.email, loading && styles.loading)}>
