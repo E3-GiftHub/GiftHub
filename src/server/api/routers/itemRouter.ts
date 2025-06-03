@@ -34,7 +34,7 @@ export const itemRouter = createTRPCRouter({
           const mark = await db.mark.findFirst({
             where: {
               eventId: input.eventId,
-              articleId: ea.itemId,
+              articleId: ea.id, // FIX: use eventArticle id, not itemId
               markerUsername: input.username,
             },
           });
@@ -42,7 +42,7 @@ export const itemRouter = createTRPCRouter({
           const hasContributed = await db.contribution.findFirst({
             where: {
               eventId: input.eventId,
-              articleId: ea.itemId,
+              articleId: ea.id, // FIX: use eventArticle id, not itemId
               guestUsername: input.username,
             },
           });
@@ -51,7 +51,7 @@ export const itemRouter = createTRPCRouter({
           const contributionSum = await db.contribution.aggregate({
             where: {
               eventId: input.eventId,
-              articleId: ea.itemId,
+              articleId: ea.id, // FIX: use eventArticle id, not itemId
             },
             _sum: { cashAmount: true },
           });
@@ -66,7 +66,7 @@ export const itemRouter = createTRPCRouter({
 
           // Handle transferCompleted explicitly as nullable
           return {
-            id: ea.itemId,
+            id: ea.id, // Use the unique eventArticle id!
             nume: ea.item?.name ?? "",
             pret: ea.item?.price?.toString() ?? "",
             state,

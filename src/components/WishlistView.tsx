@@ -162,7 +162,9 @@ const Wishlist: React.FC<WishlistProps> = ({
       if (action === "external") {
         const newType = item.state === "external" ? "none" : "external";
         setTrendingItems((prev) =>
-          prev.map((it) => (it.id === id ? { ...it, state: newType } : it)),
+          prev.map((it) =>
+            it.id === id ? { ...it, state: newType } : it,
+          ),
         );
         setMark.mutate(
           {
@@ -178,6 +180,10 @@ const Wishlist: React.FC<WishlistProps> = ({
                   it.id === id ? { ...it, state: item.state } : it,
                 ),
               );
+            },
+            onSuccess: () => {
+              // Refetch to ensure state is in sync with backend
+              refetch();
             },
           },
         );
