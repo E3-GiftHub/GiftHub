@@ -1,0 +1,13 @@
+.giftHubPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.invitationContainer {
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+}
