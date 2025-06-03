@@ -4,6 +4,7 @@ import { api } from "~/trpc/react";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
 import NotInvited from "./notinvited";
 import { useRouter } from "next/router";
+import LoadingSpinner from "./loadingspinner";
 
 // Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
@@ -102,11 +103,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     isLoadingUser ||
     !username
   ) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   } else {
     if (!eventId) {
       return <div>No event ID provided</div>;

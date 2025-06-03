@@ -4,6 +4,7 @@ import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
 import NotInvited from "./notinvited";
+import LoadingSpinner from "./loadingspinner";
 import React from "react";
 
 export default function InvitationCard({
@@ -33,22 +34,19 @@ export default function InvitationCard({
   const guestUsername = invitationData?.guestUsername;
 
   const acceptInvitation = api.invitationPreview.acceptInvitation.useMutation();
+  const router = useRouter();
 
-  if (isInvitationLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
-    );
-  }
-
-  if (!invitationData || invitationData.status === "ACCEPTED") {
-    return <NotInvited />;
+ if (isInvitationLoading) {
+    return <LoadingSpinner />;
   }
 
   const handleAccept = () => {
     if (eventData?.id && guestUsername) {
-      acceptInvitation.mutate({ eventId: eventData.id, guestUsername });
+      acceptInvitation.mutate({ eventId: eventData.id, guestUsername }, {
+        onSuccess: () => {
+          router.push(`/event?id=${eventData.id}`);
+        },
+      });
       onAccept?.();
     }
   };
@@ -56,6 +54,10 @@ export default function InvitationCard({
   const handleDecline = () => {
     onDecline?.();
   };
+
+  if (!invitationData || invitationData.status === "ACCEPTED" || (currentUser && invitationData.guestUsername !== currentUser.username)) {
+    return <NotInvited />;
+  }
 
   return (
     <div className={styles.envelope}>
@@ -105,4 +107,6 @@ export default function InvitationCard({
       <div className={`${styles.flap} ${styles.flapRight}`}></div>
     </div>
   );
+
+  
 }
