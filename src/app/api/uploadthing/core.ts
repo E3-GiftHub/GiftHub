@@ -31,6 +31,10 @@ export const ourFileRouter = {
       }),
     )
     .middleware(async ({ input }) => {
+      if (!input.username || "" === input.username) {
+        throw new UploadThingError("invalid session");
+      }
+
       return {
         username: input.username,
         eventId: input.eventId,
@@ -55,13 +59,17 @@ export const ourFileRouter = {
   eventPfpUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     .input(z.object({ username: z.string(), eventId: z.number() }))
     .middleware(async ({ input }) => {
+      if (!input.username || "" === input.username) {
+        throw new UploadThingError("invalid session");
+      }
+
       const event = await prisma.event.findUnique({
         where: { id: input.eventId },
         select: { createdByUsername: true },
       });
 
       if (!event || event.createdByUsername !== input.username) {
-        throw new UploadThingError("Unauthorized");
+        throw new UploadThingError("unauthorized user");
       }
 
       return { eventId: input.eventId };
@@ -78,13 +86,17 @@ export const ourFileRouter = {
   profilePfpUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     .input(z.object({ username: z.string() }))
     .middleware(async ({ input }) => {
+      if (!input.username || "" === input.username) {
+        throw new UploadThingError("invalid session");
+      }
+
       const user = await prisma.user.findUnique({
         where: { username: input.username },
         select: { username: true },
       });
 
       if (!user) {
-        throw new UploadThingError("NOT EXISTING USER");
+        throw new UploadThingError("not existing user");
       }
 
       return { username: input.username };
