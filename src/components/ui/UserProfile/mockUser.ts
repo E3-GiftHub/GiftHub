@@ -6,7 +6,8 @@ export interface User {
   fname: string;
   lname: string;
   email: string;
-  pictureUrl: string;
+  iban: string;
+  picture: string;
 }
 
 export const mockUser: User = {
@@ -15,5 +16,6 @@ export const mockUser: User = {
   lname: "De-LaCluj",
   username: "aragazcubuteliee",
   email: "aragazul@example.com",
-  pictureUrl: "/UserImages/aragazul_pfp.jpg",
+  iban: "INGB0002819713291",
+  picture: "/UserImages/aragazul_pfp.jpg",
 };

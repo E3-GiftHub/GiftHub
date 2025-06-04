@@ -4,7 +4,7 @@ import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import type { InvitationProps } from "../models/InvitationEventGuest.ts";
 import NotInvited from "./notinvited";
-import LoadingSpinner from "./loadingspiner";
+import LoadingSpinner from "./loadingspinner";
 import React from "react";
 
 export default function InvitationCard({

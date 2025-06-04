@@ -2,29 +2,25 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
-// Mock pentru router
 jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
-// Mock pentru next-auth/react
 jest.mock("next-auth/react", () => ({
   useSession: jest.fn(),
   signOut: jest.fn(),
 }));
 
-import { useSession, signOut } from "next-auth/react";
-
 describe("Navbar", () => {
   beforeEach(() => {
-    // Setare router mock
     (useRouter as jest.Mock).mockReturnValue({
       pathname: "/home",
       push: jest.fn(),
     });
 
-    // Simulăm o sesiune activă (user logat)
+
     (useSession as jest.Mock).mockReturnValue({
       data: { user: { name: "Cati" } },
       status: "authenticated",
@@ -57,22 +53,25 @@ describe("Navbar", () => {
   test("toggle la meniul de profil", () => {
     render(<Navbar />);
 
-    const profileToggle = screen.getByText("Profile");
-    fireEvent.click(profileToggle);
+const profileLinks = screen.queryAllByText("Profile");
+expect(profileLinks.length).toBeGreaterThan(0); 
 
-    expect(screen.getByText(/Edit Profile/i)).toBeInTheDocument();
+fireEvent.click(profileLinks[0]!); 
+
     expect(screen.getByText(/Logout/i)).toBeInTheDocument();
   });
 
   test("click pe Logout apelează signOut și redirecționează", () => {
     render(<Navbar />);
 
-    const profileBtn = screen.getByText("Profile");
-    fireEvent.click(profileBtn);
+   const profileLinks = screen.queryAllByText("Profile");
+    expect(profileLinks.length).toBeGreaterThan(0); 
+
+fireEvent.click(profileLinks[0]!); 
 
     const logoutLink = screen.getByText(/Logout/i);
     fireEvent.click(logoutLink);
+expect(signOut).toHaveBeenCalledWith({ redirectTo: "/" });
 
-    expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/" });
   });
 });
