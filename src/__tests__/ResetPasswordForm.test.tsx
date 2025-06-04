@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import ResetPasswordForm from "~/components/ui/Account/ResetPasswordForm";
 import { jest } from '@jest/globals';
-import {api} from "~/trpc/react";
 
 const mockPush = jest.fn();
 const mockQuery = { token: 'valid-token' };

@@ -57,7 +57,7 @@ describe("UploadModal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseSession.mockReturnValue({
-      data: { user: { id: "1", name: "testuser" } },
+      data: { user: { id: "1", name: "testuser", email: "test@example.com" }, expires: "2024-12-31T23:59:59.999Z" },
       status: "authenticated",
       update: jest.fn(),
     });
@@ -153,7 +153,7 @@ describe("UploadModal", () => {
 
   it("handles session without user name", () => {
     mockUseSession.mockReturnValue({
-      data: { user: { id: "1", name: null } },
+      data: { user: { id: "1", name: null, email: "test@example.com" }, expires: "2024-12-31T23:59:59.999Z" },
       status: "authenticated",
       update: jest.fn(),
     });

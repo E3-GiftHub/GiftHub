@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, MapPin, Users, Image, Flag } from "lucide-react";
+import { Clock, MapPin, Users, Flag } from "lucide-react";
 import styles from "../styles/EventView.module.css";
 import type { EventViewProps } from "~/models/EventData";
 
