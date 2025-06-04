@@ -42,7 +42,6 @@ export const userRouter = createTRPCRouter({
         data: {
           fname: input.fname!,
           lname: input.lname!,
-          //id: input.username!,
           username: input.username!,
           email: input.email,
         },
@@ -57,7 +56,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure.mutation(async ({ ctx }) => {
-    const user = await db.user.delete({
+    await db.user.delete({
       where: {
         username: ctx.session.user.id,
       },

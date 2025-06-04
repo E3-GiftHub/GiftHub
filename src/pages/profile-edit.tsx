@@ -21,17 +21,15 @@ export default function EditUserProfile() {
   const handleSave = async (
     newFname: string,
     newLname: string,
-    _newUsername: string,
+    newUsername: string,
     newEmail: string,
-    //newIban: string
   ) => {
     updateUserMutation.mutate(
       {
         fname: newFname,
         lname: newLname,
         email: newEmail,
-        username: _newUsername,
-        //iban: newIban,
+        username: newUsername,
       },
       {
         onSuccess: () => {
@@ -76,6 +74,7 @@ export default function EditUserProfile() {
     );
   }
 
+  //todo this
   console.log("cacat", session?.user?.name);
 
   return (
@@ -86,7 +85,6 @@ export default function EditUserProfile() {
         fname={user.fname ?? ""}
         lname={user.lname ?? ""}
         email={user.email ?? ""}
-        //IBAN={user.iban ?? ""}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
