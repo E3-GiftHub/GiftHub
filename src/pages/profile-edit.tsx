@@ -78,10 +78,11 @@ export default function EditUserProfile() {
         fname={user.fname ?? ""}
         lname={user.lname ?? ""}
         email={user.email ?? ""}
+        //IBAN={user.iban ?? ""}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
-        disableUsernameEditing={false}
+        disableUsernameEditing={true}
       />
       <div className={styles["empty-space"]}></div>
     </div>

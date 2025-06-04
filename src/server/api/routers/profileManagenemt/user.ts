@@ -42,17 +42,18 @@ export const userRouter = createTRPCRouter({
         data: {
           fname: input.fname!,
           lname: input.lname!,
+          //id: input.username!,
           username: input.username!,
           email: input.email,
         },
       });
 
       /// !!!!! NEW CODE , WIP
-      // Update session username if changed
-      if (input.username && ctx.session.user.id !== input.username) {
-        ctx.session.user.id = input.username;
-      }
-      return updatedUser;
+      // // Update session username if changed
+      // if (input.username && ctx.session.user.id !== input.username) {
+      //   ctx.session.user.id = input.username;
+      // }
+      // return updatedUser;
     }),
 
   delete: protectedProcedure.mutation(async ({ ctx }) => {
