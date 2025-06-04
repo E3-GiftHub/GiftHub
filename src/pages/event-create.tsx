@@ -17,7 +17,7 @@ export default function Page() {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
 
-  const createEventMutation = api.event.createEvent.useMutation({
+  const createEventMutation = api.eventPlanner.createEvent.useMutation({
     onSuccess: (data) => {
       router.push(`/event-view?id=${data.data.id}`);
     },
