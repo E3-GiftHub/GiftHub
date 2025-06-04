@@ -2,38 +2,43 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UploadModal from "../components/UploadMediaModal";
 
-// Mock useSession
+interface UploadButtonProps {
+  onUploadBegin?: () => void;
+  onClientUploadComplete?: () => void;
+  onUploadError?: (error: Error) => void;
+}
+
 jest.mock("next-auth/react", () => ({
   useSession: jest.fn(),
 }));
 
-// Mock UploadButton
+import { useSession } from "next-auth/react";
+const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
+
 jest.mock("~/utils/uploadthing", () => ({
-  UploadButton: ({ onUploadBegin, onClientUploadComplete, onUploadError }: any) => (
+  UploadButton: ({ onUploadBegin, onClientUploadComplete, onUploadError }: UploadButtonProps) => (
     <div data-testid="upload-button">
       <button
         data-testid="mock-upload-begin"
-        onClick={() => onUploadBegin && onUploadBegin()}
+        onClick={() => onUploadBegin?.()}
       >
         Choose Image
       </button>
       <button
         data-testid="mock-upload-complete"
-        onClick={() => onClientUploadComplete && onClientUploadComplete()}
+        onClick={() => onClientUploadComplete?.()}
       >
         Complete Upload
       </button>
       <button
         data-testid="mock-upload-error"
-        onClick={() => onUploadError && onUploadError(new Error("Upload failed"))}
+        onClick={() => onUploadError?.(new Error("Upload failed"))}
       >
         Trigger Error
       </button>
     </div>
   ),
 }));
-
-const { useSession } = require("next-auth/react");
 
 describe("UploadModal", () => {
   const defaultProps = {
@@ -51,8 +56,10 @@ describe("UploadModal", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useSession.mockReturnValue({
-      data: { user: { name: "testuser" } },
+    mockUseSession.mockReturnValue({
+      data: { user: { id: "1", name: "testuser" } },
+      status: "authenticated",
+      update: jest.fn(),
     });
   });
 
@@ -145,8 +152,10 @@ describe("UploadModal", () => {
   });
 
   it("handles session without user name", () => {
-    useSession.mockReturnValue({
-      data: { user: { name: null } },
+    mockUseSession.mockReturnValue({
+      data: { user: { id: "1", name: null } },
+      status: "authenticated",
+      update: jest.fn(),
     });
 
     render(<UploadModal {...defaultProps} />);
@@ -155,8 +164,10 @@ describe("UploadModal", () => {
   });
 
   it("handles no session data", () => {
-    useSession.mockReturnValue({
+    mockUseSession.mockReturnValue({
       data: null,
+      status: "unauthenticated",
+      update: jest.fn(),
     });
 
     render(<UploadModal {...defaultProps} />);

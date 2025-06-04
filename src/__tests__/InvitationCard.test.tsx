@@ -9,23 +9,32 @@ jest.mock('next/router', () => ({
   }),
 }));
 
-const mockGetSelf = jest.fn();
-const mockGetInvitationById = jest.fn();
+interface MockMutationResult {
+  mutate: jest.Mock;
+}
+
+interface MockQueryResult {
+  data?: unknown;
+  isLoading?: boolean;
+}
+
+const mockGetSelf = jest.fn<MockQueryResult, []>();
+const mockGetInvitationById = jest.fn<MockQueryResult, []>();
 const mockAcceptInvitation = jest.fn();
 
 jest.mock('~/trpc/react', () => ({
   api: {
     user: {
       getSelf: {
-        useQuery: () => mockGetSelf(),
+        useQuery: (): MockQueryResult => mockGetSelf(),
       },
     },
     invitationPreview: {
       getInvitationById: {
-        useQuery: () => mockGetInvitationById(),
+        useQuery: (): MockQueryResult => mockGetInvitationById(),
       },
       acceptInvitation: {
-        useMutation: () => ({
+        useMutation: (): MockMutationResult => ({
           mutate: mockAcceptInvitation,
         }),
       },
@@ -50,7 +59,6 @@ jest.mock('../styles/invitationcard.module.css', () => ({
   flapRight: 'flapRight',
 }));
 
-
 jest.mock('~/components/notinvited', () => {
   return function MockNotInvited() {
     return <div data-testid="not-invited">Not Invited Component</div>;
@@ -63,8 +71,13 @@ jest.mock('~/components/loadingspinner', () => {
   };
 });
 
+interface ButtonProps {
+  text: string;
+  onClick: () => void;
+}
+
 jest.mock('~/components/ui/ButtonComponent', () => ({
-  ButtonComponent: ({ text, onClick }: any) => (
+  ButtonComponent: ({ text, onClick }: ButtonProps) => (
     <button onClick={onClick} data-testid={`button-${text.toLowerCase().replace(/\s+/g, '-')}`}>
       {text}
     </button>
@@ -75,9 +88,8 @@ jest.mock('~/components/ui/ButtonComponent', () => ({
 }));
 
 // Mock models
-jest.mock('../models/InvitationEventGuest.ts', () => {});
+jest.mock('../models/InvitationEventGuest.ts', () => ({}));
 
-// Import the component after mocks
 import InvitationCard from '~/components/InvitationCard';
 
 describe('InvitationCard', () => {
@@ -199,7 +211,7 @@ describe('InvitationCard', () => {
     expect(mockAcceptInvitation).toHaveBeenCalledWith(
       { eventId: 123, guestUsername: 'testuser' },
       expect.objectContaining({
-        onSuccess: expect.any(Function),
+        onSuccess: expect.any(Function) as (() => void),
       })
     );
     expect(mockOnAccept).toHaveBeenCalled();
@@ -208,8 +220,11 @@ describe('InvitationCard', () => {
   test('navigates to event page on successful acceptance', async () => {
     let onSuccessCallback: (() => void) | undefined;
     
-    mockAcceptInvitation.mockImplementation((_, { onSuccess }) => {
-      onSuccessCallback = onSuccess;
+    mockAcceptInvitation.mockImplementation((
+      _params: { eventId: number; guestUsername: string }, 
+      options: { onSuccess?: () => void }
+    ) => {
+      onSuccessCallback = options?.onSuccess;
     });
 
     render(<InvitationCard {...defaultProps} />);

@@ -3,23 +3,34 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Calendar from "../components/ui/Calendar";
 
-jest.mock("date-fns", () => ({
-  ...jest.requireActual("date-fns"),
-  format: jest.fn().mockImplementation((date, formatStr) => {
-    if (formatStr === "MMMM yyyy") return "January 2024";
-    if (formatStr === "d") return date.getDate().toString();
-    return date.toString();
-  }),
-}));
+jest.mock("date-fns", () => {
+  const actual: Record<string, unknown> = jest.requireActual("date-fns");
+  return {
+    ...actual,
+    format: jest.fn().mockImplementation((date: Date, formatStr: string): string => {
+      if (formatStr === "MMMM yyyy") return "January 2024";
+      if (formatStr === "d") return date.getDate().toString();
+      return date.toLocaleDateString();
+    }),
+  };
+});
 
-// Mock TRPC
-const mockGetEventsByMonth = jest.fn();
+interface MockQueryResult {
+  data?: Array<{
+    id: number;
+    date: Date | null | undefined;
+    title: string;
+  }>;
+  isLoading: boolean;
+}
+
+const mockGetEventsByMonth = jest.fn<MockQueryResult, []>();
 
 jest.mock("~/trpc/react", () => ({
   api: {
     calendar: {
       getEventsByMonth: {
-        useQuery: () => mockGetEventsByMonth(),
+        useQuery: (): MockQueryResult => mockGetEventsByMonth(),
       },
     },
   },
