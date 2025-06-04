@@ -8,7 +8,7 @@ export default function Login() {
     <div className={styles.fullPageWrapper}>
       <div className={styles.signUpBox}>
         <AccountUI />
-        <LogInForm/>
+        <LogInForm />
       </div>
     </div>
   );

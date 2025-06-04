@@ -42,7 +42,7 @@ const UpcomingEventsSection: React.FC = () => {
       <ContainerEventTitle title={"My invitations"} />
 
       <div style={{}}>
-         <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
+        <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </div>
 
       {trimmedEvents.map((event) => (

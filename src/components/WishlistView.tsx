@@ -56,6 +56,27 @@ const Wishlist: React.FC<WishlistProps> = ({
   const setMark = api.item.setMark.useMutation({
     onSuccess: () => void refetch(),
   });
+  const deleteItemMutation = api.item.deleteItem.useMutation({
+  onSuccess: () => void refetch(),
+  });
+
+  const handleDeleteItem = (itemId: number) => {
+  if (!window.confirm("Are you sure you want to delete this item?")) return;
+
+  deleteItemMutation.mutate(
+    { eventId: Number(eventId), itemId },
+      {
+        onSuccess: (res) => {
+          if (!res.success) {
+            alert(res.message);
+          }
+        },
+        onError: () => {
+          alert("Something went wrong. Try again.");
+        },
+      }
+    );
+  };
 
   const { data: eventData, isLoading: isEventLoading } =
     api.event.getById.useQuery(
@@ -67,6 +88,7 @@ const Wishlist: React.FC<WishlistProps> = ({
       },
     );
 
+  //! check invites
   const { data: invitationData, isLoading: isInvitationLoading } =
     api.invitationPreview.getInvitationForUserEvent.useQuery(
       { eventId: Number(eventId), guestUsername: username ?? "" },
@@ -74,6 +96,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     );
 
   useEffect(() => {
+    if (!username) return;
     if (data) {
       const updatedItems = data.map((item) => ({
         ...item,
@@ -83,13 +106,22 @@ const Wishlist: React.FC<WishlistProps> = ({
     }
   }, [data]);
 
+  //! check planner
+  const { data: eventP } = api.invitationPreview.getPlanner.useQuery(
+    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { enabled: !!eventId && !!username && !isLoadingUser },
+  );
+
   useEffect(() => {
+    if (!eventP) return;
     if (invitationData) {
       setIsInvited(invitationData.status === "ACCEPTED"); //doar accepted! fara nonchalant kings :P
     } else if (invitationData === null) {
-      setIsInvited(false);
+      setIsInvited(username === eventP.createdByUsername);
     }
   }, [invitationData]);
+
+  console.log("Planner: ", eventP?.createdByUsername, username);
 
   // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
   if (
@@ -207,6 +239,16 @@ const Wishlist: React.FC<WishlistProps> = ({
             {trendingItems.map((item: TrendingItem) => (
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.itemImage}>
+                  {eventP?.createdByUsername === username && (
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className={styles.deleteButton}
+                      title="Delete item"
+                    >
+                      ❌
+                    </button>
+                  )}
+
                   <img
                     src={getItemImage(item)}
                     alt={item.nume}

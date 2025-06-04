@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 
 export const itemRouter = createTRPCRouter({
@@ -81,6 +81,71 @@ export const itemRouter = createTRPCRouter({
       );
       return items;
     }),
+
+  deleteItem: publicProcedure
+  .input(z.object({ itemId: z.number(), eventId: z.number() }))
+  .mutation(async ({ input, ctx }) => {
+    const username = ctx.session?.user?.name;
+
+    const event = await ctx.db.event.findUnique({
+      where: { id: input.eventId },
+    });
+
+    if (!event || event.createdByUsername !== username) {
+      return { success: false, message: "Not authorized." };
+    }
+
+    // ✅ First get the matching EventArticle row
+    const eventArticle = await ctx.db.eventArticle.findFirst({
+      where: {
+        itemId: input.itemId,
+        eventId: input.eventId,
+      },
+    });
+
+    if (!eventArticle) {
+      return {
+        success: false,
+        message: "No matching EventArticle found.",
+      };
+    }
+
+    // ✅ Check for marks on this article (already fine if you fix this too)
+    const hasMarks = await ctx.db.mark.findFirst({
+      where: { articleId: eventArticle.id },
+    });
+
+    if (hasMarks) {
+      return {
+        success: false,
+        message: "Cannot delete item that has marks.",
+      };
+    }
+
+    // ✅ Check for contributions on this article (this was broken before)
+    const hasContributions = await ctx.db.contribution.findFirst({
+      where: { articleId: eventArticle.id },
+    });
+
+    if (hasContributions) {
+      return {
+        success: false,
+        message: "Cannot delete item that has contributions.",
+      };
+    }
+
+    // ✅ Now safe to delete the EventArticle
+    await ctx.db.eventArticle.delete({
+      where: { id: eventArticle.id },
+    });
+
+    return {
+      success: true,
+      message: "Item deleted successfully.",
+    };
+  }),
+
+
 
   // Mark/unmark an item for a user
   setMark: publicProcedure

@@ -2,6 +2,7 @@ import { type AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { type Session } from "next-auth";
 import { TRPCReactProvider } from "~/trpc/react";
+import "@uploadthing/react/styles.css";
 
 const MyApp = ({
   Component,
