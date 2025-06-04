@@ -184,19 +184,25 @@ const Wishlist: React.FC<WishlistProps> = ({
       }
     }
   };
-
   const handleButtonAction = (
     id: number,
     action: "contributing" | "external",
   ) => {
     const item = trendingItems.find((i) => i.id === id);
-    if (!item) return;
-
-    if (action === "external") {
+    if (!item) return;    if (action === "external") {
       // Optimistically update UI first
-      const newType = item.state === "external" ? "none" : "external";
+      const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
+      const updatedItem: TrendingItem = {
+        ...item,
+        state: newType,
+        contribution: newType === "none" ? {
+          current: 0,
+          total: Number(item.pret)
+        } : item.contribution
+      };
+
       setTrendingItems((prev) =>
-        prev.map((it) => (it.id === id ? { ...it, state: newType } : it)),
+        prev.map((it) => (it.id === id ? updatedItem : it)),
       );
 
       // Then make the server call
@@ -212,16 +218,31 @@ const Wishlist: React.FC<WishlistProps> = ({
             // Revert on error
             setTrendingItems((prev) =>
               prev.map((it) =>
-                it.id === id ? { ...it, state: item.state } : it,
+                it.id === id ? item : it,
               ),
             );
           },
         },
-      );
-    } else {
+      );    } else {
       const currentAmount = Number(item.contribution?.current) || 0;
       const totalAmount = Number(item.pret);
       if (currentAmount < totalAmount && contribution) {
+        // Optimistically update UI for contribution state
+        const newState: TrendingItem["state"] = item.state === "contributing" ? "none" : "contributing";
+        const updatedItem: TrendingItem = {
+          ...item,
+          state: newState,
+          contribution: newState === "none" ? {
+            current: 0,
+            total: totalAmount
+          } : item.contribution
+        };
+
+        setTrendingItems((prev) =>
+          prev.map((it) => (it.id === id ? updatedItem : it)),
+        );
+
+        // Call the contribution function
         contribution(id);
       }
     }

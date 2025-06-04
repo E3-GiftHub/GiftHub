@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
+import { TRPCError } from "@trpc/server";
 
 export const itemRouter = createTRPCRouter({
   // Get all items for a given event, with mark and contribution info for the current user
@@ -19,6 +20,21 @@ export const itemRouter = createTRPCRouter({
               imagesUrl: true,
             },
           },
+          marks: {
+            where: {
+              markerUsername: input.username,
+            },
+          },
+          contributions: {
+            where: {
+              guestUsername: input.username,
+            },
+          },
+          _count: {
+            select: {
+              contributions: true,
+            },
+          },
         },
       });
 
@@ -28,46 +44,29 @@ export const itemRouter = createTRPCRouter({
         transferCompleted: article.transferCompleted ?? false,
       }));
 
-      // For each item, get mark for user and sum of contributions
+      // For each item, aggregate contribution data and determine state
       const items = await Promise.all(
-        fixedArticles.map(async (ea: (typeof fixedArticles)[number]) => {
-          // Check if the user marked as bought (external)
-          const mark = await db.mark.findFirst({
-            where: {
-              eventId: input.eventId,
-              articleId: ea.itemId,
-              markerUsername: input.username,
-            },
-          });
-          // Check if the user has contributed (in Contribution table)
-          const hasContributed = await db.contribution.findFirst({
-            where: {
-              eventId: input.eventId,
-              articleId: ea.itemId,
-              guestUsername: input.username,
-            },
-          });
-
-          // Get contribution sum
+        fixedArticles.map(async (ea) => {
+          // Get contribution sum for this specific article
           const contributionSum = await db.contribution.aggregate({
             where: {
               eventId: input.eventId,
-              articleId: ea.itemId,
+              articleId: ea.id, // Using EventArticle id instead of itemId
             },
             _sum: { cashAmount: true },
           });
 
-          // Determine state based on mark type
+          // Determine state based on mark type and contributions
           let state: "none" | "external" | "contributing" = "none";
-          if (mark?.type === "PURCHASED") {
+          if (ea.marks.some(m => m.type === "PURCHASED")) {
             state = "external";
-          } else if (hasContributed) {
+          } else if (ea.contributions.length > 0) {
             state = "contributing";
           }
 
-          // Handle transferCompleted explicitly as nullable
           return {
-            id: ea.itemId,
+            id: ea.id, // Using EventArticle id instead of itemId
+            itemId: ea.itemId, // Include the original itemId as well
             nume: ea.item?.name ?? "",
             pret: ea.item?.price?.toString() ?? "",
             state,
@@ -153,63 +152,149 @@ export const itemRouter = createTRPCRouter({
     .input(
       z.object({
         eventId: z.number(),
-        articleId: z.number(),
+        articleId: z.number(), // This is now the EventArticle id, not the itemId
         username: z.string(),
         type: z.enum(["contributing", "external", "none"]),
         amount: z.number().optional(), // Only for contributions
       }),
     )
     .mutation(async ({ input }) => {
-      if (input.type === "none") {
-        // Remove mark and contributions for this user
-        await db.mark.deleteMany({
+      try {
+        // First verify the article exists and get associated event and item info
+        const articleData = await db.eventArticle.findUnique({
           where: {
-            eventId: input.eventId,
-            articleId: input.articleId,
-            markerUsername: input.username,
+            id: input.articleId, // Using id instead of compound key
+          },
+          include: {
+            event: true,
+            item: true,
           },
         });
-        await db.contribution.deleteMany({
+
+        if (!articleData) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Item not found in this event",
+          });
+        }
+
+        if (articleData.eventId !== input.eventId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Article does not belong to this event",
+          });
+        }
+
+        // Check if user is event creator or invited guest
+        const isEventCreator = articleData.event.createdByUsername === input.username;
+        const invitation = await db.invitation.findFirst({
           where: {
             eventId: input.eventId,
-            articleId: input.articleId,
             guestUsername: input.username,
+            status: "ACCEPTED",
           },
         });
-      } else if (input.type === "external") {
-        // First, delete any existing mark for this item (from any user)
-        await db.mark.deleteMany({
-          where: {
-            eventId: input.eventId,
-            articleId: input.articleId,
-          },
-        });
-        // Then create a new mark for the current user
-        await db.mark.create({
-          data: {
-            eventId: input.eventId,
-            articleId: input.articleId,
-            markerUsername: input.username,
-            type: "PURCHASED",
-          },
-        });
-      } else if (
-        input.type === "contributing" &&
-        input.amount &&
-        input.amount > 0
-      ) {
-        // Add a contribution (not a mark)
-        await db.contribution.create({
-          data: {
-            guestUsername: input.username,
-            eventId: input.eventId,
-            articleId: input.articleId,
-            cashAmount: input.amount,
-            currency: "RON", // todo delete this hardcode
-          },
+
+        if (!invitation && !isEventCreator) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to mark this item",
+          });
+        }
+
+        // Check if item is already purchased by someone else
+        if (input.type !== "external") {
+          const existingPurchaseMark = await db.mark.findFirst({
+            where: {
+              articleId: input.articleId, // Using EventArticle id
+              type: "PURCHASED",
+            },
+          });
+
+          if (existingPurchaseMark && existingPurchaseMark.markerUsername !== input.username) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "This item has already been marked as purchased by someone else",
+            });
+          }
+        }
+
+        if (input.type === "none") {
+          // Remove mark and contributions for this user
+          await db.mark.deleteMany({
+            where: {
+              eventId: input.eventId,
+              articleId: input.articleId,
+              markerUsername: input.username,
+            },
+          });
+          await db.contribution.deleteMany({
+            where: {
+              eventId: input.eventId,
+              articleId: input.articleId,
+              guestUsername: input.username,
+            },
+          });
+        } else if (input.type === "external") {
+          // First, delete any existing mark for this item (from any user)
+          await db.mark.deleteMany({
+            where: {
+              articleId: input.articleId, // Using EventArticle id
+            },
+          });
+          // Then create a new mark for the current user
+          await db.mark.create({
+            data: {
+              eventId: input.eventId,
+              articleId: input.articleId,
+              markerUsername: input.username,
+              type: "PURCHASED",
+            },
+          });
+        } else if (input.type === "contributing" && input.amount && input.amount > 0) {
+          // Validate contribution amount
+          const totalContributions = await db.contribution.aggregate({
+            where: {
+              articleId: input.articleId, // Using EventArticle id
+            },
+            _sum: { cashAmount: true },
+          });
+
+          const currentContributions = totalContributions._sum.cashAmount ?? 0;
+          const itemPrice = Number(articleData.item.price);
+          const newTotal = Number(currentContributions) + input.amount;
+
+          if (newTotal > itemPrice) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Total contributions would exceed the item's price",
+            });
+          }
+
+          // Add a contribution
+          await db.contribution.create({
+            data: {
+              guestUsername: input.username,
+              eventId: input.eventId,
+              articleId: input.articleId,
+              cashAmount: input.amount,
+              currency: "RON", // todo delete this hardcode
+            },
+          });
+        }
+        return { success: true };
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        
+        // Log unexpected errors but don't expose internal details
+        console.error("Error in setMark mutation:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred",
         });
       }
-      return { success: true };
     }),
 });
 
