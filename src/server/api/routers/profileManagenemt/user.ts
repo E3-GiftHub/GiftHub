@@ -6,7 +6,7 @@ export const userRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
     const user = await db.user.findUnique({
       where: {
-        username: ctx.session.user.name ?? "",
+        id: ctx.session.user.id,
       },
       select: {
         username: true,

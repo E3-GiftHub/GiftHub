@@ -8,14 +8,15 @@ import { useSession } from "next-auth/react";
 
 export default function EditUserProfile() {
   const router = useRouter();
-
-  const { data: user, isLoading: userLoading, error: userError } = api.profile.user.get.useQuery();
-
-  const updateUserMutation = api.profile.user.update.useMutation();
+  const { data: session, status } = useSession();
 
   const {
-    data: session, status
-  }= useSession();
+    data: user,
+    isLoading: userLoading,
+    error: userError,
+  } = api.profile.user.get.useQuery();
+
+  const updateUserMutation = api.profile.user.update.useMutation();
 
   const handleSave = async (
     newFname: string,
@@ -40,7 +41,7 @@ export default function EditUserProfile() {
         onError: (error) => {
           alert("Update failed: " + error.message);
         },
-      }
+      },
     );
   };
 

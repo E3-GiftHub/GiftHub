@@ -74,7 +74,7 @@ export default function ViewUserProfileUI({
                   styles.fname /*styles.loading*/,
                 )}
               >
-                {profile.fname === null ? "null" : profile.fname}
+                {profile.fname === null ? "not set" : profile.fname}
                 &nbsp;&nbsp;&nbsp;&nbsp;|
               </p>
               <p
@@ -84,7 +84,7 @@ export default function ViewUserProfileUI({
                 )}
               >
                 &nbsp;
-                {profile.lname === null ? "null" : profile.fname}
+                {profile.lname === null ? "not set" : profile.fname}
               </p>
             </div>
 
