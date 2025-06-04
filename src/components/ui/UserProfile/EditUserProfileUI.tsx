@@ -201,7 +201,7 @@ export default function EditUserProfileUI({
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
               className={clsx(styles.inputField, loading && styles.loading)}
-              disabled={loading || disableUsernameEditing}
+              disabled={loading}
             />
           </div>
 

@@ -4,15 +4,18 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
+    console.log(ctx.session.user.name);
+
     const user = await db.user.findUnique({
       where: {
-        id: ctx.session.user.id,
+        username: ctx.session.user.name!,
       },
       select: {
         username: true,
         fname: true,
         lname: true,
         id: true,
+        password: true,
         email: true,
         pictureUrl: true,
       },
@@ -37,7 +40,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       return db.user.update({
         where: {
-          username: ctx.session.user.id,
+          username: ctx.session.user.name!,
         },
         data: {
           fname: input.fname!,
@@ -52,7 +55,7 @@ export const userRouter = createTRPCRouter({
   delete: protectedProcedure.mutation(async ({ ctx }) => {
     const user = await db.user.delete({
       where: {
-        username: ctx.session.user.id,
+        username: ctx.session.user.name!,
       },
     });
     return {
