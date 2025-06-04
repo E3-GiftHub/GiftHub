@@ -1,20 +1,17 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "src/styles/UserProfile/UserProfile.module.css";
 import Image from "next/image";
 import clsx from "clsx";
 import "src/styles/globals.css";
 import { useRouter } from "next/router";
 import { signOut } from "next-auth/react";
-import { UploadButton } from "~/utils/uploadthing";
-import { toast } from "sonner";
-import { api } from "src/trpc/react"; // Assuming this is your TRPC hook location
+import { api } from "src/trpc/react";
 
 interface UserProfileProps {
-  username?: string;
-  fname?: string;
-  lname?: string;
-  email?: string;
-  iban?: string;
+  username: string;
+  fname: string;
+  lname: string;
+  email: string;
   avatarUrl?: string;
   onDelete?: () => void;
   onEdit?: () => void;
@@ -55,18 +52,16 @@ const ProfileButton = ({
 );
 
 export default function UserProfileUI({
-  username = "",
-  fname = "",
-  lname = "",
-  email = "",
-  iban = "",
+  username,
+  fname,
+  lname,
+  email,
   avatarUrl,
   onDelete,
   onEdit,
-    loading = false,
+  loading = false,
 }: Readonly<UserProfileProps>) {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(avatarUrl);
-  // const { startUpload } = useUploadThing("profilePicture");
   const router = useRouter();
 
   useEffect(() => {
@@ -93,7 +88,8 @@ export default function UserProfileUI({
 
     try {
       await deleteUserMutation.mutateAsync();
-      document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+      document.cookie =
+        "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
       await signOut({ redirectTo: "/" });
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -148,9 +144,6 @@ export default function UserProfileUI({
           </div>
           <p className={clsx(styles.email, loading && styles.loading)}>
             {renderContent(email)}
-          </p>
-          <p className={clsx(styles.iban, loading && styles.loading)}>
-            {renderContent(iban)}
           </p>
 
           <div className={styles.buttonContainer}>

@@ -1,14 +1,15 @@
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { useRouter } from "next/router";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/router';
 
 // Mock next/router
-jest.mock('next/router', () => ({
+jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
-describe('UserProfileUI', () => {
+describe("UserProfileUI", () => {
   const pushMock = jest.fn();
   const mockRouter = { push: pushMock };
 
@@ -17,66 +18,80 @@ describe('UserProfileUI', () => {
     pushMock.mockClear();
   });
 
-  it('renders user data correctly', () => {
-    render(
-      <UserProfileUI
-        username="john_doe"
-        fname="John"
-        lname="Doe"
-        email="john@example.com"
-        avatarUrl="/avatar.jpg"
-      />
-    );
+  const defaultProps = {
+    username: "john_doe",
+    fname: "John",
+    lname: "Doe",
+    email: "john@example.com",
+    avatarUrl: "/avatar.jpg",
+  };
 
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('john_doe');
-    expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('Doe')).toBeInTheDocument();
-    expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByAltText('')).toHaveAttribute('src', '/avatar.jpg');
+  it("renders user data correctly", () => {
+    render(<UserProfileUI {...defaultProps} />);
+
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+      "john_doe",
+    );
+    expect(screen.getByText("John")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText("john@example.com")).toBeInTheDocument();
+    expect(screen.getByAltText("")).toHaveAttribute("src", "/avatar.jpg");
   });
 
-  it('calls onEdit prop when Edit info button is clicked', () => {
+  it("calls onEdit prop when Edit info button is clicked", () => {
     const onEdit = jest.fn();
-    render(<UserProfileUI onEdit={onEdit} />);
+    render(<UserProfileUI {...defaultProps} onEdit={onEdit} />);
 
-    const editButton = screen.getByRole('button', { name: /edit info/i });
+    const editButton = screen.getByRole("button", { name: /edit info/i });
     fireEvent.click(editButton);
     expect(onEdit).toHaveBeenCalledTimes(1);
   });
 
-  it('navigates to /editprofile when onEdit not provided', async () => {
-    render(<UserProfileUI />);
+  it("navigates to /editprofile when onEdit is not provided", async () => {
+    render(<UserProfileUI {...defaultProps} />);
 
-    const editButton = screen.getByRole('button', { name: /edit info/i });
+    const editButton = screen.getByRole("button", { name: /edit info/i });
     fireEvent.click(editButton);
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/editprofile'));
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/editprofile"));
   });
 
-  it('calls onDelete prop when Delete account button is clicked', () => {
+  it("calls onDelete prop when Delete account button is clicked", () => {
     const onDelete = jest.fn();
-    render(<UserProfileUI onDelete={onDelete} />);
+    render(<UserProfileUI {...defaultProps} onDelete={onDelete} />);
 
-    const deleteButton = screen.getByRole('button', { name: /delete account/i });
+    const deleteButton = screen.getByRole("button", {
+      name: /delete account/i,
+    });
     fireEvent.click(deleteButton);
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 
-  it('navigates to / when onDelete not provided', async () => {
-    render(<UserProfileUI />);
+  it("navigates to / when onDelete is not provided", async () => {
+    render(<UserProfileUI {...defaultProps} />);
 
-    const deleteButton = screen.getByRole('button', { name: /delete account/i });
+    const deleteButton = screen.getByRole("button", {
+      name: /delete account/i,
+    });
     fireEvent.click(deleteButton);
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/'));
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/"));
   });
 
-  it('displays loading placeholders when loading is true', () => {
-    render(<UserProfileUI username="john" fname="John" lname="Doe" email="john@example.com" loading />);
+  it("displays loading placeholders when loading is true", () => {
+    render(<UserProfileUI {...defaultProps} loading />);
 
-    const heading = screen.getByRole('heading', { level: 2 });
-    expect(heading.textContent).toBe('\u00A0');
-    const nameFields = screen.getAllByText('\u00A0');
+    // Heading is a non-breaking space
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+      "\u00A0",
+    );
+
+    // There should be several text placeholders
+    const nameFields = screen.getAllByText("\u00A0");
     expect(nameFields.length).toBeGreaterThanOrEqual(3);
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach(btn => expect(btn).toBeDisabled());
+
+    // Buttons should be disabled
+    const buttons = screen.getAllByRole("button");
+    buttons.forEach((btn) => {
+      expect(btn).toBeDisabled();
+    });
   });
 });
