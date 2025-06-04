@@ -86,9 +86,6 @@ export default function EditUserProfile() {
     );
   }
 
-  //todo this
-  console.log("cacat", session?.user?.name);
-
   return (
     <div className={styles["landing-page"]}>
       <Navbar />
