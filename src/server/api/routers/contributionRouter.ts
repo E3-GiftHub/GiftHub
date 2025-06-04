@@ -13,30 +13,33 @@ export const contributionRouter = createTRPCRouter({
         amount: z.number(),
         date: z.date().optional(),
         message: z.string().optional(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const contributionService = new ContributionService();
-       const userId = ctx.session?.user?.id;
+      const userId = ctx.session?.user?.name;
       if (!userId) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: "Missing user ID in session." });
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Missing user ID in session.",
+        });
       }
       try {
         const result = await contributionService.createContribution(
           input.contributionId,
-           userId,
+          userId,
           input.eventId,
           input.articleId,
           input.amount,
           input.date,
-          input.message
+          input.message,
         );
-        
+
         return { success: true, data: result };
       } catch (error) {
-        return { 
-          success: false, 
-          error: error instanceof Error ? error.message : "Unknown error" 
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error",
         };
       }
     }),
@@ -46,14 +49,14 @@ export const contributionRouter = createTRPCRouter({
       z.object({
         contributionId: z.string(),
         articleId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const contributionService = new ContributionService();
-      
+
       return contributionService.processContribution(
         input.contributionId,
-        input.articleId
+        input.articleId,
       );
     }),
 
@@ -61,15 +64,15 @@ export const contributionRouter = createTRPCRouter({
     .input(
       z.object({
         contributionId: z.string(),
-        action: z.enum(['approve', 'reject', 'refund']),
-      })
+        action: z.enum(["approve", "reject", "refund"]),
+      }),
     )
     .mutation(async ({ input }) => {
       const contributionService = new ContributionService();
-      
+
       return contributionService.manageContribution(
         input.contributionId,
-        input.action
+        input.action,
       );
     }),
 
@@ -77,15 +80,15 @@ export const contributionRouter = createTRPCRouter({
     .input(
       z.object({
         articleId: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const contributionService = new ContributionService();
-      
+
       const contributions = await contributionService.getContributionsForItem(
-        input.articleId
+        input.articleId,
       );
-      
+
       return { success: true, data: contributions };
     }),
 });

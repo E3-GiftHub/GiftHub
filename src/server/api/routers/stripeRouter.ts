@@ -8,14 +8,13 @@ import Stripe from "stripe";
 // router for the stripe account in navbar
 export const stripeRouter = createTRPCRouter({
   createDashboardLoginLink: protectedProcedure.mutation(async ({ ctx }) => {
-    // Presupunem că ctx.session.user.id conține username-ul utilizatorului.
-    if (!ctx.session.user.id) {
+    if (!ctx.session.user.name) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "User identifier not found in session.",
       });
     }
-    const userIdentifier = ctx.session.user.id;
+    const userIdentifier = ctx.session.user.name;
 
     const user = await ctx.db.user.findUnique({
       where: { username: userIdentifier }, // Corectat: id -> username
