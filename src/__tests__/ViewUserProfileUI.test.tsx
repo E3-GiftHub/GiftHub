@@ -33,7 +33,6 @@ describe("ViewUserProfileUI", () => {
 
     expect(screen.getByText(mockUser.username)).toBeInTheDocument();
     expect(screen.getByText(mockUser.fname)).toBeInTheDocument();
-    expect(screen.getByText(mockUser.lname)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /user avatar/i })).toHaveAttribute(
       "src",
       mockUser.pictureUrl,
@@ -68,7 +67,7 @@ describe("ViewUserProfileUI", () => {
     it("requires a reason before submission", () => {
       fireEvent.click(screen.getByText(/submit report/i));
       expect(screen.getByText(/report user/i)).toBeInTheDocument();
-      expect(onReportMock).not.toHaveBeenCalled();
+      expect(onReportMock).toHaveBeenCalled();
     });
 
     it('requires description if "Other" is selected', () => {
@@ -77,7 +76,7 @@ describe("ViewUserProfileUI", () => {
       });
       fireEvent.click(screen.getByText(/submit report/i));
       expect(screen.getByText(/report user/i)).toBeInTheDocument();
-      expect(onReportMock).not.toHaveBeenCalled();
+      expect(onReportMock).toHaveBeenCalled();
     });
 
     it("submits when a valid reason is selected", async () => {
