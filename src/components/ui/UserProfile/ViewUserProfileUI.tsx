@@ -74,12 +74,16 @@ export default function ViewUserProfileUI({
                   styles.fname /*styles.loading*/,
                 )}
               >
-                {profile.fname === null ? "not-set" : profile.fname}
+                {!profile.fname || profile.fname === ""
+                  ? "not-set"
+                  : profile.fname}
                 &nbsp;&nbsp;&nbsp;&nbsp;|
               </p>
               <p className={clsx(styles.nameField, styles.lname)}>
                 &nbsp;
-                {profile.lname === null ? "not-set" : profile.fname}
+                {!profile.lname || profile.lname === ""
+                  ? "not-set"
+                  : profile.fname}
               </p>
             </div>
 

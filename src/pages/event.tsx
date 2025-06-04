@@ -73,7 +73,7 @@ export default function EventViewPage() {
   };
 
   const handleViewProfile = (username: string) => {
-    void router.push(`/view-profile?username=${username}`);
+    void router.push(`/profile-view?username=${username}`);
   };
 
   const handleViewWishlist = () => {
@@ -112,7 +112,6 @@ export default function EventViewPage() {
       console.error("Unexpected error in useEffect:", err);
     });
   }, [eventId]);
-  
 
   // to refresh media after upload is completed
   const refetchMedia = async () => {
@@ -172,7 +171,7 @@ export default function EventViewPage() {
 
   // Check if user is invited
   if (invitationData?.status !== "ACCEPTED") {
-    return (      
+    return (
       <>
         <Head>
           <title>Event View - GiftHub</title>
@@ -183,7 +182,7 @@ export default function EventViewPage() {
         </div>
         <Footer />
       </>
-    )
+    );
   }
 
   return (
@@ -208,7 +207,8 @@ export default function EventViewPage() {
               location: eventData.location,
               date: eventData.date,
               planner: eventData.planner,
-              guests: eventData.guests,            }}
+              guests: eventData.guests,
+            }}
             onContribute={() => {
               void router.push(`/payment?eventid=${eventId}`);
             }}

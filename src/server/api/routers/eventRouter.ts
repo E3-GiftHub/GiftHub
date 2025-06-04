@@ -46,7 +46,7 @@ export const eventRouter = createTRPCRouter({
       // Map accepted guests
       const guests = event.invitations.map((inv) => ({
         id: inv.guest.username,
-        name: `${inv.guest.fname ?? ""} ${inv.guest.lname ?? ""}`.trim(),
+        name: `${!inv.guest.fname || inv.guest.fname === "" ? "not-set" : inv.guest.fname} ${!inv.guest.lname || inv.guest.lname === "" ? "not-set" : inv.guest.lname}`.trim(),
         profilePicture: inv.guest.pictureUrl ?? "/api/placeholder/40/40",
         role: "guest" as const,
       }));
