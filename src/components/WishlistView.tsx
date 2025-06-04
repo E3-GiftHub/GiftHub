@@ -10,15 +10,15 @@ import { useRouter } from "next/router";
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
     "/illustrations/account_visual.png",
-    "/illustrations/babyShower.svg", 
+    "/illustrations/babyShower.svg",
     "/illustrations/birthdayParty.svg",
   ];
-  
+
   // If the product has an image URL, use it
   if (item.imageUrl) {
     return item.imageUrl;
   }
-  
+
   // Otherwise, use a fallback image based on item ID
   const fallbackIndex = item.id % productImages.length;
   return productImages[fallbackIndex];
@@ -40,7 +40,7 @@ const Wishlist: React.FC<WishlistProps> = ({
         ? router.query.eventId[0]
         : undefined);
   const { data: currentUser, isLoading: isLoadingUser } =
-    api.user.getSelf.useQuery();
+    api.user.get.useQuery();
   const username = currentUser?.username;
 
   const { data, isLoading, isError, refetch } = api.item.getAll.useQuery(
@@ -57,14 +57,14 @@ const Wishlist: React.FC<WishlistProps> = ({
     onSuccess: () => void refetch(),
   });
   const deleteItemMutation = api.item.deleteItem.useMutation({
-  onSuccess: () => void refetch(),
+    onSuccess: () => void refetch(),
   });
 
   const handleDeleteItem = (itemId: number) => {
-  if (!window.confirm("Are you sure you want to delete this item?")) return;
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
 
-  deleteItemMutation.mutate(
-    { eventId: Number(eventId), itemId },
+    deleteItemMutation.mutate(
+      { eventId: Number(eventId), itemId },
       {
         onSuccess: (res) => {
           if (!res.success) {
@@ -74,7 +74,7 @@ const Wishlist: React.FC<WishlistProps> = ({
         onError: () => {
           alert("Something went wrong. Try again.");
         },
-      }
+      },
     );
   };
 
@@ -198,7 +198,7 @@ const Wishlist: React.FC<WishlistProps> = ({
       setTrendingItems((prev) =>
         prev.map((it) => (it.id === id ? { ...it, state: newType } : it)),
       );
-      
+
       // Then make the server call
       setMark.mutate(
         {
@@ -220,7 +220,8 @@ const Wishlist: React.FC<WishlistProps> = ({
       );
     } else {
       const currentAmount = Number(item.contribution?.current) || 0;
-      const totalAmount = Number(item.pret);      if (currentAmount < totalAmount && contribution) {
+      const totalAmount = Number(item.pret);
+      if (currentAmount < totalAmount && contribution) {
         contribution(id);
       }
     }

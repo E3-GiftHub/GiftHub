@@ -15,8 +15,9 @@ export default function InvitationCard({
   readonly invitationId: number;
   readonly onAccept?: () => void;
   readonly onDecline?: () => void;
-}) {  // luam userul curent care foloseste acm pagina
-  const { data: currentUser } = api.user.getSelf.useQuery();
+}) {
+  // luam userul curent care foloseste acm pagina
+  const { data: currentUser } = api.user.get.useQuery();
 
   // aici luam idul invitatiei
   const invitationQuery = api.invitationPreview.getInvitationById.useQuery(
@@ -81,7 +82,9 @@ export default function InvitationCard({
               <span>
                 {(() => {
                   if (isEventLoading) return "";
-                  return eventData?.date ? new Date(eventData.date).toLocaleString() : "";
+                  return eventData?.date
+                    ? new Date(eventData.date).toLocaleString()
+                    : "";
                 })()}
               </span>
             </div>
