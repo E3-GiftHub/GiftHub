@@ -3,6 +3,7 @@ import Navbar from "~/components/Navbar";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
 import { api } from "~/trpc/react";
 import React from "react";
+import formatField from "~/utils/formatField";
 
 export default function UserProfile() {
   const { data: user, isLoading, error } = api.profile.user.get.useQuery();
@@ -47,11 +48,10 @@ export default function UserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        username={user.username ?? "not-set"}
-        fname={user.fname ?? "not-set"}
-        lname={user.lname ?? "not-set"}
-        email={user.email ?? "not-set"}
-        //iban={user.iban ?? "not-set"}
+        username={formatField(user.username)}
+        fname={formatField(user.fname)}
+        lname={formatField(user.lname)}
+        email={formatField(user.email)}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
       />
       <div className={styles["empty-space"]}></div>

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import "src/styles/globals.css";
 import type { Profile } from "~/models/Profile";
 import ProfileReportButton from "./ProfileReportButton";
+import formatField from "~/utils/formatField";
 
 interface UserProfileProps {
   reporter: string | null;
@@ -74,16 +75,12 @@ export default function ViewUserProfileUI({
                   styles.fname /*styles.loading*/,
                 )}
               >
-                {!profile.fname || profile.fname === ""
-                  ? "not-set"
-                  : profile.fname}
+                {formatField(profile.fname)}
                 &nbsp;&nbsp;&nbsp;&nbsp;|
               </p>
               <p className={clsx(styles.nameField, styles.lname)}>
                 &nbsp;
-                {!profile.lname || profile.lname === ""
-                  ? "not-set"
-                  : profile.fname}
+                {formatField(profile.lname)}
               </p>
             </div>
 

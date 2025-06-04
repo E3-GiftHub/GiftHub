@@ -2,6 +2,7 @@ import React from "react";
 import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import type { GuestHeader } from "~/models/GuestHeader";
+import formatField from "~/utils/formatField";
 
 type GuestListModalProps = {
   loading: boolean;
@@ -37,8 +38,8 @@ export default function GuestListModal({
                 alt="user visual description"
               />
               <p>
-                {guest.fname ? guest.fname : "not-set"}{" "}
-                {guest.lname ? guest.lname : "not-set"}
+                {formatField(guest.fname)}
+                {formatField(guest.lname)}
               </p>
               <p>aka. {guest.username}</p>
               <button

@@ -15,6 +15,7 @@ import Footer from "../components/Footer";
 import "./../styles/globals.css";
 import { type GuestHeader } from "~/models/GuestHeader";
 import { useSession } from "next-auth/react";
+import formatField from "~/utils/formatField";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -57,8 +58,7 @@ function GuestListPreview({
             alt="user visual description"
           />
           <p className={styles.guestName}>
-            {guest.fname ? guest.fname : "not-set"}{" "}
-            {guest.lname ? guest.lname : "not-set"}
+            {formatField(guest.fname)} {formatField(guest.lname)}
           </p>
         </div>
       ))}
