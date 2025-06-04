@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styles from "../styles/wishlistcomponent.module.css";
 import { api } from "~/trpc/react";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
 import NotInvited from "./notinvited";
 import { useRouter } from "next/router";
 
-//?????? ce comit viseaza git??????
-// Functia asta ia imaginile based on id-ul produsului
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
     "/illustrations/account_visual.png",
@@ -14,12 +12,10 @@ const getItemImage = (item: TrendingItem) => {
     "/illustrations/birthdayParty.svg",
   ];
 
-  // If the product has an image URL, use it
   if (item.imageUrl) {
     return item.imageUrl;
   }
 
-  // Otherwise, use a fallback image based on item ID
   const fallbackIndex = item.id % productImages.length;
   return productImages[fallbackIndex];
 };
@@ -29,33 +25,94 @@ const Wishlist: React.FC<WishlistProps> = ({
   eventId: propEventId,
 }) => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
-  const [isInvited, setIsInvited] = useState<boolean | null>(null);
   const router = useRouter();
 
-  const eventId =
-    propEventId ??
-    (typeof router.query.eventId === "string"
-      ? router.query.eventId
-      : Array.isArray(router.query.eventId)
-        ? router.query.eventId[0]
-        : undefined);
-  const { data: currentUser, isLoading: isLoadingUser } =
-    api.user.get.useQuery();
+  const eventId = useMemo(() => {
+    return propEventId ??
+      (typeof router.query.eventId === "string"
+        ? router.query.eventId
+        : Array.isArray(router.query.eventId)
+          ? router.query.eventId[0]
+          : undefined);
+  }, [propEventId, router.query.eventId]);
+
+  const { data: currentUser, isLoading: isLoadingUser } = api.user.get.useQuery();
   const username = currentUser?.username;
 
-  const { data, isLoading, isError, refetch } = api.item.getAll.useQuery(
+  const { data: eventData, isLoading: isEventLoading } = api.event.getById.useQuery(
+    { id: eventId ? Number(eventId) : 0 },
+    { enabled: !!eventId }
+  );
+
+  const { data: eventPlanner, isLoading: isPlannerLoading } = api.invitationPreview.getPlanner.useQuery(
+    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { enabled: !!eventId && !!username }
+  );
+
+  const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
+    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { enabled: !!eventId && !!username }
+  );
+
+  const { data: itemsData, isLoading: isItemsLoading, isError, refetch } = api.item.getAll.useQuery(
     {
       eventId: eventId ? Number(eventId) : 0,
       username: username ?? "",
     },
     {
       enabled: !!eventId && !!username && !isLoadingUser,
-    },
+      staleTime: 30000, 
+    }
   );
+
+  const isInvited = useMemo(() => {
+    if (!username || !eventPlanner) return null;
+    
+    if (invitationData) {
+      return invitationData.status === "ACCEPTED";
+    } else if (invitationData === null) {
+      return username === eventPlanner.createdByUsername;
+    }
+    return null;
+  }, [invitationData, username, eventPlanner?.createdByUsername]);
+
+  const isLoading = useMemo(() => {
+    return !router.isReady ||
+           isLoadingUser ||
+           (!username) ||
+           (!eventId) ||
+           isEventLoading ||
+           isPlannerLoading ||
+           isInvitationLoading ||
+           isItemsLoading ||
+           (isInvited === null);
+  }, [
+    router.isReady,
+    isLoadingUser,
+    username,
+    eventId,
+    isEventLoading,
+    isPlannerLoading,
+    isInvitationLoading,
+    isItemsLoading,
+    isInvited
+  ]);
+
+  // ✅ OPTIMIZED: Only update items when data actually changes
+  useEffect(() => {
+    if (itemsData && itemsData.length > 0) {
+      const updatedItems = itemsData.map((item) => ({
+        ...item,
+        transferCompleted: item.transferCompleted ?? false,
+      }));
+      setTrendingItems(updatedItems);
+    }
+  }, [itemsData]);
 
   const setMark = api.item.setMark.useMutation({
     onSuccess: () => void refetch(),
   });
+
   const deleteItemMutation = api.item.deleteItem.useMutation({
     onSuccess: () => void refetch(),
   });
@@ -78,119 +135,34 @@ const Wishlist: React.FC<WishlistProps> = ({
     );
   };
 
-  const { data: eventData, isLoading: isEventLoading } =
-    api.event.getById.useQuery(
-      {
-        id: eventId ? Number(eventId) : 0,
-      },
-      {
-        enabled: !!eventId,
-      },
-    );
-
-  //! check invites
-  const { data: invitationData, isLoading: isInvitationLoading } =
-    api.invitationPreview.getInvitationForUserEvent.useQuery(
-      { eventId: Number(eventId), guestUsername: username ?? "" },
-      { enabled: !!eventId && !!username && !isLoadingUser },
-    );
-
-  useEffect(() => {
-    if (!username) return;
-    if (data) {
-      const updatedItems = data.map((item) => ({
-        ...item,
-        transferCompleted: item.transferCompleted ?? false,
-      }));
-      setTrendingItems(updatedItems);
-    }
-  }, [data]);
-
-  //! check planner
-  const { data: eventP } = api.invitationPreview.getPlanner.useQuery(
-    { eventId: Number(eventId), guestUsername: username ?? "" },
-    { enabled: !!eventId && !!username && !isLoadingUser },
+  const getButtonClass = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (
+        (buttonType === "contribute" && item.state === "contributing") ||
+        (buttonType === "external" && item.state === "external")
+      ) {
+        return `${styles.buttonPressed}`;
+      }
+      return "";
+    }, []
   );
 
-  useEffect(() => {
-    if (!eventP) return;
-    if (invitationData) {
-      setIsInvited(invitationData.status === "ACCEPTED"); //doar accepted! fara nonchalant kings :P
-    } else if (invitationData === null) {
-      setIsInvited(username === eventP.createdByUsername);
-    }
-  }, [invitationData]);
-
-  console.log("Planner: ", eventP?.createdByUsername, username);
-
-  // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
-  if (
-    !router.isReady ||
-    isLoading ||
-    isEventLoading ||
-    isInvitationLoading ||
-    isInvited === null ||
-    isLoadingUser ||
-    !username
-  ) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
-    );
-  } else {
-    if (!eventId) {
-      return <div>No event ID provided</div>;
-    } else {
-      if (!eventData && !isLoading) {
-        return <div>Event not found</div>;
-      } else {
-        if (!isInvited) {
-          return <NotInvited />;
-        } else {
-          if (isError) {
-            return <div>Failed to load items.</div>;
-          }
-        }
-      }
-    }
-  }
-
-  const getButtonClass = (
-    item: TrendingItem,
-    buttonType: "contribute" | "external",
-  ) => {
-    if (
-      (buttonType === "contribute" && item.state === "contributing") ||
-      (buttonType === "external" && item.state === "external")
-    ) {
-      return `${styles.buttonPressed}`;
-    } else {
-      return "";
-    }
-  };
-
-  const getButtonText = (
-    item: TrendingItem,
-    buttonType: "contribute" | "external",
-  ) => {
-    if (buttonType === "contribute") {
-      return "Contribute";
-    } else {
-      if (buttonType === "external") {
+  const getButtonText = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (buttonType === "contribute") {
+        return "Contribute";
+      } else if (buttonType === "external") {
         return item.state === "external" ? "Bought" : "Mark Bought";
-      } else {
-        return "";
       }
-    }
-  };
-  const handleButtonAction = (
-    id: number,
-    action: "contributing" | "external",
-  ) => {
+      return "";
+    }, []
+  );
+
+  const handleButtonAction = (id: number, action: "contributing" | "external") => {
     const item = trendingItems.find((i) => i.id === id);
-    if (!item) return;    if (action === "external") {
-      // Optimistically update UI first
+    if (!item) return;
+
+    if (action === "external") {
       const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
       const updatedItem: TrendingItem = {
         ...item,
@@ -205,29 +177,25 @@ const Wishlist: React.FC<WishlistProps> = ({
         prev.map((it) => (it.id === id ? updatedItem : it)),
       );
 
-      // Then make the server call
       setMark.mutate(
         {
           eventId: Number(eventId),
           articleId: id,
-          username: username,
+          username: username!,
           type: newType,
         },
         {
           onError: () => {
-            // Revert on error
             setTrendingItems((prev) =>
-              prev.map((it) =>
-                it.id === id ? item : it,
-              ),
+              prev.map((it) => (it.id === id ? item : it)),
             );
           },
         },
-      );    } else {
+      );
+    } else {
       const currentAmount = Number(item.contribution?.current) || 0;
       const totalAmount = Number(item.pret);
       if (currentAmount < totalAmount && contribution) {
-        // Optimistically update UI for contribution state
         const newState: TrendingItem["state"] = item.state === "contributing" ? "none" : "contributing";
         const updatedItem: TrendingItem = {
           ...item,
@@ -242,25 +210,43 @@ const Wishlist: React.FC<WishlistProps> = ({
           prev.map((it) => (it.id === id ? updatedItem : it)),
         );
 
-        // Call the contribution function
         contribution(id);
       }
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
+  }
+
+  if (!eventData && !isEventLoading) {
+    return <div>Event not found</div>;
+  }
+
+  if (isInvited === false) {
+    return <NotInvited />;
+  }
+
+  if (isError) {
+    return <div>Failed to load items.</div>;
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.wishlistContainer}>
         <h1 className={styles.title}>
-          Wishlist View for{" "}
-          {isEventLoading ? "..." : (eventData?.title ?? eventId)}
+          Wishlist View for {eventData?.title ?? eventId}
         </h1>
         <div className={styles.itemsContainer}>
           <div className={styles.itemsGrid}>
             {trendingItems.map((item: TrendingItem) => (
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.itemImage}>
-                  {eventP?.createdByUsername === username && (
+                  {eventPlanner?.createdByUsername === username && (
                     <button
                       onClick={() => handleDeleteItem(item.id)}
                       className={styles.deleteButton}
@@ -280,9 +266,7 @@ const Wishlist: React.FC<WishlistProps> = ({
                       <div className={styles.contributionText}>
                         {item.contribution.total > 0
                           ? Math.round(
-                              (item.contribution.current /
-                                item.contribution.total) *
-                                100,
+                              (item.contribution.current / item.contribution.total) * 100,
                             )
                           : 0}
                         %
@@ -296,8 +280,7 @@ const Wishlist: React.FC<WishlistProps> = ({
                         ></div>
                       </div>
                       <div className={styles.contributionAmount}>
-                        ${item.contribution.current} of $
-                        {item.contribution.total}
+                        ${item.contribution.current} of ${item.contribution.total}
                       </div>
                     </div>
                   )}
@@ -310,23 +293,15 @@ const Wishlist: React.FC<WishlistProps> = ({
                   <div className={styles.actionButtonsRow}>
                     <button
                       className={`${styles.contributeButton} ${getButtonClass(item, "contribute")}`}
-                      onClick={() =>
-                        handleButtonAction(item.id, "contributing")
-                      }
-                      disabled={
-                        item.state === "external" ||
-                        setMark.status === "pending"
-                      }
+                      onClick={() => handleButtonAction(item.id, "contributing")}
+                      disabled={item.state === "external" || setMark.status === "pending"}
                     >
                       {getButtonText(item, "contribute")}
                     </button>
                     <button
                       className={`${styles.externalButton} ${getButtonClass(item, "external")}`}
                       onClick={() => handleButtonAction(item.id, "external")}
-                      disabled={
-                        item.state === "contributing" ||
-                        setMark.status === "pending"
-                      }
+                      disabled={item.state === "contributing" || setMark.status === "pending"}
                     >
                       {getButtonText(item, "external")}
                     </button>

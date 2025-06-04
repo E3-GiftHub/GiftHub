@@ -6,81 +6,74 @@ import { TRPCError } from "@trpc/server";
 export const itemRouter = createTRPCRouter({
   // Get all items for a given event, with mark and contribution info for the current user
   getAll: publicProcedure
-    .input(z.object({ eventId: z.number(), username: z.string() }))
-    .query(async ({ input }) => {
-      // Get all items for the event, explicitly select transferCompleted as nullable
-      const eventArticles = await db.eventArticle.findMany({
-        where: { eventId: input.eventId },
-        include: {
-          item: {
-            select: {
-              id: true,
-              name: true,
-              price: true,
-              imagesUrl: true,
-            },
-          },
-          marks: {
-            where: {
-              markerUsername: input.username,
-            },
-          },
-          contributions: {
-            where: {
-              guestUsername: input.username,
-            },
-          },
-          _count: {
-            select: {
-              contributions: true,
-            },
+  .input(z.object({ eventId: z.number(), username: z.string() }))
+  .query(async ({ input }) => {
+    // Get all items for the event with their relationships
+    const eventArticles = await db.eventArticle.findMany({
+      where: { eventId: input.eventId },
+      include: {
+        item: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            imagesUrl: true,
           },
         },
-      });
+        marks: {
+          where: {
+            markerUsername: input.username,
+          },
+        },
+        contributions: {
+          where: {
+            guestUsername: input.username,
+          },
+        },
+      },
+    });
 
-      // Fix: replace null with false
-      const fixedArticles = eventArticles.map((article) => ({
-        ...article,
-        transferCompleted: article.transferCompleted ?? false,
-      }));
 
-      // For each item, aggregate contribution data and determine state
-      const items = await Promise.all(
-        fixedArticles.map(async (ea) => {
-          // Get contribution sum for this specific article
-          const contributionSum = await db.contribution.aggregate({
-            where: {
-              eventId: input.eventId,
-              articleId: ea.id, // Using EventArticle id instead of itemId
-            },
-            _sum: { cashAmount: true },
-          });
+    const allContributions = await db.contribution.groupBy({
+      by: ['articleId'],
+      where: { eventId: input.eventId },
+      _sum: { cashAmount: true },
+    });
 
-          // Determine state based on mark type and contributions
-          let state: "none" | "external" | "contributing" = "none";
-          if (ea.marks.some(m => m.type === "PURCHASED")) {
-            state = "external";
-          } else if (ea.contributions.length > 0) {
-            state = "contributing";
-          }
 
-          return {
-            id: ea.id, // Using EventArticle id instead of itemId
-            itemId: ea.itemId, // Include the original itemId as well
-            nume: ea.item?.name ?? "",
-            pret: ea.item?.price?.toString() ?? "",
-            state,
-            imageUrl: ea.item?.imagesUrl ?? undefined,
-            transferCompleted: ea.transferCompleted ?? undefined,
-            contribution: {
-              current: Number(contributionSum._sum.cashAmount ?? 0),
-              total: Number(ea.item?.price ?? 0),
-            },
-          };
-        }),
-      );
-      return items;
-    }),
+    const contributionMap = new Map(
+      allContributions.map(c => [c.articleId, Number(c._sum.cashAmount ?? 0)])
+    );
+
+    const items = eventArticles.map((ea) => {
+      // Get contribution sum from our pre-computed map
+      const totalContributionAmount = contributionMap.get(ea.id) ?? 0;
+
+      // Determine state based on mark type and contributions
+      let state: "none" | "external" | "contributing" = "none";
+      if (ea.marks.some(m => m.type === "PURCHASED")) {
+        state = "external";
+      } else if (ea.contributions.length > 0) {
+        state = "contributing";
+      }
+
+      return {
+        id: ea.id, // Using EventArticle id
+        itemId: ea.itemId, // Include the original itemId as well
+        nume: ea.item?.name ?? "",
+        pret: ea.item?.price?.toString() ?? "",
+        state,
+        imageUrl: ea.item?.imagesUrl ?? undefined,
+        transferCompleted: ea.transferCompleted ?? false, // Fix null issue
+        contribution: {
+          current: totalContributionAmount,
+          total: Number(ea.item?.price ?? 0),
+        },
+      };
+    });
+
+    return items;
+  }),
 
   deleteItem: publicProcedure
   .input(z.object({ itemId: z.number(), eventId: z.number() }))
@@ -95,7 +88,7 @@ export const itemRouter = createTRPCRouter({
       return { success: false, message: "Not authorized." };
     }
 
-    // ✅ First get the matching EventArticle row
+    
     const eventArticle = await ctx.db.eventArticle.findFirst({
       where: {
         itemId: input.itemId,
@@ -110,7 +103,7 @@ export const itemRouter = createTRPCRouter({
       };
     }
 
-    // ✅ Check for marks on this article (already fine if you fix this too)
+
     const hasMarks = await ctx.db.mark.findFirst({
       where: { articleId: eventArticle.id },
     });
@@ -122,7 +115,7 @@ export const itemRouter = createTRPCRouter({
       };
     }
 
-    // ✅ Check for contributions on this article (this was broken before)
+    
     const hasContributions = await ctx.db.contribution.findFirst({
       where: { articleId: eventArticle.id },
     });
@@ -134,7 +127,7 @@ export const itemRouter = createTRPCRouter({
       };
     }
 
-    // ✅ Now safe to delete the EventArticle
+
     await ctx.db.eventArticle.delete({
       where: { id: eventArticle.id },
     });
