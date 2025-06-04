@@ -438,3 +438,19 @@
     transform: rotate(360deg);
   }
 }
+
+.deleteButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.deleteButton:hover {
+  transform: scale(1.2);
+}

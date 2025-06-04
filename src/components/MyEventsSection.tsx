@@ -11,6 +11,7 @@ import React from "react";
 import { api } from "~/trpc/react";
 import Modal from "~/components/ModalEvents";
 import { useState } from "react";
+import { router } from "next/client";
 import Link from "next/link";
 
 
@@ -55,7 +56,12 @@ const MyEventsSection: React.FC = () => {
 
       <div className={styles["buttons-wrapper"]}>
         <SeeMoreButton onClick={openModal} />
-        <ButtonComponent text={"Add new event"} style={ButtonStyle.PRIMARY} />
+        <ButtonComponent
+          text={"Add new event"}
+          style={ButtonStyle.PRIMARY}
+          onClick={() => router.push("event-create")}
+        />
+       
       </div>
     </Container>
   );

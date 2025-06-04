@@ -5,6 +5,7 @@ import { type Session } from "next-auth";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Geist } from "next/font/google";
 import Head from "next/head";
+import "@uploadthing/react/styles.css";
 
 const geist = Geist({
   subsets: ["latin"],

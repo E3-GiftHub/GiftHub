@@ -1,3 +1,216 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  
+  .wishlistContainer {
+    width: 100%;
+    max-width: 56rem;
+    background-color: #312E81; /* indigo-900 */
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    color: white;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .searchSection {
+    margin-bottom: 1.5rem;
+  }
+  
+  .searchBar {
+    display: flex;
+    margin-bottom: 1.25rem;
+  }
+  
+  .searchInput {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    background-color: #E0E7FF; /* indigo-100 */
+    color: #1F2937; /* gray-800 */
+    border: 0;
+  }
+  
+  .searchButton {
+    background-color: #E0E7FF; /* indigo-100 */
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .searchIcon {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: #4B5563; /* gray-600 */
+  }
+  
+  .filterSection {
+    margin-bottom: 1.25rem;
+  }
+  
+  .filterLabel {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .filterButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .categoryButton, .retailerButton {
+    background-color: #E0E7FF; /* indigo-200 */
+    color: #312E81; /* indigo-900 */
+    border-radius: 0.5rem;
+    padding: 0.25rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .selectedRetailer {
+    background-color: #A5B4FC; /* indigo-300 */
+    font-weight: 700;
+  }
+  
+  .itemsContainer {
+    margin-top: 0.75rem;
+  }
+  
+  .itemsLabel {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .itemsGrid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .itemsGrid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .itemCard {
+    margin-bottom: 1.5rem;
+  }
+  
+  .itemImage {
+    background-color: #E0E7FF; /* indigo-200 */
+    border-radius: 0.5rem;
+    height: 7rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #818CF8; /* indigo-400 */
+    font-weight: 500;
+  }
+  
+  .itemDetails {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    padding: 0 0.25rem;
+  }
+  
+  .itemName, .itemPrice {
+    font-size: 0.75rem;
+  }
+  
+  .buttonsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .wishlistButton {
+    width: 100%;
+    background-color: #2563EB; /* blue-600 */
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+    transition: background-color 0.3s;
+  }
+  
+  .wishlistButton:hover {
+    background-color: #1D4ED8; /* blue-700 */
+  }
+  
+  .wishlistButtonActive {
+    width: 100%;
+    background-color: #1D4ED8; /* blue-700 */
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+  }
+  
+  .actionButtonsRow {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .buyButton {
+    flex: 1;
+    background-color: #10B981; /* emerald-500 */
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+    transition: background-color 0.3s;
+  }
+  
+  .buyButton:hover {
+    background-color: #059669; /* emerald-600 */
+  }
+  
+  .reserveButton {
+    flex: 1;
+    background-color: #F59E0B; /* amber-500 */
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+    transition: background-color 0.3s;
+  }
+  
+  .reserveButton:hover {
+    background-color: #D97706; /* amber-600 */
+  }
+  
+  .btnActive {
+    background-color: #4338CA; /* indigo-700 */
+  }
+  
+  .contributeButton {
+    width: 100%;
+    background-color: #8B5CF6; /* purple-500 */
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.75rem;
+    transition: background-color 0.3s;
+  }
+  
+  .contributeButton:hover {
+    background-color: #7C3AED; /* purple-600 */
+  }
 .giftHubPage {
   min-height: 100vh;
   background-color: #2f2464;
