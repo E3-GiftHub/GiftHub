@@ -82,7 +82,7 @@ export default function EditUserProfile() {
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
-        disableUsernameEditing={true}
+        disableUsernameEditing={false}
       />
       <div className={styles["empty-space"]}></div>
     </div>
