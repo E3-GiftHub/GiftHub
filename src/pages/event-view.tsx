@@ -16,8 +16,6 @@ import "./../styles/globals.css";
 import { type GuestHeader } from "~/models/GuestHeader";
 import { useSession } from "next-auth/react";
 
-
-
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
     const num = Number(param);
@@ -38,24 +36,29 @@ function GuestListPreview({
   eventId,
   guests,
 }: Readonly<GuestListPreviewProps>) {
-    const router = useRouter();
+  const router = useRouter();
 
   if (loading) return <div>Loading guests...</div>;
 
   return (
     <div className={styles.guestList}>
       {guests.slice(0, 10).map((guest) => (
-        <div className={styles.guestItem} 
+        <div
+          className={styles.guestItem}
           key={guest.username}
-          onClick={() => router.push(`/profile-view?username=${guest.username}`)}
-          style={{ cursor: "pointer" }}>
+          onClick={() =>
+            router.push(`/profile-view?username=${guest.username}`)
+          }
+          style={{ cursor: "pointer" }}
+        >
           <img
             className={styles.guestImage}
             src={guest.pictureUrl ?? ""}
             alt="user visual description"
           />
           <p className={styles.guestName}>
-            {guest.fname} {guest.lname}
+            {guest.fname ? guest.fname : "not-set"}{" "}
+            {guest.lname ? guest.lname : "not-set"}
           </p>
         </div>
       ))}
@@ -68,14 +71,12 @@ export default function EventView() {
   const updateEventMutation = api.eventPlanner.updateEvent.useMutation();
   const deleteEventMutation = api.eventPlanner.removeEvent.useMutation();
 
-
   // get the event id
   const router = useRouter();
   const { data: session } = useSession();
   const username = session?.user?.name ?? "anonymous";
 
   const [captionInput, setCaptionInput] = useState("");
-
 
   const { id } = router.query;
   const idParam = Array.isArray(router.query.id)
@@ -184,7 +185,6 @@ export default function EventView() {
       });
     }
   };
-  const handleSaveGuestChanges = () => setShowGuestModal(false);
 
   // Media list state
   const [showMediaModal, setShowMediaModal] = useState(false);
@@ -309,16 +309,19 @@ export default function EventView() {
           case "location":
             return eventData.location ?? "";
           case "date":
-            return eventData.date ? new Date(eventData.date).toISOString().split("T")[0] : "";
+            return eventData.date
+              ? new Date(eventData.date).toISOString().split("T")[0]
+              : "";
           case "time":
-            return eventData.date ? new Date(eventData.date).toTimeString().slice(0, 5) : "";
+            return eventData.date
+              ? new Date(eventData.date).toTimeString().slice(0, 5)
+              : "";
           default:
             return prev[pendingField];
         }
       })(),
     }));
   };
-
 
   return (
     <div className={styles.pageWrapper}>
@@ -331,7 +334,6 @@ export default function EventView() {
           guests={guests}
           onRemoveGuest={handleRemoveGuest}
           onAddGuest={handleAddGuest}
-          onSave={handleSaveGuestChanges}
           onClose={() => setShowGuestModal(false)}
           onBack={() => setShowGuestModal(false)}
         />
@@ -366,19 +368,23 @@ export default function EventView() {
           onConfirm={() => {
             void (async () => {
               try {
-                const res = await deleteEventMutation.mutateAsync({ eventId: parsedId });
+                const res = await deleteEventMutation.mutateAsync({
+                  eventId: parsedId,
+                });
                 // ✅ New: Show warning if deletion not allowed
-                  if (!res.success) {
-                    alert(res.message ?? "Cannot delete this event.");
-                    return;
-                  }
+                if (!res.success) {
+                  alert(res.message ?? "Cannot delete this event.");
+                  return;
+                }
 
                 alert("Event deleted successfully.");
                 void router.push("/");
               } catch (err) {
                 console.error("Failed to delete event:", err);
                 const message =
-                  err instanceof Error ? err.message : "Could not delete event.";
+                  err instanceof Error
+                    ? err.message
+                    : "Could not delete event.";
                 alert(message ?? "Could not delete event.");
               } finally {
                 setShowDeleteModal(false);
@@ -388,7 +394,6 @@ export default function EventView() {
           onCancel={() => setShowDeleteModal(false)}
         />
       )}
-
 
       {showMediaModal && (
         <EditMediaModal
@@ -453,7 +458,6 @@ export default function EventView() {
               }
               onKeyDown={(e) => handleKeyDown(e, "title")}
               autoFocus
-              
             />
           ) : (
             <h2
@@ -489,9 +493,9 @@ export default function EventView() {
               <UploadButton
                 endpoint="eventPfpUploader"
                 input={{
-                username: username, // or however you store the logged-in user
-                eventId: eventId,
-              }}
+                  username: username, // or however you store the logged-in user
+                  eventId: eventId,
+                }}
                 onClientUploadComplete={(res) => {
                   console.log("Banner upload success:", res);
                   router.reload(); // Refresh to show updated banner
@@ -604,7 +608,9 @@ export default function EventView() {
             <div className={styles.wishlistBox}>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                onClick={() => router.push(`/wishlist-create?eventId=${eventId}`)}
+                onClick={() =>
+                  router.push(`/wishlist-create?eventId=${eventId}`)
+                }
               >
                 Edit Wishlist
               </button>

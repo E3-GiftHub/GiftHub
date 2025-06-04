@@ -47,16 +47,14 @@ export default function UserProfile() {
     <div className={styles["landing-page"]}>
       <Navbar />
       <UserProfileUI
-        username={user.username ?? "not set"}
-        fname={user.fname ?? "not set"}
-        lname={user.lname ?? "not set"}
-        email={user.email ?? "not set"}
-        //iban={user.iban ?? "not set"}
+        username={user.username ?? "not-set"}
+        fname={user.fname ?? "not-set"}
+        lname={user.lname ?? "not-set"}
+        email={user.email ?? "not-set"}
+        //iban={user.iban ?? "not-set"}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
-
       />
       <div className={styles["empty-space"]}></div>
     </div>
   );
 }
-
