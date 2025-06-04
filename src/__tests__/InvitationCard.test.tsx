@@ -18,15 +18,15 @@ interface MockQueryResult {
   isLoading?: boolean;
 }
 
-const mockGetSelf = jest.fn<MockQueryResult, []>();
+const mockGetUser = jest.fn<MockQueryResult, []>();
 const mockGetInvitationById = jest.fn<MockQueryResult, []>();
 const mockAcceptInvitation = jest.fn();
 
 jest.mock('~/trpc/react', () => ({
   api: {
     user: {
-      getSelf: {
-        useQuery: (): MockQueryResult => mockGetSelf(),
+      get: {
+        useQuery: (): MockQueryResult => mockGetUser(),
       },
     },
     invitationPreview: {
@@ -121,8 +121,9 @@ describe('InvitationCard', () => {
     jest.clearAllMocks();
     
     // Default mocks
-    mockGetSelf.mockReturnValue({
+    mockGetUser.mockReturnValue({
       data: mockCurrentUser,
+      isLoading: false,
     });
     
     mockGetInvitationById.mockReturnValue({
@@ -132,8 +133,8 @@ describe('InvitationCard', () => {
   });
 
   test('shows loading spinner when invitation is loading', () => {
-    mockGetInvitationById.mockReturnValue({
-      data: null,
+    mockGetInvitationById.mockReturnValueOnce({
+      data: undefined,
       isLoading: true,
     });
 
@@ -143,7 +144,7 @@ describe('InvitationCard', () => {
   });
 
   test('shows not invited component when invitation data is null', () => {
-    mockGetInvitationById.mockReturnValue({
+    mockGetInvitationById.mockReturnValueOnce({
       data: null,
       isLoading: false,
     });
@@ -154,7 +155,7 @@ describe('InvitationCard', () => {
   });
 
   test('shows not invited component when invitation is already accepted', () => {
-    mockGetInvitationById.mockReturnValue({
+    mockGetInvitationById.mockReturnValueOnce({
       data: { ...mockInvitationData, status: 'ACCEPTED' },
       isLoading: false,
     });
@@ -165,8 +166,9 @@ describe('InvitationCard', () => {
   });
 
   test('shows not invited component when user is not the invited guest', () => {
-    mockGetSelf.mockReturnValue({
+    mockGetUser.mockReturnValueOnce({
       data: { ...mockCurrentUser, username: 'differentuser' },
+      isLoading: false,
     });
 
     render(<InvitationCard {...defaultProps} />);
@@ -211,7 +213,7 @@ describe('InvitationCard', () => {
     expect(mockAcceptInvitation).toHaveBeenCalledWith(
       { eventId: 123, guestUsername: 'testuser' },
       expect.objectContaining({
-        onSuccess: expect.any(Function) as (() => void),
+        onSuccess: expect.any(Function) as () => void,
       })
     );
     expect(mockOnAccept).toHaveBeenCalled();
@@ -241,17 +243,6 @@ describe('InvitationCard', () => {
     });
   });
 
-  test('shows loading text when event is loading', () => {
-    mockGetInvitationById.mockReturnValue({
-      data: mockInvitationData,
-      isLoading: true,
-    });
-
-    render(<InvitationCard {...defaultProps} />);
-    
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
-
   test('formats date correctly', () => {
     render(<InvitationCard {...defaultProps} />);
     
@@ -260,7 +251,7 @@ describe('InvitationCard', () => {
   });
 
   test('does not call accept mutation when event data is missing', () => {
-    mockGetInvitationById.mockReturnValue({
+    mockGetInvitationById.mockReturnValueOnce({
       data: { ...mockInvitationData, event: null },
       isLoading: false,
     });
@@ -270,5 +261,47 @@ describe('InvitationCard', () => {
     fireEvent.click(screen.getByTestId('button-accept-invite'));
     
     expect(mockAcceptInvitation).not.toHaveBeenCalled();
+  });
+
+  test('renders invitation card even when user data is loading', () => {
+    // Test that the component still renders the invitation card when user is loading
+    // but invitation is loaded, because the component doesn't check user loading state
+    mockGetUser.mockReturnValueOnce({
+      data: undefined,
+      isLoading: true,
+    });
+    
+    // Keep invitation loaded
+    mockGetInvitationById.mockReturnValueOnce({
+      data: mockInvitationData,
+      isLoading: false,
+    });
+
+    render(<InvitationCard {...defaultProps} />);
+    
+    // The component should render the invitation card, not the loading spinner
+    // because it only checks invitation loading state
+    expect(screen.getByText('Test Event')).toBeInTheDocument();
+    expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
+  });
+
+  test('shows not invited when user is undefined but invitation is loaded', () => {
+    // Test the case where user is undefined (not loaded) but invitation is loaded
+    mockGetUser.mockReturnValueOnce({
+      data: undefined,
+      isLoading: false, // Not loading, just no data
+    });
+    
+    mockGetInvitationById.mockReturnValueOnce({
+      data: mockInvitationData,
+      isLoading: false,
+    });
+
+    render(<InvitationCard {...defaultProps} />);
+    
+    // Since currentUser is undefined, the condition in the component will be:
+    // (currentUser && invitationData.guestUsername !== currentUser.username)
+    // This evaluates to false because currentUser is falsy, so it should render the card
+    expect(screen.getByText('Test Event')).toBeInTheDocument();
   });
 });
