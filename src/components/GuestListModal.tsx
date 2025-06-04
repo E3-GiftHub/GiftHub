@@ -37,10 +37,7 @@ export default function GuestListModal({
                 src={guest.pictureUrl ?? ""}
                 alt="user visual description"
               />
-              <p>
-                {formatField(guest.fname)}
-                {formatField(guest.lname)}
-              </p>
+              <p>{formatField(guest.fname) + " " + formatField(guest.lname)}</p>
               <p>aka. {guest.username}</p>
               <button
                 className={styles.removeGuestButton}

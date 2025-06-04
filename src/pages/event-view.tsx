@@ -58,7 +58,7 @@ function GuestListPreview({
             alt="user visual description"
           />
           <p className={styles.guestName}>
-            {formatField(guest.fname)} {formatField(guest.lname)}
+            {formatField(guest.fname) + " " + formatField(guest.lname)}
           </p>
         </div>
       ))}
