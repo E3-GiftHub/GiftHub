@@ -37,7 +37,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const updatedUser = await db.user.update({
         where: {
-          id: ctx.session.user.id,
+          username: ctx.session.user.name!,
         },
         data: {
           fname: input.fname!,
@@ -58,11 +58,33 @@ export const userRouter = createTRPCRouter({
   delete: protectedProcedure.mutation(async ({ ctx }) => {
     await db.user.delete({
       where: {
-        username: ctx.session.user.id,
+        username: ctx.session.user.name!,
       },
     });
     return {
       success: true,
     };
+  }),
+
+  prepareEdit: protectedProcedure.query(async ({ ctx }) => {
+    const user = await db.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        username: true,
+        fname: true,
+        lname: true,
+        id: true,
+        email: true,
+        password: true,
+        pictureUrl: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
   }),
 });

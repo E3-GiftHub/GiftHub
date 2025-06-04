@@ -15,7 +15,7 @@ export const authConfig: NextAuthConfig = {
         },
         password: { label: "Password", type: "password" },
       },
-      // @ts-expect-error nush boss e greu
+
       async authorize(credentials) {
         // Basic validation on credentials object
         if (!credentials?.email || !credentials?.password) {
@@ -44,6 +44,23 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
+        const isAlreadyHashed =
+          password.startsWith("$2b$") || password.startsWith("$2a$");
+        if (isAlreadyHashed) {
+          if (password === user.password) {
+            console.log("Password is already hashed");
+
+            return {
+              id: user.username,
+              name: user.username,
+              email: user.email,
+            };
+          }
+
+          console.log("Hash mismatch for user");
+          return null;
+        }
+
         if (!user.password) {
           console.error(
             `Authorize: User ${email} found but has no password set (e.g., OAuth user)`,
@@ -62,7 +79,7 @@ export const authConfig: NextAuthConfig = {
         // This object will be available in the `user` property of the `jwt` callback.
         console.log(`Authorize: Successfully authenticated user ${email}`);
         return {
-          id: user.id,
+          id: user.username, // todo check this
           name: user.username, // Or user.name, adjust based on your User model
           email: user.email,
           username: user.username, // <-- Add this line
@@ -75,7 +92,9 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {
-        token.id = user.id; // Add the user ID to the JWT
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
         // Use user['username'] to avoid TS error, since we know it's present from authorize
         //token.username = user.username;
       }
@@ -88,6 +107,8 @@ export const authConfig: NextAuthConfig = {
       // available on the `session.user` object.
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
 
       return session;
