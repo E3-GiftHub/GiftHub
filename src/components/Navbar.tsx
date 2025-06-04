@@ -23,6 +23,7 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
+  const [hasExpress, setHasExpress] = useState<string>("false");
 
   const profileRef = useRef<HTMLLIElement>(null);
   const router = useRouter();
@@ -67,6 +68,25 @@ const Navbar = () => {
     };
   }, []);
 
+  //! CHECK FOR THE STRIPE EXPRESS ACCOUNT
+  useEffect(() => {
+    if (!router.isReady || !session?.user?.name) return;
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `./api/stripe/check-express?username=${session?.user?.name as string}`,
+        );
+        const data = (await res.json()) as string;
+        setHasExpress(data);
+      } catch (error) {
+        console.error("Failed to load media", error);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  });
+
   return (
     <nav
       className={`${styles.navbar} ${
@@ -102,6 +122,18 @@ const Navbar = () => {
           <ul
             className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
+            {hasExpress === "true" && (
+              <li>
+                <Link
+                  href="/"
+                  className={
+                    activePage === "inbox" ? styles["profile-main-button"] : ""
+                  }
+                >
+                  <FaUser /> Stripe
+                </Link>
+              </li>
+            )}
             <li>
               <Link
                 href="/home#"
@@ -146,11 +178,11 @@ const Navbar = () => {
                   href="/#"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+                    document.cookie =
+                      "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
                     void signOut({
-                      redirectTo: "/"
+                      redirectTo: "/",
                     });
-
                   }}
                 >
                   <FaSignOutAlt /> Logout
