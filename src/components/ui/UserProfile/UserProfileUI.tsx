@@ -5,7 +5,7 @@ import clsx from "clsx";
 import "src/styles/globals.css";
 import { useRouter } from "next/router";
 import { signOut } from "next-auth/react";
-import { api } from "src/trpc/react";
+import { api } from "~/trpc/react";
 
 interface UserProfileProps {
   username: string;
