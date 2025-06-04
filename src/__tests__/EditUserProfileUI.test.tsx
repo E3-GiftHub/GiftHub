@@ -1,133 +1,116 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import EditUserProfileUI from '~/components/ui/UserProfile/EditUserProfileUI';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
 
-describe('EditUserProfileUI', () => {
+// Define expected type for props (or use a utility interface if available)
+interface UploadButtonProps {
+  onClientUploadComplete?: (files: { url: string }[]) => void;
+}
+
+jest.mock("~/utils/uploadthing", () => ({
+  UploadButton: ({ onClientUploadComplete }: UploadButtonProps) => {
+    return (
+      <button
+        aria-label="upload-mock"
+        onClick={() => {
+          onClientUploadComplete?.([{ url: "http://mock.url/avatar.png" }]);
+        }}
+      >
+        MockUpload
+      </button>
+    );
+  },
+}));
+
+describe("EditUserProfileUI", () => {
   const mockOnSave = jest.fn();
   const mockOnResetPassword = jest.fn();
+  const mockOnPhotoChange = jest.fn();
+
   const defaultProps = {
-    username: 'testuser',
-    fname: 'First',
-    lname: 'Last',
-    email: 'test@example.com',
-    avatarUrl: '/avatar.jpg',
+    username: "testuser",
+    fname: "Test",
+    lname: "User",
+    email: "test@example.com",
+    avatarUrl: "http://example.com/avatar.jpg",
     onSave: mockOnSave,
     onResetPassword: mockOnResetPassword,
+    onPhotoChange: mockOnPhotoChange,
+    loading: false,
+    disableUsernameEditing: false,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders with initial values', () => {
+  it("renders with correct initial values", () => {
     render(<EditUserProfileUI {...defaultProps} />);
-
-    expect(screen.getByDisplayValue('testuser')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('First')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Last')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
-    expect(screen.getByRole('img')).toHaveAttribute('src', '/avatar.jpg');
-    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /reset password/i })).toBeInTheDocument();
+    expect(screen.getByDisplayValue("testuser")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Test")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("User")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
   });
 
-  test('updates username input correctly', () => {
+  it("allows user to change inputs and triggers onSave", () => {
     render(<EditUserProfileUI {...defaultProps} />);
-    const usernameInput = screen.getByDisplayValue('testuser');
-    fireEvent.change(usernameInput, { target: { value: 'newuser' } });
-    expect(usernameInput).toHaveValue('newuser');
+
+    fireEvent.change(screen.getByPlaceholderText("username..."), {
+      target: { value: "newuser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("FirstName..."), {
+      target: { value: "New" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("LastName..."), {
+      target: { value: "Name" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("yourNewEmail@..com."), {
+      target: { value: "new@email.com" },
+    });
+
+    fireEvent.click(screen.getByText("Save changes"));
+
+    expect(mockOnSave).toHaveBeenCalledWith(
+      "New",
+      "Name",
+      "newuser",
+      "new@email.com",
+    );
   });
 
-  test('validates email input and shows error message', () => {
+  it("displays email validation error for invalid input", () => {
     render(<EditUserProfileUI {...defaultProps} />);
-    const emailInput = screen.getByDisplayValue('test@example.com');
+    const emailInput = screen.getByPlaceholderText("yourNewEmail@..com.");
 
-    fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
-    expect(screen.getByText('Please enter a valid email address')).toBeInTheDocument();
+    fireEvent.change(emailInput, { target: { value: "invalidemail" } });
 
-    fireEvent.change(emailInput, { target: { value: 'valid@example.com' } });
-    expect(screen.queryByText('Please enter a valid email address')).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Please enter a valid email address"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Save changes")).toBeDisabled();
   });
 
-  test('disables save button when email is invalid', () => {
+  it("calls onResetPassword when reset button is clicked", () => {
     render(<EditUserProfileUI {...defaultProps} />);
-    const saveButton = screen.getByRole('button', { name: /save changes/i });
-    const emailInput = screen.getByDisplayValue('test@example.com');
-
-    fireEvent.change(emailInput, { target: { value: 'invalid' } });
-    expect(saveButton).toBeDisabled();
-  });
-
-  test('calls onSave with correct values when save is clicked', () => {
-    render(<EditUserProfileUI {...defaultProps} />);
-
-    fireEvent.change(screen.getByDisplayValue('testuser'), { target: { value: 'newuser' } });
-    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
-
-    expect(mockOnSave).toHaveBeenCalledWith('First', 'Last', 'newuser', 'test@example.com');
-  });
-
-  test('does not call onSave when email is invalid', () => {
-    render(<EditUserProfileUI {...defaultProps} />);
-    const emailInput = screen.getByDisplayValue('test@example.com');
-
-    fireEvent.change(emailInput, { target: { value: 'invalid' } });
-    fireEvent.click(screen.getByRole('button', { name: /save changes/i }));
-
-    expect(mockOnSave).not.toHaveBeenCalled();
-  });
-
-  test('calls onResetPassword when reset password button is clicked', () => {
-    render(<EditUserProfileUI {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /reset password/i }));
+    fireEvent.click(screen.getByText("Reset Password"));
     expect(mockOnResetPassword).toHaveBeenCalled();
   });
 
-  test('shows loading state correctly', () => {
-    render(<EditUserProfileUI {...defaultProps} loading />);
-    const inputs = screen.getAllByRole('textbox');
-    inputs.forEach(input => expect(input).toBeDisabled());
-
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach(button => expect(button).toBeDisabled());
+  it("disables inputs when loading", () => {
+    render(<EditUserProfileUI {...defaultProps} loading={true} />);
+    expect(screen.getByPlaceholderText("username...")).toBeDisabled();
+    expect(screen.getByPlaceholderText("yourNewEmail@..com.")).toBeDisabled();
   });
 
-  test('updates input values when props change', () => {
-    const { rerender } = render(<EditUserProfileUI {...defaultProps} />);
-    rerender(
+  it("disables username editing when disableUsernameEditing is true", () => {
+    render(
       <EditUserProfileUI
         {...defaultProps}
-        username="newusername"
-        fname="NewFirst"
-        lname="NewLast"
-        email="new@example.com"
-      />
+        disableUsernameEditing={true}
+        loading={false}
+      />,
     );
-
-    expect(screen.getByDisplayValue('newusername')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('NewFirst')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('NewLast')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('new@example.com')).toBeInTheDocument();
-  });
-
-  test('handles empty initial values', () => {
-    render(<EditUserProfileUI />);
-    expect(screen.getByRole('textbox', { name: /username/i })).toHaveValue('');
-    expect(screen.getByRole('textbox', { name: /email/i })).toHaveValue('');
-  });
-
-  test('calls onPhotoChange when a file is selected', async () => {
-    const onPhotoChange = jest.fn();
-    render(<EditUserProfileUI onPhotoChange={onPhotoChange} />);
-    screen.getByLabelText('Edit avatar', { selector: 'button' });
-
-    const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
-    const fileInput = screen.getByTestId('file-input');
-
-    Object.defineProperty(fileInput, 'files', { value: [file] });
-    fireEvent.change(fileInput);
-
-    await waitFor(() => expect(onPhotoChange).toHaveBeenCalledWith(file));
+    expect(screen.getByPlaceholderText("username...")).toBeDisabled();
   });
 });

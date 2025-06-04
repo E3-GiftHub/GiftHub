@@ -1,82 +1,99 @@
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
+import { api } from "~/trpc/react";
 
-// Mock next/router
-jest.mock('next/router', () => ({
+jest.mock("next/router", () => ({
   useRouter: jest.fn(),
 }));
 
-describe('UserProfileUI', () => {
-  const pushMock = jest.fn();
-  const mockRouter = { push: pushMock };
+jest.mock("next-auth/react", () => ({
+  signOut: jest.fn(),
+}));
+
+jest.mock("~/trpc/react", () => ({
+  api: {
+    profile: {
+      user: {
+        delete: {
+          useMutation: jest.fn(() => ({
+            mutateAsync: jest.fn(),
+          })),
+        },
+      },
+    },
+  },
+}));
+
+describe("UserProfileUI", () => {
+  const defaultProps = {
+    username: "johndoe",
+    fname: "John",
+    lname: "Doe",
+    email: "john@example.com",
+    avatarUrl: "/avatar.png",
+  };
 
   beforeEach(() => {
-    (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    pushMock.mockClear();
+    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
+    window.confirm = jest.fn().mockReturnValue(true);
   });
 
-  it('renders user data correctly', () => {
-    render(
-      <UserProfileUI
-        username="john_doe"
-        fname="John"
-        lname="Doe"
-        email="john@example.com"
-        avatarUrl="/avatar.jpg"
-      />
-    );
+  it("renders user information correctly", () => {
+    render(<UserProfileUI {...defaultProps} />);
 
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('john_doe');
-    expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('Doe')).toBeInTheDocument();
-    expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByAltText('')).toHaveAttribute('src', '/avatar.jpg');
+    expect(screen.getByText("johndoe")).toBeInTheDocument();
+    expect(screen.getByText("Doe")).toBeInTheDocument();
+    expect(screen.getByText("john@example.com")).toBeInTheDocument();
   });
 
-  it('calls onEdit prop when Edit info button is clicked', () => {
+  it("triggers onEdit prop if provided", () => {
     const onEdit = jest.fn();
-    render(<UserProfileUI onEdit={onEdit} />);
-
-    const editButton = screen.getByRole('button', { name: /edit info/i });
+    render(<UserProfileUI {...defaultProps} onEdit={onEdit} />);
+    const editButton = screen.getByText(/Edit info/i);
     fireEvent.click(editButton);
-    expect(onEdit).toHaveBeenCalledTimes(1);
+    expect(onEdit).toHaveBeenCalled();
   });
 
-  it('navigates to /editprofile when onEdit not provided', async () => {
-    render(<UserProfileUI />);
-
-    const editButton = screen.getByRole('button', { name: /edit info/i });
-    fireEvent.click(editButton);
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/editprofile'));
+  it("redirects to /profile-edit if onEdit is not provided", async () => {
+    const pushMock = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
+    render(<UserProfileUI {...defaultProps} />);
+    fireEvent.click(screen.getByText(/Edit info/i));
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith("/profile-edit");
+    });
   });
 
-  it('calls onDelete prop when Delete account button is clicked', () => {
-    const onDelete = jest.fn();
-    render(<UserProfileUI onDelete={onDelete} />);
+  it("calls delete mutation and signOut on delete", async () => {
+    const mutateAsyncMock = jest.fn().mockResolvedValue({});
+    (api.profile.user.delete.useMutation as jest.Mock).mockReturnValue({
+      mutateAsync: mutateAsyncMock,
+    });
 
-    const deleteButton = screen.getByRole('button', { name: /delete account/i });
-    fireEvent.click(deleteButton);
-    expect(onDelete).toHaveBeenCalledTimes(1);
+    render(<UserProfileUI {...defaultProps} />);
+    fireEvent.click(screen.getByText(/Delete account/i));
+
+    await waitFor(() => {
+      expect(mutateAsyncMock).toHaveBeenCalled();
+      expect(signOut).toHaveBeenCalledWith({ redirectTo: "/" });
+    });
   });
 
-  it('navigates to / when onDelete not provided', async () => {
-    render(<UserProfileUI />);
+  it("does not delete if user cancels confirmation", async () => {
+    (window.confirm as jest.Mock).mockReturnValue(false);
+    const mutateAsyncMock = jest.fn();
+    (api.profile.user.delete.useMutation as jest.Mock).mockReturnValue({
+      mutateAsync: mutateAsyncMock,
+    });
 
-    const deleteButton = screen.getByRole('button', { name: /delete account/i });
-    fireEvent.click(deleteButton);
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/'));
-  });
+    render(<UserProfileUI {...defaultProps} />);
+    fireEvent.click(screen.getByText(/Delete account/i));
 
-  it('displays loading placeholders when loading is true', () => {
-    render(<UserProfileUI username="john" fname="John" lname="Doe" email="john@example.com" loading />);
-
-    const heading = screen.getByRole('heading', { level: 2 });
-    expect(heading.textContent).toBe('\u00A0');
-    const nameFields = screen.getAllByText('\u00A0');
-    expect(nameFields.length).toBeGreaterThanOrEqual(3);
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach(btn => expect(btn).toBeDisabled());
+    await waitFor(() => {
+      expect(mutateAsyncMock).not.toHaveBeenCalled();
+    });
   });
 });

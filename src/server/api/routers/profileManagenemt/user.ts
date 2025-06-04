@@ -6,7 +6,7 @@ export const userRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
     const user = await db.user.findUnique({
       where: {
-        id: ctx.session.user.id,
+        username: ctx.session.user.name!,
       },
       select: {
         username: true,
@@ -35,28 +35,56 @@ export const userRouter = createTRPCRouter({
     )
 
     .mutation(async ({ input, ctx }) => {
-      return db.user.update({
+      const updatedUser = await db.user.update({
         where: {
-          username: ctx.session.user.id,
+          username: ctx.session.user.name!,
         },
         data: {
           fname: input.fname!,
           lname: input.lname!,
-          //id: input.username!,
           username: input.username!,
           email: input.email,
         },
       });
+
+      /// !!!!! NEW CODE , WIP
+      // Update session username if changed
+      if (input.username && ctx.session.user.name !== input.username) {
+        ctx.session.user.name = input.username;
+      }
+      return updatedUser;
     }),
 
   delete: protectedProcedure.mutation(async ({ ctx }) => {
-    const user = await db.user.delete({
+    await db.user.delete({
       where: {
-        username: ctx.session.user.id,
+        username: ctx.session.user.name!,
       },
     });
     return {
       success: true,
     };
+  }),
+
+  prepareEdit: protectedProcedure.query(async ({ ctx }) => {
+    const user = await db.user.findUnique({
+      where: {
+        username: ctx.session.user.name!,
+      },
+      select: {
+        username: true,
+        fname: true,
+        lname: true,
+        id: true,
+        email: true,
+        password: true,
+        pictureUrl: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
   }),
 });
