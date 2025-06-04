@@ -1,0 +1,532 @@
+/* EventView.module.css */
+.container {
+  min-height: 100vh;
+  background-color: #2f2464;
+  padding: 1rem;
+}
+
+.content {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.reportButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0 0 0 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reportButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+
+@media (min-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 2fr 1fr;
+    align-items: stretch;
+  }
+
+}
+
+.leftColumn {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.eventCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  justify-content: flex-start;
+}
+
+.eventImage {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.infoCard {
+  background: rgba(79, 70, 229, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.infoCardButton {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+  width: 100%;
+}
+
+.infoCardButton:hover {
+  transform: scale(1.05);
+}
+
+.infoCardButton:active {
+  transform: scale(1);
+}
+
+.infoLabel {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  color: white;
+  font-weight: 600;
+}
+
+.locationCard {
+  background: rgba(79, 70, 229, 0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.locationLabel {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.locationText {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.descriptionCard {
+  background: rgba(55, 48, 163, 0.5);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  grid-column: 1 / -1;
+  min-height: 8rem; /* Make description taller */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.descriptionTitle {
+  color: white;
+  font-weight: 500;
+  margin: 0;
+}
+
+.descriptionText {
+  color: white;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.rightColumn {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* Increased gap for more separation between elements */
+}
+
+.guestCard {
+   height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+
+.plannerTitleSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guestCount {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 1.125rem;
+  gap: 0.5rem;
+}
+
+.sectionTitle {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+  margin-top: 1rem;
+}
+
+.plannerCard {
+  all: unset; /* added this because it is a button */
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  padding-right: 3rem; /* added this, trust me */
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
+  cursor: pointer;
+  transition: box-shadow ease 0.5s;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.plannerCard:hover {
+  box-shadow: 0 0 15px rgba(255,255,255, 0.2);
+}
+
+.plannerImage {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+  border: 2px solid white;
+}
+
+.plannerName {
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.plannerRole {
+  color: #e9d5ff;
+  font-size: 0.75rem;
+}
+
+.plannerSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.guestsList {
+  max-height: 30rem;
+  min-height: 12rem;
+  overflow-y: auto;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.guestItem {
+  all: unset; /* added this because it is a button */
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  padding-right: 3rem; /* added this, trust me */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+.guestItem:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.guestImage {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+}
+
+.guestName {
+  color: white;
+  font-size: 0.875rem;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.wishlistButton {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  color: white;
+  border: none;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+  width: 100%;
+}
+
+.wishlistButton:hover {
+  transform: scale(1.02);
+}
+
+.wishlistButton:active {
+  transform: scale(1);
+}
+
+.contributeButton {
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+  width: 100%;
+}
+
+.contributeButton:hover {
+  transform: scale(1.02);
+}
+
+.contributeButton:active {
+  transform: scale(1);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.modalTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.modalDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.modalTextarea {
+  width: 95%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  resize: none;
+  height: 6rem;
+  font-size: 0.875rem;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.modalButtonSecondary {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalButtonSecondary:hover {
+  background: #f9fafb;
+}
+
+.modalButtonPrimary {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: #dc2626;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalButtonPrimary:hover {
+  background: #b91c1c;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* UPLOAD */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* EDIT/VIEW Media Modal - PLANNER AND GUESTS */
+.editMediaModalWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.editMediaModalContent {
+  background: #43328b;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.editMediaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.editMediaGrid {
+  display: grid;
+  gap: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 1rem 0;
+  max-height: 60vh;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.editMediaItem img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.editMediaItem {
+  position: relative;
+  border: none;
+  border-radius: none;
+  overflow: hidden;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ff5c5c;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.editMediaActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
