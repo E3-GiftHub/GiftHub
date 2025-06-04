@@ -4,6 +4,7 @@ import styles from "~/styles/UserProfile/UserProfile.module.css";
 import Navbar from "~/components/Navbar";
 import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
 import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
 
 export default function EditUserProfile() {
   const router = useRouter();
@@ -11,6 +12,10 @@ export default function EditUserProfile() {
   const { data: user, isLoading: userLoading, error: userError } = api.profile.user.get.useQuery();
 
   const updateUserMutation = api.profile.user.update.useMutation();
+
+  const {
+    data: session, status
+  }= useSession();
 
   const handleSave = async (
     newFname: string,
@@ -69,6 +74,8 @@ export default function EditUserProfile() {
       </div>
     );
   }
+
+  console.log("cacat", session?.user?.name);
 
   return (
     <div className={styles["landing-page"]}>
