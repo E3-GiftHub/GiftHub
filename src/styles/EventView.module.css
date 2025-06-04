@@ -91,7 +91,7 @@
   padding: 0.75rem;
 }
 
-.infoCardButton {
+.mediaCardButton {
   background: radial-gradient(
     circle at bottom right,
     #a078e4 0%,
@@ -101,6 +101,7 @@
   box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
   color: white;
   border: none;
+  font-weight: 740;
   border-radius: 0.5rem;
   padding: 0.75rem;
   display: flex;
@@ -111,11 +112,11 @@
   width: 100%;
 }
 
-.infoCardButton:hover {
+.mediaCardButton:hover {
   transform: scale(1.05);
 }
 
-.infoCardButton:active {
+.mediaCardButton:active {
   transform: scale(1);
 }
 
@@ -311,7 +312,7 @@
   box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
   color: white;
   border: none;
-  font-weight: 500;
+  font-weight: 740;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   cursor: pointer;
@@ -336,7 +337,7 @@
   );
   box-shadow: 0 0 15px rgba(208, 195, 254, 0.5);
   color: white;
-  font-weight: 500;
+  font-weight: 740;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   border: none;
@@ -438,20 +439,6 @@
   height: 1rem;
 }
 
-/* UPLOAD */
-.modalBackdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
 /* EDIT/VIEW Media Modal - PLANNER AND GUESTS */
 .editMediaModalWrapper {
   position: fixed;
@@ -529,4 +516,141 @@
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+}
+
+/* UPLOAD MODAL POPUP */
+.uploadModal {
+  background: #3f2a82;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.uploadModal .modalTitle {
+  margin: 0;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+/* UPLOAD MEDIA caption input */
+.captionInput {
+  width: 100%;
+  max-width: 28rem;
+  align-self: center;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #a45eeB, #6b1ed9);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.captionInput::placeholder {
+  color: rgba(255, 255, 255, 0.37);
+}
+
+.uploadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.uploadSpinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.uploadingText {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Update the captionInput to show disabled state after choosing a file */
+.captionInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* hide the native file‐input */
+.fileInputWrapper input[type="file"] {
+  display: none;
+}
+
+/* style the UploadButton’s <label> */
+.fileInputWrapper > label {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: radial-gradient(
+    circle at bottom right,
+    #a078e4 0%,
+    #8d80ec 57%,
+    #738bf8 100%
+  );
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 12px rgba(208, 195, 254, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+}
+.fileInputWrapper > label:hover {
+  transform: scale(1.02);
+}
+
+/* hide UploadThing’s filename badge */
+.fileInputWrapper > div[data-element="allowed-content"] {
+  display: none;
+}
+
+
+.uploadActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.caption {
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }

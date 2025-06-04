@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../styles/EventView.module.css";
+import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import type { GuestHeader } from "~/models/GuestHeader";
 

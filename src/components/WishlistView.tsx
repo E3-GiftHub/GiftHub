@@ -78,8 +78,6 @@ const Wishlist: React.FC<WishlistProps> = ({
     );
   };
 
-
-
   const { data: eventData, isLoading: isEventLoading } =
     api.event.getById.useQuery(
       {
@@ -123,7 +121,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     }
   }, [invitationData]);
 
-  console.log("cacat", eventP?.createdByUsername, username);
+  console.log("Planner: ", eventP?.createdByUsername, username);
 
   // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
   if (
