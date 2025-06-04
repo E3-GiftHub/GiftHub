@@ -67,6 +67,7 @@ const Wishlist: React.FC<WishlistProps> = ({
       },
     );
 
+  //! check invites
   const { data: invitationData, isLoading: isInvitationLoading } =
     api.invitationPreview.getInvitationForUserEvent.useQuery(
       { eventId: Number(eventId), guestUsername: username ?? "" },
@@ -83,11 +84,18 @@ const Wishlist: React.FC<WishlistProps> = ({
     }
   }, [data]);
 
+  //! check planner
+  const { data: plannerUsername } =
+    api.invitationPreview.getInvitationForUserEvent.useQuery(
+      { eventId: Number(eventId), guestUsername: username ?? "" },
+      { enabled: !!eventId && !!username && !isLoadingUser },
+    );
+
   useEffect(() => {
     if (invitationData) {
       setIsInvited(invitationData.status === "ACCEPTED"); //doar accepted! fara nonchalant kings :P
     } else if (invitationData === null) {
-      setIsInvited(false);
+      setIsInvited(username === plannerUsername);
     }
   }, [invitationData]);
 
