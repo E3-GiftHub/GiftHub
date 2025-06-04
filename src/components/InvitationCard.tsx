@@ -2,7 +2,7 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
-import type { InvitationProps } from "../models/InvitationEventGuest.ts";
+
 import NotInvited from "./notinvited";
 import LoadingSpinner from "./loadingspinner";
 import React from "react";
@@ -12,9 +12,9 @@ export default function InvitationCard({
   onAccept,
   onDecline,
 }: {
-  invitationId: number;
-  onAccept?: () => void;
-  onDecline?: () => void;
+  readonly invitationId: number;
+  readonly onAccept?: () => void;
+  readonly onDecline?: () => void;
 }) {  // luam userul curent care foloseste acm pagina
   const { data: currentUser } = api.user.getSelf.useQuery();
 
@@ -79,11 +79,10 @@ export default function InvitationCard({
             <div className={styles.detailItem}>
               <span className={styles.icon}>📅</span>
               <span>
-                {isEventLoading
-                  ? ""
-                  : eventData?.date
-                    ? new Date(eventData.date).toLocaleString()
-                    : ""}
+                {(() => {
+                  if (isEventLoading) return "";
+                  return eventData?.date ? new Date(eventData.date).toLocaleString() : "";
+                })()}
               </span>
             </div>
             <div className={styles.detailItem}>
