@@ -1,41 +1,57 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "~/styles/UserProfile/UserProfile.module.css";
 import Navbar from "~/components/Navbar";
 import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
 import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 
 export default function EditUserProfile() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
-  const { data: user, isLoading: userLoading, error: userError } = api.profile.user.get.useQuery();
+  const {
+    data: user,
+    isLoading: userLoading,
+    error: userError,
+  } = api.profile.user.prepareEdit.useQuery();
 
   const updateUserMutation = api.profile.user.update.useMutation();
 
   const handleSave = async (
     newFname: string,
     newLname: string,
-    _newUsername: string,
+    newUsername: string,
     newEmail: string,
-    //newIban: string
   ) => {
     updateUserMutation.mutate(
       {
         fname: newFname,
         lname: newLname,
         email: newEmail,
-        username: _newUsername,
-        //iban: newIban,
+        username: newUsername,
       },
       {
         onSuccess: () => {
-          alert("Profile updated successfully!");
-          void router.push("/profile");
+          void (async () => {
+            await signOut({ redirect: false });
+
+            await signIn("credentials", {
+              email: newEmail,
+              password: user?.password,
+              redirect: false,
+            });
+
+            alert("Profile updated successfully!");
+            void router.push("/profile");
+          })();
         },
+
         onError: (error) => {
           alert("Update failed: " + error.message);
         },
-      }
+      },
     );
   };
 
@@ -78,11 +94,10 @@ export default function EditUserProfile() {
         fname={user.fname ?? ""}
         lname={user.lname ?? ""}
         email={user.email ?? ""}
-        //IBAN={user.iban ?? ""}
         avatarUrl={user.pictureUrl ?? "/UserImages/default_pfp.svg"}
         onSave={handleSave}
         onResetPassword={handleResetPassword}
-        disableUsernameEditing={true}
+        disableUsernameEditing={false}
       />
       <div className={styles["empty-space"]}></div>
     </div>

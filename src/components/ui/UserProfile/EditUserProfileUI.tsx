@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import styles from 'src/styles/UserProfile/UserProfile.module.css';
-import Image from 'next/image';
-import { clsx } from 'clsx';
-import {UploadButton} from "~/utils/uploadthing";
+import styles from "src/styles/UserProfile/UserProfile.module.css";
+import Image from "next/image";
+import { clsx } from "clsx";
+import { UploadButton } from "~/utils/uploadthing";
 import "src/styles/globals.css";
-
-// import {useUploadThing} from "~/utils/uploadthing";
-import { useRouter } from "next/router";
 import { toast } from "sonner";
-import { jest } from "@jest/globals";
 
 interface EditUserProfileProps {
-  username?: string;
-  fname?: string;
-  lname?: string;
-  email?: string;
-  avatarUrl?: string;
-  onSave?: (
+  username: string;
+  fname: string;
+  lname: string;
+  email: string;
+  avatarUrl: string;
+  onSave: (
     newFname: string,
     newLname: string,
     newUsername: string,
@@ -66,10 +62,10 @@ const ProfileButton = ({
 );
 
 export default function EditUserProfileUI({
-  username = "",
-  email = "",
-  fname = "",
-  lname = "",
+  username,
+  email,
+  fname,
+  lname,
   avatarUrl,
   onSave,
   onResetPassword,
@@ -122,8 +118,8 @@ export default function EditUserProfileUI({
     setLnameInput(lname);
   }, [username, email, fname, lname]);
 
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const validateEmail = (email: string): boolean => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
 
@@ -136,22 +132,22 @@ export default function EditUserProfileUI({
   };
 
   const handleSave = () => {
-    if (onSave && !emailError) {
+    if (!emailError) {
       onSave(fnameInput, lnameInput, usernameInput, emailInput);
     }
   };
 
-  const onUploadComplete = (res: {url: string}[]) => {
-    if(res[0]?.url) {
+  const onUploadComplete = (res: { url: string }[]) => {
+    if (res[0]?.url) {
       setPreviewUrl(res[0].url);
     }
     alert("Upload complete");
-  }
+  };
 
   const onUploadError = (error: Error) => {
     console.error(error);
     alert("Upload error");
-  }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -174,7 +170,7 @@ export default function EditUserProfileUI({
             <UploadButton
               className={styles.customUploadButton}
               endpoint="profilePfpUploader"
-              input={{username: usernameInput}}
+              input={{ username: usernameInput }}
               onClientUploadComplete={onUploadComplete}
               onUploadError={onUploadError}
               appearance={{
@@ -185,7 +181,7 @@ export default function EditUserProfileUI({
                   display: "none",
                 },
               }}
-              />
+            />
           </div>
         </div>
 
