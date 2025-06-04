@@ -33,18 +33,21 @@ export default function EditUserProfile() {
         username: newUsername,
       },
       {
-        onSuccess: async () => {
-          await signOut({ redirect: false });
+        onSuccess: () => {
+          void (async () => {
+            await signOut({ redirect: false });
 
-          await signIn("credentials", {
-            email: newEmail,
-            password: user?.password,
-            redirect: false,
-          });
+            await signIn("credentials", {
+              email: newEmail,
+              password: user?.password,
+              redirect: false,
+            });
 
-          alert("Profile updated successfully!");
-          void router.push("/profile");
+            alert("Profile updated successfully!");
+            void router.push("/profile");
+          })();
         },
+
         onError: (error) => {
           alert("Update failed: " + error.message);
         },

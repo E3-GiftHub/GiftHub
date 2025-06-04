@@ -132,7 +132,7 @@ export default function EditUserProfileUI({
   };
 
   const handleSave = () => {
-    if (onSave && !emailError) {
+    if (!emailError) {
       onSave(fnameInput, lnameInput, usernameInput, emailInput);
     }
   };
