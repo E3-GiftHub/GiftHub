@@ -75,6 +75,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     );
 
   useEffect(() => {
+    if (!username) return;
     if (data) {
       const updatedItems = data.map((item) => ({
         ...item,
@@ -85,19 +86,21 @@ const Wishlist: React.FC<WishlistProps> = ({
   }, [data]);
 
   //! check planner
-  const { data: plannerUsername } =
-    api.invitationPreview.getInvitationForUserEvent.useQuery(
-      { eventId: Number(eventId), guestUsername: username ?? "" },
-      { enabled: !!eventId && !!username && !isLoadingUser },
-    );
+  const { data: eventP } = api.invitationPreview.getPlanner.useQuery(
+    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { enabled: !!eventId && !!username && !isLoadingUser },
+  );
 
   useEffect(() => {
+    if (!eventP) return;
     if (invitationData) {
       setIsInvited(invitationData.status === "ACCEPTED"); //doar accepted! fara nonchalant kings :P
     } else if (invitationData === null) {
-      setIsInvited(username === plannerUsername);
+      setIsInvited(username === eventP.createdByUsername);
     }
   }, [invitationData]);
+
+  console.log("cacat", eventP?.createdByUsername, username);
 
   // aratam bucla aia rotativa krazy frog cat timp se iau datele pt event :P
   if (
