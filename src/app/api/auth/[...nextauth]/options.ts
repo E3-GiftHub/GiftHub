@@ -13,7 +13,7 @@ export const options: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      // @ts-expect-errors nush ce plm
+      // @ts-expect-errors nush ce prastie e aici dar merge
       async authorize(credentials): Promise<User | null> {
         try {
           if (!credentials?.email || !credentials?.password) {
@@ -22,7 +22,7 @@ export const options: NextAuthOptions = {
 
 
           const user = await db.user.findUnique({
-            // @ts-expect-error plm ba vedem
+            // @ts-expect-error pasnic rezolvam si vedem
             where: { email: credentials.email },
           });
 
@@ -30,7 +30,7 @@ export const options: NextAuthOptions = {
             throw new Error("User not found");
           }
 
-          const isValid = await bcrypt.compare(
+          const isValid = bcrypt.compare(
             // @ts-expect-error vedemboss
             credentials.password,
             user.password,
@@ -66,7 +66,7 @@ export const options: NextAuthOptions = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return token;
     },
-    // @ts-expect-error Pizda Masii
+    // @ts-expect-error pizza, i love pizza
     async session({ session, token }) {
       // Send properties to the client
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -86,7 +86,7 @@ export const options: NextAuthOptions = {
     signIn: "/login",
   },
   session: {
-    strategy: "jwt", // Explicitly set strategy
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.AUTH_SECRET,
