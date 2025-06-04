@@ -2,8 +2,10 @@ import { db as prisma } from "~/server/db";
 import { EventEntity } from "./Event";
 import { StatusType } from "@prisma/client";
 //import { generateToken } from "~/utils/token";
+import type { User } from "@prisma/client";
 import { EventManagementException } from "./EventManagementException";
 import { nanoid } from "nanoid";
+import { stripe } from "@/server/stripe";
 
 export class EventPlanner {
   async createEvent(data: {
@@ -32,6 +34,34 @@ export class EventPlanner {
 	*/
       },
     });
+    const user = await prisma.user.findUnique({
+      where: { username: data.createdBy },
+    });
+
+    if (!user) {
+          throw new EventManagementException(
+            `User with username '${data.createdBy}' not found.`
+          );
+        }    let userWithStripe: User = user;
+    
+        if (!userWithStripe.stripeConnectId) {
+          const userEmailForStripe = userWithStripe.email ?? undefined;
+    
+          const accountObject = await stripe.accounts.create({
+            type: "express",
+            country: "RO",
+            email: userEmailForStripe,
+            capabilities: {
+              card_payments: { requested: true },
+              transfers: { requested: true },
+            },
+          });
+    
+          userWithStripe = await prisma.user.update({
+            where: { username: userWithStripe.username },
+            data: { stripeConnectId: accountObject.id },
+          });
+        }
 
     return new EventEntity(event);
   }

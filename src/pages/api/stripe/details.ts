@@ -1,4 +1,3 @@
-// File: /pages/api/stripe/details.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
@@ -11,16 +10,31 @@ interface PaymentDetails {
   parentEventId?: number;
   eventName?: string;
   eventPlanner?: string;
+  orderId: number;       // NEXT: total stripeLinks + 1
+  imageUrl?: string;     // ← new: URL coming from either item.imagesUrl or event.pictureUrl
 }
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<PaymentDetails | { error: string }>,
+  res: NextApiResponse<PaymentDetails | { error: string }>
 ) {
   const { articleid, eventid } = req.query;
 
   const badRequest = (msg: string) => res.status(400).json({ error: msg });
 
+  // STEP 1: compute nextOrderId = count(stripeLinks) + 1
+  let nextOrderId: number;
+  try {
+    const totalLinks = await prisma.stripeLink.count();
+    nextOrderId = totalLinks + 1;
+  } catch (err) {
+    console.error("Error counting StripeLink:", err);
+    return res
+      .status(500)
+      .json({ error: "Internal server error (counting links)" });
+  }
+
+  // If the client passed articleid
   if (typeof articleid === "string") {
     const articleId = parseInt(articleid, 10);
     if (isNaN(articleId)) {
@@ -35,6 +49,7 @@ export default async function handler(
             select: {
               name: true,
               price: true,
+              imagesUrl: true,      // ← fetch the image URL from the Item table
             },
           },
           event: {
@@ -77,12 +92,22 @@ export default async function handler(
           ? `${plannerUser.fname} ${plannerUser.lname}`
           : plannerUser.username;
 
-      return res.status(200).json({        itemName: article.item.name ?? undefined,
+      // Either pick the item.imagesUrl (if set) or leave undefined
+      const imageUrl =
+        typeof article.item.imagesUrl === "string" &&
+        article.item.imagesUrl.length > 0
+          ? article.item.imagesUrl
+          : undefined;
+
+      return res.status(200).json({
+        itemName: article.item.name ?? undefined,
         itemPrice,
         alreadyContributed: contribSum,
         parentEventId: article.event.id,
         eventName: article.event.title ?? undefined,
         eventPlanner: plannerName,
+        orderId: nextOrderId,
+        imageUrl,
       });
     } catch (e) {
       console.error("Error fetching EventArticle details:", e);
@@ -90,6 +115,7 @@ export default async function handler(
     }
   }
 
+  // If the client passed eventid (i.e. “purchase whole event”)
   if (typeof eventid === "string") {
     const eventId = parseInt(eventid, 10);
     if (isNaN(eventId)) {
@@ -117,9 +143,19 @@ export default async function handler(
       const plannerName =
         event.user.fname && event.user.lname
           ? `${event.user.fname} ${event.user.lname}`
-          : event.user.username;      return res.status(200).json({
+          : event.user.username;
+
+      // Either pick event.pictureUrl (if non‐empty) or leave undefined
+      const imageUrl =
+        typeof event.pictureUrl === "string" && event.pictureUrl.length > 0
+          ? event.pictureUrl
+          : undefined;
+
+      return res.status(200).json({
         eventName: event.title ?? undefined,
         eventPlanner: plannerName,
+        orderId: nextOrderId,
+        imageUrl,
       });
     } catch (e) {
       console.error("Error fetching Event details:", e);
