@@ -18,7 +18,7 @@ const handle = async <T>(fn: () => Promise<T>) => {
   }
 };
 
-export const eventRouter = createTRPCRouter({
+export const eventPlannerRouter = createTRPCRouter({
   createEvent: publicProcedure
     .input(
       z.object({

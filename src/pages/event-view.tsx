@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import styles from "../styles/EventView.module.css";
+import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
@@ -65,8 +65,8 @@ function GuestListPreview({
 
 export default function EventView() {
   // update events
-  const updateEventMutation = api.event.updateEvent.useMutation();
-  const deleteEventMutation = api.event.removeEvent.useMutation();
+  const updateEventMutation = api.eventPlanner.updateEvent.useMutation();
+  const deleteEventMutation = api.eventPlanner.removeEvent.useMutation();
 
 
   // get the event id
@@ -110,7 +110,7 @@ export default function EventView() {
   }, [eventId]);
   //! AICI SE TERMINA FACEREA DE ROST DE GUESTS
 
-  const { data } = api.event.getEventID.useQuery(
+  const { data } = api.eventPlanner.getEventID.useQuery(
     {
       eventId: parsedId,
     },

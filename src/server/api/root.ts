@@ -4,7 +4,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { calendarRouter } from "./routers/calendarRouter";
 import { upcomingEventsRouter } from "~/server/api/routers/eventPreviewRouter";
 import { invitationsRouter } from "~/server/api/routers/invitationPreviewRouter";
-import { eventRouter } from "~/server/api/routers/EventController";
+import { eventPlannerRouter } from "~/server/api/routers/EventController";
 import { itemRouter } from "./routers/itemRouter";
 import { eventRouter } from "./routers/eventRouter";
 import { contributionsRouter } from "~/server/api/routers/ContributionsRouter";
@@ -35,7 +35,7 @@ export const appRouter = createTRPCRouter({
   invitationsNotification: invitesNotificationRouter,
   ebay: ebayRouter,
   media: mediaRouter,
-  event: eventRouter,
+  eventPlanner: eventPlannerRouter,
   guest: guestRouter,
   user: userRouter,
   email: emailRouter,
