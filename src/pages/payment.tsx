@@ -1,6 +1,7 @@
+// payment.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
@@ -17,18 +18,8 @@ interface PaymentDetails {
   parentEventId?: number;
   eventName?: string;
   eventPlanner?: string;
-}
-
-interface StripeContributeRequest {
-  userId: string;
-  amount: number;
-  articleId?: number;
-  eventId?: number;
-}
-
-interface StripeContributeResponse {
-  url?: string;
-  error?: string;
+  orderId: number;
+  imageUrl?: string;
 }
 
 export default function CheckoutPage() {
@@ -44,84 +35,108 @@ export default function CheckoutPage() {
   const [details, setDetails] = useState<PaymentDetails | null>(null);
   const [remainingAmount, setRemainingAmount] = useState<number | null>(null);
 
+  // 1) Capture articleId / eventId from URL once router is ready
   useEffect(() => {
     if (!router.isReady) return;
     if (status !== "authenticated") return;
-    const { articleid, eventid } = router.query;
 
+    const { articleid, eventid } = router.query;
     if (typeof articleid === "string") {
-      setArticleId(parseInt(articleid, 10));
+      const num = parseInt(articleid, 10);
+      setArticleId(isNaN(num) ? null : num);
     } else {
       setArticleId(null);
     }
 
     if (typeof eventid === "string") {
-      setEventId(parseInt(eventid, 10));
+      const num = parseInt(eventid, 10);
+      setEventId(isNaN(num) ? null : num);
     } else {
       setEventId(null);
     }
   }, [router.isReady, router.query, status]);
 
-  useEffect(() => {
+  // 2) Fetch details (and poll every 5 seconds) whenever articleId or eventId changes
+  const fetchDetails = useCallback(async () => {
     if (articleId !== null) {
-      fetch(`/api/stripe/details?articleid=${articleId}`)
-        .then(async (res) => {
-          if (!res.ok) {
-            const error = await res.text();
-            console.error("Failed to fetch payment details:", error);
-            throw new Error(error || "Unknown error");
-          }
-          return res.json() as Promise<PaymentDetails>;
-        })
-        .then((data) => {
-          setDetails(data);
+      try {
+        const res = await fetch(`/api/stripe/details?articleid=${articleId}`);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Failed to fetch payment details:", errorText);
+          return;
+        }
+        // First capture as `unknown`, then cast to our interface:
+        const jsonResult: unknown = await res.json();
+        const data = jsonResult as PaymentDetails;
+        setDetails(data);
 
-          if (
-            data.itemPrice != null &&
-            data.alreadyContributed != null
-          ) {
-            const rem = data.itemPrice - data.alreadyContributed;
-            setRemainingAmount(rem > 0 ? rem : 0);
-          } else {
-            setRemainingAmount(null);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setDetails(null);
+        if (data.itemPrice != null && data.alreadyContributed != null) {
+          const rem = data.itemPrice - data.alreadyContributed;
+          setRemainingAmount(rem > 0 ? rem : 0);
+        } else {
           setRemainingAmount(null);
-        });
+        }
+      } catch (err) {
+        console.error("Error in fetchDetails (article):", err);
+        setDetails(null);
+        setRemainingAmount(null);
+      }
     } else if (eventId !== null) {
-      fetch(`/api/stripe/details?eventid=${eventId}`)
-        .then(async (res) => {
-          if (!res.ok) {
-            const error = await res.text();
-            console.error("Failed to fetch event details:", error);
-            throw new Error(error || "Unknown error");
-          }
-          return res.json() as Promise<PaymentDetails>;
-        })
-        .then((data) => {
-          setDetails(data);
-          setRemainingAmount(null);
-        })
-        .catch((err) => {
-          console.error(err);
-          setDetails(null);
-          setRemainingAmount(null);
-        });
+      try {
+        const res = await fetch(`/api/stripe/details?eventid=${eventId}`);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Failed to fetch event details:", errorText);
+          return;
+        }
+        // Again, two‐step: unknown → typed
+        const jsonResult: unknown = await res.json();
+        const data = jsonResult as PaymentDetails;
+        setDetails(data);
+        setRemainingAmount(null);
+      } catch (err) {
+        console.error("Error in fetchDetails (event):", err);
+        setDetails(null);
+        setRemainingAmount(null);
+      }
     } else {
       setDetails(null);
       setRemainingAmount(null);
     }
   }, [articleId, eventId]);
 
+  useEffect(() => {
+    if (articleId === null && eventId === null) {
+      return;
+    }
+
+    // Fetch once immediately
+    void fetchDetails();
+
+    // Poll every 5 seconds
+    const intervalId = setInterval(() => {
+      void fetchDetails();
+    }, 5000);
+
+    // Clear on cleanup / unmount / ID change
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [articleId, eventId, fetchDetails]);
+
+  // 3) Handle “Checkout” button click
   const handleCheckout = async () => {
-    if (status !== "authenticated" || !session?.user?.name) {
+    if (status !== "authenticated") {
       alert("You must be signed in to proceed.");
       return;
     }
-    const purchaserUsername = session.user.name;
+    const userName = session?.user?.name;
+    if (!userName) {
+      alert("User name is missing.");
+      return;
+    }
+    const purchaserUsername = userName;
 
     const amount = Number(contributionAmount);
     if (isNaN(amount) || amount <= 0) {
@@ -138,35 +153,45 @@ export default function CheckoutPage() {
 
     if ((articleId === null && eventId === null) || !details) {
       alert("Cannot proceed: missing or invalid payment details.");
-      console.error("Missing articleId/eventId/details:", { articleId, eventId, details });
+      console.error("Missing articleId/eventId/details:", {
+        articleId,
+        eventId,
+        details,
+      });
       return;
     }
 
     setIsCheckingOut(true);
 
     try {
-      const body: StripeContributeRequest = {
+      const payload: {
+        userId: string;
+        amount: number;
+        articleId?: number;
+        eventId?: number;
+      } = {
         userId: purchaserUsername,
         amount,
+        ...(articleId !== null ? { articleId } : { eventId: eventId! }),
       };
-      if (articleId !== null) {
-        body.articleId = articleId;
-      } else {
-        body.eventId = eventId!;
-      }
 
       const response = await fetch("/api/stripe/contribute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
       });
-      
-      const data = await response.json() as StripeContributeResponse;
-      if (response.ok && data.url) {
-        window.location.href = data.url;
+
+      // Two‐step again: capture as `unknown`, then cast to our shape
+      const responseJson: unknown = await response.json();
+      const dataTyped = responseJson as { url?: string; error?: string };
+      const redirectUrl = dataTyped.url;
+      const errorMsg = dataTyped.error;
+
+      if (response.ok && redirectUrl) {
+        window.location.href = redirectUrl;
       } else {
-        alert(data.error ?? "Failed to initiate checkout. Please try again.");
-        console.error("Stripe Checkout Error:", data);
+        alert(errorMsg ?? "Failed to initiate checkout. Please try again.");
+        console.error("Stripe Checkout Error:", dataTyped);
       }
     } catch (err) {
       console.error("Network or unexpected error:", err);
@@ -176,6 +201,7 @@ export default function CheckoutPage() {
     }
   };
 
+  // 4) While loading or not authenticated, show a simple “Loading…” state
   if (!router.isReady || status === "loading" || details === null) {
     return (
       <div className={styles.container}>
@@ -188,11 +214,22 @@ export default function CheckoutPage() {
     );
   }
 
+  // Decide which image URL to use:
+  // - If details.imageUrl exists AND starts with "http://" or "https://", use it
+  // - Otherwise, default to "/cake.png"
+  const imgSrc =
+    details.imageUrl &&
+    (details.imageUrl.startsWith("http://") ||
+      details.imageUrl.startsWith("https://"))
+      ? details.imageUrl
+      : "/cake.png";
+
   return (
     <div className={styles.container}>
       <Navbar />
       <div className={styles.card}>
-        <h2 className={styles.orderId}>Order id #14385683458738543</h2>
+        {/* ORDER ID (dynamic) */}
+        <h2 className={styles.orderId}>Order ID #{details.orderId}</h2>
 
         {articleId !== null ? (
           <>
@@ -266,9 +303,9 @@ export default function CheckoutPage() {
         </div>
 
         <div className={styles.eventRowAlt}>
-          <Image
-            src="/cake.png"
-            alt="Birthday Cake"
+          <img
+            src={imgSrc}
+            alt="Event or Item"
             width={100}
             height={100}
             className={styles.image}
@@ -276,7 +313,7 @@ export default function CheckoutPage() {
           <div className={styles.eventDetails}>
             {articleId !== null ? (
               <>
-                <span>Wish‐list Item for Event #{details.parentEventId}</span>
+                <span>Wish-list Item for Event #{details.parentEventId}</span>
                 <span>Item: {details.itemName}</span>
               </>
             ) : (

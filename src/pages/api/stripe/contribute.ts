@@ -31,8 +31,8 @@ export default async function handler(
     typeof userId !== "string" ||
     typeof amount !== "number" ||
     ((articleId === undefined && eventId === undefined) ||
-    (articleId !== undefined && typeof articleId !== "number") ||
-    (eventId !== undefined && typeof eventId !== "number"))
+      (articleId !== undefined && typeof articleId !== "number") ||
+      (eventId !== undefined && typeof eventId !== "number"))
   ) {
     return res.status(400).json({ error: "Invalid request body." });
   }
@@ -72,12 +72,16 @@ export default async function handler(
         },
       });
       if (!eventRow) {
-        return res.status(400).json({ error: `Event with id=${evtId} not found.` });
+        return res
+          .status(400)
+          .json({ error: `Event with id=${evtId} not found.` });
       }
       if (!eventRow.user.stripeConnectId) {
         return res
           .status(400)
-          .json({ error: `Event planner "${eventRow.createdByUsername}" does not have a Connect account.` });
+          .json({
+            error: `Event planner "${eventRow.createdByUsername}" does not have a Connect account.`,
+          });
       }
 
       const { url } = await createCheckoutLink(
@@ -89,10 +93,11 @@ export default async function handler(
       );
 
       return res.status(200).json({ url });
-    }  } catch (err) {
+    }
+  } catch (err) {
     console.error("Error in createCheckoutLink:", err);
-    const statusCode = err instanceof Error && err.message.includes("not found") ? 404 : 500;
-    const errorMessage = err instanceof Error ? err.message : "Internal server error";
-    return res.status(statusCode).json({ error: errorMessage });
+    const errorMessage =
+      err instanceof Error ? err.message : "Internal server error.";
+    return res.status(500).json({ error: errorMessage });
   }
 }

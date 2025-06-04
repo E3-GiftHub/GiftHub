@@ -19,7 +19,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
  * @returns Promise<void>
  */
 export async function processEventItemContributions(eventId: number): Promise<void> {
-  console.log(`Starting to process individual item contributions (full price fulfillment) for event ID: ${eventId}`);
+  console.log(`Starting to process individual item contributions for event ID: ${eventId}`);
 
   const eventData = await prisma.event.findUnique({
     where: { id: eventId },
@@ -56,30 +56,31 @@ export async function processEventItemContributions(eventId: number): Promise<vo
   });
 
   if (!eventArticles.length) {
-    console.log(`No pending articles for full price fulfillment in event ID ${eventId}.`);
+    console.log(`No pending articles for item processing in event ID ${eventId}.`);
     return;
   }
-  console.log(`Found ${eventArticles.length} articles to check for full price fulfillment in event ${eventId}.`);
+  console.log(`Found ${eventArticles.length} articles to check in event ${eventId}.`);
 
   let platformAvailableCents = 0;
   try {
     const balance = await stripe.balance.retrieve();
-    const availableBalanceEntry = balance.available.find(b => b.currency.toLowerCase() === 'ron');
-    platformAvailableCents = availableBalanceEntry?.amount ?? 0;
+    const availableEntry = balance.available.find(b => b.currency.toLowerCase() === 'ron');
+    platformAvailableCents = availableEntry?.amount ?? 0;
   } catch (balanceError) {
-    console.error("Failed to retrieve platform Stripe balance for item price processing:", balanceError);
+    console.error("Failed to retrieve platform Stripe balance:", balanceError);
   }
 
   for (const eventArticle of eventArticles) {
     const articleId = eventArticle.id;
-    const itemDetails = eventArticle.item;    if (!itemDetails?.price) {
-      console.warn(`Skipping article ${articleId} (Item: ${itemDetails?.id}, Name: ${itemDetails?.name ?? 'N/A'}) for event ${eventId} (item price processing): Item or price missing.`);
+    const itemDetails = eventArticle.item;
+    if (!itemDetails?.price) {
+      console.warn(`Skipping article ${articleId} (Item ID: ${itemDetails?.id ?? 'N/A'})—item or price missing.`);
       continue;
     }
+
     const itemPriceNumber = itemDetails.price.toNumber();
     if (itemPriceNumber <= 0) {
-      console.log(`Skipping article ${articleId} (Item: ${itemDetails.id}, Name: ${itemDetails.name}) for event ${eventId} (item price processing): Price is ${itemPriceNumber} RON. Marking completed as no transfer needed.`);
-      // If price is 0 or less, it's fulfilled without payment.
+      console.log(`Price ≤ 0 for article ${articleId} (“${itemDetails.name}”). Marking completed with no transfer.`);
       await prisma.eventArticle.update({
         where: { id: articleId },
         data: { transferCompleted: true },
@@ -95,41 +96,97 @@ export async function processEventItemContributions(eventId: number): Promise<vo
     const contributedDecimalOrNull = totalContributionsAggregation._sum.cashAmount;
     let numericContributedAmount = 0;
     if (contributedDecimalOrNull) {
-      numericContributedAmount = typeof contributedDecimalOrNull === 'number' ? contributedDecimalOrNull : contributedDecimalOrNull.toNumber();
+      numericContributedAmount =
+        typeof contributedDecimalOrNull === 'number'
+          ? contributedDecimalOrNull
+          : contributedDecimalOrNull.toNumber();
     }
 
-    console.log(`Article ${articleId} (Item: ${itemDetails.name}, Price: ${itemPriceNumber} RON) (item price processing): Contributed: ${numericContributedAmount} RON.`);
+    console.log(
+      `Article ${articleId} (“${itemDetails.name}”): price ${itemPriceNumber} RON, collected so far ${numericContributedAmount} RON.`
+    );
 
-    if (numericContributedAmount >= itemPriceNumber) {
-      console.log(`Article ${articleId} is fully funded for item price. Attempting transfer of item price.`);
-      if (platformAvailableCents < itemPriceCents) {
-        console.error(`Insufficient platform funds for article ${articleId} (item price processing): Need ${itemPriceCents}, have ${platformAvailableCents}.`);
-        continue;
-      }
-      try {
-        const idempotencyKey = `transfer_fullprice_event_${eventId}_article_${articleId}`;
-        await stripe.transfers.create({
-          amount: itemPriceCents, // Transfer the ITEM'S PRICE
-          currency: 'ron',
-          destination: plannerStripeConnectId,
-          transfer_group: `EVENT#${eventId}_ARTICLE_FULLPRICE#${articleId}`,
-          description: `Full payment for item '${itemDetails.name ?? itemDetails.id}' (Article ID: ${articleId}, Event ID: ${eventId})`,
-          metadata: { eventId: eventId.toString(), articleId: articleId.toString(), itemId: itemDetails.id.toString(), type: "full_price_fulfillment" },
-        }, { idempotencyKey });
-        console.log(`Successfully transferred ${itemPriceCents / 100} RON (full item price) to planner ${plannerStripeConnectId} for article ${articleId}.`);
+    const remainingAmount = itemPriceNumber - numericContributedAmount;
+    const contributedCents = Math.round(numericContributedAmount * 100);
+
+    if (numericContributedAmount >= itemPriceNumber || remainingAmount < 2) {
+      const amountToSendCents =
+        numericContributedAmount >= itemPriceNumber ? itemPriceCents : contributedCents;
+
+      if (amountToSendCents <= 0) {
+        console.log(
+          `Nothing to transfer for article ${articleId} (“${itemDetails.name}”). Marking completed.`
+        );
         await prisma.eventArticle.update({
           where: { id: articleId },
           data: { transferCompleted: true },
         });
-        console.log(`Marked article ${articleId} as transferCompleted (item price processing).`);
+        continue;
+      }
+
+      if (platformAvailableCents < amountToSendCents) {
+        console.error(
+          `Insufficient platform funds for article ${articleId}: need ${amountToSendCents}¢, have ${platformAvailableCents}¢.`
+        );
+        continue;
+      }
+
+      try {
+        const idempotencyKey =
+          numericContributedAmount >= itemPriceNumber
+            ? `transfer_full_event_${eventId}_article_${articleId}`
+            : `transfer_partial_event_${eventId}_article_${articleId}`;
+
+        await stripe.transfers.create(
+          {
+            amount: amountToSendCents,
+            currency: 'ron',
+            destination: plannerStripeConnectId,
+            transfer_group:
+              numericContributedAmount >= itemPriceNumber
+                ? `EVENT#${eventId}_ARTICLE_FULLPRICE#${articleId}`
+                : `EVENT#${eventId}_ARTICLE_ALMOST#${articleId}`,
+            description:
+              numericContributedAmount >= itemPriceNumber
+                ? `Full payment for item '${itemDetails.name}' (Article ID: ${articleId}, Event ID: ${eventId})`
+                : `Partial (all contributed) payment for item '${itemDetails.name}' (Article ID: ${articleId}, Event ID: ${eventId})—remaining < 2 RON`,
+            metadata: {
+              eventId: eventId.toString(),
+              articleId: articleId.toString(),
+              itemId: itemDetails.id.toString(),
+              type:
+                numericContributedAmount >= itemPriceNumber
+                  ? 'full_price_fulfillment'
+                  : 'almost_full_fulfillment',
+            },
+          },
+          { idempotencyKey }
+        );
+        console.log(
+          `Transferred ${amountToSendCents / 100} RON to planner ${plannerStripeConnectId} for article ${articleId}.`
+        );
+
+        await prisma.eventArticle.update({
+          where: { id: articleId },
+          data: { transferCompleted: true },
+        });
+        console.log(`Marked article ${articleId} as transferCompleted.`);
+
+        platformAvailableCents -= amountToSendCents;
       } catch (error) {
-        console.error(`Stripe transfer for full item price failed for article ${articleId}:`, error);
+        console.error(
+          `Stripe transfer failed for article ${articleId} (“${itemDetails.name}”):`,
+          error
+        );
       }
     } else {
-      console.log(`Not enough funds for full item price for article ${articleId}. Needed: ${itemPriceNumber}, Contributed: ${numericContributedAmount}.`);
+      console.log(
+        `Article ${articleId} not yet funded enough (${numericContributedAmount}/${itemPriceNumber} RON).`
+      );
     }
   }
-  console.log(`Finished processing individual item contributions (full price fulfillment) for event ID: ${eventId}`);
+
+  console.log(`Finished processing item contributions for event ID: ${eventId}`);
 }
 
 
@@ -237,7 +294,7 @@ export async function endOfEventTransfer(eventId: number): Promise<void> {
     }
 
     console.log(`Article ID ${articleId} ('${itemName}') for event ${eventId} (end-of-event): Total collected contributions = ${numericCollectedAmount} RON.`);
-
+    
     if (numericCollectedAmount > 0) {
       const amountToTransferCents = Math.round(numericCollectedAmount * 100);
 
