@@ -73,6 +73,62 @@ export const invitationsRouter = createTRPCRouter({
       }
       return { success: true };
     }),
+
+
+declineInvitation: publicProcedure
+  .input(z.object({ 
+    eventId: z.number(), 
+    guestUsername: z.string() 
+  }))
+  .mutation(async ({ input, ctx }) => {
+    try {
+      // Verifică dacă invitația există
+      const invitation = await ctx.db.invitation.findFirst({
+        where: {
+          eventId: input.eventId,
+          guestUsername: input.guestUsername,
+        },
+      });
+
+      if (!invitation) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invitation not found",
+        });
+      }
+
+      // Verifică dacă invitația este în status PENDING (nu a fost deja acceptată)
+      if (invitation.status === "ACCEPTED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot decline an already accepted invitation",
+        });
+      }
+
+      // Șterge invitația din baza de date
+      await ctx.db.invitation.delete({
+        where: {
+          id: invitation.id,
+        },
+      });
+
+      return { 
+        success: true, 
+        message: "Invitation declined successfully" 
+      };
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      
+      console.error("Error declining invitation:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to decline invitation",
+      });
+    }
+  }),
+
   getInvitationForUserEvent: publicProcedure
     .input(z.object({ eventId: z.number(), guestUsername: z.string() }))
     .query(async ({ ctx, input }) => {
