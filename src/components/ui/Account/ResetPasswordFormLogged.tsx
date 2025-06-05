@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import styles from "../../../styles/Account.module.css";
-import Link from "next/link";
 import { api } from "~/trpc/react";
 import { resetPasswordMessages } from "~/models/messages";
 import { useSession } from "next-auth/react";
 
-export default function ResetPasswordForm() {
+export default function ResetPasswordFormLogged() {
   const resetPasswordValidationMessages = resetPasswordMessages;
   const router = useRouter();
   const { data: session } = useSession();
