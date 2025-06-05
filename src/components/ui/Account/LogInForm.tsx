@@ -1,4 +1,4 @@
-import {signIn} from "next-auth/react";
+import { signIn } from "next-auth/react";
 import React, { useState } from "react";
 import styles from "../../../styles/Account.module.css";
 import { useRouter } from "next/router";
@@ -42,7 +42,7 @@ export default function LogInForm() {
 
     setIsLoading(true);
 
-    try{
+    try {
       const result = await signIn("credentials", {
         email,
         password,
@@ -50,26 +50,22 @@ export default function LogInForm() {
         redirect: false,
       });
 
-      if(result?.error) {
-        if(result.error === "CredentialsSignIn") {
+      if (result?.error) {
+        if (result.error === "CredentialsSignIn") {
           setErrors({ email: "Invalid email or password" });
-        }
-        else {
+        } else {
           setErrors({ server: result.error });
         }
-      }
-      else {
-        if(rememberMe){
+      } else {
+        if (rememberMe) {
           document.cookie = `persistent-token=${email}; path=/; max-age=2592000`;
         }
         void router.push("/home");
       }
-    }
-    catch(err) {
+    } catch (err) {
       console.log(err);
       setErrors({ server: "An unexpected error occurred" });
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -144,7 +140,7 @@ export default function LogInForm() {
             </div>
           </div>
           <p className={styles.forgotPassword}>
-            <Link href="/forgot-password" className={styles.forgotPassword}>
+            <Link href="/password-forgot" className={styles.forgotPassword}>
               Forgot password?
             </Link>
           </p>

@@ -2,9 +2,7 @@ import { z } from "zod";
 import { db as prisma } from "~/server/db";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { EventPlanner } from "~/server/services/EventPlanner";
-import { EventEntity } from "~/server/services/Event";
 import { StatusType } from "@prisma/client";
-import type { User } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 const eventPlanner = new EventPlanner();
 
@@ -72,56 +70,55 @@ export const eventPlannerRouter = createTRPCRouter({
     ),
 */
   removeEvent: publicProcedure
-  .input(z.object({ eventId: z.number() }))
-  .mutation(async ({ input, ctx }) => {
-    const userId = ctx.session?.user?.name;
+    .input(z.object({ eventId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session?.user?.name;
 
-    if (!userId) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User not authenticated",
+      if (!userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User not authenticated",
+        });
+      }
+
+      const event = await prisma.event.findUnique({
+        where: { id: input.eventId },
       });
-    }
 
-    const event = await prisma.event.findUnique({
-      where: { id: input.eventId },
-    });
+      if (!event || event.createdByUsername !== userId) {
+        return {
+          success: false,
+          message: "Not authorized to delete this event.",
+        };
+      }
 
-    if (!event || event.createdByUsername !== userId) {
+      const hasLockedArticles = await prisma.eventArticle.findFirst({
+        where: {
+          eventId: input.eventId,
+          OR: [
+            { marks: { some: { type: "PURCHASED" } } },
+            { contributions: { some: {} } },
+          ],
+        },
+      });
+
+      if (hasLockedArticles) {
+        return {
+          success: false,
+          message:
+            "Cannot delete event: items are purchased or contributed to.",
+        };
+      }
+
+      await prisma.event.delete({
+        where: { id: input.eventId },
+      });
+
       return {
-        success: false,
-        message: "Not authorized to delete this event.",
+        success: true,
+        message: "Event deleted successfully.",
       };
-    }
-
-    const hasLockedArticles = await prisma.eventArticle.findFirst({
-      where: {
-        eventId: input.eventId,
-        OR: [
-          { marks: { some: { type: "PURCHASED" } } },
-          { contributions: { some: {} } },
-        ],
-      },
-    });
-
-    if (hasLockedArticles) {
-      return {
-        success: false,
-        message: "Cannot delete event: items are purchased or contributed to.",
-      };
-    }
-
-    await prisma.event.delete({
-      where: { id: input.eventId },
-    });
-
-    return {
-      success: true,
-      message: "Event deleted successfully.",
-    };
-  }),
-
-
+    }),
 
   sendInvitation: publicProcedure
     .input(z.object({ eventId: z.number(), guestId: z.string() }))
@@ -161,7 +158,7 @@ export const eventPlannerRouter = createTRPCRouter({
 */
 
   getUserEvents: publicProcedure.query(({ ctx }) => {
-    const userId = ctx.session?.user?.id;
+    const userId = ctx.session?.user?.name;
     if (!userId)
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -177,7 +174,7 @@ export const eventPlannerRouter = createTRPCRouter({
   }),
 
   getInvitedEvents: publicProcedure.query(({ ctx }) => {
-    const userId = ctx.session?.user?.id;
+    const userId = ctx.session?.user?.name;
     if (!userId)
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -199,7 +196,7 @@ export const eventPlannerRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const userId = ctx.session?.user?.id;
+      const userId = ctx.session?.user?.name;
       if (!userId)
         throw new TRPCError({
           code: "UNAUTHORIZED",

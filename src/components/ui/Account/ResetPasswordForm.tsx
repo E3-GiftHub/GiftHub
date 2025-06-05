@@ -102,7 +102,7 @@ export default function ResetPasswordForm() {
                         <label htmlFor="password" className={styles.inputTitle}>
                             Password{" "}
                         </label>
-                      {errors?.password && (<div className={styles.errorText} role={"alert"}>{errors.password}</div>)}
+                        {errors?.password && (<div className={styles.errorText} role={"alert"}>{errors.password}</div>)}
                         <div className={styles.passwordInput}>
                             <input
                                 type={showPassword ? "text" : "password"}
@@ -130,8 +130,8 @@ export default function ResetPasswordForm() {
                     <div className={styles.formGroup}>
                         <label htmlFor="confirmPassword" className={styles.inputTitle}>Confirm password
                         </label>
-                      {errors?.confirmPassword && (<div className={styles.errorText} role={"alert"}>{errors.confirmPassword}</div>)}
-                      <div className={styles.passwordInput}>
+                        {errors?.confirmPassword && (<div className={styles.errorText} role={"alert"}>{errors.confirmPassword}</div>)}
+                        <div className={styles.passwordInput}>
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Confirm your new password"

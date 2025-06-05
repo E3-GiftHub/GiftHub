@@ -1,9 +1,8 @@
-import React from "react";
+import React, { act } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MyEventsSection from "../components/MyEventsSection";
 import shortEventsMockResponse from "../components/mock-data/shortEventsMockResponse";
 import { api } from "~/trpc/react";
-import { act } from "react";
 
 jest.mock("~/trpc/react", () => ({
   api: {

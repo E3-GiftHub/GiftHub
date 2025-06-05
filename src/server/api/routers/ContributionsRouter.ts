@@ -3,20 +3,7 @@ import { MarkType } from "@prisma/client";
 
 export const contributionsRouter = createTRPCRouter({
   getContributionsForUserEvents: publicProcedure.query(async ({ ctx }) => {
-    /*
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "You must be logged in",
-            });
-        }
-            
-        const currentUser = ctx.session.user;
-        const userIdentifier = currentUser.id;
-        */
-
-    const currentUsername = "user1";
-
+    const currentUsername = ctx.session?.user?.name ?? "";
     const contributions = await ctx.db.contribution.findMany({
       where: {
         event: {
@@ -24,7 +11,14 @@ export const contributionsRouter = createTRPCRouter({
         },
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
+        guest: {
+          select: {
+            fname: true,
+            lname: true,
+            username: true,
+            pictureUrl: true,
+          },
+        },
         event: { select: { title: true, id: true } },
         item: { select: { name: true } },
       },
@@ -35,7 +29,7 @@ export const contributionsRouter = createTRPCRouter({
         ? `${contribution.guest.fname} contributed ${contribution.cashAmount.toString()} lei to your gift`
         : `${contribution.guest.fname} contributed an unspecified amount to your gift`,
       type: "event",
-      link: `/event?id=${contribution.event?.id}`,
+      link: `/event-view?id=${contribution.event?.id}`,
       firstName: contribution.guest.fname,
       lastName: contribution.guest.lname,
       profilePicture: contribution.guest.pictureUrl ?? "",
@@ -44,20 +38,7 @@ export const contributionsRouter = createTRPCRouter({
   }),
 
   getPurchasedItemsForUserEvents: publicProcedure.query(async ({ ctx }) => {
-    /*
-        if (!ctx.session) {
-            throw new TRPCError({
-                code: "UNAUTHORIZED",
-                message: "You must be logged in",
-            });
-        }
-
-        const currentUser = ctx.session.user;
-        const userIdentifier = currentUser.id;
-        */
-
-    const currentUsername = "user1";
-
+    const currentUsername = ctx.session?.user?.name ?? "";
     const purchasedItems = await ctx.db.mark.findMany({
       where: {
         event: {
@@ -66,7 +47,14 @@ export const contributionsRouter = createTRPCRouter({
         type: MarkType.PURCHASED,
       },
       include: {
-        guest: { select: { fname: true, lname: true, username: true, pictureUrl: true } },
+        guest: {
+          select: {
+            fname: true,
+            lname: true,
+            username: true,
+            pictureUrl: true,
+          },
+        },
         event: { select: { title: true, id: true } },
         item: { select: { name: true, price: true } },
       },

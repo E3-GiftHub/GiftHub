@@ -7,17 +7,20 @@ import { forgotPasswordMessages } from "~/models/messages";
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string | undefined> | null>(null);
+  const [errors, setErrors] = useState<Record<
+    string,
+    string | undefined
+  > | null>(null);
 
   const requestResetMutation = api.auth.resetRequest.requestReset.useMutation({
     onSuccess: () => {
-      setMessage(forgotPasswordMessages.success); 
+      setMessage(forgotPasswordMessages.success);
       setErrors(null);
     },
     onError: (err) => {
       setErrors({ server: err.message || forgotPasswordMessages.serverError });
       setMessage(null);
-    }
+    },
   });
 
   const validateForm = () => {
@@ -44,18 +47,22 @@ export default function ForgotPasswordForm() {
     <div className={`${styles.rightPanel} ${styles.resetPasswordPage}`}>
       <div className={styles.top}>
         <h2 className={styles.title}>Forgot password?</h2>
-        <p className={styles.belowTitle}>We&apos;ll send you the instructions shortly.</p>
+        <p className={styles.belowTitle}>
+          We&apos;ll send you the instructions shortly.
+        </p>
       </div>
 
       <div className={styles.middle}>
         <form
           id="forgotPasswordForm"
-          data-testid="forgot-password-form"
+          data-testid="password-forgot-form"
           className={styles.formContainer}
           onSubmit={handleSubmit}
         >
           <div className={styles.formGroup}>
-            <label htmlFor="email" className={styles.inputTitle}>Email</label>
+            <label htmlFor="email" className={styles.inputTitle}>
+              Email
+            </label>
             <input
               id="email"
               type="email"

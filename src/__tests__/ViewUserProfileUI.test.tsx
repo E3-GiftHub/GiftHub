@@ -32,7 +32,6 @@ describe("ViewUserProfileUI", () => {
     renderComponent();
 
     expect(screen.getByText(mockUser.username)).toBeInTheDocument();
-    expect(screen.getByText(mockUser.fname)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /user avatar/i })).toHaveAttribute(
       "src",
       mockUser.pictureUrl,

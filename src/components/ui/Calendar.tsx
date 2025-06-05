@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   format,
   startOfMonth,
@@ -13,16 +13,27 @@ import {
 } from "date-fns";
 import styles from "../../styles/Calendar.module.css";
 import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
 
 type CalendarProps = {
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
 };
 
-export default function Calendar({ currentDate, setCurrentDate }: CalendarProps) {
+export default function Calendar({
+  currentDate,
+  setCurrentDate,
+}: Readonly<CalendarProps>) {
+  //! get the username
+  const { data: session } = useSession();
+  useEffect(() => {
+    if (!session?.user?.name) return;
+  }, [session]);
+
   const { data: events, isLoading } = api.calendar.getEventsByMonth.useQuery({
     month: currentDate.getMonth() + 1,
     year: currentDate.getFullYear(),
+    username: session?.user?.name ?? "",
   });
 
   const selectedDates =
@@ -79,7 +90,7 @@ export default function Calendar({ currentDate, setCurrentDate }: CalendarProps)
             key={cloneDay.toISOString()}
           >
             <span>{format(cloneDay, "d")}</span>
-          </div>
+          </div>,
         );
 
         day = addDays(day, 1);
@@ -88,7 +99,7 @@ export default function Calendar({ currentDate, setCurrentDate }: CalendarProps)
       rows.push(
         <div className={styles.week} key={day.toISOString()}>
           {days}
-        </div>
+        </div>,
       );
       days = [];
     }

@@ -61,11 +61,12 @@ const config = {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.test.json",
-    },
-  },
+  // globals: {
+  //   "ts-jest": {
+  //     tsconfig: "tsconfig.test.json",
+  //   },
+  //   React: "react",
+  // },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -181,11 +182,14 @@ const config = {
   // Whether to use watchman for file crawling
   // watchman: true,
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(ts|tsx)$": ["ts-jest", {
+      tsconfig: "tsconfig.test.json",
+    }],
   },
   moduleNameMapper: {
     "\\.(css|less|sass|scss)$": "identity-obj-proxy",
     "^~/(.*)$": "<rootDir>/src/$1",
+    "^next-auth/react$": "<rootDir>/src/components/mock-data/next-auth.js",
   },
   setupFilesAfterEnv: ["<rootDir>/setupTests.ts"],
 };

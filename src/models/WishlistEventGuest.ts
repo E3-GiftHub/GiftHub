@@ -11,9 +11,11 @@ export interface TrendingItem {
     current: number;
     total: number;
   };
+  userHasContributed?: boolean;
+  userContributionAmount?: number;
 }
 
 export interface WishlistProps {
-  contribution: () => void;
+  contribution: (articleId: number) => void;
   eventId?: string | string[];
 }

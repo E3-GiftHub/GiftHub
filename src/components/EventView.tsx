@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, MapPin, Users, Image, Flag } from "lucide-react";
+import { Clock, MapPin, Users, Flag } from "lucide-react";
 import styles from "../styles/EventView.module.css";
 import type { EventViewProps } from "~/models/EventData";
 
@@ -91,8 +91,7 @@ const EventView: React.FC<EventViewProps> = ({
                   Contribute
                 </button>
 
-                <button onClick={onMediaView} className={styles.infoCardButton}>
-                  <Image className={styles.icon} />
+                  <button onClick={onMediaView} className={styles.mediaCardButton}>
                   <span>Media</span>
                 </button>
               </div>

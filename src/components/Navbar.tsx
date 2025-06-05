@@ -14,6 +14,7 @@ import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -23,6 +24,7 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLandingPage, setIsLandingPage] = useState(false);
   const [activePage, setActivePage] = useState<string | null>(null);
+  const [hasExpress, setHasExpress] = useState<string>("false");
 
   const profileRef = useRef<HTMLLIElement>(null);
   const router = useRouter();
@@ -67,6 +69,28 @@ const Navbar = () => {
     };
   }, []);
 
+  //! CHECK FOR THE STRIPE EXPRESS ACCOUNT
+  useEffect(() => {
+    if (!router.isReady || !session?.user?.name) return;
+
+    (async () => {
+      try {
+        const username = session?.user?.name;
+        if (!username) return;
+
+        const res = await fetch(
+          `./api/stripe/check-express?username=${encodeURIComponent(username)}`
+        );
+        const data = (await res.json()) as string;
+        setHasExpress(data);
+      } catch (error) {
+        console.error("Failed to load media", error);
+      }
+    })().catch((err) => {
+      console.error("Unexpected error in useEffect:", err);
+    });
+  }, [router.isReady, session?.user?.name]); // Added dependency array
+
   return (
     <nav
       className={`${styles.navbar} ${
@@ -75,7 +99,14 @@ const Navbar = () => {
     >
       <div className={styles["navbar-left"]}>
         <Link href="/">
-          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+          <Image
+        src="/logo.png"
+        alt="Gift Hub"
+        className={styles.logo}
+        width={240}
+        height={80}
+        priority
+          />
         </Link>
       </div>
 
@@ -102,6 +133,20 @@ const Navbar = () => {
           <ul
             className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
+            {hasExpress === "true" && session?.user?.name && (
+              <li>
+                <Link
+                  href={`/api/stripe/create-express-login?username=${encodeURIComponent(
+                    session.user.name
+                  )}`}
+                  className={
+                    activePage === "inbox" ? styles["profile-main-button"] : ""
+                  }
+                >
+                  <FaUser /> Stripe
+                </Link>
+              </li>
+            )}
             <li>
               <Link
                 href="/home#"
@@ -146,11 +191,11 @@ const Navbar = () => {
                   href="/#"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.cookie = "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
+                    document.cookie =
+                      "persistent-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; max-age=0";
                     void signOut({
-                      redirectTo: "/"
+                      redirectTo: "/",
                     });
-
                   }}
                 >
                   <FaSignOutAlt /> Logout

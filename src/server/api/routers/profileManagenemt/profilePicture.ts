@@ -1,27 +1,30 @@
-import {createTRPCRouter, protectedProcedure} from "~/server/api/trpc";
-import {UTApi} from "uploadthing/server";
-import {z} from "zod";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { UTApi } from "uploadthing/server";
+import { z } from "zod";
 
 const utapi = new UTApi();
 
 export const profilePictureRouter = createTRPCRouter({
   upload: protectedProcedure
-    .input(z.object({
-      key: z.string(),
-    }))
-    .mutation(async ({input, ctx}) => {
-      if(!input.key.includes(ctx.session.user.id!)){
+    .input(
+      z.object({
+        key: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (!input.key.includes(ctx.session.user.name!)) {
         throw new Error("Unauthorized file access");
       }
 
       const fileUrl = `${process.env.AUTH_URL}/api/uploadthing/${input.key}`;
-      const updatedUser = await ctx.db.user.update({
+
+      await ctx.db.user.update({
         where: {
-          username: ctx.session.user.id!,
+          username: ctx.session.user.name!,
         },
         data: {
           pictureUrl: fileUrl,
-        }
+        },
       });
 
       return {
@@ -29,40 +32,37 @@ export const profilePictureRouter = createTRPCRouter({
         url: fileUrl,
       };
     }),
-  delete: protectedProcedure
-    .mutation(async ({ctx}) =>{
-      const user = await ctx.db.user.findUnique({
+  delete: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: {
+        username: ctx.session.user.name!,
+      },
+      select: {
+        pictureUrl: true,
+      },
+    });
+
+    if (!user?.pictureUrl) {
+      throw new Error("No profile picture to delete");
+    }
+
+    const key = user.pictureUrl.split("/")[1];
+
+    try {
+      await ctx.db.user.update({
         where: {
-          username: ctx.session.user.id,
+          username: ctx.session.user.name!,
         },
-        select: {
-          pictureUrl: true,
+        data: {
+          pictureUrl: null,
         },
       });
 
-      if(!user?.pictureUrl){
-        throw new Error("No profile picture to delete");
-      }
-
-      const key = user.pictureUrl.split("/")[1];
-
-      try{
-        //await utapi.deleteFiles(key);
-
-        await ctx.db.user.update({
-          where: {
-            username: ctx.session.user.id,
-          },
-          data: {
-            pictureUrl: null,
-          }
-        });
-
-        return{
-          success: true,
-        }
-      }catch(e){
-        throw new Error("Failed to delete profile picture");
-      }
-    })
-})
+      return {
+        success: true,
+      };
+    } catch (e) {
+      alert("Failed to delete profile picture");
+    }
+  }),
+});

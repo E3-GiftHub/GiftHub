@@ -2,9 +2,9 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import styles from "../styles/invitationcard.module.css";
 import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
-import type { InvitationProps } from "../models/InvitationEventGuest.ts";
+
 import NotInvited from "./notinvited";
-import LoadingSpinner from "./loadingspiner";
+import LoadingSpinner from "./loadingspinner";
 import React from "react";
 
 export default function InvitationCard({
@@ -12,9 +12,9 @@ export default function InvitationCard({
   onAccept,
   onDecline,
 }: {
-  invitationId: number;
-  onAccept?: () => void;
-  onDecline?: () => void;
+  readonly invitationId: number;
+  readonly onAccept?: () => void;
+  readonly onDecline?: () => void;
 }) {
   // luam userul curent care foloseste acm pagina
   const { data: currentUser } = api.user.get.useQuery();
@@ -34,6 +34,10 @@ export default function InvitationCard({
   const guestUsername = invitationData?.guestUsername;
 
   const acceptInvitation = api.invitationPreview.acceptInvitation.useMutation();
+  
+  // ✅ ADDED: Decline invitation mutation
+  const declineInvitation = api.invitationPreview.declineInvitation.useMutation();
+  
   const router = useRouter();
 
   if (isInvitationLoading) {
@@ -41,6 +45,11 @@ export default function InvitationCard({
   }
 
   const handleAccept = () => {
+    // Previne click-uri multiple în timpul procesării
+    if (acceptInvitation.status === "pending" || declineInvitation.status === "pending") {
+      return;
+    }
+
     if (eventData?.id && guestUsername) {
       acceptInvitation.mutate(
         { eventId: eventData.id, guestUsername },
@@ -48,14 +57,46 @@ export default function InvitationCard({
           onSuccess: () => {
             void router.push(`/event?id=${eventData.id}`);
           },
+          onError: (error) => {
+            console.error("Error accepting invitation:", error);
+            alert("Failed to accept invitation. Please try again.");
+          },
         },
       );
       onAccept?.();
     }
   };
 
+  // ✅ UPDATED: Handle decline with database deletion
   const handleDecline = () => {
-    onDecline?.();
+    // Previne click-uri multiple în timpul procesării
+    if (acceptInvitation.status === "pending" || declineInvitation.status === "pending") {
+      return;
+    }
+
+    if (eventData?.id && guestUsername) {
+      // Confirmă acțiunea
+      if (!window.confirm("Are you sure you want to decline this invitation?")) {
+        return;
+      }
+
+      declineInvitation.mutate(
+        { eventId: eventData.id, guestUsername },
+        {
+          onSuccess: () => {
+            // Apelează callback-ul pentru redirecționare
+            onDecline?.();
+          },
+          onError: (error) => {
+            console.error("Error declining invitation:", error);
+            alert("Failed to decline invitation. Please try again.");
+          },
+        },
+      );
+    } else {
+      // Dacă nu avem datele necesare, doar apelează callback-ul
+      onDecline?.();
+    }
   };
 
   if (
@@ -80,11 +121,12 @@ export default function InvitationCard({
             <div className={styles.detailItem}>
               <span className={styles.icon}>📅</span>
               <span>
-                {isEventLoading
-                  ? ""
-                  : eventData?.date
+                {(() => {
+                  if (isEventLoading) return "";
+                  return eventData?.date
                     ? new Date(eventData.date).toLocaleString()
-                    : ""}
+                    : "";
+                })()}
               </span>
             </div>
             <div className={styles.detailItem}>
@@ -97,12 +139,12 @@ export default function InvitationCard({
           </div>
           <div className={styles.actions}>
             <ButtonComponent
-              text="Decline invite"
+              text={declineInvitation.status === "pending" ? "Declining..." : "Decline invite"}
               style={ButtonStyle.PRIMARY}
               onClick={handleDecline}
             />
             <ButtonComponent
-              text="Accept invite"
+              text={acceptInvitation.status === "pending" ? "Accepting..." : "Accept invite"}
               style={ButtonStyle.PRIMARY}
               onClick={handleAccept}
             />

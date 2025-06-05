@@ -2,6 +2,7 @@ import React from "react";
 import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import type { GuestHeader } from "~/models/GuestHeader";
+import formatField from "~/utils/formatField";
 
 type GuestListModalProps = {
   loading: boolean;
@@ -9,7 +10,6 @@ type GuestListModalProps = {
   guests: readonly GuestHeader[];
   onRemoveGuest: (username: string) => void;
   onClose: () => void;
-  onSave: () => void;
   onAddGuest: () => void;
   onBack: () => void;
 };
@@ -21,22 +21,12 @@ export default function GuestListModal({
   onRemoveGuest,
   onAddGuest,
   onClose,
-  onSave,
   onBack,
 }: Readonly<GuestListModalProps>) {
   if (loading) return <div>Loading guests...</div>;
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modal}>
-        <div className={styles.modalHeader}>
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-            onClick={onClose}
-          >
-            ← Back
-          </button>
-        </div>
-
         <h3 className={styles.modalTitle}>Full Guest List</h3>
 
         <div className={styles.guestList}>
@@ -47,9 +37,7 @@ export default function GuestListModal({
                 src={guest.pictureUrl ?? ""}
                 alt="user visual description"
               />
-              <p>
-                {guest.fname} {guest.lname}
-              </p>
+              <p>{formatField(guest.fname) + " " + formatField(guest.lname)}</p>
               <p>aka. {guest.username}</p>
               <button
                 className={styles.removeGuestButton}
@@ -63,17 +51,17 @@ export default function GuestListModal({
 
         <div className={styles.modalActions}>
           <button
-            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-            onClick={onAddGuest}
+            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+            onClick={onClose}
           >
-            Add Guest
+            ← Back
           </button>
 
           <button
             className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-            onClick={onSave}
+            onClick={onAddGuest}
           >
-            Save Changes
+            Add Guest
           </button>
         </div>
       </div>

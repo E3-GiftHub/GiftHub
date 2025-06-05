@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./../styles/InboxPageStyle.module.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import InboxContainer from "../components/ui/InboxContainer"; 
+import InboxContainer from "~/components/ui/InboxContainer";
 import "./../styles/globals.css";
 
 export default function InboxPage() {

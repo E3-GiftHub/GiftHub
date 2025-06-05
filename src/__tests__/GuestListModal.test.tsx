@@ -43,7 +43,6 @@ describe("GuestListModal", () => {
         onClose={onClose}
         onRemoveGuest={onRemoveGuest}
         onAddGuest={onAddGuest}
-        onSave={onSave}
         onBack={jest.fn()}
       />,
     );
@@ -85,12 +84,6 @@ describe("GuestListModal", () => {
     expect(onAddGuest).toHaveBeenCalled();
   });
 
-  test("calls onSave when Save Changes is clicked", () => {
-    renderLoadedModal();
-    fireEvent.click(screen.getByText("Save Changes"));
-    expect(onSave).toHaveBeenCalled();
-  });
-
   test("displays loading message when loading is true", () => {
     render(
       <GuestListModal
@@ -100,7 +93,6 @@ describe("GuestListModal", () => {
         onClose={onClose}
         onRemoveGuest={onRemoveGuest}
         onAddGuest={onAddGuest}
-        onSave={onSave}
         onBack={jest.fn()}
       />,
     );

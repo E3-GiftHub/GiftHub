@@ -1,4 +1,4 @@
-import AccountUI from "../components/ui/Account/AccountUI";
+import AccountUI from "~/components/ui/Account/AccountUI";
 import "./../styles/globals.css";
 import SignupForm from "~/components/ui/Account/SignUpForm";
 import styles from "./../styles/Account.module.css";

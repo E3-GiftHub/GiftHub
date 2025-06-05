@@ -5,10 +5,12 @@ import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
 import styles from "../styles/eventinvite.module.css";
 import { useRouter } from "next/router";
+import Termination from "@/components/Termination";
 
 export default function DemoPage() {
   const router = useRouter();
-  const invitationId = router.query.id ? Number(router.query.id) : undefined;
+  const { id } = router.query;
+  const invitationId = Number(id);
 
   return (
     <>
@@ -22,10 +24,20 @@ export default function DemoPage() {
             //posibil idul as fie invalid
             //sau un baiat foarte sneaky sa introduca
             //id=asf (ceea ce este incorect si INVALID)
-            <InvitationCard invitationId={invitationId} />
+            <InvitationCard
+              invitationId={invitationId}
+              onDecline={() => {
+                void router.push("/home");
+              }}
+            />
           )}
         </div>
         <Footer />
+        <Termination
+          eventId={null}
+          invitationId={invitationId}
+          articleId={null}
+        />
       </div>
     </>
   );
