@@ -38,11 +38,22 @@ jest.mock('next/router', () => ({
 
 interface MockMutationResult {
   mutate: jest.Mock;
+  status?: string;
 }
 
 interface MockQueryResult {
   data?: unknown;
   isLoading?: boolean;
+}
+
+interface InvitationMutationParams {
+  eventId: number;
+  guestUsername: string;
+}
+
+interface MutationOptions {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
 }
 
 const mockGetUser = jest.fn<MockQueryResult, []>();
@@ -64,11 +75,13 @@ jest.mock('~/trpc/react', () => ({
       acceptInvitation: {
         useMutation: (): MockMutationResult => ({
           mutate: mockAcceptInvitation,
+          status: 'idle',
         }),
       },
       declineInvitation: {
         useMutation: (): MockMutationResult => ({
           mutate: mockDeclineInvitation,
+          status: 'idle',
         }),
       },
     },
@@ -93,15 +106,15 @@ jest.mock('../styles/invitationcard.module.css', () => ({
 }));
 
 jest.mock('~/components/notinvited', () => {
-  return function MockNotInvited() {
-    return <div data-testid="not-invited">Not Invited Component</div>;
-  };
+  const MockNotInvited = () => <div data-testid="not-invited">Not Invited Component</div>;
+  MockNotInvited.displayName = 'NotInvited';
+  return MockNotInvited;
 });
 
 jest.mock('~/components/loadingspinner', () => {
-  return function MockLoadingSpinner() {
-    return <div data-testid="loading-spinner">Loading...</div>;
-  };
+  const MockLoadingSpinner = () => <div data-testid="loading-spinner">Loading...</div>;
+  MockLoadingSpinner.displayName = 'LoadingSpinner';
+  return MockLoadingSpinner;
 });
 
 interface ButtonProps {
@@ -246,8 +259,8 @@ describe('InvitationCard', () => {
     let onSuccessCallback: (() => void) | undefined;
     
     mockAcceptInvitation.mockImplementation((
-      params: any, 
-      options: { onSuccess?: () => void }
+      params: InvitationMutationParams, 
+      options: MutationOptions
     ) => {
       onSuccessCallback = options?.onSuccess;
     });
@@ -316,5 +329,35 @@ describe('InvitationCard', () => {
     render(<InvitationCard {...defaultProps} />);
     
     expect(screen.getByText('Test Event')).toBeInTheDocument();
+  });
+
+  test('calls decline invitation mutation when decline button is clicked', () => {
+    // Mock window.confirm to return true
+    const originalConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+
+    render(<InvitationCard {...defaultProps} />);
+    
+    fireEvent.click(screen.getByTestId('button-decline-invite'));
+    
+    expect(mockDeclineInvitation).toHaveBeenCalled();
+
+    // Restore original confirm
+    window.confirm = originalConfirm;
+  });
+
+  test('does not call decline mutation when user cancels confirmation', () => {
+    // Mock window.confirm to return false
+    const originalConfirm = window.confirm;
+    window.confirm = jest.fn(() => false);
+
+    render(<InvitationCard {...defaultProps} />);
+    
+    fireEvent.click(screen.getByTestId('button-decline-invite'));
+    
+    expect(mockDeclineInvitation).not.toHaveBeenCalled();
+
+    // Restore original confirm
+    window.confirm = originalConfirm;
   });
 });

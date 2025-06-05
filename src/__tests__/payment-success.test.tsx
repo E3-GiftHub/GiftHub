@@ -54,13 +54,24 @@ jest.mock("../styles/Payment.module.css", () => ({
 }));
 jest.mock("~/styles/globals.css", () => ({}));
 
-// Stub Navbar & Footer
-jest.mock("../components/Navbar", () => () => <div data-testid="navbar" />);
-jest.mock("../components/Footer", () => () => <div data-testid="footer" />);
+// Stub Navbar & Footer with display names
+jest.mock("../components/Navbar", () => {
+  const MockNavbar = () => <div data-testid="navbar" />;
+  MockNavbar.displayName = 'Navbar';
+  return MockNavbar;
+});
+
+jest.mock("../components/Footer", () => {
+  const MockFooter = () => <div data-testid="footer" />;
+  MockFooter.displayName = 'Footer';
+  return MockFooter;
+});
 
 describe("PaymentSuccessPage (payment-success.tsx)", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock router.push to return a resolved promise
+    mockPush.mockReturnValue(Promise.resolve(true));
   });
 
   test("renders success message correctly", () => {
@@ -129,5 +140,30 @@ describe("PaymentSuccessPage (payment-success.tsx)", () => {
     // After clicking, router.push should have been called once
     expect(mockPush).toHaveBeenCalledTimes(1);
     expect(mockPush).toHaveBeenCalledWith("/home");
+  });
+
+  test("success icon renders with correct styling", () => {
+    render(<PaymentSuccessPage />);
+
+    const successIcon = document.querySelector('svg');
+    expect(successIcon).toBeInTheDocument();
+    expect(successIcon).toHaveAttribute('stroke', 'currentColor');
+    expect(successIcon).toHaveAttribute('stroke-width', '2');
+    expect(successIcon).toHaveAttribute('fill', 'none');
+  });
+
+  test("success icon contains correct path elements", () => {
+    render(<PaymentSuccessPage />);
+
+    const circle = document.querySelector('circle');
+    const polyline = document.querySelector('polyline');
+    
+    expect(circle).toBeInTheDocument();
+    expect(circle).toHaveAttribute('cx', '12');
+    expect(circle).toHaveAttribute('cy', '12');
+    expect(circle).toHaveAttribute('r', '10');
+    
+    expect(polyline).toBeInTheDocument();
+    expect(polyline).toHaveAttribute('points', '9 12 12 15 17 10');
   });
 });

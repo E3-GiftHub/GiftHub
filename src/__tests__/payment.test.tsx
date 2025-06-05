@@ -10,14 +10,61 @@ import {
   fireEvent,
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import * as nextRouter from "next/router"; // to import useRouter type
 import PaymentPage from "../pages/payment"; // ← adjust if needed
 
-// We’ll keep a mutable object that our mock useRouter returns.
+// Define proper types for mock router
+interface MockRouter {
+  isReady: boolean;
+  query: Record<string, string | undefined>;
+  push: jest.Mock;
+  replace: jest.Mock;
+  back: jest.Mock;
+  pathname: string;
+  route: string;
+  asPath: string;
+  isFallback: boolean;
+  basePath: string;
+  locale?: string;
+  locales?: string[];
+  defaultLocale?: string;
+  isLocaleDomain: boolean;
+  isPreview: boolean;
+  events: {
+    on: jest.Mock;
+    off: jest.Mock;
+    emit: jest.Mock;
+  };
+  beforePopState: jest.Mock;
+  prefetch: jest.Mock;
+  reload: jest.Mock;
+}
+
+// We'll keep a mutable object that our mock useRouter returns.
 // Individual tests can flip `isReady` or change `query`.
-let mockRouter = {
+let mockRouter: MockRouter = {
   isReady: true,
-  query: { articleid: "123" } as Record<string, string | undefined>,
+  query: { articleid: "123" },
+  push: jest.fn(),
+  replace: jest.fn(),
+  back: jest.fn(),
+  pathname: '/payment',
+  route: '/payment',
+  asPath: '/payment',
+  isFallback: false,
+  basePath: '',
+  locale: undefined,
+  locales: undefined,
+  defaultLocale: undefined,
+  isLocaleDomain: false,
+  isPreview: false,
+  events: {
+    on: jest.fn(),
+    off: jest.fn(),
+    emit: jest.fn(),
+  },
+  beforePopState: jest.fn(),
+  prefetch: jest.fn().mockResolvedValue(undefined),
+  reload: jest.fn(),
 };
 
 // Provide a mock implementation for useRouter()
@@ -37,18 +84,72 @@ jest.mock("next-auth/react", () => ({
 jest.mock("../styles/Payment.module.css", () => ({}));
 jest.mock("../../styles/globals.css", () => ({}));
 
-// Stub Navbar & Footer
-jest.mock("../components/Navbar", () => () => <div data-testid="navbar" />);
-jest.mock("../components/Footer", () => () => <div data-testid="footer" />);
+// Stub Navbar & Footer with proper display names
+jest.mock("../components/Navbar", () => {
+  const MockNavbar = () => <div data-testid="navbar" />;
+  MockNavbar.displayName = 'MockNavbar';
+  return MockNavbar;
+});
 
-// Stub Next’s <Image> to render a plain <img>
-jest.mock("next/image", () => ({
-  __esModule: true,
-  default: (props: any) => <img {...props} alt={props.alt} />,
-}));
+jest.mock("../components/Footer", () => {
+  const MockFooter = () => <div data-testid="footer" />;
+  MockFooter.displayName = 'MockFooter';
+  return MockFooter;
+});
+
+// Define proper types for Next Image props
+interface NextImageProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  priority?: boolean;
+  placeholder?: string;
+  quality?: number;
+  fill?: boolean;
+  sizes?: string;
+  loader?: (args: { src: string; width: number; quality?: number }) => string;
+  onLoad?: () => void;
+  onError?: () => void;
+  loading?: 'lazy' | 'eager';
+  blurDataURL?: string;
+}
+
+// Stub Next's <Image> to render a plain <img> with proper types
+jest.mock("next/image", () => {
+  const MockNextImage = (props: NextImageProps) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img {...props} alt={props.alt} />
+  );
+  MockNextImage.displayName = 'MockNextImage';
+  
+  return {
+    __esModule: true,
+    default: MockNextImage,
+  };
+});
+
+// Define types for API responses
+interface DetailsResponse {
+  itemName: string;
+  itemPrice: number;
+  alreadyContributed: number;
+  parentEventId: number;
+  eventName: string;
+  eventPlanner: string;
+  orderId: number;
+  imageUrl: string;
+}
+
+// Mock window location with proper typing
+interface MockLocation {
+  href: string;
+}
 
 describe("PaymentPage (payment.tsx)", () => {
-  const detailsResponse = {
+  const detailsResponse: DetailsResponse = {
     itemName: "Fancy Cake",
     itemPrice: 200,
     alreadyContributed: 50,
@@ -64,33 +165,97 @@ describe("PaymentPage (payment.tsx)", () => {
     mockRouter = {
       isReady: true,
       query: { articleid: "123" },
+      push: jest.fn(),
+      replace: jest.fn(),
+      back: jest.fn(),
+      pathname: '/payment',
+      route: '/payment',
+      asPath: '/payment',
+      isFallback: false,
+      basePath: '',
+      locale: undefined,
+      locales: undefined,
+      defaultLocale: undefined,
+      isLocaleDomain: false,
+      isPreview: false,
+      events: {
+        on: jest.fn(),
+        off: jest.fn(),
+        emit: jest.fn(),
+      },
+      beforePopState: jest.fn(),
+      prefetch: jest.fn().mockResolvedValue(undefined),
+      reload: jest.fn(),
     };
 
-    // Mock global.fetch:
-    (global as any).fetch = jest.fn((input: RequestInfo) => {
-      const url = typeof input === "string" ? input : input.url;
+    // Mock global.fetch with proper typing:
+    global.fetch = jest.fn((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : 
+                  input instanceof URL ? input.toString() :
+                  input.url;
+      
       if (url.includes("/api/stripe/details")) {
         return Promise.resolve({
           ok: true,
+          status: 200,
+          statusText: 'OK',
+          headers: new Headers(),
+          redirected: false,
+          type: 'basic' as ResponseType,
+          url: url,
+          clone: jest.fn(),
+          body: null,
+          bodyUsed: false,
+          arrayBuffer: jest.fn(),
+          blob: jest.fn(),
+          formData: jest.fn(),
+          text: jest.fn(),
           json: () => Promise.resolve(detailsResponse),
         });
       }
+      
       if (url.includes("/api/stripe/contribute")) {
         return Promise.resolve({
           ok: true,
-          json: () =>
-            Promise.resolve({ url: "https://checkout.example.com" }),
+          status: 200,
+          statusText: 'OK',
+          headers: new Headers(),
+          redirected: false,
+          type: 'basic' as ResponseType,
+          url: url,
+          clone: jest.fn(),
+          body: null,
+          bodyUsed: false,
+          arrayBuffer: jest.fn(),
+          blob: jest.fn(),
+          formData: jest.fn(),
+          text: jest.fn(),
+          json: () => Promise.resolve({ url: "https://checkout.example.com" }),
         });
       }
+      
       return Promise.resolve({
         ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        headers: new Headers(),
+        redirected: false,
+        type: 'basic' as ResponseType,
+        url: url,
+        clone: jest.fn(),
+        body: null,
+        bodyUsed: false,
+        arrayBuffer: jest.fn(),
+        blob: jest.fn(),
+        formData: jest.fn(),
+        json: jest.fn(),
         text: () => Promise.resolve("Not Found"),
       });
     });
 
     // Allow tests to set window.location.href without errors:
-    delete (window as any).location;
-    (window as any).location = { href: "" };
+    delete (window as Record<string, unknown>).location;
+    (window as Record<string, unknown>).location = { href: "" };
   });
 
   afterEach(() => {
@@ -125,11 +290,11 @@ describe("PaymentPage (payment.tsx)", () => {
     expect(screen.getByText(/\b150\s*RON\b/)).toBeInTheDocument();
 
     // Ensure the <img> src matches details.imageUrl
-    const img = screen.getByRole("img") as HTMLImageElement;
-    expect(img.src).toBe("https://example.com/cake.png");
+    const img = screen.getByRole("img");
+    expect(img).toHaveAttribute('src', "https://example.com/cake.png");
 
     // The input should have min="1" and max="150":
-    const input = screen.getByPlaceholderText("Enter amount") as HTMLInputElement;
+    const input = screen.getByPlaceholderText("Enter amount");
     expect(input).toHaveAttribute("min", "1");
     expect(input).toHaveAttribute("max", "150");
   });
@@ -142,11 +307,11 @@ describe("PaymentPage (payment.tsx)", () => {
       expect(screen.getByText("Order ID #999")).toBeInTheDocument();
     });
 
-    const input = screen.getByPlaceholderText("Enter amount") as HTMLInputElement;
+    const input = screen.getByPlaceholderText("Enter amount");
     const button = screen.getByRole("button", { name: /CHECKOUT/i });
 
     // Spy on window.alert()
-    const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+    const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => undefined);
 
     // 1) Enter 300 → should alert about max 150:
     fireEvent.change(input, { target: { value: "300" } });
@@ -159,7 +324,7 @@ describe("PaymentPage (payment.tsx)", () => {
     fireEvent.change(input, { target: { value: "100" } });
     fireEvent.click(button);
     await waitFor(() => {
-      expect((window as any).location.href).toBe("https://checkout.example.com");
+      expect((window as Record<string, unknown>).location.href).toBe("https://checkout.example.com");
     });
 
     alertSpy.mockRestore();

@@ -41,10 +41,9 @@ const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({
   
   const router = useRouter();
 
-  const handleGoHome = (): void => {
-    router.push("/home");
-  };
-
+const handleGoHome = (): void => {
+  void router.push("/home");
+};
   return (
     <div className={styles.container}>
       <Navbar />
