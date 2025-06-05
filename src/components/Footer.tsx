@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import "./../styles/globals.css";
-import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa';
+import { FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import styles from "./../styles/Footer.module.css";
 import Link from "next/link";
 
@@ -10,11 +10,10 @@ const Footer = () => {
 
   useEffect(() => {
     const checkIfLanding = () => {
-  const pathname = window.location.pathname;
-  const hash = window.location.hash.trim();
-  setIsLandingPage(pathname === "/" && (hash === "" || hash === "#"));
-};
-
+      const pathname = window.location.pathname;
+      const hash = window.location.hash.trim();
+      setIsLandingPage(pathname === "/" && (hash === "" || hash === "#"));
+    };
 
     checkIfLanding();
     window.addEventListener("hashchange", checkIfLanding);
@@ -27,7 +26,9 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className={`${styles.footer} ${isLandingPage ? styles.footerLanding : ''}`}>
+    <footer
+      className={`${styles.footer} ${isLandingPage ? styles.footerLanding : ""}`}
+    >
       <div className={styles.topRow}>
         <div className={styles.social}>
           <span>Follow us</span>
@@ -50,7 +51,7 @@ const Footer = () => {
           </a>
 
           <a
-            href=""
+            href="https://www.instagram.com/gifthub_app/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
@@ -63,13 +64,21 @@ const Footer = () => {
       <hr className={styles.divider} />
 
       <div className={styles.bottomRow}>
-        <Link href="/privacy" className={styles.link}>Privacy Policy</Link>
+        <Link href="/privacy" className={styles.link}>
+          Privacy Policy
+        </Link>
         <div className={styles.separator}></div>
-        <Link href="/terms" className={styles.link}>Terms and Conditions</Link>
+        <Link href="/terms" className={styles.link}>
+          Terms and Conditions
+        </Link>
         <div className={styles.separator}></div>
-        <Link href="/about" className={styles.link}>About us</Link>
+        <Link href="/about" className={styles.link}>
+          About us
+        </Link>
         <div className={styles.separator}></div>
-        <Link href="mailto:e3getmehired@yahoo.com" className={styles.link}>Contact us</Link>
+        <Link href="mailto:e3getmehired@yahoo.com" className={styles.link}>
+          Contact us
+        </Link>
       </div>
 
       <div className={styles.copyrightRow}>

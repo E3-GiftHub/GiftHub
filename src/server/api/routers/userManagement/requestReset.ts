@@ -7,32 +7,32 @@ export const requestResetRouter = createTRPCRouter({
   requestReset: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input, ctx }) => {
-    const user = await ctx.db.user.findUnique({
-      where: { email: input.email },
-    });
+      const user = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
 
-    if (!user) {
-      console.log("Email not registered:", input.email);
-      return {
-        success: true,
-        message: "If the email is registered, you'll receive an email.",
-      };
-    }
-    const token = crypto.randomBytes(32).toString("hex");
-    const tokenExpires = new Date(Date.now() + 1000 * 60 * 60);
+      if (!user) {
+        console.log("Email not registered:", input.email);
+        return {
+          success: true,
+          message: "If the email is registered, you'll receive an email.",
+        };
+      }
+      const token = crypto.randomBytes(32).toString("hex");
+      const tokenExpires = new Date(Date.now() + 1000 * 60 * 60);
 
-    await ctx.db.user.update({
-      where: { email: input.email },
-      data: {
-        emailToken: token,
-        tokenExpires,
-      },
-    });
+      await ctx.db.user.update({
+        where: { email: input.email },
+        data: {
+          emailToken: token,
+          tokenExpires,
+        },
+      });
 
-    const resetLink = `https://gifthub-five.vercel.app//reset-password?token=${token}`;
-    console.log("Generated reset link:", resetLink);
+      const resetLink = `https://gifthub-five.vercel.app//password-reset?token=${token}`;
+      console.log("Generated reset link:", resetLink);
 
-    await sendEmail({
+      await sendEmail({
         to: input.email,
         subject: "Reset your GiftHub password",
         html: `
@@ -70,10 +70,10 @@ export const requestResetRouter = createTRPCRouter({
         </p>
       </div>
     `,
-      text: `Reset your password using this link: ${resetLink}`,
-    });
+        text: `Reset your password using this link: ${resetLink}`,
+      });
 
-    return {
+      return {
         success: true,
         message: "If the email is registered, you'll receive an email.",
       };

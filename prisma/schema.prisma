@@ -138,6 +138,7 @@ model Invitation {
     guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
     event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
+    @@unique([guestUsername, eventId])
     @@index([guestUsername, eventId])
     @@index([eventId])
     @@index([status])
@@ -166,6 +167,8 @@ model Event {
     paymentLinks  StripeLink[]
     eventArticles EventArticle[]
     eventReports  EventReport[]
+
+    @@unique([createdByUsername, title])
 }
 
 //! event components

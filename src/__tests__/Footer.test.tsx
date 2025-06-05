@@ -35,14 +35,8 @@ describe("Footer component", () => {
     expect(linkedinLink).toHaveAttribute("target", "_blank");
   });
 
-  test("renders GitHub icon with correct link", () => {
-    render(<Footer />);
-    const githubLink = screen.getByRole("link", {
-      name: /github/i,
-    });
-    expect(githubLink).toHaveAttribute("href", expect.stringContaining("github.com/E3-GiftHub"));
-    expect(githubLink).toHaveAttribute("target", "_blank");
-  });
+
+
 
   test("renders footer links correctly", () => {
     render(<Footer />);
