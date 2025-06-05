@@ -1,6 +1,3 @@
-// payment.tsx
-"use client";
-
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
@@ -10,6 +7,7 @@ import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "~/styles/globals.css";
+import Termination from "~/components/Termination";
 
 interface PaymentDetails {
   itemName?: string;
@@ -250,7 +248,8 @@ export default function CheckoutPage() {
                 <strong>Original Price:</strong> {details.itemPrice} RON
               </p>
               <p>
-                <strong>Already Contributed:</strong> {details.alreadyContributed} RON
+                <strong>Already Contributed:</strong>{" "}
+                {details.alreadyContributed} RON
               </p>
               <p>
                 <strong>Remaining to Contribute:</strong> {remainingAmount} RON
@@ -336,6 +335,11 @@ export default function CheckoutPage() {
         </div>
       </div>
       <Footer />
+      <Termination
+        eventId={eventId}
+        invitationId={null}
+        articleId={articleId}
+      />
     </div>
   );
 }

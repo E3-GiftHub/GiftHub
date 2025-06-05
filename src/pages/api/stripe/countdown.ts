@@ -6,36 +6,53 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const eventId = Number(req.query.eventId);
-  const invitationId = Number(req.query.invitationId);
-  if (!eventId && !invitationId)
+  // the comments will tell the page source of this parameters
+  const eventId = Number(req.query.eventId); // event-view, event
+  const invitationId = Number(req.query.invitationId); // event-invitation
+  const articleId = Number(req.query.invitationId); // payment
+  if (!eventId && !invitationId && !articleId)
     return res.status(400).json({ error: "Missing parameters" });
 
-  const termination: { date: Date | null } | null = eventId
-    ? await prisma.event.findUnique({
-        where: { id: eventId },
-        select: { date: true },
-      })
-    : ((
-        await prisma.invitation.findUnique({
-          where: { id: invitationId },
+  let termination: Date | null = null;
+
+  //! query the database depending on the source
+  if (eventId) {
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { date: true },
+    });
+    termination = event?.date ?? null;
+  } else if (invitationId) {
+    const invitation = await prisma.invitation.findUnique({
+      where: { id: invitationId },
+      select: {
+        event: {
           select: {
-            event: {
-              select: {
-                date: true,
-              },
-            },
+            date: true,
           },
-        })
-      )?.event ?? null);
+        },
+      },
+    });
+    termination = invitation?.event?.date ?? null;
+  } else {
+    const article = await prisma.eventArticle.findUnique({
+      where: { id: articleId },
+      select: {
+        event: {
+          select: {
+            date: true,
+          },
+        },
+      },
+    });
+    termination = article?.event?.date ?? null;
+  }
 
   if (!termination)
     return res.status(404).json({ error: "Invalid parameters: object" });
-  if (!termination.date)
-    return res.status(404).json({ error: "Invalid parameters: date" });
 
   const now = new Date();
-  const miliseconds = termination.date.getTime() - now.getTime();
+  const miliseconds = termination.getTime() - now.getTime();
   if (miliseconds > 0)
     return res.status(200).json({ error: "No error - wait more" });
 

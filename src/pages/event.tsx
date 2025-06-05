@@ -14,6 +14,7 @@ import Footer from "~/components/Footer";
 import UploadModal from "~/components/UploadMediaModal";
 import type { MediaHeader } from "~/models/MediaHeader";
 import NotInvited from "@/components/notinvited";
+import Termination from "~/components/Termination";
 
 export default function EventViewPage() {
   const router = useRouter();
@@ -244,6 +245,7 @@ export default function EventViewPage() {
         </main>
       </div>
       <Footer />
+      <Termination eventId={eventId} invitationId={null} articleId={null} />
     </>
   );
 }

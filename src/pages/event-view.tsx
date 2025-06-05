@@ -16,6 +16,7 @@ import "./../styles/globals.css";
 import { type GuestHeader } from "~/models/GuestHeader";
 import { useSession } from "next-auth/react";
 import formatField from "~/utils/formatField";
+import Termination from "~/components/Termination";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -618,6 +619,7 @@ export default function EventView() {
       </div>
 
       <Footer />
+      <Termination eventId={eventId} invitationId={null} articleId={null} />
     </div>
   );
 }
