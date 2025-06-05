@@ -9,6 +9,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
 
+// Define a proper error type for Stripe errors
+interface StripeError {
+  message?: string;
+  type?: string;
+  code?: string;
+  raw?: unknown;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -18,8 +26,8 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 2) Grab `username` from query
-  const username = String(req.query.username || "");
+  // 2) Grab `username` from query - Fixed nullish coalescing
+  const username = String(req.query.username ?? "");
   if (!username) {
     return res.status(400).json({ error: "Missing `username` parameter" });
   }
@@ -36,7 +44,8 @@ export default async function handler(
     return res.status(500).json({ error: "Database lookup failed." });
   }
 
-  if (!user || !user.stripeConnectId) {
+  // Fixed optional chain
+  if (!user?.stripeConnectId) {
     return res
       .status(404)
       .json({ error: "No Stripe Connect account found for this user." });
@@ -49,12 +58,14 @@ export default async function handler(
   let stripeAccount: Stripe.Response<Stripe.Account>;
   try {
     stripeAccount = await stripe.accounts.retrieve(accountId);
-  } catch (retrieveErr: any) {
+  } catch (retrieveErr: unknown) {
+    // Properly type the error
+    const error = retrieveErr as StripeError;
     console.error("Error retrieving Stripe account:", {
-      message: retrieveErr.message,
-      type: retrieveErr.type,
-      code: retrieveErr.code,
-      raw: retrieveErr.raw,
+      message: error.message ?? "Unknown error",
+      type: error.type ?? "Unknown type",
+      code: error.code ?? "Unknown code",
+      raw: error.raw,
     });
     return res.status(500).json({
       error: "Connected account retrieval failed. Check that `stripeConnectId` is valid.",
@@ -69,9 +80,15 @@ export default async function handler(
   });
 
   // Derive your origin (NEXTAUTH_URL or fallback to request headers)
-  const origin =
-    process.env.NEXTAUTH_URL ??
-    `${req.headers["x-forwarded-proto"]}://${req.headers.host}`;
+  // Fixed template literal expression type
+  const protocol = Array.isArray(req.headers["x-forwarded-proto"]) 
+    ? req.headers["x-forwarded-proto"][0] 
+    : req.headers["x-forwarded-proto"];
+  const host = Array.isArray(req.headers.host) 
+    ? req.headers.host[0] 
+    : req.headers.host;
+  
+  const origin = process.env.NEXTAUTH_URL ?? `${protocol ?? "http"}://${host ?? "localhost"}`;
 
   // 5) If onboarding is NOT complete (charges_enabled or payouts_enabled is false),
   //    issue an Account Link for onboarding.
@@ -86,12 +103,14 @@ export default async function handler(
 
       console.log("🔗 Created Account Link (onboarding):", accountLink.url);
       return res.redirect(accountLink.url);
-    } catch (accountLinkErr: any) {
+    } catch (accountLinkErr: unknown) {
+      // Properly type the error
+      const error = accountLinkErr as StripeError;
       console.error("Error creating Stripe Account Link (onboarding):", {
-        message: accountLinkErr.message,
-        type: accountLinkErr.type,
-        code: accountLinkErr.code,
-        raw: accountLinkErr.raw,
+        message: error.message ?? "Unknown error",
+        type: error.type ?? "Unknown type",
+        code: error.code ?? "Unknown code",
+        raw: error.raw,
       });
       return res.status(500).json({
         error: "Unable to create Stripe Account Link for onboarding. Check server logs.",
@@ -104,12 +123,14 @@ export default async function handler(
     const loginLink = await stripe.accounts.createLoginLink(accountId);
     console.log("🔐 Created Login Link (dashboard):", loginLink.url);
     return res.redirect(loginLink.url);
-  } catch (loginErr: any) {
+  } catch (loginErr: unknown) {
+    // Properly type the error
+    const error = loginErr as StripeError;
     console.error("Error creating Stripe login link:", {
-      message: loginErr.message,
-      type: loginErr.type,
-      code: loginErr.code,
-      raw: loginErr.raw,
+      message: error.message ?? "Unknown error",
+      type: error.type ?? "Unknown type",
+      code: error.code ?? "Unknown code",
+      raw: error.raw,
     });
     return res.status(500).json({
       error: "Unable to create Stripe login link. Check server logs for details.",

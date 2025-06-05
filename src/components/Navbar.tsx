@@ -75,7 +75,7 @@ const Navbar = () => {
     (async () => {
       try {
         const res = await fetch(
-          `./api/stripe/check-express?username=${session?.user?.name as string}`,
+          `./api/stripe/check-express?username=${session?.user?.name!}`,
         );
         const data = (await res.json()) as string;
         setHasExpress(data);
