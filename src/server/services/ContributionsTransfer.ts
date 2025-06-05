@@ -51,9 +51,15 @@ export async function processEventItemContributions(eventId: number): Promise<vo
   }
 
   const eventArticles = await prisma.eventArticle.findMany({
-    where: { eventId: eventId, transferCompleted: false },
-    include: { item: { select: { id: true, price: true, name: true } } },
-  });
+  where: {
+    eventId: eventId,
+    OR: [
+      { transferCompleted: false },
+      { transferCompleted: null }
+    ]
+  },
+  include: { item: { select: { id: true, price: true, name: true } } },
+});
 
   if (!eventArticles.length) {
     console.log(`No pending articles for item processing in event ID ${eventId}.`);
@@ -245,15 +251,16 @@ export async function endOfEventTransfer(eventId: number): Promise<void> {
 
   // 3. Get all event articles for the event that haven't had their transfer completed yet.
   const articlesToProcess = await prisma.eventArticle.findMany({
-    where: {
-      eventId: eventId,
-      transferCompleted: false, // Only process items not yet finalized
-    },
-    select: { // Select only what's needed
-      id: true,
-      item: { select: { name: true, id: true } } // For logging/metadata
-    }
-  });
+  where: {
+    eventId: eventId,
+    OR: [
+      { transferCompleted: false },
+      { transferCompleted: null }
+    ]
+  },
+  select: { id: true, item: { select: { name: true, id: true } } },
+});
+
 
   if (!articlesToProcess.length) {
     console.log(`No articles found requiring end-of-event remaining contribution transfer for event ID ${eventId}. All items already marked transferCompleted.`);

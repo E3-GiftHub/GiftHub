@@ -124,12 +124,8 @@ const Navbar = () => {
           >
             {hasExpress === "true" && (
               <li>
-                <Link
-                  href="/"
-                  className={
-                    activePage === "inbox" ? styles["profile-main-button"] : ""
-                  }
-                >
+                <Link href={`/api/stripe/create-express-login?username=${session?.user?.name}`}
+                className={activePage === "inbox" ? styles["profile-main-button"] : ""}>
                   <FaUser /> Stripe
                 </Link>
               </li>
