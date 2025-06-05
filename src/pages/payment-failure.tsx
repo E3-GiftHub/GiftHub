@@ -38,12 +38,8 @@ interface PaymentFailurePageProps {
 
 const PaymentFailurePage: React.FC<PaymentFailurePageProps> = ({
 }) => {
-  const handleTryAgain = (): void => {
-    console.log("Navigating to checkout to try again...");
-  };
-
   const handleContactSupport = (): void => {
-    console.log("Navigating to contact support...");
+     window.location.href = "mailto:e3getmehired@yahoo.com?subject=Payment Failed&body=Hello! Unfortuanately, my payment failed. Please assist me with this issue. :(";
   };
 
   return (
@@ -62,9 +58,6 @@ const PaymentFailurePage: React.FC<PaymentFailurePageProps> = ({
           </p>
 
           <div className={styles.buttonWrapper}>
-            <button onClick={handleTryAgain} className={styles.actionButton}>
-              Try Again
-            </button>
             <button
               onClick={handleContactSupport}
               className={styles.actionButton}
