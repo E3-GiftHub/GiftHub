@@ -7,9 +7,52 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PaymentSuccessPage from "../pages/payment-success"; // ← adjust path if needed
 
+const mockPush = jest.fn();
+const mockReplace = jest.fn();
+const mockBack = jest.fn();
+const mockReload = jest.fn();
+
+// Mock NextRouter completely
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: mockReplace,
+    back: mockBack,
+    reload: mockReload,
+    pathname: '/payment-success',
+    route: '/payment-success',
+    asPath: '/payment-success',
+    query: {},
+    isReady: true,
+    isFallback: false,
+    basePath: '',
+    locale: undefined,
+    locales: undefined,
+    defaultLocale: undefined,
+    isLocaleDomain: false,
+    isPreview: false,
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+      emit: jest.fn(),
+    },
+    beforePopState: jest.fn(),
+    prefetch: jest.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 // Stub CSS modules and globals
-jest.mock("../styles/Payment.module.css", () => ({}));
-jest.mock("../../styles/globals.css", () => ({}));
+jest.mock("../styles/Payment.module.css", () => ({
+  container: 'container',
+  mainContent: 'mainContent',
+  card: 'card',
+  iconContainer: 'iconContainer',
+  failureMessage: 'failureMessage',
+  buttonWrapper: 'buttonWrapper',
+  actionButton: 'actionButton',
+  icon: 'icon',
+}));
+jest.mock("~/styles/globals.css", () => ({}));
 
 // Stub Navbar & Footer
 jest.mock("../components/Navbar", () => () => <div data-testid="navbar" />);
@@ -17,47 +60,74 @@ jest.mock("../components/Footer", () => () => <div data-testid="footer" />);
 
 describe("PaymentSuccessPage (payment-success.tsx)", () => {
   beforeEach(() => {
-    jest.spyOn(console, "log").mockImplementation(() => {});
-  });
-  afterEach(() => {
-    (console.log as jest.Mock).mockRestore();
+    jest.clearAllMocks();
   });
 
-  test("renders success message with given orderId", () => {
-    render(<PaymentSuccessPage orderId="ABC123" />);
+  test("renders success message correctly", () => {
+    render(<PaymentSuccessPage />);
 
-    // 1) The <h2> with "Payment Successful" should be present:
+    // Check that the "Payment Successful" heading is present
     expect(screen.getByText("Payment Successful")).toBeInTheDocument();
 
-    // 2) Find the <span> that contains "#ABC123":
-    const orderSpan = screen.getByText("#ABC123");
-    expect(orderSpan).toBeInTheDocument();
+    // Check that the success message paragraph is present
+    expect(screen.getByText("You can now view your order details or return to the homepage.")).toBeInTheDocument();
 
-    // 3) Get its closest parent <p> and assert it contains the surrounding text:
-    const parentParagraph = orderSpan.closest("p");
-    expect(parentParagraph).toBeInTheDocument();
-    // Check that the parent paragraph has "Your payment for order"
-    expect(parentParagraph).toHaveTextContent(/Your payment for order/i);
-    // And that it has "was processed successfully."
-    expect(parentParagraph).toHaveTextContent(/was processed successfully\./i);
+    // Check that the "Go to Homepage" button is present
+    expect(screen.getByRole("button", { name: /Go to Homepage/i })).toBeInTheDocument();
 
-    // Finally, verify both buttons are present:
-    expect(screen.getByRole("button", { name: /View Order/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Go to Homepage/i })
-    ).toBeInTheDocument();
+    // Check that the success icon (SVG) is present
+    const successIcon = document.querySelector('svg');
+    expect(successIcon).toBeInTheDocument();
   });
 
-  test("clicking buttons calls console.log with correct messages", () => {
-    render(<PaymentSuccessPage orderId="XYZ789" />);
+  test("clicking Go to Homepage button calls router.push with correct path", () => {
+    render(<PaymentSuccessPage />);
 
-    const viewButton = screen.getByRole("button", { name: /View Order/i });
     const homeButton = screen.getByRole("button", { name: /Go to Homepage/i });
-
-    fireEvent.click(viewButton);
-    expect(console.log).toHaveBeenCalledWith("Navigating to order details...");
-
     fireEvent.click(homeButton);
-    expect(console.log).toHaveBeenCalledWith("Navigating to homepage...");
+
+    // Verify router.push was called with "/home"
+    expect(mockPush).toHaveBeenCalledWith("/home");
+  });
+
+  test("renders navbar and footer components", () => {
+    render(<PaymentSuccessPage />);
+
+    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("footer")).toBeInTheDocument();
+  });
+
+  test("success icon has correct attributes", () => {
+    render(<PaymentSuccessPage />);
+
+    const successIcon = document.querySelector('svg');
+    expect(successIcon).toBeInTheDocument();
+    expect(successIcon).toHaveAttribute('width', '80');
+    expect(successIcon).toHaveAttribute('height', '80');
+    expect(successIcon).toHaveAttribute('viewBox', '0 0 24 24');
+  });
+
+  test("component renders with orderId prop without errors", () => {
+    // Even though orderId isn't used, test that passing it doesn't break anything
+    render(<PaymentSuccessPage orderId="TEST123" />);
+
+    expect(screen.getByText("Payment Successful")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Go to Homepage/i })).toBeInTheDocument();
+  });
+
+  test("handleGoHome function is called on button click", () => {
+    render(<PaymentSuccessPage />);
+
+    const homeButton = screen.getByRole("button", { name: /Go to Homepage/i });
+    
+    // Before clicking, router.push should not have been called
+    expect(mockPush).not.toHaveBeenCalled();
+    
+    // Click the button
+    fireEvent.click(homeButton);
+    
+    // After clicking, router.push should have been called once
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith("/home");
   });
 });
