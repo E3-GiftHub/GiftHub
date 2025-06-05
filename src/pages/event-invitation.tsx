@@ -9,6 +9,9 @@ import { useRouter } from "next/router";
 export default function DemoPage() {
   const router = useRouter();
   const invitationId = router.query.id ? Number(router.query.id) : undefined;
+  const handleDecline = () => {
+    router.push("/home"); // Redirect to home page after declining
+  }
 
   return (
     <>
@@ -22,7 +25,8 @@ export default function DemoPage() {
             //posibil idul as fie invalid
             //sau un baiat foarte sneaky sa introduca
             //id=asf (ceea ce este incorect si INVALID)
-            <InvitationCard invitationId={invitationId} />
+            <InvitationCard invitationId={invitationId} 
+            onDecline={handleDecline}/>
           )}
         </div>
         <Footer />
