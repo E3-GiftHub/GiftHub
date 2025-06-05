@@ -27,6 +27,8 @@ const Wishlist: React.FC<WishlistProps> = ({
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([]);
   const router = useRouter();
 
+  
+  // Memoize eventId calculation
   const eventId = useMemo(() => {
     return propEventId ??
       (typeof router.query.eventId === "string"
@@ -36,13 +38,11 @@ const Wishlist: React.FC<WishlistProps> = ({
           : undefined);
   }, [propEventId, router.query.eventId]);
 
-  if (!eventId) {
-    return <div>No event ID provided</div>;
-  }
-
+  // Get user data first (this enables other queries)
   const { data: currentUser, isLoading: isLoadingUser } = api.user.get.useQuery();
   const username = currentUser?.username;
 
+  // Run these queries in parallel (not dependent on each other)
   const { data: eventData, isLoading: isEventLoading } = api.event.getById.useQuery(
     { id: eventId ? Number(eventId) : 0 },
     { enabled: !!eventId }
@@ -58,6 +58,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     { enabled: !!eventId && !!username }
   );
 
+  // Only run items query when we have all prerequisites
   const { data: itemsData, isLoading: isItemsLoading, isError, refetch } = api.item.getAll.useQuery(
     {
       eventId: eventId ? Number(eventId) : 0,
@@ -65,10 +66,19 @@ const Wishlist: React.FC<WishlistProps> = ({
     },
     {
       enabled: !!eventId && !!username && !isLoadingUser,
-      staleTime: 30000, 
+      staleTime: 30000, // 30 seconds
     }
   );
 
+  const setMark = api.item.setMark.useMutation({
+    onSuccess: () => void refetch(),
+  });
+
+  const deleteItemMutation = api.item.deleteItem.useMutation({
+    onSuccess: () => void refetch(),
+  });
+
+  // Memoize invitation status calculation
   const isInvited = useMemo(() => {
     if (!username || !eventPlanner) return null;
     
@@ -80,6 +90,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     return null;
   }, [invitationData, username, eventPlanner?.createdByUsername]);
 
+  // Memoize loading state calculation
   const isLoading = useMemo(() => {
     return !router.isReady ||
            isLoadingUser ||
@@ -102,7 +113,34 @@ const Wishlist: React.FC<WishlistProps> = ({
     isInvited
   ]);
 
+  if (!eventId) {
+    return <div>No event ID provided</div>;
+  }
 
+  // Memoize button class calculation
+  const getButtonClass = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (buttonType === "contribute" && item.userHasContributed) {
+        return `${styles.buttonPressed}`;
+      } else if (buttonType === "external" && item.state === "external") {
+        return `${styles.buttonPressed}`;
+      }
+      return "";
+    }, []
+  );
+
+  const getButtonText = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (buttonType === "contribute") {
+        return item.userHasContributed ? "Add More" : "Contribute";
+      } else if (buttonType === "external") {
+        return item.state === "external" ? "Bought" : "Mark Bought";
+      }
+      return "";
+    }, []
+  );
+
+  // Only update items when data actually changes
   useEffect(() => {
     if (itemsData && itemsData.length > 0) {
       const updatedItems = itemsData.map((item) => ({
@@ -113,101 +151,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     }
   }, [itemsData]);
 
-  const setMark = api.item.setMark.useMutation({
-    onSuccess: () => void refetch(),
-  });
-
-  const deleteItemMutation = api.item.deleteItem.useMutation({
-    onSuccess: () => void refetch(),
-  });
-
-  const handleDeleteItem = (itemId: number) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
-
-    deleteItemMutation.mutate(
-      { eventId: Number(eventId), itemId },
-      {
-        onSuccess: (res) => {
-          if (!res.success) {
-            alert(res.message);
-          }
-        },
-        onError: () => {
-          alert("Something went wrong. Try again.");
-        },
-      },
-    );
-  };
-
-  const getButtonClass = useMemo(() => 
-  (item: TrendingItem, buttonType: "contribute" | "external") => {
-    if (buttonType === "contribute" && item.userHasContributed) {
-      return `${styles.buttonPressed}`;
-    } else if (buttonType === "external" && item.state === "external") {
-      return `${styles.buttonPressed}`;
-    }
-    return "";
-  }, []
-);
-
-  const getButtonText = useMemo(() => 
-    (item: TrendingItem, buttonType: "contribute" | "external") => {
-      if (buttonType === "contribute") {
-        // Show different text based on user's contribution status
-        return item.userHasContributed ? "Add More" : "Contribute";
-      } else if (buttonType === "external") {
-        return item.state === "external" ? "Bought" : "Mark Bought";
-      }
-      return "";
-    }, []
-  );
-
- const handleButtonAction = (id: number, action: "contributing" | "external") => {
-  const item = trendingItems.find((i) => i.id === id);
-  if (!item) return;
-
-  if (action === "external") {
-    // Handle external purchase marking
-    const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
-    const updatedItem: TrendingItem = {
-      ...item,
-      state: newType,
-      contribution: newType === "none" ? {
-        current: 0,
-        total: Number(item.pret)
-      } : item.contribution
-    };
-
-    setTrendingItems((prev) =>
-      prev.map((it) => (it.id === id ? updatedItem : it)),
-    );
-
-    setMark.mutate(
-      {
-        eventId: Number(eventId),
-        articleId: id,
-        username: username!,
-        type: newType,
-      },
-      {
-        onError: () => {
-          setTrendingItems((prev) =>
-            prev.map((it) => (it.id === id ? item : it)),
-          );
-        },
-      },
-    );
-  } else {
-    // Handle contribution
-    const currentAmount = Number(item.contribution?.current) || 0;
-    const totalAmount = Number(item.pret);
-    
-    if (currentAmount < totalAmount && contribution) {      
-      contribution(id);
-    }
-  }
-};
-
+  // ✅ NOW we can do early returns - all hooks are above
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -227,6 +171,68 @@ const Wishlist: React.FC<WishlistProps> = ({
   if (isError) {
     return <div>Failed to load items.</div>;
   }
+
+  const handleDeleteItem = (itemId: number) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+
+    deleteItemMutation.mutate(
+      { eventId: Number(eventId), itemId },
+      {
+        onSuccess: (res) => {
+          if (!res.success) {
+            alert(res.message);
+          }
+        },
+        onError: () => {
+          alert("Something went wrong. Try again.");
+        },
+      },
+    );
+  };
+
+  const handleButtonAction = (id: number, action: "contributing" | "external") => {
+    const item = trendingItems.find((i) => i.id === id);
+    if (!item) return;
+
+    if (action === "external") {
+      const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
+      const updatedItem: TrendingItem = {
+        ...item,
+        state: newType,
+        contribution: newType === "none" ? {
+          current: 0,
+          total: Number(item.pret)
+        } : item.contribution
+      };
+
+      setTrendingItems((prev) =>
+        prev.map((it) => (it.id === id ? updatedItem : it)),
+      );
+
+      setMark.mutate(
+        {
+          eventId: Number(eventId),
+          articleId: id,
+          username: username!,
+          type: newType,
+        },
+        {
+          onError: () => {
+            setTrendingItems((prev) =>
+              prev.map((it) => (it.id === id ? item : it)),
+            );
+          },
+        },
+      );
+    } else {
+      const currentAmount = Number(item.contribution?.current) || 0;
+      const totalAmount = Number(item.pret);
+      
+      if (currentAmount < totalAmount && contribution) {
+        contribution(id);
+      }
+    }
+  };
 
   return (
     <div className={styles.container}>
