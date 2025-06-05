@@ -86,7 +86,10 @@ describe("LogInForm", () => {
   test("navigates to forgot password page", () => {
     render(<LogInForm />);
     const forgotPasswordLink = screen.getByText(/forgot password/i);
-    expect(forgotPasswordLink.closest("a")).toHaveAttribute("href", "/forgot-password");
+    expect(forgotPasswordLink.closest("a")).toHaveAttribute(
+      "href",
+      "/password-forgot",
+    );
   });
 
   test("navigates to signup page", () => {
