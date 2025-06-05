@@ -36,6 +36,10 @@ const Wishlist: React.FC<WishlistProps> = ({
           : undefined);
   }, [propEventId, router.query.eventId]);
 
+  if (!eventId) {
+    return <div>No event ID provided</div>;
+  }
+
   const { data: currentUser, isLoading: isLoadingUser } = api.user.get.useQuery();
   const username = currentUser?.username;
 
