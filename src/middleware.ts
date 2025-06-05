@@ -31,6 +31,7 @@ export function middleware(request: NextRequest) {
     "/payment",
     "/profile-edit",
     "/profile",
+    "/password-reset-logged",
   ];
 
   if (!isLoggedIn && protectedRoutes.includes(pathname)) {
@@ -44,6 +45,7 @@ export const config = {
     "/register",
     "/password-forgot",
     "/password-reset",
+    "/password-reset-logged",
 
     "/home",
     "/inbox",

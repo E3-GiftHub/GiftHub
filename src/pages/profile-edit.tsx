@@ -56,7 +56,7 @@ export default function EditUserProfile() {
   };
 
   const handleResetPassword = async () => {
-    await router.push("/password-reset");
+    await router.push("/password-reset-logged");
   };
 
   if (userLoading) {
