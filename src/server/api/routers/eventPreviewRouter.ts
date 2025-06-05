@@ -2,20 +2,15 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const upcomingEventsRouter = createTRPCRouter({
   getUpcomingEvents: publicProcedure.query(async ({ ctx }) => {
-
-
-
     // alegem userul care participa la evenimentul cel mai recent
     const today = new Date();
     const userIdentifier = ctx.session!.user!.name!;
 
-
     const userEvents = await ctx.db.event.findMany({
       where: {
         createdByUsername: userIdentifier,
-        date: { gte: today },
       },
-      orderBy: { date: "asc" },
+      orderBy: { date: "desc" },
       select: {
         id: true,
         pictureUrl: true,
