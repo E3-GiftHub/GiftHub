@@ -100,12 +100,12 @@ const Navbar = () => {
       <div className={styles["navbar-left"]}>
         <Link href="/">
           <Image
-            src="/logo.png"
-            alt="Gift Hub"
-            className={styles.logo}
-            width={120}
-            height={40}
-            priority
+        src="/logo.png"
+        alt="Gift Hub"
+        className={styles.logo}
+        width={240}
+        height={80}
+        priority
           />
         </Link>
       </div>
