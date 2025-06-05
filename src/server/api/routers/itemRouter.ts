@@ -107,10 +107,10 @@ export const itemRouter = createTRPCRouter({
       return { success: false, message: "Not authorized." };
     }
 
-    
+
     const eventArticle = await ctx.db.eventArticle.findFirst({
       where: {
-        itemId: input.itemId,
+        id: input.itemId,
         eventId: input.eventId,
       },
     });
