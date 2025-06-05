@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styles from "../styles/wishlistcomponent.module.css";
 import { api } from "~/trpc/react";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
@@ -37,6 +37,8 @@ const Wishlist: React.FC<WishlistProps> = ({
           : undefined);
   }, [propEventId, router.query.eventId]);
 
+  // ALL HOOKS MUST BE HERE - BEFORE ANY CONDITIONAL RETURNS
+  
   // Get user data first (this enables other queries)
   const { data: currentUser, isLoading: isLoadingUser } = api.user.get.useQuery();
   const username = currentUser?.username;
@@ -48,12 +50,12 @@ const Wishlist: React.FC<WishlistProps> = ({
   );
 
   const { data: eventPlanner, isLoading: isPlannerLoading } = api.invitationPreview.getPlanner.useQuery(
-    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
     { enabled: !!eventId && !!username }
   );
 
   const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
-    { eventId: Number(eventId), guestUsername: username ?? "" },
+    { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
     { enabled: !!eventId && !!username }
   );
 
@@ -77,7 +79,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     onSuccess: () => void refetch(),
   });
 
-
+  // Memoize invitation status calculation - FIXED dependency
   const isInvited = useMemo(() => {
     if (!username || !eventPlanner) return null;
     
@@ -87,7 +89,7 @@ const Wishlist: React.FC<WishlistProps> = ({
       return username === eventPlanner.createdByUsername;
     }
     return null;
-  }, [invitationData, username, eventPlanner]);
+  }, [invitationData, username, eventPlanner]); // Added eventPlanner dependency
 
   // Memoize loading state calculation
   const isLoading = useMemo(() => {
@@ -112,26 +114,67 @@ const Wishlist: React.FC<WishlistProps> = ({
     isInvited
   ]);
 
+  // Memoize button class calculation
+  const getButtonClass = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (buttonType === "contribute" && item.userHasContributed) {
+        return `${styles.buttonPressed}`;
+      } else if (buttonType === "external" && item.state === "external") {
+        return `${styles.buttonPressed}`;
+      }
+      return "";
+    }, []
+  );
 
-  const getButtonClass = useCallback((item: TrendingItem, buttonType: "contribute" | "external") => {
-    if (buttonType === "contribute" && item.userHasContributed) {
-      return `${styles.buttonPressed}`;
-    } else if (buttonType === "external" && item.state === "external") {
-      return `${styles.buttonPressed}`;
+  const getButtonText = useMemo(() => 
+    (item: TrendingItem, buttonType: "contribute" | "external") => {
+      if (buttonType === "contribute") {
+        return item.userHasContributed ? "Add More" : "Contribute";
+      } else if (buttonType === "external") {
+        return item.state === "external" ? "Bought" : "Mark Bought";
+      }
+      return "";
+    }, []
+  );
+
+  // Only update items when data actually changes
+  useEffect(() => {
+    if (itemsData && itemsData.length > 0) {
+      const updatedItems = itemsData.map((item) => ({
+        ...item,
+        transferCompleted: item.transferCompleted ?? false,
+      }));
+      setTrendingItems(updatedItems);
     }
-    return "";
-  }, []);
+  }, [itemsData]);
 
-  const getButtonText = useCallback((item: TrendingItem, buttonType: "contribute" | "external") => {
-    if (buttonType === "contribute") {
-      return item.userHasContributed ? "Add More" : "Contribute";
-    } else if (buttonType === "external") {
-      return item.state === "external" ? "Bought" : "Mark Bought";
-    }
-    return "";
-  }, []);
+  // NOW ALL CONDITIONAL RETURNS CAN HAPPEN - ALL HOOKS ARE ABOVE
+  
+  if (!eventId) {
+    return <div>No event ID provided</div>;
+  }
 
-  const handleDeleteItem = useCallback((itemId: number) => {
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+      </div>
+    );
+  }
+
+  if (!eventData && !isEventLoading) {
+    return <div>Event not found</div>;
+  }
+
+  if (isInvited === false) {
+    return <NotInvited />;
+  }
+
+  if (isError) {
+    return <div>Failed to load items.</div>;
+  }
+
+  const handleDeleteItem = (itemId: number) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
 
     deleteItemMutation.mutate(
@@ -147,9 +190,9 @@ const Wishlist: React.FC<WishlistProps> = ({
         },
       },
     );
-  }, [eventId, deleteItemMutation]);
+  };
 
-  const handleButtonAction = useCallback((id: number, action: "contributing" | "external") => {
+  const handleButtonAction = (id: number, action: "contributing" | "external") => {
     const item = trendingItems.find((i) => i.id === id);
     if (!item) return;
 
@@ -191,38 +234,7 @@ const Wishlist: React.FC<WishlistProps> = ({
         contribution(id);
       }
     }
-  }, [trendingItems, eventId, username, setMark, contribution]);
-
-  useEffect(() => {
-    if (itemsData && itemsData.length > 0) {
-      const updatedItems = itemsData.map((item) => ({
-        ...item,
-        transferCompleted: item.transferCompleted ?? false,
-      }));
-      setTrendingItems(updatedItems);
-    }
-  }, [itemsData]);
-
-  
-  if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-      </div>
-    );
-  }
-
-  if (!eventData && !isEventLoading) {
-    return <div>Event not found</div>;
-  }
-
-  if (isInvited === false) {
-    return <NotInvited />;
-  }
-
-  if (isError) {
-    return <div>Failed to load items.</div>;
-  }
+  };
 
   return (
     <div className={styles.container}>
