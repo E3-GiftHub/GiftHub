@@ -25,50 +25,69 @@ export const itemRouter = createTRPCRouter({
             markerUsername: input.username,
           },
         },
+        
         contributions: {
           where: {
             guestUsername: input.username,
           },
         },
+      
+        _count: {
+          select: {
+            contributions: true, 
+          },
+        },
       },
     });
 
-
+    
     const allContributions = await db.contribution.groupBy({
       by: ['articleId'],
       where: { eventId: input.eventId },
       _sum: { cashAmount: true },
     });
 
-
+    
     const contributionMap = new Map(
       allContributions.map(c => [c.articleId, Number(c._sum.cashAmount ?? 0)])
     );
 
+  
     const items = eventArticles.map((ea) => {
-      // Get contribution sum from our pre-computed map
+    
       const totalContributionAmount = contributionMap.get(ea.id) ?? 0;
-
-      // Determine state based on mark type and contributions
+      
+    
       let state: "none" | "external" | "contributing" = "none";
+      
+      // If marked as purchased by current user, show as external
       if (ea.marks.some(m => m.type === "PURCHASED")) {
         state = "external";
-      } else if (ea.contributions.length > 0) {
+      } 
+      // If anyone has contributed to this item, show as contributing
+      else if (totalContributionAmount > 0) {
+        state = "contributing";
+      }
+      // If current user has contributions but total is 0 (edge case), show contributing
+      else if (ea.contributions.length > 0) {
         state = "contributing";
       }
 
       return {
-        id: ea.id, // Using EventArticle id
-        itemId: ea.itemId, // Include the original itemId as well
+        id: ea.id,
+        itemId: ea.itemId,
         nume: ea.item?.name ?? "",
         pret: ea.item?.price?.toString() ?? "",
         state,
         imageUrl: ea.item?.imagesUrl ?? undefined,
-        transferCompleted: ea.transferCompleted ?? false, // Fix null issue
+        transferCompleted: ea.transferCompleted ?? false,
         contribution: {
-          current: totalContributionAmount,
+          current: totalContributionAmount, // Total from all users
           total: Number(ea.item?.price ?? 0),
         },
+        
+        userHasContributed: ea.contributions.length > 0,
+        userContributionAmount: ea.contributions.reduce((sum, c) => sum + Number(c.cashAmount), 0),
       };
     });
 
@@ -153,7 +172,7 @@ export const itemRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       try {
-        // First verify the article exists and get associated event and item info
+        
         const articleData = await db.eventArticle.findUnique({
           where: {
             id: input.articleId, // Using id instead of compound key
