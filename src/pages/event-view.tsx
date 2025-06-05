@@ -83,9 +83,7 @@ export default function EventView() {
     ? router.query.id[0]
     : router.query.id;
 
-  console.log("idParam: ", idParam);
-  const eventId = Number(idParam) ?? 0;
-  console.log("Event id: ", eventId);
+  const eventId = Number(idParam);
   const parsedId = parseId(id) ?? 0;
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -133,13 +131,10 @@ export default function EventView() {
   >(null);
   const [tempValue, setTempValue] = useState("");
 
-  // todo to change the frontend with hooks ANDREI.
-  // Andrei: done
   const handleRemoveGuest = (username: string) => {
-    // Remove from view immediately
+    // remove from view immediately
     setGuests((prev) => prev.filter((g) => g.username !== username));
 
-    // Then call API to remove in backend
     const f = async () => {
       try {
         const res = await fetch(
@@ -204,8 +199,6 @@ export default function EventView() {
     { enabled: parsedId !== null && parsedId > 0 },
   );
 
-  console.log("ID: ", parsedId);
-
   useEffect(() => {
     if (eventData?.date) {
       // Ensure date is formatted as yyyy-mm-dd
@@ -218,7 +211,6 @@ export default function EventView() {
         time: dateObj.toTimeString().slice(0, 5),
         location: eventData.location ?? "",
       });
-      console.log("date ", date);
     }
   }, [eventData]);
 
