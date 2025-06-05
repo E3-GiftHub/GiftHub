@@ -570,7 +570,7 @@ export default function EventView() {
               <GuestListPreview
                 loading={loadingGuests}
                 eventId={eventId}
-                guests={guests}
+                guests={Array.isArray(guests) ? guests : []}
               />
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.seeMoreOverride}`}
