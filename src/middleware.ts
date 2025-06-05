@@ -10,15 +10,21 @@ export const config = {
   matcher: [
     "/home",
     "/inbox",
-    "/profile-view",
+
+    "/event-create",
     "/event-invitation",
+
     "/event", // guest
     "/event-view", // planner
     "/wishlist-view", // guest
     "/wishlist-create", // planner
-    "/contribution-item",
-    "/contribution-direct",
+
     "/payment-failure",
     "/payment-success",
+    "/payment",
+
+    "/profile-edit",
+    // "/profile-view", // allow to see users
+    "/profile",
   ],
 };
