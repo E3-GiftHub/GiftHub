@@ -25,7 +25,7 @@ export default function Calendar({
   setCurrentDate,
 }: Readonly<CalendarProps>) {
   //! get the username
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   useEffect(() => {
     if (!session?.user?.name) return;
   }, [session]);
