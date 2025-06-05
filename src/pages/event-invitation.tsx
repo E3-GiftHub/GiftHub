@@ -9,9 +9,11 @@ import { useRouter } from "next/router";
 export default function DemoPage() {
   const router = useRouter();
   const invitationId = router.query.id ? Number(router.query.id) : undefined;
+  
+  // Fix: Handle the promise with void operator to explicitly ignore the result
   const handleDecline = () => {
-    router.push("/home"); // Redirect to home page after declining
-  }
+    void router.push("/home"); // Use void operator to mark as intentionally ignored
+  };
 
   return (
     <>

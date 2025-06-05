@@ -14,6 +14,7 @@ import styles from "./../styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/react";
+import Image from "next/image";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -74,8 +75,11 @@ const Navbar = () => {
 
     (async () => {
       try {
+        const username = session?.user?.name;
+        if (!username) return;
+
         const res = await fetch(
-          `./api/stripe/check-express?username=${session?.user?.name!}`,
+          `./api/stripe/check-express?username=${encodeURIComponent(username)}`
         );
         const data = (await res.json()) as string;
         setHasExpress(data);
@@ -85,7 +89,7 @@ const Navbar = () => {
     })().catch((err) => {
       console.error("Unexpected error in useEffect:", err);
     });
-  });
+  }, [router.isReady, session?.user?.name]); // Added dependency array
 
   return (
     <nav
@@ -95,7 +99,14 @@ const Navbar = () => {
     >
       <div className={styles["navbar-left"]}>
         <Link href="/">
-          <img src="/logo.png" alt="Gift Hub" className={styles.logo} />
+          <Image
+            src="/logo.png"
+            alt="Gift Hub"
+            className={styles.logo}
+            width={120}
+            height={40}
+            priority
+          />
         </Link>
       </div>
 
@@ -122,10 +133,16 @@ const Navbar = () => {
           <ul
             className={`${styles["nav-links"]} ${menuOpen ? styles.open : ""}`}
           >
-            {hasExpress === "true" && (
+            {hasExpress === "true" && session?.user?.name && (
               <li>
-                <Link href={`/api/stripe/create-express-login?username=${session?.user?.name}`}
-                className={activePage === "inbox" ? styles["profile-main-button"] : ""}>
+                <Link
+                  href={`/api/stripe/create-express-login?username=${encodeURIComponent(
+                    session.user.name
+                  )}`}
+                  className={
+                    activePage === "inbox" ? styles["profile-main-button"] : ""
+                  }
+                >
                   <FaUser /> Stripe
                 </Link>
               </li>

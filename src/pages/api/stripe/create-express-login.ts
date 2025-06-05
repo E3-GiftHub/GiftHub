@@ -81,14 +81,17 @@ export default async function handler(
 
   // Derive your origin (NEXTAUTH_URL or fallback to request headers)
   // Fixed template literal expression type
-  const protocol = Array.isArray(req.headers["x-forwarded-proto"]) 
-    ? req.headers["x-forwarded-proto"][0] 
-    : req.headers["x-forwarded-proto"];
-  const host = Array.isArray(req.headers.host) 
-    ? req.headers.host[0] 
-    : req.headers.host;
-  
-  const origin = process.env.NEXTAUTH_URL ?? `${protocol ?? "http"}://${host ?? "localhost"}`;
+  const getHeaderValue = (headerValue: string | string[] | undefined): string => {
+    if (Array.isArray(headerValue)) {
+      return headerValue[0] ?? "";
+    }
+    return headerValue ?? "";
+  };
+
+  const protocol = getHeaderValue(req.headers["x-forwarded-proto"]);
+  const host = getHeaderValue(req.headers.host);
+
+  const origin = process.env.NEXTAUTH_URL ?? `${protocol || "http"}://${host || "localhost"}`;
 
   // 5) If onboarding is NOT complete (charges_enabled or payouts_enabled is false),
   //    issue an Account Link for onboarding.
