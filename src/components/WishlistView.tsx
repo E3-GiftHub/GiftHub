@@ -98,7 +98,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     isInvited
   ]);
 
-  // ✅ OPTIMIZED: Only update items when data actually changes
+
   useEffect(() => {
     if (itemsData && itemsData.length > 0) {
       const updatedItems = itemsData.map((item) => ({
@@ -136,21 +136,21 @@ const Wishlist: React.FC<WishlistProps> = ({
   };
 
   const getButtonClass = useMemo(() => 
-    (item: TrendingItem, buttonType: "contribute" | "external") => {
-      if (
-        (buttonType === "contribute" && item.state === "contributing") ||
-        (buttonType === "external" && item.state === "external")
-      ) {
-        return `${styles.buttonPressed}`;
-      }
-      return "";
-    }, []
-  );
+  (item: TrendingItem, buttonType: "contribute" | "external") => {
+    if (buttonType === "contribute" && item.userHasContributed) {
+      return `${styles.buttonPressed}`;
+    } else if (buttonType === "external" && item.state === "external") {
+      return `${styles.buttonPressed}`;
+    }
+    return "";
+  }, []
+);
 
   const getButtonText = useMemo(() => 
     (item: TrendingItem, buttonType: "contribute" | "external") => {
       if (buttonType === "contribute") {
-        return "Contribute";
+        // Show different text based on user's contribution status
+        return item.userHasContributed ? "Add More" : "Contribute";
       } else if (buttonType === "external") {
         return item.state === "external" ? "Bought" : "Mark Bought";
       }
@@ -158,62 +158,51 @@ const Wishlist: React.FC<WishlistProps> = ({
     }, []
   );
 
-  const handleButtonAction = (id: number, action: "contributing" | "external") => {
-    const item = trendingItems.find((i) => i.id === id);
-    if (!item) return;
+ const handleButtonAction = (id: number, action: "contributing" | "external") => {
+  const item = trendingItems.find((i) => i.id === id);
+  if (!item) return;
 
-    if (action === "external") {
-      const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
-      const updatedItem: TrendingItem = {
-        ...item,
-        state: newType,
-        contribution: newType === "none" ? {
-          current: 0,
-          total: Number(item.pret)
-        } : item.contribution
-      };
+  if (action === "external") {
+    // Handle external purchase marking
+    const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
+    const updatedItem: TrendingItem = {
+      ...item,
+      state: newType,
+      contribution: newType === "none" ? {
+        current: 0,
+        total: Number(item.pret)
+      } : item.contribution
+    };
 
-      setTrendingItems((prev) =>
-        prev.map((it) => (it.id === id ? updatedItem : it)),
-      );
+    setTrendingItems((prev) =>
+      prev.map((it) => (it.id === id ? updatedItem : it)),
+    );
 
-      setMark.mutate(
-        {
-          eventId: Number(eventId),
-          articleId: id,
-          username: username!,
-          type: newType,
+    setMark.mutate(
+      {
+        eventId: Number(eventId),
+        articleId: id,
+        username: username!,
+        type: newType,
+      },
+      {
+        onError: () => {
+          setTrendingItems((prev) =>
+            prev.map((it) => (it.id === id ? item : it)),
+          );
         },
-        {
-          onError: () => {
-            setTrendingItems((prev) =>
-              prev.map((it) => (it.id === id ? item : it)),
-            );
-          },
-        },
-      );
-    } else {
-      const currentAmount = Number(item.contribution?.current) || 0;
-      const totalAmount = Number(item.pret);
-      if (currentAmount < totalAmount && contribution) {
-        const newState: TrendingItem["state"] = item.state === "contributing" ? "none" : "contributing";
-        const updatedItem: TrendingItem = {
-          ...item,
-          state: newState,
-          contribution: newState === "none" ? {
-            current: 0,
-            total: totalAmount
-          } : item.contribution
-        };
-
-        setTrendingItems((prev) =>
-          prev.map((it) => (it.id === id ? updatedItem : it)),
-        );
-
-        contribution(id);
-      }
+      },
+    );
+  } else {
+    // Handle contribution
+    const currentAmount = Number(item.contribution?.current) || 0;
+    const totalAmount = Number(item.pret);
+    
+    if (currentAmount < totalAmount && contribution) {      
+      contribution(id);
     }
-  };
+  }
+};
 
   if (isLoading) {
     return (

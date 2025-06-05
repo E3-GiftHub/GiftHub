@@ -11,6 +11,8 @@ export interface TrendingItem {
     current: number;
     total: number;
   };
+  userHasContributed?: boolean;
+  userContributionAmount?: number;
 }
 
 export interface WishlistProps {
