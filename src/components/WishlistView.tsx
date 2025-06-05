@@ -29,38 +29,49 @@ const Wishlist: React.FC<WishlistProps> = ({
 
   // Memoize eventId calculation
   const eventId = useMemo(() => {
-    return propEventId ??
+    return (
+      propEventId ??
       (typeof router.query.eventId === "string"
         ? router.query.eventId
         : Array.isArray(router.query.eventId)
           ? router.query.eventId[0]
-          : undefined);
+          : undefined)
+    );
   }, [propEventId, router.query.eventId]);
 
   // ALL HOOKS MUST BE HERE - BEFORE ANY CONDITIONAL RETURNS
-  
+
   // Get user data first (this enables other queries)
-  const { data: currentUser, isLoading: isLoadingUser } = api.user.get.useQuery();
+  const { data: currentUser, isLoading: isLoadingUser } =
+    api.user.get.useQuery();
   const username = currentUser?.username;
 
   // Run these queries in parallel (not dependent on each other)
-  const { data: eventData, isLoading: isEventLoading } = api.event.getById.useQuery(
-    { id: eventId ? Number(eventId) : 0 },
-    { enabled: !!eventId }
-  );
+  const { data: eventData, isLoading: isEventLoading } =
+    api.event.getById.useQuery(
+      { id: eventId ? Number(eventId) : 0 },
+      { enabled: !!eventId },
+    );
 
-  const { data: eventPlanner, isLoading: isPlannerLoading } = api.invitationPreview.getPlanner.useQuery(
-    { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
-    { enabled: !!eventId && !!username }
-  );
+  const { data: eventPlanner, isLoading: isPlannerLoading } =
+    api.invitationPreview.getPlanner.useQuery(
+      { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
+      { enabled: !!eventId && !!username },
+    );
 
-  const { data: invitationData, isLoading: isInvitationLoading } = api.invitationPreview.getInvitationForUserEvent.useQuery(
-    { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
-    { enabled: !!eventId && !!username }
-  );
+  const { data: invitationData, isLoading: isInvitationLoading } =
+    api.invitationPreview.getInvitationForUserEvent.useQuery(
+      { eventId: Number(eventId ?? 0), guestUsername: username ?? "" },
+      { enabled: !!eventId && !!username },
+    );
 
   // Only run items query when we have all prerequisites
-  const { data: itemsData, isLoading: isItemsLoading, isError, refetch } = api.item.getAll.useQuery(
+  const {
+    data: itemsData,
+    isLoading: isItemsLoading,
+    isError,
+    refetch,
+  } = api.item.getAll.useQuery(
     {
       eventId: eventId ? Number(eventId) : 0,
       username: username ?? "",
@@ -68,7 +79,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     {
       enabled: !!eventId && !!username && !isLoadingUser,
       staleTime: 30000, // 30 seconds
-    }
+    },
   );
 
   const setMark = api.item.setMark.useMutation({
@@ -82,7 +93,7 @@ const Wishlist: React.FC<WishlistProps> = ({
   // Memoize invitation status calculation - FIXED dependency
   const isInvited = useMemo(() => {
     if (!username || !eventPlanner) return null;
-    
+
     if (invitationData) {
       return invitationData.status === "ACCEPTED";
     } else if (invitationData === null) {
@@ -93,15 +104,17 @@ const Wishlist: React.FC<WishlistProps> = ({
 
   // Memoize loading state calculation
   const isLoading = useMemo(() => {
-    return !router.isReady ||
-           isLoadingUser ||
-           (!username) ||
-           (!eventId) ||
-           isEventLoading ||
-           isPlannerLoading ||
-           isInvitationLoading ||
-           isItemsLoading ||
-           (isInvited === null);
+    return (
+      !router.isReady ||
+      isLoadingUser ||
+      !username ||
+      !eventId ||
+      isEventLoading ||
+      isPlannerLoading ||
+      isInvitationLoading ||
+      isItemsLoading ||
+      isInvited === null
+    );
   }, [
     router.isReady,
     isLoadingUser,
@@ -111,30 +124,32 @@ const Wishlist: React.FC<WishlistProps> = ({
     isPlannerLoading,
     isInvitationLoading,
     isItemsLoading,
-    isInvited
+    isInvited,
   ]);
 
   // Memoize button class calculation
-  const getButtonClass = useMemo(() => 
-    (item: TrendingItem, buttonType: "contribute" | "external") => {
+  const getButtonClass = useMemo(
+    () => (item: TrendingItem, buttonType: "contribute" | "external") => {
       if (buttonType === "contribute" && item.userHasContributed) {
         return `${styles.buttonPressed}`;
       } else if (buttonType === "external" && item.state === "external") {
         return `${styles.buttonPressed}`;
       }
       return "";
-    }, []
+    },
+    [],
   );
 
-  const getButtonText = useMemo(() => 
-    (item: TrendingItem, buttonType: "contribute" | "external") => {
+  const getButtonText = useMemo(
+    () => (item: TrendingItem, buttonType: "contribute" | "external") => {
       if (buttonType === "contribute") {
         return item.userHasContributed ? "Add More" : "Contribute";
       } else if (buttonType === "external") {
         return item.state === "external" ? "Bought" : "Mark Bought";
       }
       return "";
-    }, []
+    },
+    [],
   );
 
   // Only update items when data actually changes
@@ -149,7 +164,7 @@ const Wishlist: React.FC<WishlistProps> = ({
   }, [itemsData]);
 
   // NOW ALL CONDITIONAL RETURNS CAN HAPPEN - ALL HOOKS ARE ABOVE
-  
+
   if (!eventId) {
     return <div>No event ID provided</div>;
   }
@@ -192,19 +207,32 @@ const Wishlist: React.FC<WishlistProps> = ({
     );
   };
 
-  const handleButtonAction = (id: number, action: "contributing" | "external") => {
+  const handleButtonAction = (
+    id: number,
+    action: "contributing" | "external",
+  ) => {
     const item = trendingItems.find((i) => i.id === id);
     if (!item) return;
+    if (item.transferCompleted) {
+      alert(
+        "the event is over, the transfer of the items is completely done. you can not contribute anymore!",
+      );
+      return;
+    }
 
     if (action === "external") {
-      const newType: TrendingItem["state"] = item.state === "external" ? "none" : "external";
+      const newType: TrendingItem["state"] =
+        item.state === "external" ? "none" : "external";
       const updatedItem: TrendingItem = {
         ...item,
         state: newType,
-        contribution: newType === "none" ? {
-          current: 0,
-          total: Number(item.pret)
-        } : item.contribution
+        contribution:
+          newType === "none"
+            ? {
+                current: 0,
+                total: Number(item.pret),
+              }
+            : item.contribution,
       };
 
       setTrendingItems((prev) =>
@@ -229,7 +257,7 @@ const Wishlist: React.FC<WishlistProps> = ({
     } else {
       const currentAmount = Number(item.contribution?.current) || 0;
       const totalAmount = Number(item.pret);
-      
+
       if (currentAmount < totalAmount && contribution) {
         contribution(id);
       }
@@ -267,7 +295,9 @@ const Wishlist: React.FC<WishlistProps> = ({
                       <div className={styles.contributionText}>
                         {item.contribution.total > 0
                           ? Math.round(
-                              (item.contribution.current / item.contribution.total) * 100,
+                              (item.contribution.current /
+                                item.contribution.total) *
+                                100,
                             )
                           : 0}
                         %
@@ -281,7 +311,8 @@ const Wishlist: React.FC<WishlistProps> = ({
                         ></div>
                       </div>
                       <div className={styles.contributionAmount}>
-                        ${item.contribution.current} of ${item.contribution.total}
+                        ${item.contribution.current} of $
+                        {item.contribution.total}
                       </div>
                     </div>
                   )}
@@ -294,15 +325,23 @@ const Wishlist: React.FC<WishlistProps> = ({
                   <div className={styles.actionButtonsRow}>
                     <button
                       className={`${styles.contributeButton} ${getButtonClass(item, "contribute")}`}
-                      onClick={() => handleButtonAction(item.id, "contributing")}
-                      disabled={item.state === "external" || setMark.status === "pending"}
+                      onClick={() =>
+                        handleButtonAction(item.id, "contributing")
+                      }
+                      disabled={
+                        item.state === "external" ||
+                        setMark.status === "pending"
+                      }
                     >
                       {getButtonText(item, "contribute")}
                     </button>
                     <button
                       className={`${styles.externalButton} ${getButtonClass(item, "external")}`}
                       onClick={() => handleButtonAction(item.id, "external")}
-                      disabled={item.state === "contributing" || setMark.status === "pending"}
+                      disabled={
+                        item.state === "contributing" ||
+                        setMark.status === "pending"
+                      }
                     >
                       {getButtonText(item, "external")}
                     </button>
