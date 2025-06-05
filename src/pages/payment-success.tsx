@@ -5,6 +5,7 @@ import styles from "../styles/Payment.module.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "~/styles/globals.css";
+import { useRouter } from "next/router";
 
 interface SVGIconProps {
   className?: string;
@@ -36,14 +37,12 @@ interface PaymentSuccessPageProps {
 }
 
 const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({
-  orderId = "N/A",
 }) => {
-  const handleViewOrder = (): void => {
-    console.log("Navigating to order details...");
-  };
+  
+  const router = useRouter();
 
   const handleGoHome = (): void => {
-    console.log("Navigating to homepage...");
+    router.push("/home");
   };
 
   return (
@@ -56,26 +55,11 @@ const PaymentSuccessPage: React.FC<PaymentSuccessPageProps> = ({
             <SuccessIcon />
           </div>
           <h2 className={styles.failureMessage}>Payment Successful</h2>
-
-          <p
-            style={{
-              textAlign: "center",
-              margin: "20px 0",
-              fontSize: "1.1rem",
-            }}
-          >
-            Your payment for order{" "}
-            <span className={styles.orderId}>#{orderId}</span> was processed
-            successfully.
-          </p>
           <p style={{ textAlign: "center", marginBottom: "30px" }}>
             You can now view your order details or return to the homepage.
           </p>
 
           <div className={styles.buttonWrapper}>
-            <button onClick={handleViewOrder} className={styles.actionButton}>
-              View Order
-            </button>
             <button onClick={handleGoHome} className={styles.actionButton}>
               Go to Homepage
             </button>

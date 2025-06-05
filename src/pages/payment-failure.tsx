@@ -37,7 +37,6 @@ interface PaymentFailurePageProps {
 }
 
 const PaymentFailurePage: React.FC<PaymentFailurePageProps> = ({
-  orderId = "N/A",
 }) => {
   const handleTryAgain = (): void => {
     console.log("Navigating to checkout to try again...");
@@ -57,17 +56,6 @@ const PaymentFailurePage: React.FC<PaymentFailurePageProps> = ({
             <FailureIcon />
           </div>
           <h2 className={styles.failureMessage}>The payment failed</h2>
-
-          <p
-            style={{
-              textAlign: "center",
-              margin: "20px 0",
-              fontSize: "1.1rem",
-            }}
-          >
-            Unfortunately, a problem occurred while processing the payment for
-            your order. <span className={styles.orderId}>#{orderId}</span>.
-          </p>
           <p style={{ textAlign: "center", marginBottom: "30px" }}>
             Please try again or use a different payment method. If the problem
             persists, please contact support.
