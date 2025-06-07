@@ -9,7 +9,7 @@ export async function createCheckoutLink(
   idType: "eventArticle" | "event",
   amountRON: number,
   isContribute: boolean,
-  userId: string
+  userId: string,
 ): Promise<{
   url: string;
   stripePaymentLinkId: string;
@@ -32,7 +32,7 @@ export async function createCheckoutLink(
     !hasAtMostTwoDecimals(amountRON)
   ) {
     throw new Error(
-      `Invalid amountRON: must be a positive number with at most two decimals, got ${amountRON}.`
+      `Invalid amountRON: must be a positive number with at most two decimals, got ${amountRON}.`,
     );
   }
 
@@ -103,7 +103,10 @@ export async function createCheckoutLink(
     // Build exactly the same fields as before for contributions:
     const itemName = eventArticle.item.name ?? "Untitled Item";
     const eventTitle = eventArticle.event.title ?? "Untitled Event";
-    const imageUrl = eventArticle.item.imagesUrl ?? "/UserImages/default_pfp.svg";
+    const imageUrl =
+      eventArticle.item.imagesUrl?.trim() ??
+      "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
+
     const plannerFullName =
       `${plannerFirstName} ${plannerLastName}`.trim() || plannerUsername;
 
@@ -114,7 +117,9 @@ export async function createCheckoutLink(
     ].join("\n\n\n");
 
     if (!isContribute) {
-      throw new Error(`Contributions must have isContribute = true for eventArticle.`);
+      throw new Error(
+        `Contributions must have isContribute = true for eventArticle.`,
+      );
     }
 
     productParams = {
@@ -175,7 +180,9 @@ export async function createCheckoutLink(
   let transferDestination: string | undefined = undefined;
   if (!isContribute) {
     if (!plannerStripeId) {
-      throw new Error(`Event planner "${plannerUsername}" does not have a Stripe Connect ID.`);
+      throw new Error(
+        `Event planner "${plannerUsername}" does not have a Stripe Connect ID.`,
+      );
     }
     transferDestination = plannerStripeId;
   }
@@ -213,7 +220,8 @@ export async function createCheckoutLink(
     product = await stripe.products.create(productParams);
   } catch (prodErr: unknown) {
     console.error("Stripe Product creation error:", prodErr);
-    const errorMessage = prodErr instanceof Error ? prodErr.message : String(prodErr);
+    const errorMessage =
+      prodErr instanceof Error ? prodErr.message : String(prodErr);
     throw new Error(`Failed to create Stripe Product: ${errorMessage}`);
   }
 
@@ -229,7 +237,8 @@ export async function createCheckoutLink(
     });
   } catch (priceErr: unknown) {
     console.error("Stripe Price creation error:", priceErr);
-    const errorMessage = priceErr instanceof Error ? priceErr.message : String(priceErr);
+    const errorMessage =
+      priceErr instanceof Error ? priceErr.message : String(priceErr);
     throw new Error(`Failed to create Stripe Price: ${errorMessage}`);
   }
 
@@ -239,7 +248,7 @@ export async function createCheckoutLink(
   const rawBase = process.env.NEXT_PUBLIC_BASE_URL;
   if (!rawBase) {
     throw new Error(
-      "Environment variable NEXT_PUBLIC_BASE_URL is not set. Include full URL, e.g. http://localhost:3000."
+      "Environment variable NEXT_PUBLIC_BASE_URL is not set. Include full URL, e.g. http://localhost:3000.",
     );
   }
   let normalizedBase = rawBase;
@@ -269,7 +278,9 @@ export async function createCheckoutLink(
       : {}),
     metadata: {
       eventId: eventId.toString(),
-      ...(idType === "eventArticle" ? { eventArticleId: articleId!.toString() } : {}),
+      ...(idType === "eventArticle"
+        ? { eventArticleId: articleId!.toString() }
+        : {}),
       ...(itemId !== null ? { itemId: itemId.toString() } : {}),
       purchaserUsername: userId,
       isContribute: isContribute ? "true" : "false",
@@ -288,7 +299,8 @@ export async function createCheckoutLink(
     link = await stripe.paymentLinks.create(paymentLinkParams);
   } catch (stripeErr: unknown) {
     console.error("Stripe PaymentLink creation error:", stripeErr);
-    const errorMessage = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+    const errorMessage =
+      stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
     throw new Error(`Failed to create Stripe Payment Link: ${errorMessage}`);
   }
 
@@ -312,7 +324,8 @@ export async function createCheckoutLink(
     });
   } catch (prismaErr: unknown) {
     console.error("Prisma stripeLink.create error:", prismaErr);
-    const errorMessage = prismaErr instanceof Error ? prismaErr.message : String(prismaErr);
+    const errorMessage =
+      prismaErr instanceof Error ? prismaErr.message : String(prismaErr);
     throw new Error(`Failed to save StripeLink in database: ${errorMessage}`);
   }
 
