@@ -62,7 +62,9 @@
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .inactive:hover {
@@ -110,6 +112,7 @@
 }
 
 .checkoutBtn {
+  margin-left: 1rem;
   background: linear-gradient(to right, #627bff, #c684ff);
   padding: 1rem 2rem;
   color: white;
@@ -135,7 +138,10 @@
   border-radius: 12px;
   cursor: pointer;
   box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.3s ease;
 }
 
 .actionButton:hover {
@@ -159,7 +165,6 @@
   text-align: center;
   margin: 1rem 0;
 }
-
 
 .paymentSectionAlt {
   margin-top: 1.5rem;
@@ -247,7 +252,9 @@
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .inactive:hover {
@@ -265,7 +272,10 @@
   border-radius: 12px;
   cursor: pointer;
   box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.3s ease;
 }
 
 .actionButton:hover {
