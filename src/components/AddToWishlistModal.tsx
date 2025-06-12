@@ -1,6 +1,5 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/Button.module.css";
 import modalStyles from "../styles/ModalEventHome.module.css";
 
@@ -27,7 +26,7 @@ export default function AddToWishlistModal({
   itemPrice,
   itemDescription,
   onAddToWishlist,
-}: AddToWishlistModalProps) {
+}: Readonly<AddToWishlistModalProps>) {
   const [quantity, setQuantity] = useState(1);
 
   if (!isOpen) return null;
@@ -47,10 +46,10 @@ export default function AddToWishlistModal({
         <h2 className={modalStyles.modalTitleAdd}>Add to Wishlist</h2>
         <div className={modalStyles.product}>
           <img
-              src={itemPhoto}
-              alt={itemName}
-              className={modalStyles.modalImage}
-            />
+            src={itemPhoto}
+            alt={itemName}
+            className={modalStyles.modalImage}
+          />
 
           <div className={modalStyles.productInfo}>
             <h3 className={modalStyles.modalItemName}>{itemName}</h3>
@@ -61,14 +60,16 @@ export default function AddToWishlistModal({
               </p>
             )}
             <div>
-            <label htmlFor="quantity" className={modalStyles.quantityLabel}>
-              Quantity:
-            </label>
-            <input type="number" id="quantity"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className={modalStyles.quantityInput}
+              <label htmlFor="quantity" className={modalStyles.quantityLabel}>
+                Quantity:
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                className={modalStyles.quantityInput}
               />
             </div>
             <div className={modalStyles.modalButtons}>
