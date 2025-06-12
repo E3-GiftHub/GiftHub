@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { WishlistService } from "../../services/WishlistService";
+import { PriorityType } from "@prisma/client";
 
 const wishlistService = new WishlistService();
 
@@ -8,7 +9,9 @@ export const wishlistRouter = createTRPCRouter({
   createWishlist: publicProcedure
     .input(z.object({ eventIdentifier: z.string() }))
     .mutation(async ({ input }) => {
-      const result = await wishlistService.createWishlist(input.eventIdentifier);
+      const result = await wishlistService.createWishlist(
+        input.eventIdentifier,
+      );
       if (!result.success) {
         throw new Error("Could not create wishlist");
       }
@@ -18,7 +21,9 @@ export const wishlistRouter = createTRPCRouter({
   getWishlist: publicProcedure
     .input(z.object({ wishlistIdentifier: z.string() }))
     .query(async ({ input }) => {
-      const result = await wishlistService.getWishlist(input.wishlistIdentifier);
+      const result = await wishlistService.getWishlist(
+        input.wishlistIdentifier,
+      );
       if (!result.success) {
         throw new Error("Wishlist not found");
       }
@@ -32,9 +37,10 @@ export const wishlistRouter = createTRPCRouter({
         item: z.object({
           itemId: z.number(),
           quantity: z.number().min(1),
-          priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
+          priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+          note: z.string(),
         }),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const result = await WishlistService.addItem({
@@ -42,6 +48,7 @@ export const wishlistRouter = createTRPCRouter({
         itemId: input.item.itemId,
         quantityRequested: input.item.quantity,
         priority: input.item.priority,
+        note: input.item.note,
       });
 
       return { success: true, data: result };
@@ -52,7 +59,7 @@ export const wishlistRouter = createTRPCRouter({
       z.object({
         eventId: z.number(),
         itemId: z.number(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await WishlistService.removeItem({

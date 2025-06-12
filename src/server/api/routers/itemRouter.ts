@@ -2,7 +2,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { TRPCError } from "@trpc/server";
+import type { TrendingItem } from "@/models/WishlistEventGuest";
+import { PriorityType } from "@prisma/client";
 
+//! changed a lot here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 export const itemRouter = createTRPCRouter({
   // Get all items for a given event, with mark and contribution info for the current user
   getAll: publicProcedure
@@ -16,19 +19,20 @@ export const itemRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
+              description: true,
               price: true,
               imagesUrl: true,
             },
           },
           marks: {
             where: {
-              markerUsername: input.username,
+              eventId: input.eventId,
             },
           },
 
           contributions: {
             where: {
-              guestUsername: input.username,
+              eventId: input.eventId,
             },
           },
 
@@ -53,7 +57,7 @@ export const itemRouter = createTRPCRouter({
         ]),
       );
 
-      const items = eventArticles.map((ea) => {
+      const items: TrendingItem[] = eventArticles.map((ea) => {
         const totalContributionAmount = contributionMap.get(ea.id) ?? 0;
 
         let state: "none" | "external" | "contributing" = "none";
@@ -73,7 +77,6 @@ export const itemRouter = createTRPCRouter({
 
         return {
           id: ea.id,
-          itemId: ea.itemId,
           nume: ea.item?.name ?? "",
           pret: ea.item?.price?.toString() ?? "",
           state,
@@ -89,7 +92,26 @@ export const itemRouter = createTRPCRouter({
             (sum, c) => sum + Number(c.cashAmount),
             0,
           ),
+
+          //! new added
+          desc: ea.item.description,
+          note: ea.userNote,
+          priority: ea.priority ?? PriorityType.LOW,
         };
+      });
+
+      //! sorting
+      const priorityOrder: Record<PriorityType, number> = {
+        LOW: 1,
+        MEDIUM: 2,
+        HIGH: 3,
+      };
+
+      items.sort((a, b) => {
+        return (
+          priorityOrder[b.priority ?? PriorityType.LOW] -
+          priorityOrder[a.priority ?? PriorityType.LOW]
+        );
       });
 
       return items;

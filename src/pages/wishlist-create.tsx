@@ -5,6 +5,7 @@ import { api } from "~/trpc/react";
 
 import formatImage from "~/utils/formatImage";
 import type { EbayItem } from "~/models/EbayItem";
+import type { WishlistInputItem } from "~/models/WishlistInputItem";
 
 import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
@@ -16,13 +17,6 @@ import "./../styles/globals.css";
 
 type ItemCreateResponse = {
   itemId: number;
-};
-
-type WishlistInputItem = {
-  name: string;
-  photo: string;
-  price: string;
-  quantity: number;
 };
 
 export default function CreateWishlist() {
@@ -72,9 +66,10 @@ export default function CreateWishlist() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: item.name,
-          description: "", // optional
+          description: item.description,
           imagesUrl: item.photo,
           price: (item.price ?? "").split(" ")[0],
+          // todo retailer?
         }),
       });
 
@@ -85,6 +80,12 @@ export default function CreateWishlist() {
         throw new Error("Item creation failed. No ID returned.");
       }
 
+      const p = item.priority.valueOf();
+      let priority: "LOW" | "MEDIUM" | "HIGH";
+      if (1 === p) priority = "LOW";
+      else if (2 === p) priority = "MEDIUM";
+      else priority = "HIGH";
+
       // 2. Add to wishlist (EventArticle)
       for (let i = 0; i < item.quantity; i++) {
         await addItemToWishlist({
@@ -92,7 +93,8 @@ export default function CreateWishlist() {
           item: {
             itemId,
             quantity: 1, // single entry at a time
-            priority: "LOW",
+            priority: priority,
+            note: item.note,
           },
         });
       }
@@ -193,7 +195,7 @@ export default function CreateWishlist() {
               itemName={selectedItem.name}
               itemPhoto={selectedItem.photo}
               itemPrice={selectedItem.price}
-              itemDescription={selectedItem.description}
+              itemDescription={selectedItem.description ?? ""}
               onAddToWishlist={handleAddToWishlist}
             />
           )}

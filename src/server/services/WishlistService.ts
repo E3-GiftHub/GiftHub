@@ -77,13 +77,15 @@ export class WishlistService {
     eventId: number;
     itemId: number;
     quantityRequested: number;
-    priority?: PriorityType;
+    priority: PriorityType;
+    note: string;
   }): Promise<WishlistItemDTO> {
     const record = await prisma.eventArticle.create({
       data: {
         eventId: params.eventId,
         itemId: params.itemId,
-        priority: params.priority ?? PriorityType.LOW,
+        priority: params.priority,
+        userNote: params.note,
       },
     });
 
