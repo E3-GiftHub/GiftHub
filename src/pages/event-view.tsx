@@ -94,6 +94,7 @@ export default function EventView() {
   const [guests, setGuests] = useState<GuestHeader[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(true);
   useEffect(() => {
+    if (!username) return;
     (async () => {
       try {
         const res = await fetch(`./api/guest-list?eventId=${eventId}`);
@@ -151,13 +152,22 @@ export default function EventView() {
       }
     };
     f().catch((err) => {
-      console.error("Unexpected error in useEffect:", err);
+      console.error("Unexpected error in handleRemoveGuest():", err);
     });
   };
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest username:");
+    if (username === name) {
+      alert("you can not invite yourself");
+      return;
+    }
+
     const user = guests.find((g) => g.username === name);
+    if (user) {
+      alert("guest already invited");
+      return;
+    }
 
     // the user is not already a Guest in this Event
     if (user == null && name?.trim()) {
@@ -171,13 +181,13 @@ export default function EventView() {
             error: string;
           };
           console.log(apiStatus);
-          // Do NOT add to view here; guest appears after they accept invitation
+          if (apiStatus.error !== "No error") alert(apiStatus.error);
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
       };
       f().catch((err) => {
-        console.error("Unexpected error in useEffect:", err);
+        console.error("Unexpected error in handleAddGuest():", err);
       });
     }
   };
