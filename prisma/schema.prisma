@@ -322,26 +322,26 @@ model Mark {
 
 model UserReport {
     id                 Int      @id @default(autoincrement())
-    reportedByUsername String
+    reportedByUsername String   @default("DELETED_USER")
     reportedUsername   String
     reason             String?
     description        String?
     createdAt          DateTime @default(now())
 
-    userHell User @relation("reported", fields: [reportedUsername], references: [username])
-    userSane User @relation("reporter", fields: [reportedByUsername], references: [username])
+    userSane User @relation("reporter", fields: [reportedByUsername], references: [username], onDelete: SetDefault)
+    userHell User @relation("reported", fields: [reportedUsername], references: [username], onDelete: Restrict)
 }
 
 model EventReport {
     id                 Int      @id @default(autoincrement())
-    reportedByUsername String // NOT always a Guest
+    reportedByUsername String   @default("DELETED_USER") // NOT always a Guest
     reportedId         Int
     reason             String?
     description        String?
     createdAt          DateTime @default(now())
 
-    user  User  @relation(fields: [reportedByUsername], references: [username])
-    event Event @relation(fields: [reportedId], references: [id])
+    user  User  @relation(fields: [reportedByUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [reportedId], references: [id], onDelete: Restrict)
 }
 
 //! notifications
