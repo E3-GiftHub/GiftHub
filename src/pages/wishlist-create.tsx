@@ -2,25 +2,17 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import { api } from "~/trpc/react";
+
+import formatImage from "~/utils/formatImage";
+import type { EbayItem } from "~/models/EbayItem";
+
 import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
+import Termination from "~/components/Termination";
+
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import "./../styles/globals.css";
-import Termination from "~/components/Termination";
-
-interface EbayItem {
-  itemId: string;
-  title: string;
-  image?: {
-    imageUrl?: string;
-  };
-  price?: {
-    value?: string;
-    currency?: string;
-  };
-  shortDescription?: string;
-}
 
 type ItemCreateResponse = {
   itemId: number;
@@ -156,7 +148,7 @@ export default function CreateWishlist() {
                 <div key={item.itemId} className={styles.itemCard}>
                   <div className={styles.itemImage}>
                     <img
-                      src={item.image?.imageUrl}
+                      src={formatImage(item.image?.imageUrl, "/logo.png")}
                       alt={item.title}
                       style={{ width: "100%", height: "auto" }}
                     />
