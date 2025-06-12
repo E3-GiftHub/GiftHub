@@ -101,6 +101,7 @@ model User {
     emailToken      String? // NOT UNIQUE: only one null value allowed
     tokenExpires    DateTime?
     pictureUrl      String?   @default("/UserImages/default_pfp.svg")
+    pictureKey      String?
 
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
@@ -152,6 +153,7 @@ model Event {
     date        DateTime?
     time        DateTime?
     pictureUrl  String?   @default("/UserImages/default_pfp.svg")
+    pictureKey  String?
     token       String?
 
     createdByUsername String   @default("DELETED_USER")

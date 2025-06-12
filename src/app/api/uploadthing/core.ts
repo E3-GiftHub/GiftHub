@@ -1,6 +1,7 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { db as prisma } from "~/server/db";
+import { utapi } from "~/server/uploadthing";
 import { z } from "zod";
 
 export type OurFileRouter = {
@@ -76,10 +77,24 @@ export const ourFileRouter = {
       return { eventId: input.eventId };
     })
     .onUploadComplete(async ({ metadata, file }) => {
+      // delete old picture
+      const picture = await prisma.event.findUnique({
+        where: { id: metadata.eventId },
+        select: { pictureKey: true },
+      });
+
+      // do not throw, compatibility issues
+      if (!picture) console.log("UploadThingError: Event not found");
+      else {
+        const { pictureKey } = picture;
+        if (pictureKey) utapi.deleteFiles(pictureKey);
+      }
+
       await prisma.event.update({
         where: { id: metadata.eventId },
-        data: { pictureUrl: file.ufsUrl },
+        data: { pictureUrl: file.ufsUrl, pictureKey: file.key },
       });
+
       return { url: file.ufsUrl };
     }),
 
@@ -103,9 +118,22 @@ export const ourFileRouter = {
       return { username: input.username };
     })
     .onUploadComplete(async ({ metadata, file }) => {
+      // delete old picture
+      const picture = await prisma.user.findUnique({
+        where: { username: metadata.username },
+        select: { pictureKey: true },
+      });
+
+      // do not throw, compatibility issues
+      if (!picture) console.log("UploadThingError: User not found");
+      else {
+        const { pictureKey } = picture;
+        if (pictureKey) utapi.deleteFiles(pictureKey);
+      }
+
       await prisma.user.update({
         where: { username: metadata.username },
-        data: { pictureUrl: file.ufsUrl },
+        data: { pictureUrl: file.ufsUrl, pictureKey: file.key },
       });
       return { url: file.ufsUrl };
     }),
