@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import styles from "../styles/Button.module.css";
 import modalStyles from "../styles/ModalEventHome.module.css";
 
-import { PriorityTypeEnum } from "@/models/PriorityTypeEnum";
+import { PriorityTypeEnum } from "~/models/PriorityTypeEnum";
 
 interface AddToWishlistModalProps {
   isOpen: boolean;
