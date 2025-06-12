@@ -1,5 +1,4 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import { db as prisma } from "~/server/db";
 import { utapi } from "~/server/uploadthing";
 import { z } from "zod";
@@ -87,7 +86,7 @@ export const ourFileRouter = {
       if (!picture) console.log("UploadThingError: Event not found");
       else {
         const { pictureKey } = picture;
-        if (pictureKey) utapi.deleteFiles(pictureKey);
+        if (pictureKey) await utapi.deleteFiles(pictureKey);
       }
 
       await prisma.event.update({
@@ -128,7 +127,7 @@ export const ourFileRouter = {
       if (!picture) console.log("UploadThingError: User not found");
       else {
         const { pictureKey } = picture;
-        if (pictureKey) utapi.deleteFiles(pictureKey);
+        if (pictureKey) await utapi.deleteFiles(pictureKey);
       }
 
       await prisma.user.update({

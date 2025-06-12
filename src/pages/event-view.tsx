@@ -181,7 +181,9 @@ export default function EventView() {
             error: string;
           };
           console.log(apiStatus);
-          if (apiStatus.error !== "No error") alert(apiStatus.error);
+          if (apiStatus.error === "No error")
+            alert("Succeded to send the invite");
+          else alert(apiStatus.error);
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
