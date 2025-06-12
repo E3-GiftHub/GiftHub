@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import styles from "../styles/Button.module.css";
 import modalStyles from "../styles/ModalEventHome.module.css";
 
+import { PriorityTypeEnum } from "@/models/PriorityTypeEnum";
+
 interface AddToWishlistModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,6 +30,10 @@ export default function AddToWishlistModal({
   onAddToWishlist,
 }: Readonly<AddToWishlistModalProps>) {
   const [quantity, setQuantity] = useState(1);
+  const [priority, setPriority] = useState<PriorityTypeEnum>(
+    PriorityTypeEnum.LOW,
+  );
+  const [note, setNote] = useState("");
 
   if (!isOpen) return null;
 
@@ -59,7 +65,7 @@ export default function AddToWishlistModal({
                 {itemDescription}
               </p>
             )}
-            <div>
+            <div className={modalStyles.plannerInputs}>
               <label htmlFor="quantity" className={modalStyles.quantityLabel}>
                 Quantity:
               </label>

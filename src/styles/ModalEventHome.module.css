@@ -77,6 +77,20 @@
   resize: none;
 }
 
+.noteInput {
+  margin-left: 15px;
+
+  margin-right: 3.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+  background-color: #cbb1dc;
+  color: #1e1e1e;
+  font-size: 1rem;
+  resize: none;
+}
+
 @media (max-width: 600px) {
   .product {
     flex-direction: column;
@@ -88,4 +102,8 @@
     align-self: center;
     width: 50%;
   }
+}
+
+.plannerInputs {
+  display: grid;
 }
