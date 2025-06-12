@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "../styles/wishlistcomponent.module.css";
+import buttonStyles from "../styles/Button.module.css";
 import { api } from "~/trpc/react";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
 import NotInvited from "./notinvited";
@@ -267,6 +268,15 @@ const Wishlist: React.FC<WishlistProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.wishlistContainer}>
+        {/* go back */}
+        <button
+          className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+          onClick={router.back}
+        >
+          ← Back
+        </button>
+
+        {/* actual wishlist */}
         <h1 className={styles.title}>
           Wishlist View for {eventData?.title ?? eventId}
         </h1>

@@ -80,7 +80,7 @@ export default function AddToWishlistModal({
                 Cancel
               </button>
               <button
-                className={`${styles.button} ${styles["button-secondary"]}`}
+                className={`${styles.button} ${styles["button-primary"]}`}
                 onClick={handleAddToWishlist}
               >
                 Add to Wishlist

@@ -109,6 +109,14 @@ export default function CreateWishlist() {
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
+          {/* go back */}
+          <button
+            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+            onClick={router.back}
+          >
+            ← Back
+          </button>
+
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>
               Add Item to the Wishlist for Event {eventId}
