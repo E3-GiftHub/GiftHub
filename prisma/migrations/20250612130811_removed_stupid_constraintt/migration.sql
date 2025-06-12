@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Media" ALTER COLUMN "key" DROP DEFAULT;

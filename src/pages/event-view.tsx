@@ -406,7 +406,7 @@ export default function EventView() {
             <input
               type="text"
               placeholder="Enter caption"
-              className={styles.captionInput} // Optional: create styling if needed
+              className={styles.captionInput}
               value={captionInput}
               onChange={(e) => setCaptionInput(e.target.value)}
             />
@@ -414,7 +414,7 @@ export default function EventView() {
             <UploadButton
               endpoint="imageUploader"
               input={{
-                username: username, // or however you store the logged-in user
+                username: username,
                 eventId: eventId,
                 caption: captionInput,
               }}

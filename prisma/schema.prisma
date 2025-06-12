@@ -232,6 +232,7 @@ model Media {
     uploaderUsername String @default("DELETED_USER")
     eventId          Int
     url              String
+    key              String
 
     caption   String?
     mediaType String?

@@ -99,7 +99,6 @@ async function createUsers() {
   return users;
 }
 
-
 async function createRetailers() {
   const retailerNames = [
     "Emag",
@@ -503,6 +502,7 @@ async function createMedia(users: User[], events: Event[]) {
           mediaType,
           fileType,
           fileSize: 1000000 + Math.floor(Math.random() * 5000000),
+          key: "",
         },
       });
 

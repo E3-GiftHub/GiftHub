@@ -115,6 +115,7 @@ TABLE Media {
   uploaderUsername STRING [ref: > User.username]
   eventId INTEGER [ref: > Event.id] // Directly linked to the event
   url STRING
+  key STRING // uploadthing specific
 
   caption STRING
   mediaType STRING

@@ -46,8 +46,9 @@ export const ourFileRouter = {
         data: {
           uploaderUsername: metadata.username,
           eventId: metadata.eventId,
-          url: file.ufsUrl,
           caption: metadata.caption,
+          url: file.ufsUrl,
+          key: file.key,
           mediaType: "image",
           fileType: file.type,
           fileSize: file.size,
@@ -56,7 +57,7 @@ export const ourFileRouter = {
       return { url: file.ufsUrl };
     }),
 
-  eventPfpUploader: f({ image: { maxFileSize: "32MB", maxFileCount: 1 } })
+  eventPfpUploader: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
     .input(z.object({ username: z.string(), eventId: z.number() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
@@ -83,7 +84,7 @@ export const ourFileRouter = {
     }),
 
   // pass to this the username from the session! the same is assumed above
-  profilePfpUploader: f({ image: { maxFileSize: "32MB", maxFileCount: 1 } })
+  profilePfpUploader: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
     .input(z.object({ username: z.string() }))
     .middleware(async ({ input }) => {
       if (!input.username || "" === input.username) {
