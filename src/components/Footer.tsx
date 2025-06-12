@@ -64,15 +64,15 @@ const Footer = () => {
       <hr className={styles.divider} />
 
       <div className={styles.bottomRow}>
-        <Link href="/privacy" className={styles.link}>
+        <Link href="/disclosure-privacy" className={styles.link}>
           Privacy Policy
         </Link>
         <div className={styles.separator}></div>
-        <Link href="/terms" className={styles.link}>
+        <Link href="/disclosure-terms" className={styles.link}>
           Terms and Conditions
         </Link>
         <div className={styles.separator}></div>
-        <Link href="/about" className={styles.link}>
+        <Link href="/disclosure-about" className={styles.link}>
           About us
         </Link>
         <div className={styles.separator}></div>
