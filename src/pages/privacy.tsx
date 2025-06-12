@@ -1,8 +1,11 @@
 import React from "react";
-import "./../styles/globals.css";
-import styles from "../styles/AboutPage.module.css";
-import Link from "next/link";
+
+import "~/styles/globals.css";
+import styles from "~/styles/AboutPage.module.css";
+import buttonStyles from "~/styles/Button.module.css";
+
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 const PrivacyPolicyPage: React.FC = () => {
   const contactEmail = "contact@gifthub.eu";
@@ -375,7 +378,15 @@ const PrivacyPolicyPage: React.FC = () => {
         </div>
 
         <footer className={styles.footerNote}>
-          © 2025 GiftHub — Built with passion by Group E3 💜
+          <Link
+            href="/home#"
+            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+            style={{ textDecoration: "none" }}
+          >
+            Home
+          </Link>
+
+          <p>© 2025 GiftHub — Built with passion by Group E3 💜</p>
         </footer>
       </div>
     </div>
