@@ -430,10 +430,10 @@ export default function EventView() {
                 eventId: eventId,
                 caption: captionInput,
               }}
+              onUploadProgress={() => setShowUploadModal(false)}
               onClientUploadComplete={(res) => {
                 console.log("Files:", res);
                 alert("Upload completed");
-                setShowUploadModal(false);
               }}
               onUploadError={(err: Error) => {
                 alert(`Error: ${err.message}`);

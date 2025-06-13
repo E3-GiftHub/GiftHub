@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import { api } from "~/trpc/react";
+import { utapi } from "~/server/uploadthing";
 
 import formatImage from "~/utils/formatImage";
 import type { EbayItem } from "~/models/EbayItem";
@@ -102,6 +103,21 @@ export default function CreateWishlist() {
     }
   };
 
+  const closeCustom = async (key: string | null) => {
+    setIsCustomOpen(false);
+    if (!key || "" === key) return;
+
+    try {
+      await fetch("/api/cancel-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: key }),
+      });
+    } catch (err) {
+      console.error("❌ Failed to cancel upload", err);
+    }
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Navbar />
@@ -126,7 +142,7 @@ export default function CreateWishlist() {
           {isCustomOpen && (
             <CustomWishlistModal
               onAddToWishlist={handleAddToWishlist}
-              onClose={() => setIsCustomOpen(false)}
+              onClose={closeCustom}
             />
           )}
 

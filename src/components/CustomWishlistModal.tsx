@@ -10,7 +10,7 @@ import type { WishlistInputItem } from "~/models/WishlistInputItem";
 
 interface CustomWishlistModalProps {
   onAddToWishlist: (item: WishlistInputItem) => void;
-  onClose: () => void;
+  onClose: (key: string | null) => void;
 }
 
 export default function CustomWishlistModal({
@@ -40,7 +40,7 @@ export default function CustomWishlistModal({
       note: note,
       retailer: null,
     });
-    onClose();
+    onClose(null);
   };
 
   const onUploadComplete = (res: { url: string; key: string }[]) => {
@@ -163,7 +163,7 @@ export default function CustomWishlistModal({
             <div className={modalStyles.modalButtons}>
               <button
                 className={`${styles.button} ${styles["button-secondary"]}`}
-                onClick={onClose}
+                onClick={() => onClose(key)}
               >
                 Cancel
               </button>
