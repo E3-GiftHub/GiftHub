@@ -9,6 +9,7 @@ import type { WishlistInputItem } from "~/models/WishlistInputItem";
 
 import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
+import CustomWishlistModal from "../components/CustomWishlistModal";
 import Termination from "~/components/Termination";
 
 import styles from "../styles/WishlistPage.module.css";
@@ -31,6 +32,7 @@ export default function CreateWishlist() {
     { enabled: debouncedSearchTerm.length > 1 },
   );
 
+  const [isCustomOpen, setIsCustomOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     name: string;
@@ -64,13 +66,7 @@ export default function CreateWishlist() {
       const itemResponse = await fetch("/api/item-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: item.name,
-          description: item.description,
-          imagesUrl: item.photo,
-          price: (item.price ?? "").split(" ")[0],
-          // todo retailer?
-        }),
+        body: JSON.stringify(item),
       });
 
       const result = (await itemResponse.json()) as ItemCreateResponse;
@@ -118,6 +114,21 @@ export default function CreateWishlist() {
           >
             ← Back
           </button>
+
+          {/* create custom article */}
+          <button
+            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+            onClick={() => setIsCustomOpen(true)}
+          >
+            Create custom article
+          </button>
+
+          {isCustomOpen && (
+            <CustomWishlistModal
+              onAddToWishlist={handleAddToWishlist}
+              onClose={() => setIsCustomOpen(false)}
+            />
+          )}
 
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>

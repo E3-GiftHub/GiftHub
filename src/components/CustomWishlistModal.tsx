@@ -1,76 +1,123 @@
-"use client";
 import React, { useState } from "react";
-import styles from "../styles/Button.module.css";
-import modalStyles from "../styles/ModalEventHome.module.css";
+import { UploadButton } from "~/utils/uploadthing";
+
+import styles from "~/styles/Button.module.css";
+import modalStyles from "~/styles/ModalCustomItem.module.css";
 
 // typescript compliant, not prisma!
 import { PriorityTypeEnum } from "~/models/PriorityTypeEnum";
 import type { WishlistInputItem } from "~/models/WishlistInputItem";
 
-const EBAY_ID = 1;
-
-interface AddToWishlistModalProps {
-  isOpen: boolean;
-  itemName: string;
-  itemPhoto: string;
-  itemPrice: string;
-  itemDescription: string;
+interface CustomWishlistModalProps {
   onAddToWishlist: (item: WishlistInputItem) => void;
   onClose: () => void;
 }
 
-export default function AddToWishlistModal({
-  isOpen,
-  itemName,
-  itemPhoto,
-  itemPrice,
-  itemDescription,
+export default function CustomWishlistModal({
   onAddToWishlist,
   onClose,
-}: Readonly<AddToWishlistModalProps>) {
+}: Readonly<CustomWishlistModalProps>) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [photo, setPhoto] = useState<string>("/UserImages/default_pfp.svg");
+  const [key, setKey] = useState<string>("");
+  const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [priority, setPriority] = useState<PriorityTypeEnum>(
     PriorityTypeEnum.LOW,
   );
   const [note, setNote] = useState("");
 
-  if (!isOpen) return null;
-
   const handleAddToWishlist = () => {
     onAddToWishlist({
-      name: itemName,
-      description: itemDescription,
-      photo: itemPhoto,
-      key: null,
-      price: itemPrice,
+      name: name,
+      description: description,
+      photo: photo,
+      key: key,
+      price: price,
       quantity: quantity,
       priority: priority,
       note: note,
-      retailer: EBAY_ID,
+      retailer: null,
     });
+    onClose();
+  };
+
+  const onUploadComplete = (res: { url: string; key: string }[]) => {
+    const result = res[0]!;
+    if (!result || "" === result.url || "" === result.key)
+      alert("Upload failed");
+
+    setPhoto(result.url);
+    setKey(result.key);
+    alert("Upload complete");
+  };
+
+  const onUploadError = (error: Error) => {
+    console.error(error);
+    alert("Upload error");
   };
 
   return (
     <div className={modalStyles.modalOverlay}>
       <div className={modalStyles.modalContent}>
-        <h2 className={modalStyles.modalTitleAdd}>Add to Wishlist</h2>
+        <h2 className={modalStyles.modalTitleAdd}>
+          Add custom article to Wishlist
+        </h2>
+
+        {/** IMAGE */}
         <div className={modalStyles.product}>
-          <img
-            src={itemPhoto}
-            alt={itemName}
-            className={modalStyles.modalImage}
-          />
+          <div className={modalStyles.leftside}>
+            <div className={modalStyles.wrapperUploadButton}>
+              <img src={photo} alt={name} className={modalStyles.modalImage} />
+            </div>
+            <div className={modalStyles.wrapperUploadButton}>
+              <UploadButton
+                className={modalStyles.customUploadButton}
+                endpoint="articlePfpUploader"
+                input={{ key: key }}
+                onClientUploadComplete={onUploadComplete}
+                onUploadError={onUploadError}
+              />
+            </div>
+          </div>
 
+          {/** PLANNER INPUT */}
           <div className={modalStyles.productInfo}>
-            <h3 className={modalStyles.modalItemName}>{itemName}</h3>
-            <p className={modalStyles.modalItemPrice}>{itemPrice}</p>
-            {itemDescription && (
-              <p className={modalStyles.modalItemDescription}>
-                {itemDescription}
-              </p>
-            )}
-
             <div className={modalStyles.plannerInputs}>
+              <label htmlFor="name" className={modalStyles.nameLabel}>
+                Add the name:
+              </label>
+              <input
+                type="string"
+                id="name"
+                value={name}
+                onChange={(e) => setName(String(e.target.value))}
+                className={modalStyles.noteInput}
+              />
+
+              <label htmlFor="desc" className={modalStyles.descLabel}>
+                Add the description of the article:
+              </label>
+              <input
+                type="string"
+                id="desc"
+                value={description}
+                onChange={(e) => setDescription(String(e.target.value))}
+                className={modalStyles.noteInput}
+              />
+
+              <label htmlFor="price" className={modalStyles.priceLabel}>
+                Price:
+              </label>
+              <input
+                type="string"
+                id="price"
+                value={price}
+                onChange={(e) => setPrice(String(e.target.value))}
+                className={modalStyles.noteInput}
+              />
+
               <label htmlFor="note" className={modalStyles.noteLabel}>
                 Add a note for your guests:
               </label>

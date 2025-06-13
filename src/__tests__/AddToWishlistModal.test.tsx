@@ -65,8 +65,10 @@ describe("AddToWishlistModal", () => {
       note: "",
       photo: "/test.jpg",
       price: "$19.99",
+      key: null,
       quantity: 3,
       priority: 1,
+      retailer: 1,
     });
   });
 });

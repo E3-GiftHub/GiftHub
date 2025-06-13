@@ -16,13 +16,17 @@ export type OurFileRouter = {
     input: { username: string };
     output: { url: string };
   };
+  articlePfpUploader: {
+    input: { key: string }; // old key
+    output: { url: string; key: string };
+  };
 };
 
 const f = createUploadthing<OurFileRouter>();
 
 //! client ensures auth
 export const ourFileRouter = {
-  imageUploader: f({ image: { maxFileSize: "32MB", maxFileCount: 1 } })
+  imageUploader: f({ image: { maxFileSize: "32MB", maxFileCount: 5 } })
     .input(
       z.object({
         username: z.string(),
@@ -135,5 +139,26 @@ export const ourFileRouter = {
         data: { pictureUrl: file.ufsUrl, pictureKey: file.key },
       });
       return { url: file.ufsUrl };
+    }),
+
+  // no database manipulation here, see CustomWishlistModal.tsx
+  articlePfpUploader: f({
+    image: { maxFileSize: "4MB", maxFileCount: 1 },
+  })
+    .input(z.object({ key: z.string() }))
+    .middleware(async ({ input }) => {
+      if (!input.key || "" === input.key) {
+        console.log("warning - articlePfpUploader: key is null");
+        return input;
+      }
+
+      const res = await utapi.deleteFiles(input.key);
+      if (false === res.success)
+        console.log("warning - articlePfpUploader: invalid key");
+
+      return input;
+    })
+    .onUploadComplete(async ({ file }) => {
+      return { url: file.ufsUrl, key: file.key };
     }),
 } satisfies FileRouter;

@@ -97,8 +97,8 @@ const Wishlist: React.FC<WishlistProps> = ({
   const isInvited = useMemo((): boolean => {
     if (!username || !eventPlanner) return false;
 
-    if (eventPlanner) return username === eventPlanner.createdByUsername;
-    return invitationData?.status === "ACCEPTED";
+    if (invitationData?.status === "ACCEPTED") return true;
+    return username === eventPlanner.createdByUsername;
   }, [invitationData, username, eventPlanner]); // Added eventPlanner dependency
 
   // Memoize loading state calculation
