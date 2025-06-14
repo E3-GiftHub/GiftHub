@@ -4,6 +4,7 @@ import { db } from "~/server/db";
 import { TRPCError } from "@trpc/server";
 import type { TrendingItem } from "@/models/WishlistEventGuest";
 import { PriorityType } from "@prisma/client";
+import { utapi } from "@/server/uploadthing";
 
 //! changed a lot here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 export const itemRouter = createTRPCRouter({
@@ -135,6 +136,7 @@ export const itemRouter = createTRPCRouter({
           id: input.itemId,
           eventId: input.eventId,
         },
+        include: { item: true },
       });
 
       if (!eventArticle) {
@@ -166,8 +168,16 @@ export const itemRouter = createTRPCRouter({
         };
       }
 
+      // custom item
+      if (eventArticle.item.imagesKey)
+        await utapi.deleteFiles(eventArticle.item.imagesKey);
+
+      const CorrectItemId = eventArticle.item.id;
       await ctx.db.eventArticle.delete({
         where: { id: eventArticle.id },
+      });
+      await ctx.db.item.delete({
+        where: { id: CorrectItemId },
       });
 
       return {
