@@ -97,7 +97,7 @@ export const itemRouter = createTRPCRouter({
           //! new added
           desc: ea.item.description,
           note: ea.userNote,
-          priority: ea.priority ?? PriorityType.LOW,
+          priority: ea.priority,
         };
       });
 

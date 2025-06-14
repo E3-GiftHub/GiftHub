@@ -4,10 +4,9 @@
  * @param input - The input string potentially containing currency symbols or codes.
  * @returns A cleaned decimal string (e.g., "1234.56")
  */
-export function stripCurrency(input: string): string {
-  if (typeof input !== "string") {
-    throw new TypeError("Input must be a string.");
-  }
+export function stripCurrency(input: string | null): string | null {
+  if (null === input) return null;
+  if (typeof input !== "string") throw new TypeError("Input must be a string.");
 
   const currencyPatterns = [
     /\$/g, // Dollar symbol

@@ -328,7 +328,7 @@ export default function EventView() {
     }));
   };
 
-  const onConfirm = () => {
+  const onConfirmDeleteEvent = () => {
     void (async () => {
       try {
         const res = await deleteEventMutation.mutateAsync({
@@ -395,7 +395,7 @@ export default function EventView() {
 
       {showDeleteModal && (
         <DeleteEventModal
-          onConfirm={onConfirm}
+          onConfirm={onConfirmDeleteEvent}
           onCancel={() => setShowDeleteModal(false)}
         />
       )}
