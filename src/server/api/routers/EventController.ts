@@ -4,6 +4,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { EventPlanner } from "~/server/services/EventPlanner";
 import { StatusType } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { utapi } from "@/server/uploadthing";
 const eventPlanner = new EventPlanner();
 
 const handle = async <T>(fn: () => Promise<T>) => {
@@ -108,6 +109,38 @@ export const eventPlannerRouter = createTRPCRouter({
           message:
             "Cannot delete event: items are purchased or contributed to.",
         };
+      }
+
+      // all good now delete pfp, media, articles
+      if (event.pictureKey) await utapi.deleteFiles(event.pictureKey);
+
+      const media = await prisma.media.findMany({
+        where: { eventId: event.id },
+        select: { key: true },
+      });
+
+      // only uploadthing deletion because we have cascade constraints
+      for (let i = 0; i < media.length; i++) {
+        const photo = media[i];
+        if (!photo || !photo.key) continue;
+        await utapi.deleteFiles(photo.key);
+      }
+
+      // manually delete custom items created
+      const customs = await prisma.eventArticle.findMany({
+        where: { eventId: event.id },
+        include: {
+          item: { select: { id: true, imagesKey: true } },
+        },
+      });
+
+      // only if imagesKey is NOT NULL => custom item => delete it
+      for (let i = 0; i < customs.length; i++) {
+        const art = customs[i];
+        if (!art || !art.item || !art.item.imagesKey) continue;
+        await prisma.eventArticle.delete({ where: { id: art.id } });
+        await utapi.deleteFiles(art.item.imagesKey);
+        await prisma.item.delete({ where: { id: art.item.id } });
       }
 
       await prisma.event.delete({
