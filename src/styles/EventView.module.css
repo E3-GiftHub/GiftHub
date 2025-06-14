@@ -43,13 +43,11 @@
   gap: 1.5rem;
 }
 
-
 @media (min-width: 1024px) {
   .mainGrid {
     grid-template-columns: 2fr 1fr;
     align-items: stretch;
   }
-
 }
 
 .leftColumn {
@@ -108,7 +106,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
+  transition:
+    transform 0.1s ease,
+    background 0.2s;
   width: 100%;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .guestCard {
-   height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.1);
@@ -193,7 +193,6 @@
   border-radius: 1rem;
   padding: 1.5rem;
 }
-
 
 .plannerTitleSection {
   display: flex;
@@ -227,12 +226,12 @@
   background: linear-gradient(90deg, #9333ea 0%, #4f46e5 100%);
   cursor: pointer;
   transition: box-shadow ease 0.5s;
-  width: 100%; 
+  width: 100%;
   box-sizing: border-box;
 }
 
 .plannerCard:hover {
-  box-shadow: 0 0 15px rgba(255,255,255, 0.2);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .plannerImage {
@@ -276,7 +275,7 @@
   border-radius: 0.5rem;
   margin-bottom: 0.5rem;
   transition: all 0.2s;
-  width: 100%; 
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -316,7 +315,9 @@
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
+  transition:
+    transform 0.1s ease,
+    background 0.2s;
   width: 100%;
 }
 
@@ -342,7 +343,9 @@
   border-radius: 0.75rem;
   border: none;
   cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
+  transition:
+    transform 0.1s ease,
+    background 0.2s;
   width: 100%;
 }
 
@@ -545,12 +548,12 @@
   padding: 0.75rem 1rem;
   margin: 0;
   border-radius: 0.75rem;
-  background: linear-gradient(135deg, #a45eeB, #6b1ed9);
+  background: linear-gradient(135deg, #a45eeb, #6b1ed9);
   border: none;
   color: #fff;
   font-size: 1rem;
   outline: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .captionInput::placeholder {
@@ -576,8 +579,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .uploadingText {
@@ -614,7 +621,9 @@
   border-radius: 0.75rem;
   box-shadow: 0 0 12px rgba(208, 195, 254, 0.6);
   cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
+  transition:
+    transform 0.1s ease,
+    background 0.2s;
 }
 .fileInputWrapper > label:hover {
   transform: scale(1.02);
@@ -624,7 +633,6 @@
 .fileInputWrapper > div[data-element="allowed-content"] {
   display: none;
 }
-
 
 .uploadActions {
   display: flex;

@@ -1,33 +1,25 @@
 import { db } from "~/server/db";
+import { stripCurrency } from "~/utils/stripCurrency";
 import type { NextApiRequest, NextApiResponse } from "next";
+import type { WishlistInputItem } from "~/models/WishlistInputItem";
 
-
-// 1. Define a type for incoming data
-interface ItemRequestBody {
-  id?: number;
-  name: string;
-  description?: string;
-  imagesUrl?: string;
-  price?: number;
-}
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 2. Safely cast the body to the defined type
-  const body = req.body as ItemRequestBody;
-
-  const { name, description, imagesUrl, price } = body;
+  const body = req.body as WishlistInputItem;
+  const { name, description, photo, key, price, retailer } = body;
 
   try {
-    // 3. Check for existing item
     const existingItem = await db.item.findFirst({
       where: {
-        name,
-        price,
-        description,
+        name: name,
+        description: description,
+        imagesUrl: photo,
       },
     });
 
@@ -36,13 +28,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json({ itemId: existingItem.id });
     }
 
-    // 4. Create new item
     const newItem = await db.item.create({
       data: {
-        name,
-        description,
-        imagesUrl,
-        price,
+        name: name,
+        description: description,
+        imagesUrl: photo,
+        imagesKey: key,
+        price: stripCurrency(price),
+        retailerId: retailer,
       },
     });
 

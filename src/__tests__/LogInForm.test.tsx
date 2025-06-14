@@ -1,13 +1,10 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import LogInForm from "~/components/ui/Account/LogInForm";
-import { act } from "react";
-import { signIn } from "next-auth/react";
 
 // LoginForm.test.tsx
 const mockPush = jest.fn();
-const mockSignIn = jest.fn();
 
 jest.mock("next-auth/react", () => ({
   // signIn: (...args: unknown[]) => mockSignIn(...args),

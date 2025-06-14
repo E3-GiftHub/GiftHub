@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import styles from "../styles/wishlistcomponent.module.css";
 import { api } from "~/trpc/react";
-import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
-import NotInvited from "./notinvited";
 import { useRouter } from "next/router";
+import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
+
+import styles from "../styles/wishlistcomponent.module.css";
+import buttonStyles from "../styles/Button.module.css";
+
+import NotInvited from "./notinvited";
 
 const getItemImage = (item: TrendingItem) => {
   const productImages = [
@@ -91,15 +94,11 @@ const Wishlist: React.FC<WishlistProps> = ({
   });
 
   // Memoize invitation status calculation - FIXED dependency
-  const isInvited = useMemo(() => {
-    if (!username || !eventPlanner) return null;
+  const isInvited = useMemo((): boolean => {
+    if (!username || !eventPlanner) return false;
 
-    if (invitationData) {
-      return invitationData.status === "ACCEPTED";
-    } else if (invitationData === null) {
-      return username === eventPlanner.createdByUsername;
-    }
-    return null;
+    if (invitationData?.status === "ACCEPTED") return true;
+    return username === eventPlanner.createdByUsername;
   }, [invitationData, username, eventPlanner]); // Added eventPlanner dependency
 
   // Memoize loading state calculation
@@ -112,8 +111,7 @@ const Wishlist: React.FC<WishlistProps> = ({
       isEventLoading ||
       isPlannerLoading ||
       isInvitationLoading ||
-      isItemsLoading ||
-      isInvited === null
+      isItemsLoading
     );
   }, [
     router.isReady,
@@ -124,7 +122,6 @@ const Wishlist: React.FC<WishlistProps> = ({
     isPlannerLoading,
     isInvitationLoading,
     isItemsLoading,
-    isInvited,
   ]);
 
   // Memoize button class calculation
@@ -267,6 +264,15 @@ const Wishlist: React.FC<WishlistProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.wishlistContainer}>
+        {/* go back */}
+        <button
+          className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+          onClick={router.back}
+        >
+          ← Back
+        </button>
+
+        {/* actual wishlist */}
         <h1 className={styles.title}>
           Wishlist View for {eventData?.title ?? eventId}
         </h1>
@@ -317,10 +323,8 @@ const Wishlist: React.FC<WishlistProps> = ({
                     </div>
                   )}
                 </div>
-                <div className={styles.itemDetails}>
-                  <span className={styles.itemName}>{item.nume}</span>
-                  <span className={styles.itemPrice}>{item.pret}</span>
-                </div>
+
+                {/* buttons */}
                 <div className={styles.buttonsContainer}>
                   <div className={styles.actionButtonsRow}>
                     <button
@@ -346,6 +350,17 @@ const Wishlist: React.FC<WishlistProps> = ({
                       {getButtonText(item, "external")}
                     </button>
                   </div>
+                </div>
+
+                {/* data */}
+                <div className={styles.itemDetails}>
+                  <span className={styles.itemName}>{item.nume}</span>
+                  <div className={styles.itemDetailsEz}>
+                    <span className={styles.itemPrice}>{item.pret}</span>
+                    <span className={styles.itemPriority}>{item.priority}</span>
+                  </div>
+                  <span className={styles.itemDescription}>{item.desc}</span>
+                  <span className={styles.itemNote}>{item.note}</span>
                 </div>
               </div>
             ))}

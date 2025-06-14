@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { utapi } from "@/server/uploadthing";
 
 export const mediaRouter = createTRPCRouter({
   getMediaByEvent: publicProcedure
@@ -21,6 +22,23 @@ export const mediaRouter = createTRPCRouter({
     .input(z.object({ mediaId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
+        const media = await ctx.db.media.findUnique({
+          where: { id: input.mediaId },
+          select: { key: true },
+        });
+
+        if (!media) return { success: false, message: "Media not found." };
+
+        // first delete on their server
+        const { key } = media;
+        const result = await utapi.deleteFiles(key);
+        if (!result.success)
+          return {
+            success: false,
+            message: "Media can not be removed from uploadthing.",
+          };
+
+        // second delete on ours
         await ctx.db.media.delete({
           where: { id: input.mediaId },
         });

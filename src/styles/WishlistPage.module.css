@@ -21,6 +21,10 @@
   padding: 0;
 }
 
+.main button {
+  margin: 0.5rem;
+}
+
 .titleContainer {
   background-color: #4a3f8c;
   padding: clamp(1rem, 3vw, 2rem);
@@ -78,7 +82,7 @@
   font-family: "Poppins", sans-serif;
 }
 
-.searchLabel{
+.searchLabel {
   justify-self: center;
 }
 

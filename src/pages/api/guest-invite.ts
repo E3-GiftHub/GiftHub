@@ -18,7 +18,8 @@ export default async function handler(
     select: { username: true },
   });
 
-  if (user === null) return res.status(404).json({ error: "Missing User" });
+  if (user === null)
+    return res.status(404).json({ error: "No User found with this username" });
 
   // user exists
   await prisma.invitation.create({

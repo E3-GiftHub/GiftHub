@@ -247,13 +247,53 @@
 }
 
 .itemDetails {
-  display: flex;
+  display: grid;
   justify-content: space-between;
   margin-bottom: 0.25rem;
   padding: 0 0.25rem;
 }
 
+/* flexing the price and priority */
+.itemDetailsEz {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 0.25rem;
+  padding: 0 0.25rem;
+}
+
+.itemPriority,
+.itemPrice {
+  color: a5b4fc;
+}
+
+.itemNote {
+  border-radius: 0.3rem;
+  text-align: center;
+  border: none;
+  background-color: #a5b4fc;
+}
+
+.itemName {
+  margin: 0.5rem;
+  border-radius: 0.3rem;
+  text-align: center;
+  border: none;
+  background-color: #a5b4fc;
+}
+
+.itemDescription {
+  margin: 0.3rem;
+  border-radius: 0.3rem;
+  font-size: 0.5rem;
+  color: aliceblue;
+  border: none;
+  background-color: #a5b4fc;
+}
+
 .itemName,
+.itemNote,
+.itemPriority,
 .itemPrice {
   font-size: 0.75rem;
 }
