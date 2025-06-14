@@ -120,9 +120,8 @@ export const eventPlannerRouter = createTRPCRouter({
       });
 
       // only uploadthing deletion because we have cascade constraints
-      for (let i = 0; i < media.length; i++) {
-        const photo = media[i];
-        if (!photo || !photo.key) continue;
+      for (const photo of media) {
+        if (!photo?.key) continue;
         await utapi.deleteFiles(photo.key);
       }
 
@@ -135,9 +134,8 @@ export const eventPlannerRouter = createTRPCRouter({
       });
 
       // only if imagesKey is NOT NULL => custom item => delete it
-      for (let i = 0; i < customs.length; i++) {
-        const art = customs[i];
-        if (!art || !art.item || !art.item.imagesKey) continue;
+      for (const art of customs) {
+        if (!art?.item?.imagesKey) continue;
         await prisma.eventArticle.delete({ where: { id: art.id } });
         await utapi.deleteFiles(art.item.imagesKey);
         await prisma.item.delete({ where: { id: art.item.id } });
