@@ -15,6 +15,7 @@ import Termination from "~/components/Termination";
 
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import "./../styles/globals.css";
 
 type ItemCreateResponse = {
@@ -172,7 +173,11 @@ export default function CreateWishlist() {
           </div>
 
           {/* Search Results */}
-          {isLoading && <p className={styles.searchLabel}>Searching...</p>}
+          {isLoading && (
+            <div className={loadingStyles.loadingContainer}>
+              <div className={loadingStyles.spinner}></div>
+            </div>
+          )}
           {!isLoading &&
             debouncedSearchTerm.length > 1 &&
             searchResults.length === 0 && (

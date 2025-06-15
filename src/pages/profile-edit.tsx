@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import styles from "~/styles/UserProfile/UserProfile.module.css";
+import loadingStyles from "~/styles/wishlistcomponent.module.css";
 import Navbar from "~/components/Navbar";
 import EditUserProfileUI from "~/components/ui/UserProfile/EditUserProfileUI";
 import { api } from "~/trpc/react";
@@ -63,7 +64,9 @@ export default function EditUserProfile() {
     return (
       <div className={styles["landing-page"]}>
         <Navbar />
-        <p>Loading user data...</p>
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner}></div>
+        </div>
       </div>
     );
   }

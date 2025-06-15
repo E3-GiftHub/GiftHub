@@ -6,6 +6,7 @@ import {
 import ContainerEventTitle from "~/components/ui/ContainerEventTitle";
 import { ContainerEventRow } from "~/components/ui/ContainerEventRow";
 import styles from "~/styles/HomePageStyle.module.css";
+import loadingStyles from "~/styles/wishlistcomponent.module.css";
 import { ButtonComponent, ButtonStyle } from "~/components/ui/ButtonComponent";
 import React from "react";
 import { api } from "~/trpc/react";
@@ -27,7 +28,13 @@ const MyEventsSection: React.FC = () => {
   } = api.eventPreview.getUpcomingEvents.useQuery();
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <Container borderStyle={ContainerBorderStyle.TOP}>
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner}></div>
+        </div>
+      </Container>
+    );
   }
 
   if (isError) {
