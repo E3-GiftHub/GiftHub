@@ -38,6 +38,25 @@ export default tseslint.config(
       ],
     },
   },
+  
+  {
+    // for ignoring some .tests errors when building
+    files: ["**/*.test.ts", "**/*.test.tsx", "src/__tests__/**/*"],
+    rules: {
+      "@typescript-eslint/unbound-method": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      // allow unused vars in tests (for mock setups, etc.)
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^(mock|Mock)"
+      }],
+      // allow any type in tests for mocking purposes
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,

@@ -328,6 +328,14 @@ export const itemRouter = createTRPCRouter({
               currency: "RON", // todo delete this hardcode
             },
           });
+
+          // Send email notification to event owner about the contribution
+          const { notifyEventOwnerOfPurchase } = await import("@/server/api/routers/inboxEmailNotifier");
+          await notifyEventOwnerOfPurchase(
+            input.eventId,
+            input.username,
+            articleData.item.name ?? "an item"
+          );
         }
         return { success: true };
       } catch (error) {

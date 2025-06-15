@@ -71,6 +71,19 @@ export const invitationsRouter = createTRPCRouter({
           message: "Invitation not found",
         });
       }
+
+      // sends email notification to event owner about invitation acceptance
+      try {
+        const { notifyEventOwnerOfInvitationResponse } = await import("@/server/api/routers/inboxEmailNotifier");
+        await notifyEventOwnerOfInvitationResponse(
+          input.eventId,
+          input.guestUsername,
+          "ACCEPTED"
+        );
+      } catch (emailError) {
+        console.error("Failed to send acceptance notification email:", emailError);
+      }
+
       return { success: true };
     }),
 
@@ -111,6 +124,18 @@ declineInvitation: publicProcedure
           id: invitation.id,
         },
       });
+
+      // sends email notification to event owner about invitation decline
+      try {
+        const { notifyEventOwnerOfInvitationResponse } = await import("@/server/api/routers/inboxEmailNotifier");
+        await notifyEventOwnerOfInvitationResponse(
+          input.eventId,
+          input.guestUsername,
+          "DECLINED"
+        );
+      } catch (emailError) {
+        console.error("Failed to send decline notification email:", emailError);
+      }
 
       return { 
         success: true, 

@@ -160,6 +160,27 @@ export default async function handler(
               currency: "ron",
             },
           });
+
+          // sends email notification to event owner about the contribution
+          if (eventId && eventArticleId) {
+            const { notifyEventOwnerOfContribution } = await import("@/server/api/routers/inboxEmailNotifier");
+            
+            // gets the item name for the notification
+            const eventArticle = await prisma.eventArticle.findUnique({
+              where: { id: eventArticleId },
+              include: { item: { select: { name: true } } },
+            });
+
+            if (eventArticle?.item?.name) {
+              await notifyEventOwnerOfContribution(
+                eventId,
+                purchaserUsername,
+                eventArticle.item.name,
+                amountRON,
+                "RON"
+              );
+            }
+          }
         } catch (dbErr) {
           console.error("Prisma error creating Contribution:", dbErr);
         }
