@@ -214,13 +214,8 @@ export default function CheckoutPage() {
   }
 
   // Decide which image URL to use:
-  // const imgSrc = details.imageUrl ?? "/cake.png";
-  const imgSrc =
-    details.imageUrl &&
-      (details.imageUrl.startsWith("http://") ||
-        details.imageUrl.startsWith("https://"))
-      ? details.imageUrl
-      : "/cake.png";
+  // - Otherwise, default to "/cake.png"
+  const imgSrc = details.imageUrl ?? "/cake.png";
 
   return (
     <div className={styles.container}>
