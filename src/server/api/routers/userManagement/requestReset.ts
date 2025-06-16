@@ -29,11 +29,11 @@ export const requestResetRouter = createTRPCRouter({
         },
       });
 
-      const resetLink = `https://gifthub-five.vercel.app/password-reset?token=${token}`;
+      const resetLink = `${EMAIL_CONFIG.APP_URL}/password-reset?token=${token}`;
       console.log("Generated reset link:", resetLink);
 
-      const logoUrl = 'https://gifthub-five.vercel.app/logo.png';
-      const appUrl = 'https://gifthub-five.vercel.app';
+      const logoUrl = `${EMAIL_CONFIG.APP_URL}/logo.png`;
+      const appUrl = EMAIL_CONFIG.APP_URL;
 
       await sendEmail({
         to: input.email,
