@@ -2,6 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "~/server/db";
 import * as bcrypt from "bcrypt";
+import { notifyUserOfLogin } from "~/server/api/routers/inboxEmailNotifier";
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -87,6 +88,18 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      // Trigger login notification email when user successfully signs in
+      if (user?.name) {
+        try {
+          const loginTimestamp = new Date().toLocaleString();
+          await notifyUserOfLogin(user.name, loginTimestamp);
+        } catch (error) {
+          console.error('Failed to send login notification:', error);
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       // The 'user' object is passed from the `authorize` callback on initial sign-in.
       if (user) {

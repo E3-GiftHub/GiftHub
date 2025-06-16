@@ -17,27 +17,33 @@ export default function CustomWishlistModal({
   onAddToWishlist,
   onClose,
 }: Readonly<CustomWishlistModalProps>) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const noPriority = -1;
+  const [name, setName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [photo, setPhoto] = useState<string>("/UserImages/default_pfp.svg");
-  const [key, setKey] = useState<string>("");
-  const [price, setPrice] = useState("");
+  const [key, setKey] = useState<string | null>(null);
+  const [price, setPrice] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [priority, setPriority] = useState<PriorityTypeEnum>(
-    PriorityTypeEnum.LOW,
-  );
-  const [note, setNote] = useState("");
+  const [priority, setPriority] = useState<PriorityTypeEnum | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  const stripEmpty = (input: string | null): string | null => {
+    if (null === input) return null;
+    if ("" === input) return null;
+    return input;
+  };
 
   const handleAddToWishlist = () => {
     onAddToWishlist({
-      name: name,
-      description: description,
+      name: stripEmpty(name),
+      description: stripEmpty(description),
       photo: photo,
-      key: key,
-      price: price,
+      key: stripEmpty(key),
+      price: stripEmpty(price),
       quantity: quantity,
-      priority: priority,
-      note: note,
+      priority:
+        priority === (Number(noPriority) as PriorityTypeEnum) ? null : priority,
+      note: stripEmpty(note),
       retailer: null,
     });
     onClose(null);
@@ -69,13 +75,17 @@ export default function CustomWishlistModal({
         <div className={modalStyles.product}>
           <div className={modalStyles.leftside}>
             <div className={modalStyles.wrapperUploadButton}>
-              <img src={photo} alt={name} className={modalStyles.modalImage} />
+              <img
+                src={photo}
+                alt={name ?? "find a way to visualize without vision my friend"}
+                className={modalStyles.modalImage}
+              />
             </div>
             <div className={modalStyles.wrapperUploadButton}>
               <UploadButton
                 className={modalStyles.customUploadButton}
                 endpoint="articlePfpUploader"
-                input={{ key: key }}
+                input={{ key: key ?? "" }}
                 onClientUploadComplete={onUploadComplete}
                 onUploadError={onUploadError}
               />
@@ -91,7 +101,7 @@ export default function CustomWishlistModal({
               <input
                 type="string"
                 id="name"
-                value={name}
+                value={name ?? ""}
                 onChange={(e) => setName(String(e.target.value))}
                 className={modalStyles.noteInput}
               />
@@ -102,7 +112,7 @@ export default function CustomWishlistModal({
               <input
                 type="string"
                 id="desc"
-                value={description}
+                value={description ?? ""}
                 onChange={(e) => setDescription(String(e.target.value))}
                 className={modalStyles.noteInput}
               />
@@ -113,7 +123,7 @@ export default function CustomWishlistModal({
               <input
                 type="string"
                 id="price"
-                value={price}
+                value={price ?? ""}
                 onChange={(e) => setPrice(String(e.target.value))}
                 className={modalStyles.noteInput}
               />
@@ -124,7 +134,7 @@ export default function CustomWishlistModal({
               <input
                 type="string"
                 id="note"
-                value={note}
+                value={note ?? ""}
                 onChange={(e) => setNote(String(e.target.value))}
                 className={modalStyles.noteInput}
               />
@@ -148,12 +158,13 @@ export default function CustomWishlistModal({
                 </label>
                 <select
                   id="priority"
-                  value={priority}
+                  value={priority ?? ""}
                   onChange={(e) =>
                     setPriority(Number(e.target.value) as PriorityTypeEnum)
                   }
                   className={modalStyles.priorityInput}
                 >
+                  <option value={noPriority}>None</option>
                   <option value={PriorityTypeEnum.LOW}>Low</option>
                   <option value={PriorityTypeEnum.MEDIUM}>Medium</option>
                   <option value={PriorityTypeEnum.HIGH}>High</option>

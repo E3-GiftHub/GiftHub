@@ -2,15 +2,15 @@ import { PriorityTypeEnum } from "~/models/PriorityTypeEnum";
 
 export type WishlistInputItem = {
   //! item properties
-  name: string;
-  description: string;
+  name: string | null;
+  description: string | null;
   photo: string;
   key: string | null; // null => NOT custom
-  price: string;
+  price: string | null;
   retailer: number | null; // null => custom;
 
   //! article properties
   quantity: number;
-  priority: PriorityTypeEnum;
-  note: string;
+  priority: PriorityTypeEnum | null;
+  note: string | null;
 };

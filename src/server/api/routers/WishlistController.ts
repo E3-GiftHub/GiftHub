@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { WishlistService } from "../../services/WishlistService";
 import { PriorityType } from "@prisma/client";
@@ -37,8 +37,8 @@ export const wishlistRouter = createTRPCRouter({
         item: z.object({
           itemId: z.number(),
           quantity: z.number().min(1),
-          priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
-          note: z.string(),
+          priority: z.enum(["LOW", "MEDIUM", "HIGH"]).nullable(),
+          note: z.string().nullable(),
         }),
       }),
     )

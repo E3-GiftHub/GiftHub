@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import { api } from "~/trpc/react";
-import { utapi } from "~/server/uploadthing";
 
 import formatImage from "~/utils/formatImage";
 import type { EbayItem } from "~/models/EbayItem";
@@ -78,11 +77,11 @@ export default function CreateWishlist() {
         throw new Error("Item creation failed. No ID returned.");
       }
 
-      const p = item.priority.valueOf();
-      let priority: "LOW" | "MEDIUM" | "HIGH";
+      const p = item.priority?.valueOf();
+      let priority: "LOW" | "MEDIUM" | "HIGH" | null = null;
       if (1 === p) priority = "LOW";
       else if (2 === p) priority = "MEDIUM";
-      else priority = "HIGH";
+      else if (3 === p) priority = "HIGH";
 
       // 2. Add to wishlist (EventArticle)
       for (let i = 0; i < item.quantity; i++) {

@@ -6,7 +6,6 @@ import "~/styles/globals.css";
 import styles from "../styles/Payment.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
-import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Termination from "~/components/Termination";
