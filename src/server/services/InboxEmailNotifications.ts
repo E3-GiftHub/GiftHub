@@ -1,14 +1,32 @@
 import { sendEmail } from "~/server/email";
 import { db as prisma } from "~/server/db";
+import { getEmailUrls } from "~/server/config/email";
 
 interface NotificationEmailData {
   recipientUsername: string;
-  type: 'contribution' | 'purchase' | 'invitation_received' | 'invitation_accepted' | 'invitation_declined';
-  eventTitle: string;
-  eventId: number;
-  actorName: string;
+  type: 'contribution' | 'purchase' | 'invitation_received' | 'invitation_accepted' | 'invitation_declined' | 'login_alert' | 'item_goal_reached' | 'payment_confirmation' | 'new_item_added' | 'welcome' | 'account_deleted';
+  eventTitle?: string;
+  eventId?: number;
+  actorName?: string;
   amount?: string;
   itemName?: string;
+  loginInfo?: {
+    timestamp: string;
+    ipAddress?: string;
+    userAgent?: string;
+    location?: string;
+  };
+  paymentInfo?: {
+    transactionId: string;
+    paymentMethod?: string;
+    currency: string;
+  };
+  itemInfo?: {
+    goalAmount?: string;
+    currentAmount?: string;
+    contributors?: number;
+    imageUrl?: string;
+  };
 }
 
 /**
@@ -47,10 +65,12 @@ export async function sendInboxNotificationEmail(data: NotificationEmailData) {
 
 function generateEmailContent(data: NotificationEmailData, recipientFirstName?: string | null) {
   const firstName = recipientFirstName ?? 'there';
-  const appUrl = 'https://gifthub-five.vercel.app';
-  const inboxUrl = `${appUrl}/inbox`;
-  const eventUrl = `${appUrl}/event-view?id=${data.eventId}`;
-  const logoUrl = `${appUrl}/logo.png`;
+  
+  const useWishlistView = ['contribution', 'purchase', 'item_goal_reached', 'new_item_added'].includes(data.type);
+
+  const useProfileEdit = data.type === 'login_alert';
+  
+  const { app: appUrl, inbox: inboxUrl, event: eventUrl, logo: logoUrl } = getEmailUrls(data.eventId, useWishlistView, useProfileEdit);
 
   let subject: string;
   let mainMessage: string;
@@ -85,6 +105,42 @@ function generateEmailContent(data: NotificationEmailData, recipientFirstName?: 
       subject = `${data.actorName} declined your invitation`;
       mainMessage = `${data.actorName} has declined your invitation to "${data.eventTitle}".`;
       actionText = 'View Event';
+      break;
+    
+    case 'login_alert':
+      subject = `New login to your GiftHub account`;
+      mainMessage = `Someone just logged into your GiftHub account at ${data.loginInfo?.timestamp}. If this wasn't you, please secure your account immediately.`;
+      actionText = 'Secure Account';
+      break;
+    
+    case 'item_goal_reached':
+      subject = `🎉 Goal reached for "${data.itemName}" in "${data.eventTitle}"!`;
+      mainMessage = `Great news! The item "${data.itemName}" has reached its funding goal of ${data.itemInfo?.goalAmount}. Thanks to ${data.itemInfo?.contributors} generous contributor${(data.itemInfo?.contributors ?? 0) > 1 ? 's' : ''}!`;
+      actionText = 'View Item';
+      break;
+    
+    case 'payment_confirmation':
+      subject = `Payment confirmed for "${data.eventTitle}"`;
+      mainMessage = `Your ${data.paymentInfo?.paymentMethod ? data.paymentInfo.paymentMethod + ' ' : ''}payment of ${data.amount} for "${data.itemName}" has been successfully processed. Transaction ID: ${data.paymentInfo?.transactionId}`;
+      actionText = 'View Details';
+      break;
+    
+    case 'new_item_added':
+      subject = `New item added to "${data.eventTitle}"`;
+      mainMessage = `${data.actorName} has added a new item "${data.itemName}" to the wishlist for "${data.eventTitle}". Check it out and consider contributing!`;
+      actionText = 'View Item';
+      break;
+    
+    case 'welcome':
+      subject = `Welcome to GiftHub! 🎁`;
+      mainMessage = `Welcome to GiftHub! We're excited to have you join our community. You can now create events, manage wishlists, and share special moments with your friends and family.`;
+      actionText = 'Explore GiftHub';
+      break;
+    
+    case 'account_deleted':
+      subject = `Your GiftHub account has been deleted`;
+      mainMessage = `Your GiftHub account has been successfully deleted. We're sorry to see you go! If you change your mind, you can always create a new account to rejoin our community.`;
+      actionText = 'Create New Account';
       break;
     
     default:
@@ -142,6 +198,15 @@ function generateEmailContent(data: NotificationEmailData, recipientFirstName?: 
                         <table cellpadding="0" cellspacing="0" border="0" style="margin: 30px auto; width: 100%;">
                           <tr>
                             <td style="text-align: center;">
+                              ${data.type === 'welcome' ? `
+                                <a href="${appUrl}" style="display: inline-block; padding: 16px 32px; background-color: #8d80ec; background: linear-gradient(135deg, #a078e4 0%, #8d80ec 57%, #738bf8 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; min-width: 120px;">
+                                  Go to GiftHub
+                                </a>
+                              ` : data.type === 'account_deleted' ? `
+                                <a href="${appUrl}" style="display: inline-block; padding: 16px 32px; background-color: #8d80ec; background: linear-gradient(135deg, #a078e4 0%, #8d80ec 57%, #738bf8 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; min-width: 120px;">
+                                  ${actionText}
+                                </a>
+                              ` : `
                               <table cellpadding="0" cellspacing="0" border="0" style="display: inline-block;">
                                 <tr>
                                   <td style="padding-right: 15px;">
@@ -156,6 +221,7 @@ function generateEmailContent(data: NotificationEmailData, recipientFirstName?: 
                                   </td>
                                 </tr>
                               </table>
+                              `}
                             </td>
                           </tr>
                         </table>
@@ -199,11 +265,14 @@ Hi ${firstName}!
 
 ${mainMessage}
 
+${data.type === 'welcome' || data.type === 'account_deleted' ? `
+🎁 ${data.type === 'welcome' ? 'Go to GiftHub' : actionText}: ${appUrl}
+` : `
 📧 View your inbox: ${inboxUrl}
 🎯 ${actionText}: ${eventUrl}
 
 Event: ${data.eventTitle}
-
+`}
 ---
 You're receiving this because you're part of the GiftHub community.
 Visit GiftHub: ${appUrl}

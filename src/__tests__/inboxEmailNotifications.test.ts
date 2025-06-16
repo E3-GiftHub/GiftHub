@@ -58,6 +58,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -107,6 +108,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -146,6 +148,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -184,6 +187,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -222,6 +226,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -260,6 +265,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -311,6 +317,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -350,6 +357,7 @@ describe("sendInboxNotificationEmail", () => {
       emailToken: null,
       tokenExpires: null,
       pictureUrl: null,
+      pictureKey: null,
       emailVerified: null,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -377,12 +385,112 @@ describe("sendInboxNotificationEmail", () => {
     expect(emailCall?.html).toContain("View Inbox");
     expect(emailCall?.html).toContain("View Contribution");
     expect(emailCall?.html).toContain("https://gifthub-five.vercel.app/inbox");
-    expect(emailCall?.html).toContain("https://gifthub-five.vercel.app/event-view?id=1");
+    expect(emailCall?.html).toContain("https://gifthub-five.vercel.app/wishlist-view?eventId=1");
 
     // Check text content
     expect(emailCall?.text).toContain("Hi John!");
     expect(emailCall?.text).toContain("Jane Smith contributed 50 RON to Gift Card");
     expect(emailCall?.text).toContain("View your inbox: https://gifthub-five.vercel.app/inbox");
-    expect(emailCall?.text).toContain("View Contribution: https://gifthub-five.vercel.app/event-view?id=1");
+    expect(emailCall?.text).toContain("View Contribution: https://gifthub-five.vercel.app/wishlist-view?eventId=1");
+  });
+
+  it('should generate login alert email with profile edit URL', async () => {
+    const mockUser = {
+      username: "alice",
+      email: 'user@example.com',
+      fname: 'Alice',
+      lname: 'Smith',
+      id: "2",
+      password: null,
+      stripeConnectId: null,
+      emailToken: null,
+      tokenExpires: null,
+      pictureUrl: null,
+      pictureKey: null,
+      emailVerified: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockUserFindUnique.mockResolvedValue(mockUser);
+
+    await sendInboxNotificationEmail({
+      recipientUsername: 'alice',
+      type: 'login_alert',
+      actorName: 'System',
+      eventTitle: '',
+      amount: '',
+      itemName: '',
+      loginInfo: {
+        timestamp: '2023-12-01 10:30:00',
+        ipAddress: '192.168.1.1',
+        userAgent: 'Chrome/91.0',
+      },
+    });
+
+    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+
+    const emailCall = mockSendEmail.mock.calls[0]?.[0];
+    
+    // Check that the email contains the profile edit URL
+    expect(emailCall?.html).toContain("Hi Alice!");
+    expect(emailCall?.html).toContain("New login to your GiftHub account");
+    expect(emailCall?.html).toContain("Secure Account");
+    expect(emailCall?.html).toContain("https://gifthub-five.vercel.app/inbox");
+    expect(emailCall?.html).toContain("https://gifthub-five.vercel.app/profile-edit");
+
+    // Check text content
+    expect(emailCall?.text).toContain("Hi Alice!");
+    expect(emailCall?.text).toContain("Someone just logged into your GiftHub account");
+    expect(emailCall?.text).toContain("View your inbox: https://gifthub-five.vercel.app/inbox");
+    expect(emailCall?.text).toContain("Secure Account: https://gifthub-five.vercel.app/profile-edit");
+  });
+
+  it('should generate welcome email with app URL', async () => {
+    const mockUser = {
+      username: "newuser",
+      email: 'newuser@example.com',
+      fname: 'Alice',
+      lname: 'Smith',
+      id: "3",
+      password: null,
+      stripeConnectId: null,
+      emailToken: null,
+      tokenExpires: null,
+      pictureUrl: null,
+      pictureKey: null,
+      emailVerified: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockUserFindUnique.mockResolvedValue(mockUser);
+
+    await sendInboxNotificationEmail({
+      recipientUsername: 'newuser',
+      type: 'welcome',
+    });
+
+    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+
+    const emailCall = mockSendEmail.mock.calls[0]?.[0];
+    
+    // Check that the email contains welcome content
+    expect(emailCall?.html).toContain("Hi Alice!");
+    expect(emailCall?.html).toContain("Welcome to GiftHub!");
+    expect(emailCall?.html).toContain("We're excited to have you join our community");
+    expect(emailCall?.html).toContain("Go to GiftHub");
+    expect(emailCall?.html).toContain("https://gifthub-five.vercel.app");
+    // Welcome email should NOT contain inbox URL since it only has one button
+    expect(emailCall?.html).not.toContain("https://gifthub-five.vercel.app/inbox");
+
+    // Check text content
+    expect(emailCall?.text).toContain("Hi Alice!");
+    expect(emailCall?.text).toContain("Welcome to GiftHub!");
+    expect(emailCall?.text).toContain("We're excited to have you join our community");
+    expect(emailCall?.text).toContain("Visit GiftHub: https://gifthub-five.vercel.app");
+
+    // Check subject
+    expect(emailCall?.subject).toContain("Welcome to GiftHub!");
   });
 });

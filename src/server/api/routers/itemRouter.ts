@@ -294,6 +294,14 @@ export const itemRouter = createTRPCRouter({
               type: "PURCHASED",
             },
           });
+
+          // Send email notification to event owner about the purchase
+          const { notifyEventOwnerOfPurchase } = await import("@/server/api/routers/inboxEmailNotifier");
+          await notifyEventOwnerOfPurchase(
+            input.eventId,
+            input.username,
+            articleData.item.name ?? "an item"
+          );
         } else if (
           input.type === "contributing" &&
           input.amount &&
@@ -329,13 +337,41 @@ export const itemRouter = createTRPCRouter({
             },
           });
 
+          // Check if goal is reached after this contribution
+          const goalReached = newTotal >= itemPrice;
+          
           // Send email notification to event owner about the contribution
-          const { notifyEventOwnerOfPurchase } = await import("@/server/api/routers/inboxEmailNotifier");
-          await notifyEventOwnerOfPurchase(
+          const { notifyEventOwnerOfContribution } = await import("@/server/api/routers/inboxEmailNotifier");
+          await notifyEventOwnerOfContribution(
             input.eventId,
             input.username,
-            articleData.item.name ?? "an item"
+            articleData.item.name ?? "an item",
+            input.amount,
+            "RON"
           );
+
+          // Send goal reached notification if this contribution completes the funding
+          if (goalReached) {
+            try {
+              const { notifyOwnerOfItemGoalReached } = await import("@/server/api/routers/inboxEmailNotifier");
+              
+              // Count unique contributors for this item
+              const contributors = await db.contribution.groupBy({
+                by: ['guestUsername'],
+                where: { articleId: input.articleId },
+              });
+              
+              await notifyOwnerOfItemGoalReached(
+                input.eventId,
+                articleData.item.name ?? "an item",
+                `${itemPrice} RON`,
+                contributors.length
+              );
+            } catch (goalNotificationErr) {
+              console.error("Failed to send goal reached notification:", goalNotificationErr);
+              // Don't throw - contribution should succeed even if notification fails
+            }
+          }
         }
         return { success: true };
       } catch (error) {

@@ -186,6 +186,35 @@ export default async function handler(
         }
       }
 
+      // 4b2. Send payment confirmation email to the purchaser
+      if (purchaserUsername && eventId && amountRON !== undefined) {
+        try {
+          const { notifyUserOfPaymentConfirmation } = await import("@/server/api/routers/inboxEmailNotifier");
+          
+          // Get item name for the notification
+          let itemName = "an item";
+          if (eventArticleId) {
+            const eventArticle = await prisma.eventArticle.findUnique({
+              where: { id: eventArticleId },
+              include: { item: { select: { name: true } } },
+            });
+            itemName = eventArticle?.item?.name ?? "an item";
+          }
+
+          await notifyUserOfPaymentConfirmation(
+            purchaserUsername,
+            eventId,
+            itemName,
+            `${amountRON} RON`,
+            session.id, // Use session ID as transaction ID
+            session.payment_method_types?.[0],
+            "RON"
+          );
+        } catch (notificationErr) {
+          console.error("Failed to send payment confirmation notification:", notificationErr);
+        }
+      }
+
       // 4c. Deactivate (archive) the Payment Link in Stripe
       if (paymentLinkId) {
         try {
