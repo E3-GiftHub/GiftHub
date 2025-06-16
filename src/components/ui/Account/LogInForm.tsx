@@ -51,10 +51,32 @@ export default function LogInForm() {
       });
 
       if (result?.error) {
-        if (result.error === "CredentialsSignIn") {
+        // Check if this is an unverified email error
+        // Most common cases from NextAuth for unverified email
+        if (
+          result.error === "Configuration" && email.trim()
+        ) {
+          // NextAuth returns "Configuration" error for custom auth errors
+          setErrors({ 
+            unverifiedEmail: email
+          });
+        } else if (
+          result.error === "CallbackRouteError" && email.trim()
+        ) {
+          setErrors({ 
+            unverifiedEmail: email
+          });
+        } else if (
+          result.error.includes("UNVERIFIED_EMAIL") || 
+          result.error === "UNVERIFIED_EMAIL"
+        ) {
+          setErrors({ 
+            unverifiedEmail: email
+          });
+        } else if (result.error === "CredentialsSignin" || result.error === "CredentialsSignIn") {
           setErrors({ email: "Invalid email or password" });
         } else {
-          setErrors({ server: result.error });
+          setErrors({ server: `Login failed: ${result.error}` });
         }
       } else {
         if (rememberMe) {
@@ -62,8 +84,7 @@ export default function LogInForm() {
         }
         void router.push("/home");
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
       setErrors({ server: "An unexpected error occurred" });
     } finally {
       setIsLoading(false);
@@ -75,10 +96,45 @@ export default function LogInForm() {
       <div className={styles.top}>
         <h3 className={styles.aboveTitle}>Welcome back!</h3>
         <h2 className={styles.title}>Log in to your account</h2>
-        {errors?.server &&
-          (errors.server === "User not found" ||
-            errors.server === "Passwords don't match") &&
-          errors.server}
+        
+        {/* Server errors */}
+        {errors?.server && (
+          <div className={styles.forgotPasswordMessage} style={{ 
+            backgroundColor: "#ef4444", 
+            color: "white", 
+            padding: "1rem", 
+            borderRadius: "8px",
+            marginTop: "1rem",
+            textAlign: "center"
+          }}>
+            <p style={{ margin: 0 }}>❌ {errors.server}</p>
+          </div>
+        )}
+        
+        {/* Email verification error */}
+        {errors?.unverifiedEmail && (
+          <div className={styles.forgotPasswordMessage} style={{ 
+            backgroundColor: "#f59e0b", 
+            color: "white", 
+            padding: "1rem", 
+            borderRadius: "8px",
+            marginTop: "1rem",
+            textAlign: "center"
+          }}>
+            <p style={{ margin: "0 0 10px 0" }}>⚠️ Please verify your email first</p>
+            <Link href={`/resend-verification?email=${encodeURIComponent(errors.unverifiedEmail)}`}>
+              <button className={styles.secondaryButton} style={{ 
+                color: "#FFFFFF", 
+                textDecoration: "underline",
+                fontSize: "0.9em",
+                background: "transparent",
+                border: "1px solid white"
+              }}>
+                Resend verification email
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
       <div className={styles.middle}>
         <form

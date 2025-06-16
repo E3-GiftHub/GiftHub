@@ -329,6 +329,7 @@
   font-size: 1.2em;
   margin-bottom: 0;
   margin-top: .5em;
+  flex-direction: column;
 }
 
 .secondaryButton {
@@ -344,6 +345,87 @@
 
 .secondaryButton:hover {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* Success Message Styles */
+.successMessage {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  animation: slideInFromTop 0.5s ease-out;
+}
+
+.successMessage h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+}
+
+.successMessage p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.successMessage .redirectText {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments for success message */
+@media (max-width: 768px) {
+  .successMessage {
+    padding: 1.25rem;
+    margin: 0.75rem 0;
+    border-radius: 10px;
+  }
+  
+  .successMessage h3 {
+    font-size: 1.1rem;
+  }
+  
+  .successMessage p {
+    font-size: 0.9rem;
+  }
+  
+  .successMessage .redirectText {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .successMessage {
+    padding: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .successMessage h3 {
+    font-size: 1rem;
+  }
+  
+  .successMessage p {
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 1000px) {

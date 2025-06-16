@@ -3,6 +3,7 @@ import { signupRouter } from "~/server/api/routers/userManagement/signup";
 import { recoveryRouter } from "~/server/api/routers/userManagement/findByEmail";
 import { updatePasswordRouter } from "~/server/api/routers/userManagement/updatePassword";
 import {requestResetRouter} from "~/server/api/routers/userManagement/requestReset";
+import { emailVerificationRouter } from "~/server/api/routers/userManagement/emailVerification";
 
 import { createTRPCRouter } from "~/server/api/trpc";
 
@@ -12,4 +13,5 @@ export const authRouter = createTRPCRouter({
   findByEmail: recoveryRouter,
   update: updatePasswordRouter,
   resetRequest: requestResetRouter,
+  emailVerification: emailVerificationRouter,
 });

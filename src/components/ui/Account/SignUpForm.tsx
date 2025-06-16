@@ -28,14 +28,22 @@ export default function SignupForm() {
   const validationMessages = getValidationMessages();
 
   const [errors, setErrors] = useState<Record<string, string> | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
   const signupMutation = api.auth.signup.signup.useMutation({
-    onSuccess: () => {
-      void router.push("/login");
+    onSuccess: (data) => {
+      setSuccessMessage(data.message);
+      
+      // Delay redirect to allow user to read the message
+      setTimeout(() => {
+        void router.push("/login");
+      }, 4000);
     },
     onError: (err) => {
-      if (err.message === "User already exists") {
+      if (err.message === "Username already exists") {
         setErrors({ username: err.message });
+      } else if (err.message === "Email already exists") {
+        setErrors({ email: err.message });
       } else if (err.message === "Passwords don't match") {
         setErrors({ confirmPassword: err.message });
       } else {
@@ -85,6 +93,7 @@ export default function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors(null);
+    setSuccessMessage(null);
     if (validateForm()) {
       signupMutation.mutate(formData);
     }
@@ -95,6 +104,17 @@ export default function SignupForm() {
       <div className={styles.top}>
         <h3 className={styles.aboveTitle}>Welcome to GiftHub!</h3>
         <h2 className={styles.title}>Create your account</h2>
+        
+        {/* Success Message */}
+        {successMessage && (
+          <div className={styles.successMessage}>
+            <h3>Account Created Successfully!</h3>
+            <p>{successMessage}</p>
+            <p className={styles.redirectText}>
+              Redirecting to login in a few seconds...
+            </p>
+          </div>
+        )}
       </div>
       {errors?.server}
 
@@ -231,6 +251,15 @@ export default function SignupForm() {
           Already have an account?{" "}
           <Link href="/login">
             <button className={styles.secondaryButton}>Log in</button>
+          </Link>
+        </p>
+        
+        <p className={styles.footer} style={{ marginTop: "1rem", fontSize: "0.9em" }}>
+          Didn&apos;t receive the verification email?{" "}
+          <Link href="/resend-verification">
+            <button className={styles.secondaryButton} style={{ textDecoration: "underline" }}>
+              Resend verification email
+            </button>
           </Link>
         </p>
       </div>
