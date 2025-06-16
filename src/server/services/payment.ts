@@ -103,9 +103,27 @@ export async function createCheckoutLink(
     // Build exactly the same fields as before for contributions:
     const itemName = eventArticle.item.name ?? "Untitled Item";
     const eventTitle = eventArticle.event.title ?? "Untitled Event";
-    const imageUrl =
-      eventArticle.item.imagesUrl?.trim() ??
-      "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
+    
+    // Helper function to validate URL
+    const isValidUrl = (urlString: string): boolean => {
+      try {
+        const url = new URL(urlString);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    };
+
+    // Get a valid image URL or omit images entirely if none available
+    const fallbackImageUrl = "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
+    const rawImageUrl = eventArticle.item.imagesUrl?.trim();
+    
+    let imageUrl: string | null = null;
+    if (rawImageUrl && isValidUrl(rawImageUrl)) {
+      imageUrl = rawImageUrl;
+    } else if (isValidUrl(fallbackImageUrl)) {
+      imageUrl = fallbackImageUrl;
+    }
 
     const plannerFullName =
       `${plannerFirstName} ${plannerLastName}`.trim() || plannerUsername;
@@ -124,8 +142,8 @@ export async function createCheckoutLink(
 
     productParams = {
       name: itemName,
-      images: [imageUrl],
       description: descriptionText,
+      ...(imageUrl ? { images: [imageUrl] } : {}),
     };
   } else {
     //
@@ -220,6 +238,7 @@ export async function createCheckoutLink(
     product = await stripe.products.create(productParams);
   } catch (prodErr: unknown) {
     console.error("Stripe Product creation error:", prodErr);
+    console.error("Product params that caused the error:", JSON.stringify(productParams, null, 2));
     const errorMessage =
       prodErr instanceof Error ? prodErr.message : String(prodErr);
     throw new Error(`Failed to create Stripe Product: ${errorMessage}`);
