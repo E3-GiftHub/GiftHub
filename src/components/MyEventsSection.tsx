@@ -31,7 +31,7 @@ const MyEventsSection: React.FC = () => {
     return (
       <Container borderStyle={ContainerBorderStyle.TOP}>
         <div className={loadingStyles.loadingContainer}>
-          <div className={loadingStyles.spinner}></div>
+          <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
         </div>
       </Container>
     );

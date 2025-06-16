@@ -246,7 +246,10 @@ export default function EventView() {
             alignItems: "center",
           }}
         >
-          <h2>Loading event...</h2>
+          
+          <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+      </div>
         </div>
       </div>
     );
@@ -608,7 +611,10 @@ export default function EventView() {
                       alt="representation of users' pictogrphic activity"
                     />
                   </div>
-                )) ?? <p>Loading media...</p>}
+                  //unsure if this is the right way to do it loading spinner
+                )) ??           <div className={loadingStyles.loadingContainer}>
+                <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+              </div>}
               </div>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}

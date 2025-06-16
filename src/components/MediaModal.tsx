@@ -18,12 +18,13 @@ export default function MediaModal({
   onUpload,
   onClose,
 }: Readonly<MediaModalProps>) {
+  //(Ionut) Am adaugat loading pentru a evita blocarea paginii
   if (isLoading) {
     return (
       <div className={styles.editMediaModalWrapper}>
         <div className={styles.editMediaModalContent}>
           <div className={loadingStyles.loadingContainer}>
-            <div className={loadingStyles.spinner}></div>
+            <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
           </div>
         </div>
       </div>

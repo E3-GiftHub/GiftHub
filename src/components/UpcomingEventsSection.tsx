@@ -32,7 +32,7 @@ const UpcomingEventsSection: React.FC = () => {
     return (
       <Container borderStyle={ContainerBorderStyle.BOTTOM}>
         <div className={loadingStyles.loadingContainer}>
-          <div className={loadingStyles.spinner}></div>
+          <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
         </div>
       </Container>
     );
