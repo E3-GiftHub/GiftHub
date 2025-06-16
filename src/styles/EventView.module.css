@@ -662,3 +662,24 @@
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
+.confirmationState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+.confirmationText {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.confirmationButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
