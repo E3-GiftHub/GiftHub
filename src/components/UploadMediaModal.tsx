@@ -155,14 +155,14 @@ export default function UploadModal({
                 allowedContent: "",
               }}
             />
-          )}
-        </div>        {/* Actions */}
-        {!showConfirmation && (
+          )}        </div>
+
+        {/* Actions */}
+        {!showConfirmation && !isUploading && (
           <div className={styles.uploadActions}>
             <button
               className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
               onClick={handleCancel}
-              disabled={isUploading}
             >
               Cancel
             </button>
