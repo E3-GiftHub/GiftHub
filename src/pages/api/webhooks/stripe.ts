@@ -149,6 +149,7 @@ export default async function handler(
       }
 
       if (isContribute && eventArticleId && amountRON !== undefined && purchaserUsername) {
+        let flagSuccess = true;
         try {
           await prisma.contribution.create({
             data: {
@@ -161,7 +162,62 @@ export default async function handler(
             },
           });
         } catch (dbErr) {
+          flagSuccess = false;
           console.error("Prisma error creating Contribution:", dbErr);
+        }
+
+        // sends email notification to event owner about the contribution
+        if (flagSuccess && eventId && eventArticleId) {
+          const { notifyEventOwnerOfContribution } = await import("@/server/api/routers/inboxEmailNotifier");
+
+          // gets the item name for the notification
+          const eventArticle = await prisma.eventArticle.findUnique({
+            where: { id: eventArticleId },
+            include: { item: { select: { name: true } } },
+          });
+
+          if (eventArticle?.item?.name) {
+            try {
+              await notifyEventOwnerOfContribution(
+                eventId,
+                purchaserUsername,
+                eventArticle.item.name,
+                amountRON,
+                "ron"
+              );
+            } catch (emailErr) {
+              console.error("Error sending contribution notification email:", emailErr);
+            }
+          }
+        }
+      }
+
+      // 4b2. Send payment confirmation email to the purchaser
+      if (purchaserUsername && eventId && amountRON !== undefined) {
+        try {
+          const { notifyUserOfPaymentConfirmation } = await import("@/server/api/routers/inboxEmailNotifier");
+
+          // Get item name for the notification
+          let itemName = "an item";
+          if (eventArticleId) {
+            const eventArticle = await prisma.eventArticle.findUnique({
+              where: { id: eventArticleId },
+              include: { item: { select: { name: true } } },
+            });
+            itemName = eventArticle?.item?.name ?? "an item";
+          }
+
+          await notifyUserOfPaymentConfirmation(
+            purchaserUsername,
+            eventId,
+            itemName,
+            `${amountRON} RON`,
+            session.id, // Use session ID as transaction ID
+            session.payment_method_types?.[0],
+            "RON"
+          );
+        } catch (notificationErr) {
+          console.error("Failed to send payment confirmation notification:", notificationErr);
         }
       }
 

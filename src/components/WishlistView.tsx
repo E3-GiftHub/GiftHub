@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/router";
 import type { TrendingItem, WishlistProps } from "../models/WishlistEventGuest";
+import formatField from "~/utils/formatField";
 
 import styles from "../styles/wishlistcomponent.module.css";
 import buttonStyles from "../styles/Button.module.css";
@@ -226,9 +227,9 @@ const Wishlist: React.FC<WishlistProps> = ({
         contribution:
           newType === "none"
             ? {
-                current: 0,
-                total: Number(item.pret),
-              }
+              current: 0,
+              total: Number(item.pret),
+            }
             : item.contribution,
       };
 
@@ -301,10 +302,10 @@ const Wishlist: React.FC<WishlistProps> = ({
                       <div className={styles.contributionText}>
                         {item.contribution.total > 0
                           ? Math.round(
-                              (item.contribution.current /
-                                item.contribution.total) *
-                                100,
-                            )
+                            (item.contribution.current /
+                              item.contribution.total) *
+                            100,
+                          )
                           : 0}
                         %
                       </div>
@@ -354,13 +355,13 @@ const Wishlist: React.FC<WishlistProps> = ({
 
                 {/* data */}
                 <div className={styles.itemDetails}>
-                  <span className={styles.itemName}>{item.nume}</span>
+                  <span className={styles.itemName}>{formatField(item.nume)}</span>
                   <div className={styles.itemDetailsEz}>
-                    <span className={styles.itemPrice}>{item.pret}</span>
-                    <span className={styles.itemPriority}>{item.priority}</span>
+                    <span className={styles.itemPrice}>{formatField(item.pret)}</span>
+                    <span className={styles.itemPriority}>{formatField(item.priority)}</span>
                   </div>
-                  <span className={styles.itemDescription}>{item.desc}</span>
-                  <span className={styles.itemNote}>{item.note}</span>
+                  <span className={styles.itemDescription}>{formatField(item.desc)}</span>
+                  <span className={styles.itemNote}>{formatField(item.note)}</span>
                 </div>
               </div>
             ))}
