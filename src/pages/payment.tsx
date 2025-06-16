@@ -6,7 +6,6 @@ import "~/styles/globals.css";
 import styles from "../styles/Payment.module.css";
 import buttonStyles from "../styles/Button.module.css";
 
-import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Termination from "~/components/Termination";
@@ -215,8 +214,13 @@ export default function CheckoutPage() {
   }
 
   // Decide which image URL to use:
-  // - Otherwise, default to "/cake.png"
-  const imgSrc = details.imageUrl ?? "/cake.png";
+  // const imgSrc = details.imageUrl ?? "/cake.png";
+  const imgSrc =
+    details.imageUrl &&
+      (details.imageUrl.startsWith("http://") ||
+        details.imageUrl.startsWith("https://"))
+      ? details.imageUrl
+      : "/cake.png";
 
   return (
     <div className={styles.container}>
