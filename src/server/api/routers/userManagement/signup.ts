@@ -49,6 +49,14 @@ export const signupRouter = createTRPCRouter({
         },
       });
 
+      // Send welcome email to new user
+      try {
+        const { notifyUserOfWelcome } = await import("@/server/api/routers/inboxEmailNotifier");
+        await notifyUserOfWelcome(input.username);
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+      }
+
       return {
         success: true,
       };

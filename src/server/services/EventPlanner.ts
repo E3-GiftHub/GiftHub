@@ -70,23 +70,6 @@ export class EventPlanner {
     await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: number, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({
-      where: { username: guestId },
-    });
-    if (!exists) throw new EventManagementException("Guest does not exist");
-
-    await prisma.invitation.create({
-      data: {
-        eventId: eventId,
-        guestUsername: guestId,
-        status: StatusType.PENDING,
-        createdAt: new Date(),
-        //guest:{ connect: { username: guestId }},
-        //event:{ connect: { id: eventId } },
-      },
-    });
-  }
   /* Depricated
   async manageWishlist(eventId: number) {
     const wishlist = await prisma.eventItem.findMany({

@@ -3,7 +3,7 @@
 import { db as prisma } from "~/server/db";
 import { WishlistDTO } from "./WishlistDTO";
 import type { WishlistItemDTO } from "./WishlistDTO";
-import { PriorityType } from "@prisma/client";
+import type { PriorityType } from "@prisma/client";
 
 export class WishlistService {
   /**
@@ -87,7 +87,32 @@ export class WishlistService {
         priority: params.priority,
         userNote: params.note,
       },
+      include: {
+        item: {
+          select: { name: true }
+        }
+      }
     });
+
+    // Send notification to guests about new item added
+    try {
+      const { notifyGuestsOfNewItem } = await import("@/server/api/routers/inboxEmailNotifier");
+      
+      const event = await prisma.event.findUnique({
+        where: { id: params.eventId },
+        select: { createdByUsername: true }
+      });
+      
+      if (event?.createdByUsername && record.item?.name) {
+        await notifyGuestsOfNewItem(
+          params.eventId,
+          event.createdByUsername,
+          record.item.name
+        );
+      }
+    } catch (error) {
+      console.error('Failed to send new item notification:', error);
+    }
 
     return {
       itemIdentifier: record.itemId.toString(),

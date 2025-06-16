@@ -151,12 +151,6 @@ export const eventPlannerRouter = createTRPCRouter({
       };
     }),
 
-  sendInvitation: publicProcedure
-    .input(z.object({ eventId: z.number(), guestId: z.string() }))
-    .mutation(({ input }) =>
-      handle(() => eventPlanner.sendInvitation(input.eventId, input.guestId)),
-    ),
-
   /*
 
   getEventAnalytics: publicProcedure
