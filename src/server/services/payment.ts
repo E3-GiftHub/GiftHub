@@ -104,7 +104,6 @@ export async function createCheckoutLink(
     const itemName = eventArticle.item.name ?? "Untitled Item";
     const eventTitle = eventArticle.event.title ?? "Untitled Event";
     const imageUrl =
-      eventArticle.item.imagesUrl?.trim() ??
       "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
 
     const plannerFullName =
