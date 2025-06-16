@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import crypto from "crypto";
 import { sendEmail } from "~/server/email";
+import { EMAIL_CONFIG } from "~/server/config/email";
 
 export const requestResetRouter = createTRPCRouter({
   requestReset: publicProcedure
