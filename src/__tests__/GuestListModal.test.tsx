@@ -96,6 +96,6 @@ describe("GuestListModal", () => {
       />,
     );
 
-    expect(screen.getByText("Loading guests...")).toBeInTheDocument();
+    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
   });
 });

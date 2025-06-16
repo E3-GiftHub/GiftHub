@@ -262,7 +262,7 @@ describe("PaymentPage (payment.tsx)", () => {
     mockRouter.query = {};
 
     render(<PaymentPage />);
-    expect(screen.getByText("Loading…")).toBeInTheDocument();
+    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
   });
 
   test("fetches details and displays them correctly", async () => {
