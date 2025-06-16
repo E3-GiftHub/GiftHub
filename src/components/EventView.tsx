@@ -28,6 +28,14 @@ const EventView: React.FC<EventViewProps> = ({
         {/* Header */}
         <div className={styles.header}>
           <h1 className={styles.title}>{eventData.title}</h1>
+          <div className={styles.headerActions}>
+          <button
+            onClick={() => console.log("Leave Event")} // TODO chiar sa il scoata din event :PD
+            className={styles.leaveButton}
+            title="Report Event"
+          >
+          </button>
+
           <button
             onClick={() => setShowReportModal(true)}
             className={styles.reportButton}
@@ -35,6 +43,7 @@ const EventView: React.FC<EventViewProps> = ({
           >
             <Flag className={styles.icon} />
           </button>
+          </div>
         </div>
 
         <div className={styles.mainGrid}>
