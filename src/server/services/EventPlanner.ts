@@ -70,46 +70,6 @@ export class EventPlanner {
     await prisma.event.delete({ where: { id: eventId } });
   }
 
-  async sendInvitation(eventId: number, guestId: string): Promise<void> {
-    const exists = await prisma.user.findUnique({
-      where: { username: guestId },
-    });
-    if (!exists) throw new EventManagementException("Guest does not exist");
-
-    await prisma.invitation.create({
-      data: {
-        eventId: eventId,
-        guestUsername: guestId,
-        status: StatusType.PENDING,
-        createdAt: new Date(),
-        //guest:{ connect: { username: guestId }},
-        //event:{ connect: { id: eventId } },
-      },
-    });
-
-    // sends email notification to the invited user
-    try {
-      const event = await prisma.event.findUnique({
-        where: { id: eventId },
-        select: { 
-          title: true, 
-          createdByUsername: true 
-        },
-      });
-
-      if (event) {
-        const { notifyUserOfNewInvitation } = await import("@/server/api/routers/inboxEmailNotifier");
-        await notifyUserOfNewInvitation(
-          guestId, // guest username
-          event.createdByUsername, // host username  
-          event.title ?? "An Event",
-          eventId
-        );
-      }
-    } catch (emailError: unknown) {
-      console.error("Failed to send invitation notification email:", emailError);
-    }
-  }
   /* Depricated
   async manageWishlist(eventId: number) {
     const wishlist = await prisma.eventItem.findMany({
