@@ -482,6 +482,7 @@
   overflow-y: auto;
   flex-grow: 1;
   padding: 1rem 0;
+  scrollbar-width: none;
   max-height: 60vh;
   grid-template-columns: repeat(4, 1fr);
 }
