@@ -172,13 +172,17 @@ export default async function handler(
             });
 
             if (eventArticle?.item?.name) {
-              await notifyEventOwnerOfContribution(
-                eventId,
-                purchaserUsername,
-                eventArticle.item.name,
-                amountRON,
-                "RON"
-              );
+              try {
+                await notifyEventOwnerOfContribution(
+                  eventId,
+                  purchaserUsername,
+                  eventArticle.item.name,
+                  amountRON,
+                  "RON"
+                );
+              } catch (emailErr) {
+                console.error("Error sending contribution notification email:", emailErr);
+              }
             }
           }
         } catch (dbErr) {
