@@ -21,7 +21,12 @@ export default async function handler(
   if (user === null)
     return res.status(404).json({ error: "No User found with this username" });
 
-  // user exists
+  // user exists, check if there is an invitation for him
+  const invitation = await prisma.invitation.findFirst({ where: { guestUsername: username, eventId: eventId } });
+  if (invitation)
+    return res.status(404).json({ error: "User already invited" });
+
+  // create invite
   await prisma.invitation.create({
     data: { guestUsername: username, eventId: eventId },
   });
