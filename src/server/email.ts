@@ -12,7 +12,7 @@ const createTransporter = () => {
     auth: {
       user: env.SMTP_USER,
       pass: env.SMTP_PASS,
-    },  // mai jos e ca un fel de if, daca vercel pune development atunci se relaxeaza niste restrictii
+    },  // Below is a conditional check: if Vercel sets the environment to development, some restrictions are relaxed.
     ...(env.NODE_ENV === 'development' && { tls: { rejectUnauthorized: false }}),
     connectionTimeout: 30000,
     greetingTimeout: 30000,
