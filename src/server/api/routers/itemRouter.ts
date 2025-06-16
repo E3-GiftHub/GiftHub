@@ -297,11 +297,16 @@ export const itemRouter = createTRPCRouter({
 
           // Send email notification to event owner about the purchase
           const { notifyEventOwnerOfPurchase } = await import("@/server/api/routers/inboxEmailNotifier");
-          await notifyEventOwnerOfPurchase(
-            input.eventId,
-            input.username,
-            articleData.item.name ?? "an item"
-          );
+          try {
+            await notifyEventOwnerOfPurchase(
+              input.eventId,
+              input.username,
+              articleData.item.name ?? "an item"
+            );
+          } catch (emailError) {
+            console.error("Failed to send email notification:", emailError);
+            // Proceed without interrupting the purchase flow
+          }
         } else if (
           input.type === "contributing" &&
           input.amount &&
