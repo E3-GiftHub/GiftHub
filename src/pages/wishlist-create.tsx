@@ -11,6 +11,8 @@ import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
 import CustomWishlistModal from "../components/CustomWishlistModal";
 import Termination from "~/components/Termination";
+import Unauthorized from "~/components/Unauthorized";
+import { useEventAccess } from "../server/services/eventAccessHook";
 
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
@@ -22,7 +24,12 @@ type ItemCreateResponse = {
 
 export default function CreateWishlist() {
   const router = useRouter();
-  const { eventId } = router.query;
+  const { eventId: rawEventId } = router.query;
+  const parsedEventId = Array.isArray(rawEventId)
+    ? parseInt(rawEventId[0] || "")
+    : parseInt(rawEventId || "");
+
+  const { hasAccess, loading: accessLoading } = useEventAccess(parsedEventId);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
@@ -46,6 +53,8 @@ export default function CreateWishlist() {
     description: "",
   });
 
+  const { mutateAsync: addItemToWishlist } = api.wishlist.addItem.useMutation();
+
   const openModal = (item: {
     name: string;
     photo: string;
@@ -58,11 +67,8 @@ export default function CreateWishlist() {
 
   const closeModal = () => setIsModalOpen(false);
 
-  const { mutateAsync: addItemToWishlist } = api.wishlist.addItem.useMutation();
-
   const handleAddToWishlist = async (item: WishlistInputItem) => {
     try {
-      // 1. First, save the item into the `Item` table (this logic needs an endpoint if not already present)
       const itemResponse = await fetch("/api/item-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -70,7 +76,6 @@ export default function CreateWishlist() {
       });
 
       const result = (await itemResponse.json()) as ItemCreateResponse;
-      console.log("🪵 /api/item-create result:", result);
       const itemId = result.itemId;
       if (!itemId) {
         throw new Error("Item creation failed. No ID returned.");
@@ -82,20 +87,18 @@ export default function CreateWishlist() {
       else if (2 === p) priority = "MEDIUM";
       else if (3 === p) priority = "HIGH";
 
-      // 2. Add to wishlist (EventArticle)
       for (let i = 0; i < item.quantity; i++) {
         await addItemToWishlist({
-          eventId: Number(eventId),
+          eventId: parsedEventId,
           item: {
             itemId,
-            quantity: 1, // single entry at a time
+            quantity: 1,
             priority: priority,
             note: item.note,
           },
         });
       }
 
-      console.log("Item added to wishlist in DB");
       closeModal();
     } catch (err) {
       console.error("❌ Failed to add item to wishlist", err);
@@ -117,12 +120,14 @@ export default function CreateWishlist() {
     }
   };
 
+  if (accessLoading) return <div className={styles.pageWrapper}><Navbar /><div className={styles.container}><h2>Checking access...</h2></div></div>;
+  if (!hasAccess) return <Unauthorized />;
+
   return (
     <div className={styles.pageWrapper}>
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
-          {/* go back */}
           <button
             className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
             onClick={router.back}
@@ -130,7 +135,6 @@ export default function CreateWishlist() {
             ← Back
           </button>
 
-          {/* create custom article */}
           <button
             className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
             onClick={() => setIsCustomOpen(true)}
@@ -147,11 +151,10 @@ export default function CreateWishlist() {
 
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>
-              Add Item to the Wishlist for Event {eventId}
+              Add Item to the Wishlist for Event {parsedEventId}
             </h1>
           </div>
 
-          {/* Search Bar */}
           <div className={styles.section}>
             <div className={styles.searchContainer}>
               <label htmlFor="product-search" className={styles.sectionTitle}>
@@ -170,7 +173,6 @@ export default function CreateWishlist() {
             </div>
           </div>
 
-          {/* Search Results */}
           {isLoading && <p className={styles.searchLabel}>Searching...</p>}
           {!isLoading &&
             debouncedSearchTerm.length > 1 &&
@@ -213,7 +215,6 @@ export default function CreateWishlist() {
             </div>
           )}
 
-          {/* Modal */}
           {isModalOpen && (
             <AddToWishlistModal
               isOpen={isModalOpen}
@@ -227,7 +228,7 @@ export default function CreateWishlist() {
           )}
         </main>
         <Termination
-          eventId={Number(eventId)}
+          eventId={parsedEventId}
           invitationId={null}
           articleId={null}
         />

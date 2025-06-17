@@ -17,6 +17,8 @@ import { type GuestHeader } from "~/models/GuestHeader";
 import { useSession } from "next-auth/react";
 import formatField from "~/utils/formatField";
 import Termination from "~/components/Termination";
+import Unauthorized from "../components/Unauthorized";
+import { useEventAccess } from "../server/services/eventAccessHook"; 
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -68,31 +70,70 @@ function GuestListPreview({
 }
 
 export default function EventView() {
-  // update events
-  const updateEventMutation = api.eventPlanner.updateEvent.useMutation();
-  const deleteEventMutation = api.eventPlanner.removeEvent.useMutation();
-
   // get the event id
   const router = useRouter();
+  const { isReady, query } = router;
+  const rawId = Array.isArray(query.id) ? query.id[0] : query.id;
+  const parsedId = parseId(rawId);
+
+  const updateEventMutation = api.eventPlanner.updateEvent.useMutation();
+  const deleteEventMutation = api.eventPlanner.removeEvent.useMutation();
+  const { hasAccess, loading: accessLoading } = useEventAccess(parsedId);
   const { data: session } = useSession();
   const username = session?.user?.name ?? "anonymous";
+  const eventId = Number(rawId);
 
+  
   const [captionInput, setCaptionInput] = useState("");
-
-  const { id } = router.query;
-  const idParam = Array.isArray(router.query.id)
-    ? router.query.id[0]
-    : router.query.id;
-
-  const eventId = Number(idParam);
-  const parsedId = parseId(id) ?? 0;
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  //! AICI FACEM ROST DE GUESTS
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [guests, setGuests] = useState<GuestHeader[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(true);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    date: "",
+    time: "",
+    location: "",
+  });
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingField, setPendingField] = useState<
+    keyof typeof formData | null
+  >(null);
+  const [tempValue, setTempValue] = useState("");
+
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const mediaData = api.media.getMediaByEvent.useQuery(
+    { eventId: parsedId ?? -1 },
+    { enabled: parsedId !== null && parsedId > 0 },
+  );
+  const [mediaList, setMediaList] = useState(
+    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
+  );
+  const removeMediaMutation = api.media.removeMedia.useMutation();
+  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery(
+    {
+      eventId: parsedId ?? -1,
+    },
+    { enabled: parsedId !== null && parsedId > 0 },
+  );
+
+  const { data } = api.eventPlanner.getEventID.useQuery(
+    {
+      eventId: parsedId ?? -1,
+    },
+    { enabled: parsedId !== null },
+  );
+
+  const eventData = data?.data;
+
+
+  
+
+
+
   useEffect(() => {
     if (!username) return;
     (async () => {
@@ -111,27 +152,66 @@ export default function EventView() {
   }, [eventId]);
   //! AICI SE TERMINA FACEREA DE ROST DE GUESTS
 
-  const { data } = api.eventPlanner.getEventID.useQuery(
-    {
-      eventId: parsedId,
-    },
-    { enabled: parsedId !== null },
-  );
+  
+  useEffect(() => {
+    if (eventData?.date) {
+      // Ensure date is formatted as yyyy-mm-dd
+      const dateObj = new Date(eventData.date);
+      const date = dateObj.toISOString().split("T")[0] ?? "";
+      setFormData({
+        title: eventData.title ?? "",
+        description: eventData.description ?? "",
+        date: date,
+        time: dateObj.toTimeString().slice(0, 5),
+        location: eventData.location ?? "",
+      });
+    }
+  }, [eventData]);
 
-  const eventData = data?.data;
+  if (eventData === undefined) {
+    return (
+      <div className={styles.pageWrapper}>
+        <Navbar />
+        <div
+          className={styles.container}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <h2>Loading event...</h2>
+        </div>
+      </div>
+    );
+  }
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    date: "",
-    time: "",
-    location: "",
-  });
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingField, setPendingField] = useState<
-    keyof typeof formData | null
-  >(null);
-  const [tempValue, setTempValue] = useState("");
+  if (!isReady || parsedId === null) {
+    return (
+      <div className={styles.pageWrapper}>
+        <Navbar />
+        <div className={styles.container}>
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (accessLoading) {
+    return (
+      <div className={styles.pageWrapper}>
+        <Navbar />
+        <div className={styles.container}>
+          <h2>Validating access...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return <Unauthorized />;
+  }
+  
 
   const handleRemoveGuest = (username: string) => {
     // remove from view immediately
@@ -193,57 +273,8 @@ export default function EventView() {
       });
     }
   };
+ 
 
-  // Media list state
-  const [showMediaModal, setShowMediaModal] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const mediaData = api.media.getMediaByEvent.useQuery(
-    { eventId: parsedId },
-    { enabled: parsedId !== null && parsedId > 0 },
-  );
-  const [mediaList, setMediaList] = useState(
-    Array.from({ length: 12 }, (_, i) => `/placeholder/image${i + 1}.jpg`),
-  );
-  const removeMediaMutation = api.media.removeMedia.useMutation();
-  const { refetch: mediaRefetch } = api.media.getMediaByEvent.useQuery(
-    {
-      eventId: parsedId,
-    },
-    { enabled: parsedId !== null && parsedId > 0 },
-  );
-
-  useEffect(() => {
-    if (eventData?.date) {
-      // Ensure date is formatted as yyyy-mm-dd
-      const dateObj = new Date(eventData.date);
-      const date = dateObj.toISOString().split("T")[0] ?? "";
-      setFormData({
-        title: eventData.title ?? "",
-        description: eventData.description ?? "",
-        date: date,
-        time: dateObj.toTimeString().slice(0, 5),
-        location: eventData.location ?? "",
-      });
-    }
-  }, [eventData]);
-
-  if (eventData === undefined) {
-    return (
-      <div className={styles.pageWrapper}>
-        <Navbar />
-        <div
-          className={styles.container}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <h2>Loading event...</h2>
-        </div>
-      </div>
-    );
-  }
 
   const handleRemoveMedia = async (mediaId: number) => {
     try {
