@@ -1,4 +1,5 @@
 import styles from "~/styles/UserProfile/UserProfile.module.css";
+import loadingStyles from "~/styles/wishlistcomponent.module.css";
 import Navbar from "~/components/Navbar";
 import UserProfileUI from "~/components/ui/UserProfile/UserProfileUI";
 import { api } from "~/trpc/react";
@@ -16,7 +17,9 @@ export default function UserProfile() {
     return (
       <div className={styles["landing-page"]}>
         <Navbar />
-        <p>Loading user data...</p>
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner}></div>
+        </div>
       </div>
     );
   }

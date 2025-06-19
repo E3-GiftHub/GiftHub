@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import type { Profile } from "~/models/Profile";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
+
 
 export default function UserProfile() {
   const router = useRouter();
@@ -66,7 +68,9 @@ export default function UserProfile() {
     }
   };
 
-  if (!userProfile) return <p> Loading ... </p>;
+  if (!userProfile) return           <div className={loadingStyles.loadingContainer}>
+  <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+</div>;
 
   return (
     <div className={styles["landing-page"]}>
