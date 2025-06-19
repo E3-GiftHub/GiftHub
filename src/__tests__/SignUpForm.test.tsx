@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import SignUpForm from "~/components/ui/Account/SignUpForm";
 import { api } from "~/trpc/react";
@@ -20,7 +20,13 @@ type FormData = {
   confirmPassword: string;
 };
 
-type OnSuccessCallback = () => void;
+type SignupResponse = {
+  success: boolean;
+  emailSent: boolean;
+  message: string;
+};
+
+type OnSuccessCallback = (data: SignupResponse) => void;
 type OnErrorCallback = (error: { message: string }) => void;
 const mutateMock = jest.fn() as jest.MockedFunction<
   (
@@ -154,7 +160,8 @@ describe("SignUpForm", () => {
     });
   });
 
-  test("handles mutation onSuccess by redirecting to /login", async () => {
+  test("handles mutation onSuccess by showing success message and redirecting to /login", async () => {
+    jest.useFakeTimers();
     render(<SignUpForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), {
@@ -174,15 +181,38 @@ describe("SignUpForm", () => {
 
     await waitFor(() => {
       expect(mutateMock).toHaveBeenCalled();
-      const call = mutateMock.mock.calls[0];
-      if (!call) throw new Error("mutateMock was not called");
-      const [, onSuccess] = call;
-      onSuccess();
+    });
+
+    const call = mutateMock.mock.calls[0];
+    if (!call) throw new Error("mutateMock was not called");
+    const [, onSuccess] = call;
+    
+    // Trigger the success callback
+    onSuccess({
+      success: true,
+      emailSent: true,
+      message: "Account created successfully. Please check your email to verify your account."
+    });
+
+    // Wait for success message to appear in DOM and check specific elements
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /account created successfully/i })).toBeInTheDocument();
+    });
+    
+    expect(screen.getByText(/please check your email to verify your account/i)).toBeInTheDocument();
+    expect(screen.getByText(/redirecting to login in a few seconds/i)).toBeInTheDocument();
+
+    // Fast-forward time to trigger redirect
+    jest.advanceTimersByTime(4000);
+    
+    await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/login");
     });
+
+    jest.useRealTimers();
   });
 
-  test("handles mutation onError 'User already exists'", async () => {
+  test("handles mutation onError 'Username already exists'", async () => {
     render(<SignUpForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), {
@@ -204,8 +234,62 @@ describe("SignUpForm", () => {
       const call = mutateMock.mock.calls[0];
       if (!call) throw new Error("mutateMock was not called");
       const [, , onError] = call;
-      onError({ message: "User already exists" });
-      expect(screen.getByText(/user already exists/i)).toBeInTheDocument();
+      onError({ message: "Username already exists" });
+      expect(screen.getByText(/username already exists/i)).toBeInTheDocument();
+    });
+  });
+
+  test("handles mutation onError 'Email already exists'", async () => {
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: "User123" },
+    });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+      target: { value: "Password1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), {
+      target: { value: "Password1" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() => {
+      const call = mutateMock.mock.calls[0];
+      if (!call) throw new Error("mutateMock was not called");
+      const [, , onError] = call;
+      onError({ message: "Email already exists" });
+      expect(screen.getByText(/email already exists/i)).toBeInTheDocument();
+    });
+  });
+
+  test("handles generic server error", async () => {
+    render(<SignUpForm />);
+
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: "User123" },
+    });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "user@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+      target: { value: "Password1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/confirm your password/i), {
+      target: { value: "Password1" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+
+    await waitFor(() => {
+      const call = mutateMock.mock.calls[0];
+      if (!call) throw new Error("mutateMock was not called");
+      const [, , onError] = call;
+      onError({ message: "Some unknown error" });
+      expect(screen.getByText(/an unexpected error occurred/i)).toBeInTheDocument();
     });
   });
 

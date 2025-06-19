@@ -36,6 +36,7 @@ export const authConfig: NextAuthConfig = {
             username: true,
             email: true,
             password: true,
+            emailVerified: true,
           },
         });
 
@@ -48,8 +49,6 @@ export const authConfig: NextAuthConfig = {
           password.startsWith("$2b$") || password.startsWith("$2a$");
         if (isAlreadyHashed) {
           if (password === user.password) {
-            console.log("Password is already hashed");
-
             return {
               id: user.username,
               name: user.username,
@@ -57,7 +56,6 @@ export const authConfig: NextAuthConfig = {
             };
           }
 
-          console.log("Hash mismatch for user");
           return null;
         }
 
@@ -75,9 +73,14 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
+        // Check if email is verified
+        if (!user.emailVerified) {
+          console.error(`Authorize: Email not verified for user ${email}`);
+          throw new Error("UNVERIFIED_EMAIL");
+        }
+
         // If everything is okay, return the user object.
         // This object will be available in the `user` property of the `jwt` callback.
-        console.log(`Authorize: Successfully authenticated user ${email}`);
         return {
           id: user.username,
           name: user.username,

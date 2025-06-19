@@ -125,6 +125,8 @@ model User {
     sessions                  Session[]
     mediaNotifications        MediaNotification[]
     contributionNotifications ContributionNotification[]
+
+    @@index([emailToken])
 }
 
 model Invitation {

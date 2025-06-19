@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     "/register",
     "/password-forgot",
     "/password-reset",
+    "/verify-email",
+    "/resend-verification",
   ];
 
   if (isLoggedIn && guestOnlyRoutes.includes(pathname)) {
@@ -46,6 +48,8 @@ export const config = {
     "/password-forgot",
     "/password-reset",
     "/password-reset-logged",
+    "/verify-email",
+    "/resend-verification",
 
     "/home",
     "/inbox",
