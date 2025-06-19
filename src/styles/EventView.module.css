@@ -662,3 +662,17 @@
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
+
+@media (max-width: 480px) {
+  .editMediaGrid{
+    grid-template-columns:  1fr;
+  }
+  .editMediaItem img {
+    width: 100%;
+    height: auto;
+  }
+  .editMediaModalContent{
+    width: 70%;
+  }
+}
