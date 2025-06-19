@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Clock, MapPin, Users, Flag } from "lucide-react";
 import styles from "../styles/EventView.module.css";
 import type { EventViewProps } from "~/models/EventData";
+import { useRouter } from "next/router";
+import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
 
 const EventView: React.FC<EventViewProps> = ({
   eventData,
@@ -10,7 +13,13 @@ const EventView: React.FC<EventViewProps> = ({
   onMediaView,
   onReport,
   onViewProfile,
-}) => {
+}) => {  const router = useRouter();
+  const { data: session } = useSession();
+  const removeGuest = api.guest.removeGuestFromEvent.useMutation({
+    onSuccess: () => {
+      void router.push("/home");
+    },
+  });
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
 
@@ -29,10 +38,20 @@ const EventView: React.FC<EventViewProps> = ({
         <div className={styles.header}>
           <h1 className={styles.title}>{eventData.title}</h1>
           <div className={styles.headerActions}>
-          <button
-            onClick={() => console.log("Leave Event")} // TODO chiar sa il scoata din event :PD
+            <button
+            onClick={() => {
+              if (confirm("Are you sure you want to leave this event?")) {
+                const username = session?.user?.name;
+                if (username) {
+                  removeGuest.mutate({
+                    eventId: Number(eventData.id),
+                    guestUsername: username,
+                  });
+                }
+              }
+            }}
             className={styles.leaveButton}
-            title="Report Event"
+            title="Leave Event"
           >
           </button>
 
