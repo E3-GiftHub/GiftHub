@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clock, MapPin, Users, Flag } from "lucide-react";
+import { Clock, MapPin, Users, Flag, LogOut } from "lucide-react"; // ADAUGĂ LogOut
 import styles from "../styles/EventView.module.css";
 import type { EventViewProps } from "~/models/EventData";
 import { useRouter } from "next/router";
@@ -13,7 +13,8 @@ const EventView: React.FC<EventViewProps> = ({
   onMediaView,
   onReport,
   onViewProfile,
-}) => {  const router = useRouter();
+}) => {  
+  const router = useRouter();
   const { data: session } = useSession();
   const removeGuest = api.guest.removeGuestFromEvent.useMutation({
     onSuccess: () => {
@@ -39,29 +40,29 @@ const EventView: React.FC<EventViewProps> = ({
           <h1 className={styles.title}>{eventData.title}</h1>
           <div className={styles.headerActions}>
             <button
-            onClick={() => {
-              if (confirm("Are you sure you want to leave this event?")) {
-                const username = session?.user?.name;
-                if (username) {
-                  removeGuest.mutate({
-                    eventId: Number(eventData.id),
-                    guestUsername: username,
-                  });
+              onClick={() => {
+                if (confirm("Are you sure you want to leave this event?")) {
+                  const username = session?.user?.name;
+                  if (username) {
+                    removeGuest.mutate({
+                      eventId: Number(eventData.id),
+                      guestUsername: username,
+                    });
+                  }
                 }
-              }
-            }}
-            className={styles.leaveButton}
-            title="Leave Event"
-          >
-          </button>
+              }}
+              className={styles.leaveButton}
+              title="Leave Event"
+            >
+            </button>
 
-          <button
-            onClick={() => setShowReportModal(true)}
-            className={styles.reportButton}
-            title="Report Event"
-          >
-            <Flag className={styles.icon} />
-          </button>
+            <button
+              onClick={() => setShowReportModal(true)}
+              className={styles.reportButton}
+              title="Report Event"
+            >
+              <Flag className={styles.icon} />
+            </button>
           </div>
         </div>
 
@@ -119,7 +120,7 @@ const EventView: React.FC<EventViewProps> = ({
                   Contribute
                 </button>
 
-                  <button onClick={onMediaView} className={styles.mediaCardButton}>
+                <button onClick={onMediaView} className={styles.mediaCardButton}>
                   <span>Media</span>
                 </button>
               </div>

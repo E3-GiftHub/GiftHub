@@ -10,6 +10,8 @@ jest.mock('../styles/EventView.module.css', () => ({
   content: 'content',
   header: 'header',
   title: 'title',
+  headerActions: 'headerActions',
+  leaveButton: 'leaveButton',
   reportButton: 'reportButton',
   icon: 'icon',
   mainGrid: 'mainGrid',
@@ -57,7 +59,33 @@ jest.mock('lucide-react', () => ({
   MapPin: () => <div data-testid="mappin-icon" />,
   Users: () => <div data-testid="users-icon" />,
   Flag: () => <div data-testid="flag-icon" />,
+  LogOut: () => <div data-testid="logout-icon" />,
 }));
+
+// ADAUGĂ ACESTEA - Mock pentru Next.js și NextAuth
+jest.mock('next/router', () => ({
+  useRouter: jest.fn(),
+}));
+
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}));
+
+// Mock pentru TRPC API
+jest.mock('~/trpc/react', () => ({
+  api: {
+    guest: {
+      removeGuestFromEvent: {
+        useMutation: jest.fn(),
+      },
+    },
+  },
+}));
+
+// Import pentru a putea folosi mock-urile
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import { api } from '~/trpc/react';
 
 describe('EventView', () => {
   const mockOnContribute = jest.fn();
@@ -65,9 +93,13 @@ describe('EventView', () => {
   const mockOnMediaView = jest.fn();
   const mockOnReport = jest.fn();
   const mockOnViewProfile = jest.fn();
+  
+  // ADAUGĂ ACESTEA - Mock-uri pentru funcțiile Next.js
+  const mockPush = jest.fn();
+  const mockMutate = jest.fn();
 
   const mockEventData = {
-    id: 'event-123',
+    id: '123', // Schimbă din 'event-123' în '123'
     title: 'Birthday Party',
     picture: 'https://example.com/event.jpg',
     date: '2024-12-25',
@@ -77,20 +109,20 @@ describe('EventView', () => {
       id: 'planner-1',
       name: 'John Doe',
       profilePicture: 'https://example.com/planner.jpg',
-      role: 'planner' as const, // Change from 'organizer' to 'planner'
+      role: 'planner' as const,
     },
     guests: [
       {
         id: 'guest-1',
         name: 'Jane Smith',
         profilePicture: 'https://example.com/guest1.jpg',
-        role: 'guest' as const, // Add 'as const' to ensure literal type
+        role: 'guest' as const,
       },
       {
         id: 'guest-2',
         name: 'Bob Johnson',
         profilePicture: 'https://example.com/guest2.jpg',
-        role: 'guest' as const, // Add 'as const' to ensure literal type
+        role: 'guest' as const,
       },
     ],
   };
@@ -106,6 +138,23 @@ describe('EventView', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // ADAUGĂ ACESTEA - Setup pentru mock-uri
+    (useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+    });
+    
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { name: 'testuser', id: '1' } },
+      status: 'authenticated',
+    });
+    
+    (api.guest.removeGuestFromEvent.useMutation as jest.Mock).mockReturnValue({
+      mutate: mockMutate,
+    });
+
+    // Mock pentru window.confirm
+    window.confirm = jest.fn(() => true);
   });
 
   test('renders event title and basic information', () => {
@@ -163,6 +212,33 @@ describe('EventView', () => {
     expect(screen.getByText('View Wishlist')).toBeInTheDocument();
     expect(screen.getByText('Contribute')).toBeInTheDocument();
     expect(screen.getByText('Media')).toBeInTheDocument();
+  });
+
+  // ADAUGĂ ACEST TEST NOU - pentru leave button
+  test('shows confirmation and calls removeGuest when leave button is clicked', () => {
+    render(<EventView {...defaultProps} />);
+    
+    const leaveButton = screen.getByTitle('Leave Event');
+    fireEvent.click(leaveButton);
+    
+    expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to leave this event?');
+    expect(mockMutate).toHaveBeenCalledWith({
+      eventId: 123, // Number('123') = 123
+      guestUsername: 'testuser',
+    });
+  });
+
+  // ADAUGĂ ACEST TEST - când user-ul anulează
+  test('does not call removeGuest when user cancels confirmation', () => {
+    window.confirm = jest.fn(() => false); // User-ul apasă Cancel
+    
+    render(<EventView {...defaultProps} />);
+    
+    const leaveButton = screen.getByTitle('Leave Event');
+    fireEvent.click(leaveButton);
+    
+    expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to leave this event?');
+    expect(mockMutate).not.toHaveBeenCalled();
   });
 
   test('calls onViewWishlist when wishlist button is clicked', () => {

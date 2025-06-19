@@ -85,8 +85,7 @@ export default function UploadModal({
         />
 
         {/* File picker (UploadButton) or Loading or Confirmation */}
-        <div className={styles.fileInputWrapper}>
-          {isUploading ? (
+        <div className={styles.fileInputWrapper}>          {isUploading ? (
             <div className={styles.uploadingState}>
               <div className={styles.uploadSpinner}></div>
               <p className={styles.uploadingText}>Uploading...</p>
@@ -103,13 +102,9 @@ export default function UploadModal({
                   onClick={() => startUpload(selectedFiles)}
                 >
                   Yes, upload
-                </button>
-                <button
+                </button>                <button
                   className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-                  onClick={() => {
-                    setSelectedFiles([]);
-                    setShowConfirmation(false);
-                  }}
+                  onClick={handleCancel}
                 >
                   Cancel
                 </button>
