@@ -28,8 +28,8 @@ export default function CreateWishlist() {
   const router = useRouter();
   const { eventId: rawEventId } = router.query;
   const parsedEventId = Array.isArray(rawEventId)
-    ? parseInt(rawEventId[0] || "")
-    : parseInt(rawEventId || "");
+    ? parseInt(rawEventId[0] ?? "")
+    : parseInt(rawEventId ?? "");
 
   const { hasAccess, loading: accessLoading } = useEventAccess(parsedEventId);
 
