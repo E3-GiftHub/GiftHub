@@ -9,6 +9,7 @@ import buttonStyles from "../styles/Button.module.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Termination from "~/components/Termination";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 
 interface PaymentDetails {
   itemName?: string;
@@ -206,7 +207,9 @@ export default function CheckoutPage() {
       <div className={styles.container}>
         <Navbar />
         <div className={styles.card}>
-          <p>Loading…</p>
+        <div className={loadingStyles.loadingContainer}>
+  <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+</div>;
         </div>
         <Footer />
       </div>

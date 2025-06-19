@@ -73,7 +73,7 @@ describe('MediaModal', () => {
   it('renders loading state when isLoading is true', () => {
     render(<MediaModal {...defaultProps} isLoading={true} />);
     
-    expect(screen.getByText('Loading ...')).toBeInTheDocument();
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it('renders modal content when not loading', () => {
@@ -212,18 +212,18 @@ describe('MediaModal', () => {
   it('handles loading state properly', () => {
     const { rerender } = render(<MediaModal {...defaultProps} isLoading={true} />);
     
-    // Should show loading text
-    expect(screen.getByText('Loading ...')).toBeInTheDocument();
+    // Should show loading spinner
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
     
     // Should not show modal content
     expect(screen.queryByRole('button', { name: '← Back' })).not.toBeInTheDocument();
     
-    // Switch to loaded state
+    // Change to not loading
     rerender(<MediaModal {...defaultProps} isLoading={false} />);
     
     // Should show modal content
     expect(screen.getByRole('button', { name: '← Back' })).toBeInTheDocument();
-    expect(screen.queryByText('Loading ...')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload Media' })).toBeInTheDocument();
   });
 
   it('displays different content for empty and populated media arrays', () => {

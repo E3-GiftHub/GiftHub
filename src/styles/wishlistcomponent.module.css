@@ -91,7 +91,7 @@
 
 .itemsLabel {
   margin-bottom: 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 .itemsGrid {
@@ -125,6 +125,10 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
 .itemCard:hover {
@@ -247,17 +251,20 @@
 }
 
 .itemDetails {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  width: 80%;
   justify-content: space-between;
   margin-bottom: 0.25rem;
-  padding: 0 0.25rem;
+  padding: 0.3rem;
+  gap: 10px;
 }
 
 /* flexing the price and priority */
 .itemDetailsEz {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: 2.5rem;
   margin-bottom: 0.25rem;
   padding: 0 0.25rem;
 }
@@ -272,6 +279,7 @@
   text-align: center;
   border: none;
   background-color: #a5b4fc;
+  font-size: 0.8rem;
 }
 
 .itemName {
@@ -283,9 +291,9 @@
 }
 
 .itemDescription {
-  margin: 0.3rem;
+  padding: 0.3rem;
   border-radius: 0.3rem;
-  font-size: 0.5rem;
+  font-size: 0.8rem;
   color: aliceblue;
   border: none;
   background-color: #a5b4fc;
@@ -295,7 +303,7 @@
 .itemNote,
 .itemPriority,
 .itemPrice {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 .buttonsContainer {

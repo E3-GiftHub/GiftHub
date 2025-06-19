@@ -6,6 +6,7 @@ import { ButtonComponent, ButtonStyle } from "./ui/ButtonComponent";
 import NotInvited from "./notinvited";
 import LoadingSpinner from "./loadingspinner";
 import React from "react";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 
 export default function InvitationCard({
   invitationId,
@@ -40,9 +41,15 @@ export default function InvitationCard({
   
   const router = useRouter();
 
-  if (isInvitationLoading) {
-    return <LoadingSpinner />;
-  }
+  if (isInvitationLoading)return (
+    <div className={styles.editMediaModalWrapper}>
+      <div className={styles.editMediaModalContent}>
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+        </div>
+      </div>
+    </div>
+  );
 
   const handleAccept = () => {
     // Previne click-uri multiple în timpul procesării

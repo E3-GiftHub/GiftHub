@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 import DeleteEventModal from "../components/DeleteEventModal";
@@ -18,7 +19,7 @@ import { useSession } from "next-auth/react";
 import formatField from "~/utils/formatField";
 import Termination from "~/components/Termination";
 import Unauthorized from "../components/Unauthorized";
-import { useEventAccess } from "../server/services/eventAccessHook"; 
+import { useEventAccess } from "../server/services/eventAccessHook";
 
 function parseId(param: string | string[] | undefined): number | null {
   if (typeof param === "string") {
@@ -42,7 +43,13 @@ function GuestListPreview({
 }: Readonly<GuestListPreviewProps>) {
   const router = useRouter();
 
-  if (loading) return <div>Loading guests...</div>;
+  if (loading) {
+    return (
+      <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner}></div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.guestList}>
@@ -83,7 +90,6 @@ export default function EventView() {
   const username = session?.user?.name ?? "anonymous";
   const eventId = Number(rawId);
 
-  
   const [captionInput, setCaptionInput] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showGuestModal, setShowGuestModal] = useState(false);
@@ -129,11 +135,6 @@ export default function EventView() {
 
   const eventData = data?.data;
 
-
-  
-
-
-
   useEffect(() => {
     if (!username) return;
     (async () => {
@@ -152,7 +153,6 @@ export default function EventView() {
   }, [eventId]);
   //! AICI SE TERMINA FACEREA DE ROST DE GUESTS
 
-  
   useEffect(() => {
     if (eventData?.date) {
       // Ensure date is formatted as yyyy-mm-dd
@@ -180,7 +180,12 @@ export default function EventView() {
             alignItems: "center",
           }}
         >
-          <h2>Loading event...</h2>
+          <div className={loadingStyles.loadingContainer}>
+            <div
+              className={loadingStyles.spinner}
+              data-testid="loading-spinner"
+            ></div>
+          </div>
         </div>
       </div>
     );
@@ -211,7 +216,6 @@ export default function EventView() {
   if (!hasAccess) {
     return <Unauthorized />;
   }
-  
 
   const handleRemoveGuest = (username: string) => {
     // remove from view immediately
@@ -245,7 +249,7 @@ export default function EventView() {
 
     const user = guests.find((g) => g.username === name);
     if (user) {
-      alert("guest already invited");
+      alert("the User already accepted your invite");
       return;
     }
 
@@ -273,8 +277,6 @@ export default function EventView() {
       });
     }
   };
- 
-
 
   const handleRemoveMedia = async (mediaId: number) => {
     try {
@@ -632,7 +634,15 @@ export default function EventView() {
                       alt="representation of users' pictogrphic activity"
                     />
                   </div>
-                )) ?? <p>Loading media...</p>}
+                  //unsure if this is the right way to do it loading spinner
+                )) ?? (
+                  <div className={loadingStyles.loadingContainer}>
+                    <div
+                      className={loadingStyles.spinner}
+                      data-testid="loading-spinner"
+                    ></div>
+                  </div>
+                )}
               </div>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}

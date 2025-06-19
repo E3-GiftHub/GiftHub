@@ -16,7 +16,9 @@ import { useEventAccess } from "../server/services/eventAccessHook";
 
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import "./../styles/globals.css";
+import ebayLogo from "./../../public/illustrations/ebay-logo.png";
 
 type ItemCreateResponse = {
   itemId: number;
@@ -120,7 +122,15 @@ export default function CreateWishlist() {
     }
   };
 
-  if (accessLoading) return <div className={styles.pageWrapper}><Navbar /><div className={styles.container}><h2>Checking access...</h2></div></div>;
+  if (accessLoading)
+    return (
+      <div className={styles.pageWrapper}>
+        <Navbar />
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner}></div>
+        </div>
+      </div>
+    );
   if (!hasAccess) return <Unauthorized />;
 
   return (
@@ -128,20 +138,6 @@ export default function CreateWishlist() {
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-            onClick={router.back}
-          >
-            ← Back
-          </button>
-
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-            onClick={() => setIsCustomOpen(true)}
-          >
-            Create custom article
-          </button>
-
           {isCustomOpen && (
             <CustomWishlistModal
               onAddToWishlist={handleAddToWishlist}
@@ -150,15 +146,42 @@ export default function CreateWishlist() {
           )}
 
           <div className={styles.titleContainer}>
+            {/* go back */}
+            <button
+              className={`${buttonStyles.button} ${buttonStyles["button-secondary"]} ${styles.backButton}`}
+              onClick={router.back}
+            >
+              ← Back
+            </button>
             <h1 className={styles.title}>
               Add Item to the Wishlist for Event {parsedEventId}
             </h1>
           </div>
 
           <div className={styles.section}>
+            {/* create custom article */}
+            <button
+              className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+              onClick={() => setIsCustomOpen(true)}
+            >
+              Create custom article
+            </button>
+            {isCustomOpen && (
+              <CustomWishlistModal
+                onAddToWishlist={handleAddToWishlist}
+                onClose={closeCustom}
+              />
+            )}
+
+            <p>or</p>
             <div className={styles.searchContainer}>
               <label htmlFor="product-search" className={styles.sectionTitle}>
-                Search for a product:
+                Search for a product on:
+                <img
+                  src={"/illustrations/ebay-logo.png"}
+                  alt="ebayLogo"
+                  className={styles.ebayLogo}
+                />
               </label>
               <div className={styles.searchWrapper}>
                 <input
@@ -173,11 +196,16 @@ export default function CreateWishlist() {
             </div>
           </div>
 
-          {isLoading && <p className={styles.searchLabel}>Searching...</p>}
+          {/* Search Results */}
+          {isLoading && (
+            <div className={loadingStyles.loadingContainer}>
+              <div className={loadingStyles.spinner}></div>
+            </div>
+          )}
           {!isLoading &&
             debouncedSearchTerm.length > 1 &&
             searchResults.length === 0 && (
-              <p className={styles.searchLabel}>No items found :(</p>
+              <p className={styles.searchLabel}>No items found</p>
             )}
 
           {searchResults.length > 0 && (
