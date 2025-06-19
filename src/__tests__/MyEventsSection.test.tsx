@@ -24,7 +24,7 @@ describe("MyEventsSection", () => {
       isError: false,
     });
     render(<MyEventsSection />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it("renders the error state", () => {
