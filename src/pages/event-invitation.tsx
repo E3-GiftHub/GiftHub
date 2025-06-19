@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
 import InvitationCard from "../components/InvitationCard";
 import Head from "next/head";
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
 import styles from "../styles/eventinvite.module.css";
-import { useRouter } from "next/router";
 import Termination from "@/components/Termination";
 
 export default function DemoPage() {
@@ -12,10 +12,14 @@ export default function DemoPage() {
   const { id } = router.query;
   const invitationId = Number(id);
 
+  useEffect(() => {
+    if (!invitationId) return;
+  }, [invitationId]);
+
   return (
     <>
       <Head>
-        <title>GiftHub </title>
+        <title>GiftHub</title>
       </Head>
       <div className={styles.giftHubPage}>
         <Navbar />
