@@ -6,6 +6,7 @@ import MobileFilterMenu from "./MobileFilterMenu";
 import InboxNotification from "~/components/ui/InboxNotification";
 import type { InboxNotificationResponse } from "~/models/InboxNotificationResponse";
 import { api } from "~/trpc/react";
+import formatField from "~/utils/formatField"
 
 const InboxContainer = () => {
   const [activeTab, setActiveTab] = useState("All");
@@ -26,8 +27,8 @@ const InboxContainer = () => {
       text: n.text,
       type: n.type as "event" | "invitation",
       link: n.link,
-      firstName: n.firstName ?? "",
-      lastName: n.lastName ?? "",
+      firstName: formatField(n.firstName),
+      lastName: formatField(n.lastName),
       profilePicture: n.profilePicture ?? "",
       notificationDate: n.notificationDate ?? new Date().toISOString(),
     })),
@@ -36,18 +37,18 @@ const InboxContainer = () => {
       text: n.text,
       type: n.type as "event" | "invitation",
       link: n.link,
-      firstName: n.firstName ?? "",
-      lastName: n.lastName ?? "",
+      firstName: formatField(n.firstName),
+      lastName: formatField(n.lastName),
       profilePicture: n.profilePicture ?? "",
       notificationDate: n.notificationDate ?? new Date().toISOString(),
     })),
     ...invitations.map((n) => ({
       id: n.id,
-      text: "You received an invitation to " + n.title,
+      text: "You received an invitation to " + formatField(n.title),
       type: n.type as "event" | "invitation",
       link: n.link,
-      firstName: n.firstName ?? "",
-      lastName: n.lastName ?? "",
+      firstName: formatField(n.firstName),
+      lastName: formatField(n.lastName),
       profilePicture: n.profilePicture ?? "",
       notificationDate: n.createdAt
         ? new Date(n.createdAt).toISOString()
