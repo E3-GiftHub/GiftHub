@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import styles from "../styles/EventPlannerView.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import GuestListModal from "../components/GuestListModal";
 import EditMediaModal from "../components/EditMediaModal";
 import DeleteEventModal from "../components/DeleteEventModal";
@@ -40,7 +41,13 @@ function GuestListPreview({
 }: Readonly<GuestListPreviewProps>) {
   const router = useRouter();
 
-  if (loading) return <div>Loading guests...</div>;
+  if (loading) {
+    return (
+      <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner}></div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.guestList}>
@@ -239,7 +246,10 @@ export default function EventView() {
             alignItems: "center",
           }}
         >
-          <h2>Loading event...</h2>
+          
+          <div className={loadingStyles.loadingContainer}>
+        <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+      </div>
         </div>
       </div>
     );
@@ -601,7 +611,10 @@ export default function EventView() {
                       alt="representation of users' pictogrphic activity"
                     />
                   </div>
-                )) ?? <p>Loading media...</p>}
+                  //unsure if this is the right way to do it loading spinner
+                )) ??           <div className={loadingStyles.loadingContainer}>
+                <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+              </div>}
               </div>
               <button
                 className={`${buttonStyles.button} ${buttonStyles["button-primary"]} ${styles.mediaButton}`}

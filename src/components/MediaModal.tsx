@@ -2,6 +2,7 @@
 import React from "react";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import loadingStyles from "../styles/wishlistcomponent.module.css";
 import type { MediaHeader } from "~/models/MediaHeader";
 
 interface MediaModalProps {
@@ -17,7 +18,18 @@ export default function MediaModal({
   onUpload,
   onClose,
 }: Readonly<MediaModalProps>) {
-  if (isLoading) return <p>Loading ... </p>;
+  //(Ionut) Am adaugat loading pentru a evita blocarea paginii
+  if (isLoading) {
+    return (
+      <div className={styles.editMediaModalWrapper}>
+        <div className={styles.editMediaModalContent}>
+          <div className={loadingStyles.loadingContainer}>
+            <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={styles.editMediaModalWrapper}>
       <div className={styles.editMediaModalContent}>
