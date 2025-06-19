@@ -3,9 +3,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import UploadModal from "../components/UploadMediaModal";
 
 interface UploadButtonProps {
+  endpoint?: string;
+  input?: any;
+  onBeforeUploadBegin?: (files: File[]) => Promise<File[]>;
   onUploadBegin?: () => void;
   onClientUploadComplete?: () => void;
   onUploadError?: (error: Error) => void;
+  appearance?: any;
+  content?: any;
 }
 
 jest.mock("next-auth/react", () => ({
@@ -15,14 +20,38 @@ jest.mock("next-auth/react", () => ({
 import { useSession } from "next-auth/react";
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
 
+// ÎMBUNĂTĂȚEȘTE MOCK-UL - să includă toate proprietățile
 jest.mock("~/utils/uploadthing", () => ({
-  UploadButton: ({ onUploadBegin, onClientUploadComplete, onUploadError }: UploadButtonProps) => (
+  UploadButton: ({ 
+    onUploadBegin, 
+    onClientUploadComplete, 
+    onUploadError,
+    onBeforeUploadBegin,
+    endpoint,
+    input
+  }: UploadButtonProps) => (
     <div data-testid="upload-button">
+      <span data-testid="endpoint">{endpoint}</span>
+      <span data-testid="input-data">{JSON.stringify(input)}</span>
+      <button
+        data-testid="mock-file-select"
+        onClick={async () => {
+          const mockFiles = [
+            new File(['mock content'], 'test.jpg', { type: 'image/jpeg' }),
+            new File(['mock content 2'], 'test2.jpg', { type: 'image/jpeg' })
+          ];
+          if (onBeforeUploadBegin) {
+            await onBeforeUploadBegin(mockFiles);
+          }
+        }}
+      >
+        Choose Files
+      </button>
       <button
         data-testid="mock-upload-begin"
         onClick={() => onUploadBegin?.()}
       >
-        Choose Image
+        Start Upload
       </button>
       <button
         data-testid="mock-upload-complete"
@@ -91,6 +120,66 @@ describe("UploadModal", () => {
     expect(screen.queryByText("Uploading...")).not.toBeInTheDocument();
   });
 
+  // ADAUGĂ ACEST TEST NOU - pentru file selection
+  it("shows confirmation state when files are selected", async () => {
+    render(<UploadModal {...defaultProps} />);
+    
+    const fileSelectButton = screen.getByTestId("mock-file-select");
+    fireEvent.click(fileSelectButton);
+    
+    // Așteaptă ca starea să se actualizeze
+    expect(await screen.findByText(/Are you sure you want to upload/)).toBeInTheDocument();
+    expect(screen.getByText("Yes, upload")).toBeInTheDocument();
+    expect(screen.getByText(/2 photos/)).toBeInTheDocument(); // 2 fișiere mock
+  });
+
+  // ADAUGĂ ACEST TEST NOU - pentru confirmarea upload-ului
+  it("handles confirmation flow correctly", async () => {
+    render(<UploadModal {...defaultProps} />);
+    
+    // Selectează fișiere
+    const fileSelectButton = screen.getByTestId("mock-file-select");
+    fireEvent.click(fileSelectButton);
+    
+    // Confirmă upload-ul
+    const confirmButton = await screen.findByText("Yes, upload");
+    fireEvent.click(confirmButton);
+    
+    // Ar trebui să ascundă confirmarea
+    expect(screen.queryByText(/Are you sure you want to upload/)).not.toBeInTheDocument();
+  });
+
+  // ADAUGĂ ACEST TEST NOU - pentru anularea confirmării
+  it("can cancel file confirmation", async () => {
+    render(<UploadModal {...defaultProps} />);
+    
+    // Selectează fișiere
+    const fileSelectButton = screen.getByTestId("mock-file-select");
+    fireEvent.click(fileSelectButton);
+    
+    // Anulează
+    const cancelButton = await screen.findByText("Cancel");
+    fireEvent.click(cancelButton);
+    
+    // Ar trebui să se întoarcă la starea inițială
+    expect(screen.queryByText(/Are you sure you want to upload/)).not.toBeInTheDocument();
+    expect(screen.getByTestId("upload-button")).toBeInTheDocument();
+  });
+
+  // ADAUGĂ ACEST TEST NOU - pentru props-urile UploadButton
+  it("passes correct props to UploadButton", () => {
+    render(<UploadModal {...defaultProps} captionInput="Test caption" />);
+    
+    expect(screen.getByTestId("endpoint")).toHaveTextContent("imageUploader");
+    
+    const inputData = JSON.parse(screen.getByTestId("input-data").textContent ?? "{}");
+    expect(inputData).toEqual({
+      username: "testuser",
+      eventId: 1,
+      caption: "Test caption",
+    });
+  });
+
   it("calls onClose when cancel button is clicked", () => {
     render(<UploadModal {...defaultProps} />);
     
@@ -108,12 +197,13 @@ describe("UploadModal", () => {
     
     expect(defaultProps.onCaptionChange).toHaveBeenCalledWith("New caption");
   });
-
-  it("disables cancel button when uploading", () => {
+  it("hides cancel button when uploading", () => {
     render(<UploadModal {...defaultProps} isUploading={true} />);
     
-    const cancelButton = screen.getByText("Cancel");
-    expect(cancelButton).toBeDisabled();
+    // Cancel button should not be visible during upload
+    expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
+    // Should show uploading state instead
+    expect(screen.getByText("Uploading...")).toBeInTheDocument();
   });
 
   it("disables caption input when uploading", () => {
@@ -161,6 +251,10 @@ describe("UploadModal", () => {
     render(<UploadModal {...defaultProps} />);
     
     expect(screen.getByText("Upload Media")).toBeInTheDocument();
+    
+    // Verifică că username-ul este string gol când name este null
+    const inputData = JSON.parse(screen.getByTestId("input-data").textContent ?? "{}");
+    expect(inputData.username).toBe("");
   });
 
   it("handles no session data", () => {
@@ -173,6 +267,10 @@ describe("UploadModal", () => {
     render(<UploadModal {...defaultProps} />);
     
     expect(screen.getByText("Upload Media")).toBeInTheDocument();
+    
+    // Verifică că username-ul este string gol când nu există sesiune
+    const inputData = JSON.parse(screen.getByTestId("input-data").textContent ?? "{}");
+    expect(inputData.username).toBe("");
   });
 
   it("renders with custom caption input value", () => {
@@ -180,5 +278,23 @@ describe("UploadModal", () => {
     
     const captionInput = screen.getByDisplayValue("Test caption");
     expect(captionInput).toBeInTheDocument();
+  });
+
+  // ADAUGĂ ACEST TEST NOU - pentru resetarea stării la închidere
+  it("resets state when modal is closed during confirmation", async () => {
+    render(<UploadModal {...defaultProps} />);
+    
+    // Selectează fișiere
+    const fileSelectButton = screen.getByTestId("mock-file-select");
+    fireEvent.click(fileSelectButton);
+    
+    // Confirmă că suntem în starea de confirmare
+    expect(await screen.findByText(/Are you sure you want to upload/)).toBeInTheDocument();
+    
+    // Închide modalul
+    const cancelButton = screen.getByText("Cancel");
+    fireEvent.click(cancelButton);
+    
+    expect(defaultProps.onClose).toHaveBeenCalled();
   });
 });

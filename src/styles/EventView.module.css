@@ -14,23 +14,83 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
 }
 
 .title {
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
+  line-height: 2.5rem;
+}
+
+.leaveButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: all 0.5s;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  color: white;
+}
+
+.leaveButton::before,
+.leaveButton::after {
+  content: "";
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s, transform 0.5s;
+  width: 100%;
+  text-align: center;
+}
+
+.leaveButton::before {
+  content: "X";
+  color: black;
+  opacity: 1;
+}
+
+.leaveButton::after {
+  content: "Leave Event";
+  opacity: 0;
+}
+
+.leaveButton:hover {
+  width: 10rem;
+  background: rgba(220, 38, 38, 0.8); /* Culoare roșie pentru Leave Event */
+  color: white;
+}
+
+.leaveButton:hover::before {
+  opacity: 0;
+  transform: translate(-50%, -150%);
+}
+
+.leaveButton:hover::after {
+  opacity: 1;
+  transform: translate(-50%, -50%);
 }
 
 .reportButton {
   width: 2.5rem;
   height: 2.5rem;
-  padding: 0 0 0 0;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   cursor: pointer;
   transition: all 0.2s;
+  margin-left: 0.5rem;
 }
 
 .reportButton:hover {
@@ -482,6 +542,7 @@
   overflow-y: auto;
   flex-grow: 1;
   padding: 1rem 0;
+  scrollbar-width: none;
   max-height: 60vh;
   grid-template-columns: repeat(4, 1fr);
 }
@@ -663,16 +724,23 @@
   margin-top: 0.25rem;
 }
 
+.confirmationState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+.confirmationText {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
 
-@media (max-width: 480px) {
-  .editMediaGrid{
-    grid-template-columns:  1fr;
-  }
-  .editMediaItem img {
-    width: 100%;
-    height: auto;
-  }
-  .editMediaModalContent{
-    width: 70%;
-  }
+.confirmationButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
 }
