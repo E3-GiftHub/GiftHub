@@ -121,7 +121,11 @@
 }
 
 .itemCard {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 1rem;
   padding: 1rem;
@@ -136,11 +140,15 @@
 
 .itemCard:hover {
   transform: translateY(-4px);
-  box-shadow: 
+  box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-color: rgba(255, 255, 255, 0.25);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.08)
+  );
 }
 
 /* REDESIGNED IMAGE CONTAINER */
@@ -161,7 +169,7 @@
 .actualItemImage {
   width: 100%;
   height: 100%;
-  object-fit: contain; 
+  object-fit: contain;
   border-radius: 0.75rem;
 }
 
@@ -212,7 +220,6 @@
   transform-origin: left;
   transform: scaleX(0);
 }
-
 
 .contributionAmount {
   font-size: 0.75rem;
@@ -281,8 +288,8 @@
   line-height: 1.4;
   border: 1px solid rgba(255, 255, 255, 0.1);
   min-height: 40px;
-  display: flex;
   align-items: center;
+  text-align: center;
 }
 
 .itemNote {
@@ -409,7 +416,6 @@
   background: linear-gradient(135deg, #9333ea, #7e22ce);
 }
 
-
 .contributeButton:disabled,
 .externalButton:disabled {
   opacity: 0.5;
@@ -484,11 +490,11 @@
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
+
   .itemCard {
     min-height: 320px;
   }
-  
+
   .itemImage {
     height: 120px;
   }
