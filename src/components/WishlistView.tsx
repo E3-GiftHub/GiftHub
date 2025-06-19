@@ -360,8 +360,12 @@ const Wishlist: React.FC<WishlistProps> = ({
                     <span className={styles.itemPrice}>{formatField(item.pret)}</span>
                     <span className={styles.itemPriority}>{formatField(item.priority)}</span>
                   </div>
-                  <span className={styles.itemDescription}>{formatField(item.desc)}</span>
-                  <span className={styles.itemNote}>{formatField(item.note)}</span>
+                  <span className={styles.itemDescription}>
+                    {item.desc && item.desc !== 'not-set' ? formatField(item.desc) : 'No description'}
+                  </span>
+                  <span className={styles.itemNote}>
+                    {item.note && item.note !== 'not-set' ? formatField(item.note) : 'No note'}
+                  </span>
                 </div>
               </div>
             ))}

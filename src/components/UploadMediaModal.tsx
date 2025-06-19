@@ -2,6 +2,14 @@ import { useSession } from "next-auth/react";
 import { UploadButton } from "~/utils/uploadthing";
 import styles from "../styles/EventView.module.css";
 import buttonStyles from "../styles/Button.module.css";
+import { useState, useRef } from "react";
+
+
+declare global {
+  interface Window {
+    _startUpload?: () => void;
+  }
+}
 
 interface UploadModalProps {
   readonly showUploadModal: boolean;
@@ -29,16 +37,36 @@ export default function UploadModal({
   onRefetchMedia,
 }: UploadModalProps) {
   const { data: session } = useSession();
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const uploadPromiseResolve = useRef<((files: File[]) => void) | null>(null);
 
   if (!showUploadModal) return null;
 
   const handleCancel = () => {
+    setSelectedFiles([]);
+    setShowConfirmation(false);
+    uploadPromiseResolve.current = null;
     onClose();
   };
 
   const handleUploadComplete = () => {
+    setSelectedFiles([]);
+    setShowConfirmation(false);
+    uploadPromiseResolve.current = null;
     onUploadComplete();
     onRefetchMedia();
+  };
+
+  const handleFilesSelected = (files: File[]) => {
+    setSelectedFiles(files);
+    setShowConfirmation(true);
+  };
+  const startUpload = (files: File[]) => {
+    setShowConfirmation(false);
+    if (uploadPromiseResolve.current) {
+      uploadPromiseResolve.current(files);
+    }
   };
 
   return (
@@ -56,12 +84,31 @@ export default function UploadModal({
           disabled={isUploading}
         />
 
-        {/* File picker (UploadButton) or Loading */}
-        <div className={styles.fileInputWrapper}>
-          {isUploading ? (
+        {/* File picker (UploadButton) or Loading or Confirmation */}
+        <div className={styles.fileInputWrapper}>          {isUploading ? (
             <div className={styles.uploadingState}>
               <div className={styles.uploadSpinner}></div>
               <p className={styles.uploadingText}>Uploading...</p>
+            </div>
+          ) : showConfirmation ? (
+            <div className={styles.confirmationState}>
+              <p className={styles.confirmationText}>
+                Are you sure you want to upload: {selectedFiles.length}{" "}
+                {selectedFiles.length === 1 ? "photo" : "photos"}?
+              </p>
+              <div className={styles.confirmationButtons}>
+                <button
+                  className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                  onClick={() => startUpload(selectedFiles)}
+                >
+                  Yes, upload
+                </button>                <button
+                  className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           ) : (
             <UploadButton
@@ -70,6 +117,11 @@ export default function UploadModal({
                 username: session?.user?.name ?? "",
                 eventId,
                 caption: captionInput,
+              }}              onBeforeUploadBegin={(files) => {
+                handleFilesSelected(files);
+                return new Promise((resolve) => {
+                  uploadPromiseResolve.current = resolve;
+                });
               }}
               onUploadBegin={onUploadBegin}
               onClientUploadComplete={handleUploadComplete}
@@ -94,23 +146,23 @@ export default function UploadModal({
                 },
               }}
               content={{
-                button: "Choose Image",
+                button: "Choose Files",
                 allowedContent: "",
               }}
             />
-          )}
-        </div>
+          )}        </div>
 
         {/* Actions */}
-        <div className={styles.uploadActions}>
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-            onClick={handleCancel}
-            disabled={isUploading}
-          >
-            Cancel
-          </button>
-        </div>
+        {!showConfirmation && !isUploading && (
+          <div className={styles.uploadActions}>
+            <button
+              className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
