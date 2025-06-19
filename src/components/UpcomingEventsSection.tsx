@@ -11,6 +11,7 @@ import Modal from "~/components/ModalEvents";
 import React, { useState } from "react";
 import Link from "next/link";
 import styles from "~/styles/HomePageStyle.module.css";
+import loadingStyles from "~/styles/wishlistcomponent.module.css";
 
 const UpcomingEventsSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -28,7 +29,13 @@ const UpcomingEventsSection: React.FC = () => {
   });
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <Container borderStyle={ContainerBorderStyle.BOTTOM}>
+        <div className={loadingStyles.loadingContainer}>
+          <div className={loadingStyles.spinner} data-testid="loading-spinner"></div>
+        </div>
+      </Container>
+    );
   }
 
   if (isError) {
