@@ -238,7 +238,7 @@ export default function SignupForm() {
         <Link href="/disclosure-privacy">
           <button className={styles.secondaryButton}>Privacy Policy</button>
         </Link>
-        &nbsp;and
+        &nbsp;&nbsp;and
         <Link href="/disclosure-terms">
           <button className={styles.secondaryButton}>
             Terms and Conditions
