@@ -97,7 +97,6 @@ export default function SignupForm() {
         <h2 className={styles.title}>Create your account</h2>
       </div>
       {errors?.server}
-
       <div className={styles.middle}>
         <form id="signUpForm" className={styles.formContainer}>
           {/*username input*/}
@@ -216,7 +215,6 @@ export default function SignupForm() {
           </div>
         </form>
       </div>
-
       <div className={styles.bottom}>
         <button
           type="submit"
@@ -234,6 +232,19 @@ export default function SignupForm() {
           </Link>
         </p>
       </div>
+
+      <p className={styles.termsPrivacy}>
+        By joining, you agree to our
+        <Link href="/disclosure-privacy">
+          <button className={styles.secondaryButton}>Privacy Policy</button>
+        </Link>
+        &nbsp;and
+        <Link href="/disclosure-terms">
+          <button className={styles.secondaryButton}>
+            Terms and Conditions
+          </button>
+        </Link>
+      </p>
     </div>
   );
 }
