@@ -1,0 +1,35 @@
+-- DropForeignKey
+ALTER TABLE "Mark" DROP CONSTRAINT "Mark_articleId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "Mark" DROP CONSTRAINT "Mark_eventId_fkey";
+
+-- DropForeignKey
+ALTER TABLE "Mark" DROP CONSTRAINT "Mark_itemId_fkey";
+
+-- AlterTable
+ALTER TABLE "Contribution" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "Event" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "EventArticle" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "Item" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "StripeLink" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AddForeignKey
+ALTER TABLE "Mark" ADD CONSTRAINT "Mark_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mark" ADD CONSTRAINT "Mark_articleId_fkey" FOREIGN KEY ("articleId") REFERENCES "EventArticle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mark" ADD CONSTRAINT "Mark_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

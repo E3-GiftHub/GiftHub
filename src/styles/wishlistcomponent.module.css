@@ -96,225 +96,221 @@
 
 .itemsGrid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0.5rem 0;
 }
 
-/* Responsive grid based on screen size */
-@media (min-width: 500px) {
-  .itemsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 768px) {
+/* Responsive grid */
+@media (max-width: 1200px) {
   .itemsGrid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 900px) {
   .itemsGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .itemsGrid {
+    grid-template-columns: 1fr;
   }
 }
 
 .itemCard {
-  margin-bottom: 1rem;
-  transition: all 0.2s ease;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  backdrop-filter: blur(10px);
+  min-height: 350px;
+  position: relative;
 }
 
 .itemCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.08)
+  );
 }
 
-/* Contribution progress overlay */
+/* REDESIGNED IMAGE CONTAINER */
 .itemImage {
-  background-color: #e0e7ff; /* indigo-200 */
-  border-radius: 0.5rem;
-  height: 7rem;
-  margin-bottom: 0.5rem;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #818cf8; /* indigo-400 */
-  font-weight: 500;
-  position: relative; /* For positioning the overlay */
-  overflow: hidden; /* For the progress indicator */
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .actualItemImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
 }
 
 .contributionOverlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition:
-    opacity 0.4s ease,
-    visibility 0.4s ease,
-    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s ease;
   color: white;
-  border-radius: 0;
+  border-radius: 0.75rem;
   z-index: 10;
-  backdrop-filter: blur(4px); /* Only blur, no color */
+  backdrop-filter: blur(8px);
 }
 
 .itemCard:hover .contributionOverlay {
   opacity: 1;
   visibility: visible;
-  border-radius: 0.5rem;
-  transform: scale(1);
 }
 
 .contributionText {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
   color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.3s ease 0.1s,
-    transform 0.3s ease 0.1s; /* Delayed animation */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .contributionProgress {
-  width: 70%;
-  height: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
+  width: 80%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 0.75rem;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  transform: scaleX(0.9);
-  transition:
-    opacity 0.3s ease 0.2s,
-    transform 0.3s ease 0.2s; /* More delayed */
+  margin-bottom: 0.5rem;
 }
 
 .contributionBar {
   height: 100%;
-  background: linear-gradient(90deg, #9333ea, #c084fc);
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(90deg, #a78bfa, #7c3aed, #6366f1);
+  border-radius: 3px;
+  transition: transform 0.6s ease;
   transform-origin: left;
-  transform: scaleX(0); /* Start with 0 width */
-  transition: transform 0.8s cubic-bezier(0.11, 0.65, 0.33, 1) 0.3s; /* Even more delayed smooth animation */
+  transform: scaleX(0);
 }
 
 .contributionAmount {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.9);
-  background-color: rgba(0, 0, 0, 0.3);
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.3s ease 0.3s,
-    transform 0.3s ease 0.3s; /* Most delayed */
-}
-
-/* Add these new styles to animate the elements when the overlay appears */
-.itemCard:hover .contributionText,
-.itemCard:hover .contributionProgress,
-.itemCard:hover .contributionAmount {
-  opacity: 1;
-  transform: translateY(0) scaleX(1);
-}
-
-.itemCard:hover .contributionBar {
-  transform: scaleX(1); /* Animate to full width */
+  font-size: 0.75rem;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 500;
 }
 
 .itemDetails {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-  padding: 0.3rem;
-  gap: 10px;
-}
-
-/* flexing the price and priority */
-.itemDetailsEz {
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  margin-bottom: 0.25rem;
-  padding: 0 0.25rem;
-}
-
-.itemPriority,
-.itemPrice {
-  color: a5b4fc;
-}
-
-.itemNote {
-  border-radius: 0.3rem;
-  text-align: center;
-  border: none;
-  background-color: #a5b4fc;
-  font-size: 0.8rem;
-}
-
-.itemName {
-  margin: 0.5rem;
-  border-radius: 0.3rem;
-  text-align: center;
-  border: none;
-  background-color: #a5b4fc;
-}
-
-.itemDescription {
-  padding: 0.3rem;
-  border-radius: 0.3rem;
-  font-size: 0.8rem;
-  color: aliceblue;
-  border: none;
-  background-color: #a5b4fc;
-}
-
-.itemName,
-.itemNote,
-.itemPriority,
-.itemPrice {
-  font-size: 0.8rem;
-}
-
-.buttonsContainer {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.itemName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e0e7ff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.itemDetailsEz {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.itemPrice {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+.itemPriority {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+}
+
+.itemDescription {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c7d2fe;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 40px;
+  align-items: center;
+  text-align: center;
+}
+
+.itemNote {
+  background: rgba(255, 255, 255, 0.08);
+  color: #c7d2fe;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-style: italic;
+}
+
+.buttonsContainer {
+  margin-top: auto;
 }
 
 .actionButtonsRow {
   display: flex;
   gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .contributionInputContainer {
@@ -326,142 +322,132 @@
 .contributionInput {
   flex: 1;
   padding: 0.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid #e0e7ff;
-  background-color: #e0e7ff;
-  color: #1f2937;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
   font-size: 0.875rem;
+}
+
+.contributionInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .contributeSubmitButton,
 .contributeCancelButton {
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .contributeSubmitButton {
-  background-color: #818cf8;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
 }
 
 .contributeCancelButton {
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0e7ff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .contributeSubmitButton:hover {
-  background-color: #6366f1;
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
 }
 
 .contributeCancelButton:hover {
-  background-color: #c7d2fe;
+  background: rgba(255, 255, 255, 0.15);
 }
 
-/* Refined button styles with responsive sizing */
 .contributeButton,
 .externalButton {
   flex: 1;
-  border-radius: 32px;
-  padding: 0.35rem 0;
-  font-size: 0.75rem;
-  transition:
-    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
   text-align: center;
-  font-weight: 500;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  color: white;
-  height: 28px;
-  min-width: 0;
   position: relative;
-  transform: translateY(0);
-  display: flex; /* Add this */
-  align-items: center; /* Add this */
-  justify-content: center; /* Add this */
-}
-
-/* Media queries for responsive sizing */
-@media (min-width: 400px) {
-  .contributeButton,
-  .externalButton {
-    min-width: 85px;
-  }
-}
-
-@media (min-width: 768px) {
-  .contributeButton,
-  .externalButton {
-    min-width: 100px;
-  }
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .contributeButton {
-  background-color: #8b5cf6; /* Purple color for contribute */
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .externalButton {
-  background-color: #6366f1; /* Indigo color for external */
-}
-
-.contributeButton:hover:not(:disabled),
-.externalButton:hover:not(:disabled) {
-  cursor: pointer;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  /* Remove any transform to prevent movement */
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
 }
 
 .contributeButton:hover:not(:disabled) {
-  background-color: #7c3aed; /* Darker purple on hover */
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
 }
 
 .externalButton:hover:not(:disabled) {
-  background-color: #4f46e5; /* Darker indigo on hover */
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
 }
 
-/* Disabled button style */
-.contributeButton:disabled,
-.externalButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.contributeButton {
-  background-color: #8b5cf6; /* Purple color for contribute */
-}
-
-.externalButton {
-  background-color: #6366f1; /* Indigo color for external */
-}
-
-.contributeButton:hover:not(:disabled),
-.externalButton:hover:not(:disabled) {
-  cursor: pointer;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Pressed button effect */
 .buttonPressed {
-  background-color: #4338ca !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(1px) !important;
-  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
+  transform: translateY(0px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Disabled button style */
+.buttonPressed:hover {
+  background: linear-gradient(135deg, #9333ea, #7e22ce);
+}
+
 .contributeButton:disabled,
 .externalButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: rgba(107, 114, 128, 0.5);
   box-shadow: none;
   transform: none;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(239, 68, 68, 0.9);
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 15;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.deleteButton:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
 }
 
 .loadingContainer {
@@ -487,18 +473,29 @@
   }
 }
 
-.deleteButton {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: transparent;
-  border: none;
-  color: red;
-  font-size: 1.2rem;
-  cursor: pointer;
-  z-index: 10;
+@media (max-width: 1200px) {
+  .itemsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.deleteButton:hover {
-  transform: scale(1.2);
+@media (max-width: 900px) {
+  .itemsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .itemsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .itemCard {
+    min-height: 320px;
+  }
+
+  .itemImage {
+    height: 120px;
+  }
 }
