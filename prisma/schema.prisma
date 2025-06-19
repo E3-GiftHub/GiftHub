@@ -1,313 +1,381 @@
+/**
+ * ! documentation
+ * https://pris.ly/d/prisma-schema
+ * https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+ * https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+ * ! summary
+ * * 0. enum
+ * * 1. default models
+ * * 2. implemented components - main data
+ * * 3. event components
+ * * 4. actions
+ * * 5. reports
+ * * 6. notifications
+ */
+
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
-model Account {
-  id                    String  @id @default(cuid())
-  userUsername          String
-  type                  String
-  provider              String
-  providerAccountId     String
-  refreshToken          String?
-  accessToken           String?
-  expiresAt             Int?
-  tokenType             String?
-  scope                 String?
-  idToken               String?
-  sessionState          String?
-  refreshTokenExpiresIn Int?
-  user                  User    @relation(fields: [userUsername], references: [username], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userUsername String
-  expires      DateTime
-  user         User     @relation(fields: [userUsername], references: [username], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-model User {
-  username                  String                     @id @unique @default(cuid())
-  email                     String?                    @unique
-  id                        String?                    @unique
-  fname                     String?
-  lname                     String?
-  password                  String?
-  pictureUrl                String?                    @default("/UserImages/default_pfp.svg")
-  emailVerified             DateTime?
-  createdAt                 DateTime                   @default(now())
-  updatedAt                 DateTime                   @updatedAt
-  stripeConnectId           String?
-  emailToken                String?
-  tokenExpires              DateTime?
-  pictureKey                String?
-  accounts                  Account[]
-  contributions             Contribution[]
-  contributionNotifications ContributionNotification[]
-  eventsCreated             Event[]
-  eventReports              EventReport[]
-  invitations               Invitation[]
-  marks                     Mark[]
-  postsMedia                Media[]
-  mediaNotifications        MediaNotification[]
-  sessions                  Session[]
-  paymentLinks              StripeLink[]
-  reporters                 UserReport[]               @relation("reporter")
-  reportedUsers             UserReport[]               @relation("reported")
-
-  @@index([emailToken])
-}
-
-model Invitation {
-  id            Int        @id @default(autoincrement())
-  guestUsername String
-  eventId       Int
-  status        StatusType @default(PENDING)
-  createdAt     DateTime   @default(now())
-  repliedAt     DateTime?
-  event         Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  guest         User       @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
-
-  @@unique([guestUsername, eventId])
-  @@index([guestUsername, eventId])
-  @@index([eventId])
-  @@index([status])
-}
-
-model Event {
-  id                Int            @id @default(autoincrement())
-  title             String?
-  description       String?
-  location          String?
-  date              DateTime?
-  pictureUrl        String?        @default("/UserImages/default_pfp.svg")
-  token             String?
-  createdByUsername String         @default("DELETED_USER")
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  time              DateTime?
-  pictureKey        String?
-  contributions     Contribution[]
-  user              User           @relation(fields: [createdByUsername], references: [username], onDelete: SetDefault)
-  eventArticles     EventArticle[]
-  eventReports      EventReport[]
-  invitations       Invitation[]
-  marks             Mark[]
-  postsMedia        Media[]
-  paymentLinks      StripeLink[]
-
-  @@unique([createdByUsername, title])
-}
-
-model EventArticle {
-  eventId           Int
-  itemId            Int            @default(-1)
-  userNote          String?
-  priority          PriorityType?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  id                Int            @id @default(autoincrement())
-  transferCompleted Boolean?
-  contributions     Contribution[]
-  event             Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  item              Item           @relation(fields: [itemId], references: [id], onDelete: SetDefault)
-  marks             Mark[]
-  paymentLinks      StripeLink[]
-
-  @@index([eventId])
-  @@index([itemId])
-}
-
-model Item {
-  id              Int            @id @default(autoincrement())
-  name            String?
-  description     String?
-  imagesUrl       String?
-  price           Decimal?
-  retailerId      Int?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  imagesKey       String?
-  contributions   Contribution[]
-  eventOccurences EventArticle[]
-  retailer        Retailer?      @relation(fields: [retailerId], references: [id])
-  marks           Mark[]
-  StripeLink      StripeLink[]
-
-  @@index([retailerId])
-}
-
-model Retailer {
-  id     Int     @id @default(autoincrement())
-  name   String?
-  apiUrl String?
-  items  Item[]
-}
-
-model Media {
-  id               Int                 @id @default(autoincrement())
-  uploaderUsername String              @default("DELETED_USER")
-  eventId          Int
-  url              String
-  caption          String?
-  mediaType        String?
-  fileType         String?
-  fileSize         Int?
-  createdAt        DateTime            @default(now())
-  key              String
-  event            Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user             User                @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
-  notifications    MediaNotification[]
-
-  @@index([uploaderUsername, eventId])
-}
-
-model StripeLink {
-  id                  String        @id @default(cuid())
-  /// required by prisma
-  eventId             Int?
-  articleId           Int?
-  stripePaymentLinkId String        @unique
-  paymentLinkUrl      String
-  amount              Decimal
-  currency            String
-  status              StatusPayment
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-  guestUsername       String        @default("DELETED_USER")
-  /// required by prisma
-  itemId              Int?
-  article             EventArticle? @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  event               Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  guest               User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-  Item                Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
-
-  @@index([eventId, articleId, status])
-}
-
-model Contribution {
-  id                       Int                        @id @default(autoincrement())
-  /// required by prisma
-  eventId                  Int?
-  articleId                Int
-  cashAmount               Decimal
-  createdAt                DateTime                   @default(now())
-  currency                 String
-  guestUsername            String                     @default("DELETED_USER")
-  /// required by prisma
-  itemId                   Int?
-  updatedAt                DateTime                   @updatedAt
-  article                  EventArticle               @relation(fields: [articleId], references: [id])
-  event                    Event?                     @relation(fields: [eventId], references: [id], onDelete: Restrict)
-  guest                    User                       @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
-  item                     Item?                      @relation(fields: [itemId], references: [id], onDelete: Restrict)
-  ContributionNotification ContributionNotification[]
-
-  @@index([guestUsername, eventId])
-}
-
-model Mark {
-  markerUsername String
-  /// required by prisma
-  eventId        Int?
-  articleId      Int
-  type           MarkType
-  createdAt      DateTime     @default(now())
-  /// required by prisma
-  itemId         Int?
-  article        EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  event          Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  item           Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  guest          User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
-
-  @@id([markerUsername, articleId])
-  @@index([eventId])
-}
-
-model UserReport {
-  id                 Int      @id @default(autoincrement())
-  reportedByUsername String   @default("DELETED_USER")
-  reportedUsername   String
-  reason             String?
-  description        String?
-  createdAt          DateTime @default(now())
-  userSane           User     @relation("reporter", fields: [reportedByUsername], references: [username], onDelete: SetDefault)
-  userHell           User     @relation("reported", fields: [reportedUsername], references: [username])
-}
-
-model EventReport {
-  id                 Int      @id @default(autoincrement())
-  reportedByUsername String   @default("DELETED_USER")
-  reportedId         Int
-  reason             String?
-  description        String?
-  createdAt          DateTime @default(now())
-  user               User     @relation(fields: [reportedByUsername], references: [username], onDelete: SetDefault)
-  event              Event    @relation(fields: [reportedId], references: [id])
-}
-
-model MediaNotification {
-  id       Int                @id @default(autoincrement())
-  username String
-  mediaId  Int
-  action   NotificationAction
-  media    Media              @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  user     User               @relation(fields: [username], references: [username], onDelete: Cascade)
-
-  @@index([username])
-}
-
-model ContributionNotification {
-  id             Int                @id @default(autoincrement())
-  username       String
-  contributionId Int
-  action         NotificationAction
-  cash           Contribution       @relation(fields: [contributionId], references: [id], onDelete: Cascade)
-  user           User               @relation(fields: [username], references: [username], onDelete: Cascade)
-
-  @@index([username])
-}
+//! enum
 
 enum StatusType {
-  PENDING
-  ACCEPTED
+    PENDING
+    ACCEPTED
+    // REJECTED: if rejected => delete row
 }
 
 enum PriorityType {
-  LOW
-  MEDIUM
-  HIGH
+    LOW
+    MEDIUM
+    HIGH
 }
 
 /// we keep this in case of new types of marks
 enum MarkType {
-  PURCHASED
+    PURCHASED
+    // NULL: if null => delete row
 }
 
 enum StatusPayment {
-  PENDING
-  ACCEPTED
-  EXPIRED
+    PENDING
+    ACCEPTED
+    EXPIRED
 }
 
+//! default models
+
+model Account {
+    id                    String  @id @default(cuid())
+    userUsername          String
+    type                  String
+    provider              String
+    providerAccountId     String
+    refreshToken          String?
+    accessToken           String?
+    expiresAt             Int?
+    tokenType             String?
+    scope                 String?
+    idToken               String?
+    sessionState          String?
+    refreshTokenExpiresIn Int?
+
+    user User @relation(fields: [userUsername], references: [username], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userUsername String
+    expires      DateTime
+
+    user User @relation(fields: [userUsername], references: [username], onDelete: Cascade)
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+//! implemented components - main data
+
+model User {
+    username        String    @id @unique @default(cuid())
+    email           String?   @unique
+    id              String?   @unique
+    fname           String?
+    lname           String?
+    password        String? // stored with hash obviously
+    stripeConnectId String? // NOT UNIQUE: only one null value allowed
+    emailToken      String? // NOT UNIQUE: only one null value allowed
+    tokenExpires    DateTime?
+    pictureUrl      String?   @default("/UserImages/default_pfp.svg")
+    pictureKey      String?
+
+    emailVerified DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // relations
+    eventsCreated Event[]
+    invitations   Invitation[]
+
+    postsMedia    Media[]
+    marks         Mark[]
+    contributions Contribution[]
+    paymentLinks  StripeLink[]
+
+    reporters     UserReport[]  @relation("reporter")
+    reportedUsers UserReport[]  @relation("reported")
+    eventReports  EventReport[]
+
+    // mandatory assets
+    accounts                  Account[]
+    sessions                  Session[]
+    mediaNotifications        MediaNotification[]
+    contributionNotifications ContributionNotification[]
+
+    @@index([emailToken])
+}
+
+model Invitation {
+    id            Int    @id @default(autoincrement())
+    guestUsername String
+    eventId       Int
+
+    status    StatusType @default(PENDING)
+    createdAt DateTime   @default(now())
+    repliedAt DateTime?
+
+    guest User  @relation(fields: [guestUsername], references: [username], onDelete: Cascade)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+    @@unique([guestUsername, eventId])
+    @@index([guestUsername, eventId])
+    @@index([eventId])
+    @@index([status])
+}
+
+model Event {
+    id          Int       @id @default(autoincrement())
+    title       String?
+    description String?
+    location    String?
+    date        DateTime?
+    time        DateTime?
+    pictureUrl  String?   @default("/UserImages/default_pfp.svg")
+    pictureKey  String?
+    token       String?
+
+    createdByUsername String   @default("DELETED_USER")
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+    user              User     @relation(fields: [createdByUsername], references: [username], onDelete: SetDefault)
+
+    invitations Invitation[]
+
+    postsMedia    Media[]
+    marks         Mark[]
+    contributions Contribution[]
+    paymentLinks  StripeLink[]
+    eventArticles EventArticle[]
+    eventReports  EventReport[]
+
+    @@unique([createdByUsername, title])
+}
+
+//! event components
+
+// junction TABLE for event-specific wishlist entry
+model EventArticle {
+    id                Int           @id @default(autoincrement())
+    eventId           Int
+    itemId            Int           @default(-1) // deleted item
+    userNote          String? // additional note
+    priority          PriorityType?
+    transferCompleted Boolean? // sent from our stripe to the Planner stripe
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    item  Item  @relation(fields: [itemId], references: [id], onDelete: SetDefault)
+
+    // @@id([eventId, itemId]) //! an item can be added ++ times
+    marks         Mark[]
+    contributions Contribution[]
+    paymentLinks  StripeLink[]
+
+    @@index([eventId])
+    @@index([itemId])
+}
+
+model Item {
+    id          Int      @id @default(autoincrement())
+    name        String?
+    description String?
+    imagesUrl   String?
+    imagesKey   String? //! NULL => NOT custom item
+    price       Decimal?
+
+    retailerId Int? //! NULL => custom item
+    retailer   Retailer? @relation(fields: [retailerId], references: [id], onDelete: SetNull)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    eventOccurences EventArticle[]
+    marks           Mark[]
+    contributions   Contribution[]
+    StripeLink      StripeLink[]
+
+    @@index([retailerId])
+}
+
+model Retailer {
+    id     Int     @id @default(autoincrement())
+    name   String?
+    apiUrl String?
+    items  Item[]
+}
+
+//! actions
+
+model Media {
+    id               Int    @id @default(autoincrement())
+    uploaderUsername String @default("DELETED_USER")
+    eventId          Int
+    url              String
+    key              String
+
+    caption   String?
+    mediaType String?
+    fileType  String?
+    fileSize  Int?
+    createdAt DateTime @default(now())
+
+    user  User  @relation(fields: [uploaderUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+    notifications MediaNotification[]
+
+    @@index([uploaderUsername, eventId])
+}
+
+//! real money
+//! SetDefault = deleted content 
+//! it is about real money, do not delete records
+
+model StripeLink {
+    id            String @id @default(cuid())
+    guestUsername String @default("DELETED_USER")
+    eventId       Int? /// required by prisma
+    articleId     Int? // optional: `direct contribution` case
+    itemId        Int? /// required by prisma
+
+    stripePaymentLinkId String @unique
+    paymentLinkUrl      String // reusable redirecting link
+
+    amount   Decimal
+    currency String
+    status   StatusPayment
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    guest   User          @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    Item    Item?         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@index([eventId, articleId, status])
+}
+
+model Contribution {
+    id            Int    @id @default(autoincrement())
+    guestUsername String @default("DELETED_USER") // always a Guest
+    eventId       Int? /// required by prisma
+    articleId     Int
+    itemId        Int? /// required by prisma
+
+    cashAmount Decimal
+    currency   String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt //! users can NOT withdraw back
+    //! updated only if SetDefault
+
+    guest   User         @relation(fields: [guestUsername], references: [username], onDelete: SetDefault)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Restrict)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Restrict)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Restrict)
+
+    ContributionNotification ContributionNotification[]
+
+    @@index([guestUsername, eventId])
+}
+
+model Mark {
+    markerUsername String // always a Guest
+    eventId        Int? /// required by prisma
+    articleId      Int
+    itemId         Int? /// required by prisma
+
+    type      MarkType
+    createdAt DateTime @default(now())
+
+    guest   User         @relation(fields: [markerUsername], references: [username], onDelete: Cascade)
+    event   Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    article EventArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    item    Item?        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@id([markerUsername, articleId])
+    @@index([eventId])
+}
+
+//! reports
+
+model UserReport {
+    id                 Int      @id @default(autoincrement())
+    reportedByUsername String   @default("DELETED_USER")
+    reportedUsername   String
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
+
+    userSane User @relation("reporter", fields: [reportedByUsername], references: [username], onDelete: SetDefault)
+    userHell User @relation("reported", fields: [reportedUsername], references: [username], onDelete: Restrict)
+}
+
+model EventReport {
+    id                 Int      @id @default(autoincrement())
+    reportedByUsername String   @default("DELETED_USER") // NOT always a Guest
+    reportedId         Int
+    reason             String?
+    description        String?
+    createdAt          DateTime @default(now())
+
+    user  User  @relation(fields: [reportedByUsername], references: [username], onDelete: SetDefault)
+    event Event @relation(fields: [reportedId], references: [id], onDelete: Restrict)
+}
+
+//! notifications
+
 enum NotificationAction {
-  READ
-  DELETE
+    READ
+    DELETE
+}
+
+model MediaNotification {
+    id       Int                @id @default(autoincrement())
+    username String
+    mediaId  Int
+    action   NotificationAction
+
+    user  User  @relation(fields: [username], references: [username], onDelete: Cascade)
+    media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+    @@index([username])
+}
+
+model ContributionNotification {
+    id             Int                @id @default(autoincrement())
+    username       String
+    contributionId Int
+    action         NotificationAction
+
+    user User         @relation(fields: [username], references: [username], onDelete: Cascade)
+    cash Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+    @@index([username])
 }
