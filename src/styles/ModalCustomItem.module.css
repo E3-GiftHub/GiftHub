@@ -16,7 +16,7 @@
   padding: 2rem;
   max-height: 70vh;
   overflow-y: auto;
-  width: 65%;
+  width: 70%;
   position: relative;
   z-index: 1011;
   background-color: #17153b;
@@ -73,11 +73,8 @@
 .modalImage {
   height: fit-content;
   width: fit-content;
-  width: 60%;
-  margin: 1rem;
-}
-
-.customUploadButton {
+  margin-bottom: 1rem;
+  width: 50%;
 }
 
 /* inputs */
@@ -86,7 +83,7 @@
   width: 20%;
 
   margin-right: 3.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.5rem;
   border: none;
   margin-bottom: 2rem;
   border-radius: 10px;
@@ -98,10 +95,10 @@
 
 .priorityInput {
   margin-left: 15px;
-  width: 24%;
+  width: 40%;
 
   margin-right: 3.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.5rem;
   border: none;
   margin-bottom: 2rem;
   border-radius: 10px;
@@ -113,7 +110,7 @@
 
 .noteInput {
   margin-right: 8rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.5rem;
   border: none;
   margin-bottom: 2rem;
   border-radius: 10px;
@@ -121,6 +118,7 @@
   color: #1e1e1e;
   font-size: 1rem;
   resize: none;
+  width: 90%;
 }
 .priorityInput option {
   background-color: #cbb1dc;
@@ -137,7 +135,7 @@
   .modalImage {
     justify-self: center;
     align-self: center;
-    width: 50%;
+    width: 100%;
   }
 }
 

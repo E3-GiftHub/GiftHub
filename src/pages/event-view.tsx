@@ -172,7 +172,7 @@ export default function EventView() {
 
     const user = guests.find((g) => g.username === name);
     if (user) {
-      alert("guest already invited");
+      alert("the User already accepted your invite");
       return;
     }
 

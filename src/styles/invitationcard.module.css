@@ -192,10 +192,10 @@
 }
 
 
-@media (max-width: 500px) { /* Updated from 400px to match new envelope size */
+@media (max-width: 720px) { /* Updated from 400px to match new envelope size */
   .envelope {
-    width: 550px; /* Updated from 300px */
-    height: 420px; /* Updated from 190px */
+    width: 350px; /* Updated from 300px */
+    height: 220px; /* Updated from 190px */
   }
 
   .title {
@@ -203,5 +203,8 @@
   }
   .description {
     font-size: 0.8rem;
+  }
+  .card{
+    width: 85%;
   }
 }

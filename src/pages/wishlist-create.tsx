@@ -16,6 +16,7 @@ import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import loadingStyles from "../styles/wishlistcomponent.module.css";
 import "./../styles/globals.css";
+import ebayLogo from "./../../public/illustrations/ebay-logo.png"
 
 type ItemCreateResponse = {
   itemId: number;
@@ -123,30 +124,15 @@ export default function CreateWishlist() {
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
-          {/* go back */}
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
-            onClick={router.back}
-          >
-            ← Back
-          </button>
-
-          {/* create custom article */}
-          <button
-            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
-            onClick={() => setIsCustomOpen(true)}
-          >
-            Create custom article
-          </button>
-
-          {isCustomOpen && (
-            <CustomWishlistModal
-              onAddToWishlist={handleAddToWishlist}
-              onClose={closeCustom}
-            />
-          )}
 
           <div className={styles.titleContainer}>
+            {/* go back */}
+              <button
+                className={`${buttonStyles.button} ${buttonStyles["button-secondary"]} ${styles.backButton}`}
+                onClick={router.back}
+              >
+                ← Back
+              </button>
             <h1 className={styles.title}>
               Add Item to the Wishlist for Event {eventId}
             </h1>
@@ -154,9 +140,25 @@ export default function CreateWishlist() {
 
           {/* Search Bar */}
           <div className={styles.section}>
+            {/* create custom article */}
+            <button
+              className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+              onClick={() => setIsCustomOpen(true)}
+            >
+              Create custom article
+            </button>
+            {isCustomOpen && (
+            <CustomWishlistModal
+              onAddToWishlist={handleAddToWishlist}
+              onClose={closeCustom}
+            />
+          )}
+
+            <p>or</p>
             <div className={styles.searchContainer}>
               <label htmlFor="product-search" className={styles.sectionTitle}>
-                Search for a product:
+                Search for a product on:
+                <img src={'/illustrations/ebay-logo.png'} alt='ebayLogo' className={styles.ebayLogo}/>
               </label>
               <div className={styles.searchWrapper}>
                 <input
