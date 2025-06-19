@@ -32,7 +32,6 @@ describe("GuestListModal", () => {
   const onClose = jest.fn();
   const onRemoveGuest = jest.fn();
   const onAddGuest = jest.fn();
-  const onSave = jest.fn();
 
   const renderLoadedModal = () => {
     render(

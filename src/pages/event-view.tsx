@@ -94,6 +94,7 @@ export default function EventView() {
   const [guests, setGuests] = useState<GuestHeader[]>([]);
   const [loadingGuests, setLoadingGuests] = useState(true);
   useEffect(() => {
+    if (!username) return;
     (async () => {
       try {
         const res = await fetch(`./api/guest-list?eventId=${eventId}`);
@@ -151,13 +152,22 @@ export default function EventView() {
       }
     };
     f().catch((err) => {
-      console.error("Unexpected error in useEffect:", err);
+      console.error("Unexpected error in handleRemoveGuest():", err);
     });
   };
 
   const handleAddGuest = () => {
     const name = window.prompt("Enter guest username:");
+    if (username === name) {
+      alert("you can not invite yourself");
+      return;
+    }
+
     const user = guests.find((g) => g.username === name);
+    if (user) {
+      alert("guest already invited");
+      return;
+    }
 
     // the user is not already a Guest in this Event
     if (user == null && name?.trim()) {
@@ -171,13 +181,15 @@ export default function EventView() {
             error: string;
           };
           console.log(apiStatus);
-          // Do NOT add to view here; guest appears after they accept invitation
+          if (apiStatus.error === "No error")
+            alert("Succeded to send the invite");
+          else alert(apiStatus.error);
         } catch (error) {
           console.error("Failed to insert guests", error);
         }
       };
       f().catch((err) => {
-        console.error("Unexpected error in useEffect:", err);
+        console.error("Unexpected error in handleAddGuest():", err);
       });
     }
   };
@@ -316,6 +328,31 @@ export default function EventView() {
     }));
   };
 
+  const onConfirmDeleteEvent = () => {
+    void (async () => {
+      try {
+        const res = await deleteEventMutation.mutateAsync({
+          eventId: parsedId,
+        });
+        // ✅ New: Show warning if deletion not allowed
+        if (!res.success) {
+          alert(res.message ?? "Cannot delete this event.");
+          return;
+        }
+
+        alert("Event deleted successfully.");
+        void router.push("/");
+      } catch (err) {
+        console.error("Failed to delete event:", err);
+        const message =
+          err instanceof Error ? err.message : "Could not delete event.";
+        alert(message ?? "Could not delete event.");
+      } finally {
+        setShowDeleteModal(false);
+      }
+    })();
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Navbar />
@@ -358,32 +395,7 @@ export default function EventView() {
 
       {showDeleteModal && (
         <DeleteEventModal
-          onConfirm={() => {
-            void (async () => {
-              try {
-                const res = await deleteEventMutation.mutateAsync({
-                  eventId: parsedId,
-                });
-                // ✅ New: Show warning if deletion not allowed
-                if (!res.success) {
-                  alert(res.message ?? "Cannot delete this event.");
-                  return;
-                }
-
-                alert("Event deleted successfully.");
-                void router.push("/");
-              } catch (err) {
-                console.error("Failed to delete event:", err);
-                const message =
-                  err instanceof Error
-                    ? err.message
-                    : "Could not delete event.";
-                alert(message ?? "Could not delete event.");
-              } finally {
-                setShowDeleteModal(false);
-              }
-            })();
-          }}
+          onConfirm={onConfirmDeleteEvent}
           onCancel={() => setShowDeleteModal(false)}
         />
       )}
@@ -406,7 +418,7 @@ export default function EventView() {
             <input
               type="text"
               placeholder="Enter caption"
-              className={styles.captionInput} // Optional: create styling if needed
+              className={styles.captionInput}
               value={captionInput}
               onChange={(e) => setCaptionInput(e.target.value)}
             />
@@ -414,14 +426,14 @@ export default function EventView() {
             <UploadButton
               endpoint="imageUploader"
               input={{
-                username: username, // or however you store the logged-in user
+                username: username,
                 eventId: eventId,
                 caption: captionInput,
               }}
+              onUploadProgress={() => setShowUploadModal(false)}
               onClientUploadComplete={(res) => {
                 console.log("Files:", res);
                 alert("Upload completed");
-                setShowUploadModal(false);
               }}
               onUploadError={(err: Error) => {
                 alert(`Error: ${err.message}`);

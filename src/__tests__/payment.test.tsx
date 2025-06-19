@@ -1,14 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-
 import React from "react";
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-} from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PaymentPage from "../pages/payment"; // ← adjust if needed
 
@@ -47,11 +38,11 @@ let mockRouter: MockRouter = {
   push: jest.fn(),
   replace: jest.fn(),
   back: jest.fn(),
-  pathname: '/payment',
-  route: '/payment',
-  asPath: '/payment',
+  pathname: "/payment",
+  route: "/payment",
+  asPath: "/payment",
   isFallback: false,
-  basePath: '',
+  basePath: "",
   locale: undefined,
   locales: undefined,
   defaultLocale: undefined,
@@ -87,13 +78,13 @@ jest.mock("../../styles/globals.css", () => ({}));
 // Stub Navbar & Footer with proper display names
 jest.mock("../components/Navbar", () => {
   const MockNavbar = () => <div data-testid="navbar" />;
-  MockNavbar.displayName = 'MockNavbar';
+  MockNavbar.displayName = "MockNavbar";
   return MockNavbar;
 });
 
 jest.mock("../components/Footer", () => {
   const MockFooter = () => <div data-testid="footer" />;
-  MockFooter.displayName = 'MockFooter';
+  MockFooter.displayName = "MockFooter";
   return MockFooter;
 });
 
@@ -113,7 +104,7 @@ interface NextImageProps {
   loader?: (args: { src: string; width: number; quality?: number }) => string;
   onLoad?: () => void;
   onError?: () => void;
-  loading?: 'lazy' | 'eager';
+  loading?: "lazy" | "eager";
   blurDataURL?: string;
 }
 
@@ -123,8 +114,8 @@ jest.mock("next/image", () => {
     // eslint-disable-next-line @next/next/no-img-element
     <img {...props} alt={props.alt} />
   );
-  MockNextImage.displayName = 'MockNextImage';
-  
+  MockNextImage.displayName = "MockNextImage";
+
   return {
     __esModule: true,
     default: MockNextImage,
@@ -168,11 +159,11 @@ describe("PaymentPage (payment.tsx)", () => {
       push: jest.fn(),
       replace: jest.fn(),
       back: jest.fn(),
-      pathname: '/payment',
-      route: '/payment',
-      asPath: '/payment',
+      pathname: "/payment",
+      route: "/payment",
+      asPath: "/payment",
       isFallback: false,
-      basePath: '',
+      basePath: "",
       locale: undefined,
       locales: undefined,
       defaultLocale: undefined,
@@ -190,18 +181,21 @@ describe("PaymentPage (payment.tsx)", () => {
 
     // Mock global.fetch with proper typing:
     global.fetch = jest.fn((input: RequestInfo | URL) => {
-      const url = typeof input === "string" ? input : 
-                  input instanceof URL ? input.toString() :
-                  input.url;
-      
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.toString()
+            : input.url;
+
       if (url.includes("/api/stripe/details")) {
         return Promise.resolve({
           ok: true,
           status: 200,
-          statusText: 'OK',
+          statusText: "OK",
           headers: new Headers(),
           redirected: false,
-          type: 'basic' as ResponseType,
+          type: "basic" as ResponseType,
           url: url,
           clone: jest.fn(),
           body: null,
@@ -213,15 +207,15 @@ describe("PaymentPage (payment.tsx)", () => {
           json: () => Promise.resolve(detailsResponse),
         });
       }
-      
+
       if (url.includes("/api/stripe/contribute")) {
         return Promise.resolve({
           ok: true,
           status: 200,
-          statusText: 'OK',
+          statusText: "OK",
           headers: new Headers(),
           redirected: false,
-          type: 'basic' as ResponseType,
+          type: "basic" as ResponseType,
           url: url,
           clone: jest.fn(),
           body: null,
@@ -233,14 +227,14 @@ describe("PaymentPage (payment.tsx)", () => {
           json: () => Promise.resolve({ url: "https://checkout.example.com" }),
         });
       }
-      
+
       return Promise.resolve({
         ok: false,
         status: 404,
-        statusText: 'Not Found',
+        statusText: "Not Found",
         headers: new Headers(),
         redirected: false,
-        type: 'basic' as ResponseType,
+        type: "basic" as ResponseType,
         url: url,
         clone: jest.fn(),
         body: null,
@@ -291,7 +285,7 @@ describe("PaymentPage (payment.tsx)", () => {
 
     // Ensure the <img> src matches details.imageUrl
     const img = screen.getByRole("img");
-    expect(img).toHaveAttribute('src', "https://example.com/cake.png");
+    expect(img).toHaveAttribute("src", "https://example.com/cake.png");
 
     // The input should have min="1" and max="150":
     const input = screen.getByPlaceholderText("Enter amount");
@@ -311,12 +305,16 @@ describe("PaymentPage (payment.tsx)", () => {
     const button = screen.getByRole("button", { name: /CHECKOUT/i });
 
     // Spy on window.alert()
-    const alertSpy = jest.spyOn(window, "alert").mockImplementation(() => undefined);
+    const alertSpy = jest
+      .spyOn(window, "alert")
+      .mockImplementation(() => undefined);
 
     // 1) Enter 300 → should alert about max 150:
     fireEvent.change(input, { target: { value: "300" } });
     fireEvent.click(button);
-    expect(alertSpy).toHaveBeenCalledWith("You can only contribute up to 150 RON.");
+    expect(alertSpy).toHaveBeenCalledWith(
+      "You can only contribute up to 150 RON.",
+    );
 
     alertSpy.mockReset();
 
@@ -324,7 +322,9 @@ describe("PaymentPage (payment.tsx)", () => {
     fireEvent.change(input, { target: { value: "100" } });
     fireEvent.click(button);
     await waitFor(() => {
-      expect((window as Record<string, unknown>).location.href).toBe("https://checkout.example.com");
+      expect((window as Record<string, unknown>).location.href).toBe(
+        "https://checkout.example.com",
+      );
     });
 
     alertSpy.mockRestore();

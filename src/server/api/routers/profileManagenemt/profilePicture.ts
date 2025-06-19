@@ -1,8 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { UTApi } from "uploadthing/server";
 import { z } from "zod";
-
-const utapi = new UTApi();
 
 export const profilePictureRouter = createTRPCRouter({
   upload: protectedProcedure
@@ -45,8 +42,6 @@ export const profilePictureRouter = createTRPCRouter({
     if (!user?.pictureUrl) {
       throw new Error("No profile picture to delete");
     }
-
-    const key = user.pictureUrl.split("/")[1];
 
     try {
       await ctx.db.user.update({

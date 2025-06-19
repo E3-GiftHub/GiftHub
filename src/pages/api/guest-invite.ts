@@ -18,12 +18,36 @@ export default async function handler(
     select: { username: true },
   });
 
-  if (user === null) return res.status(404).json({ error: "Missing User" });
+  if (user === null)
+    return res.status(404).json({ error: "No User found with this username" });
 
   // user exists
   await prisma.invitation.create({
     data: { guestUsername: username, eventId: eventId },
   });
+
+  // sends email notification to the invited user
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { 
+        title: true, 
+        createdByUsername: true 
+      },
+    });
+
+    if (event) {
+      const { notifyUserOfNewInvitation } = await import("@/server/api/routers/inboxEmailNotifier");
+      await notifyUserOfNewInvitation(
+        username,
+        event.createdByUsername,
+        event.title ?? "An Event",
+        eventId
+      );
+    }
+  } catch (emailError: unknown) {
+    console.error("Failed to send invitation notification email:", emailError);
+  }
 
   return res.status(200).json({ error: "No error" });
 }

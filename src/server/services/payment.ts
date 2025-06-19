@@ -101,11 +101,23 @@ export async function createCheckoutLink(
     plannerStripeId = eventArticle.event.user.stripeConnectId;
 
     // Build exactly the same fields as before for contributions:
+    const validImageUrl = (urlString: string | null): string => {
+      const fallbackUrl = "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
+      if (null == urlString)
+        return fallbackUrl;
+      try {
+        const url = new URL(urlString);
+        if (url.protocol === 'http:' || url.protocol === 'https:')
+          return urlString;
+        return fallbackUrl;
+      } catch {
+        return fallbackUrl;
+      }
+    };
+
     const itemName = eventArticle.item.name ?? "Untitled Item";
     const eventTitle = eventArticle.event.title ?? "Untitled Event";
-    const imageUrl =
-      eventArticle.item.imagesUrl?.trim() ??
-      "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2025/05/1440/810/michael-jordan.jpg?ve=1&tl=1";
+    const imageUrl = validImageUrl(eventArticle.item.imagesUrl);
 
     const plannerFullName =
       `${plannerFirstName} ${plannerLastName}`.trim() || plannerUsername;
@@ -271,10 +283,10 @@ export async function createCheckoutLink(
     ],
     ...(transferDestination
       ? {
-          transfer_data: {
-            destination: transferDestination,
-          },
-        }
+        transfer_data: {
+          destination: transferDestination,
+        },
+      }
       : {}),
     metadata: {
       eventId: eventId.toString(),

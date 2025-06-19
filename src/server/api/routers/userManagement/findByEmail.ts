@@ -9,8 +9,6 @@ export const recoveryRouter = createTRPCRouter({
   findByEmail: publicProcedure
     .input(findByEmailSchema)
     .mutation(async ({ input, ctx }) => {
-      const { email } = input;
-
       const user = await ctx.db.user.findUnique({
         where: {
           email: input.email,

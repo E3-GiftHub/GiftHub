@@ -2,35 +2,22 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import { api } from "~/trpc/react";
+
+import formatImage from "~/utils/formatImage";
+import type { EbayItem } from "~/models/EbayItem";
+import type { WishlistInputItem } from "~/models/WishlistInputItem";
+
 import Navbar from "../components/Navbar";
 import AddToWishlistModal from "../components/AddToWishlistModal";
+import CustomWishlistModal from "../components/CustomWishlistModal";
+import Termination from "~/components/Termination";
+
 import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import "./../styles/globals.css";
-import Termination from "~/components/Termination";
-
-interface EbayItem {
-  itemId: string;
-  title: string;
-  image?: {
-    imageUrl?: string;
-  };
-  price?: {
-    value?: string;
-    currency?: string;
-  };
-  shortDescription?: string;
-}
 
 type ItemCreateResponse = {
   itemId: number;
-};
-
-type WishlistInputItem = {
-  name: string;
-  photo: string;
-  price: string;
-  quantity: number;
 };
 
 export default function CreateWishlist() {
@@ -45,6 +32,7 @@ export default function CreateWishlist() {
     { enabled: debouncedSearchTerm.length > 1 },
   );
 
+  const [isCustomOpen, setIsCustomOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     name: string;
@@ -78,12 +66,7 @@ export default function CreateWishlist() {
       const itemResponse = await fetch("/api/item-create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: item.name,
-          description: "", // optional
-          imagesUrl: item.photo,
-          price: (item.price ?? "").split(" ")[0],
-        }),
+        body: JSON.stringify(item),
       });
 
       const result = (await itemResponse.json()) as ItemCreateResponse;
@@ -93,6 +76,12 @@ export default function CreateWishlist() {
         throw new Error("Item creation failed. No ID returned.");
       }
 
+      const p = item.priority?.valueOf();
+      let priority: "LOW" | "MEDIUM" | "HIGH" | null = null;
+      if (1 === p) priority = "LOW";
+      else if (2 === p) priority = "MEDIUM";
+      else if (3 === p) priority = "HIGH";
+
       // 2. Add to wishlist (EventArticle)
       for (let i = 0; i < item.quantity; i++) {
         await addItemToWishlist({
@@ -100,7 +89,8 @@ export default function CreateWishlist() {
           item: {
             itemId,
             quantity: 1, // single entry at a time
-            priority: "LOW",
+            priority: priority,
+            note: item.note,
           },
         });
       }
@@ -112,11 +102,49 @@ export default function CreateWishlist() {
     }
   };
 
+  const closeCustom = async (key: string | null) => {
+    setIsCustomOpen(false);
+    if (!key || "" === key) return;
+
+    try {
+      await fetch("/api/cancel-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: key }),
+      });
+    } catch (err) {
+      console.error("❌ Failed to cancel upload", err);
+    }
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Navbar />
       <div className={styles.container}>
         <main className={styles.main}>
+          {/* go back */}
+          <button
+            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+            onClick={router.back}
+          >
+            ← Back
+          </button>
+
+          {/* create custom article */}
+          <button
+            className={`${buttonStyles.button} ${buttonStyles["button-primary"]}`}
+            onClick={() => setIsCustomOpen(true)}
+          >
+            Create custom article
+          </button>
+
+          {isCustomOpen && (
+            <CustomWishlistModal
+              onAddToWishlist={handleAddToWishlist}
+              onClose={closeCustom}
+            />
+          )}
+
           <div className={styles.titleContainer}>
             <h1 className={styles.title}>
               Add Item to the Wishlist for Event {eventId}
@@ -156,7 +184,7 @@ export default function CreateWishlist() {
                 <div key={item.itemId} className={styles.itemCard}>
                   <div className={styles.itemImage}>
                     <img
-                      src={item.image?.imageUrl}
+                      src={formatImage(item.image?.imageUrl, "/logo.png")}
                       alt={item.title}
                       style={{ width: "100%", height: "auto" }}
                     />
@@ -193,7 +221,7 @@ export default function CreateWishlist() {
               itemName={selectedItem.name}
               itemPhoto={selectedItem.photo}
               itemPrice={selectedItem.price}
-              itemDescription={selectedItem.description}
+              itemDescription={selectedItem.description ?? ""}
               onAddToWishlist={handleAddToWishlist}
             />
           )}

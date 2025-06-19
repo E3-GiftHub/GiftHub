@@ -1,4 +1,5 @@
-type ItemState = 'none' | 'contributing' | 'external';
+import { PriorityType } from "@prisma/client";
+type ItemState = "none" | "contributing" | "external";
 
 export interface TrendingItem {
   id: number;
@@ -13,6 +14,11 @@ export interface TrendingItem {
   };
   userHasContributed?: boolean;
   userContributionAmount?: number;
+
+  //! new added
+  desc: string | null;
+  note: string | null;
+  priority: PriorityType | null;
 }
 
 export interface WishlistProps {

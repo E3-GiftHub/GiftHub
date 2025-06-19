@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 
+import "~/styles/globals.css";
 import styles from "../styles/Payment.module.css";
-import Image from "next/image";
+import buttonStyles from "../styles/Button.module.css";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import "~/styles/globals.css";
 import Termination from "~/components/Termination";
 
 interface PaymentDetails {
@@ -213,14 +214,8 @@ export default function CheckoutPage() {
   }
 
   // Decide which image URL to use:
-  // - If details.imageUrl exists AND starts with "http://" or "https://", use it
   // - Otherwise, default to "/cake.png"
-  const imgSrc =
-    details.imageUrl &&
-    (details.imageUrl.startsWith("http://") ||
-      details.imageUrl.startsWith("https://"))
-      ? details.imageUrl
-      : "/cake.png";
+  const imgSrc = details.imageUrl ?? "/cake.png";
 
   return (
     <div className={styles.container}>
@@ -325,6 +320,13 @@ export default function CheckoutPage() {
         </div>
 
         <div className={styles.checkoutBtnWrapper}>
+          <button
+            className={`${buttonStyles.button} ${buttonStyles["button-secondary"]}`}
+            onClick={router.back}
+          >
+            ← Back
+          </button>
+
           <button
             className={styles.checkoutBtn}
             onClick={handleCheckout}

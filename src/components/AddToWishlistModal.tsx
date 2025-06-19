@@ -1,43 +1,52 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import styles from "../styles/Button.module.css";
 import modalStyles from "../styles/ModalEventHome.module.css";
 
+// typescript compliant, not prisma!
+import { PriorityTypeEnum } from "~/models/PriorityTypeEnum";
+import type { WishlistInputItem } from "~/models/WishlistInputItem";
+
+const EBAY_ID = 1;
+
 interface AddToWishlistModalProps {
   isOpen: boolean;
-  onClose: () => void;
   itemName: string;
   itemPhoto: string;
   itemPrice: string;
-  itemDescription?: string;
-  onAddToWishlist: (item: {
-    name: string;
-    photo: string;
-    price: string;
-    quantity: number;
-  }) => void;
+  itemDescription: string;
+  onAddToWishlist: (item: WishlistInputItem) => void;
+  onClose: () => void;
 }
 
 export default function AddToWishlistModal({
   isOpen,
-  onClose,
   itemName,
   itemPhoto,
   itemPrice,
   itemDescription,
   onAddToWishlist,
-}: AddToWishlistModalProps) {
+  onClose,
+}: Readonly<AddToWishlistModalProps>) {
   const [quantity, setQuantity] = useState(1);
+  const [priority, setPriority] = useState<PriorityTypeEnum>(
+    PriorityTypeEnum.LOW,
+  );
+  const [note, setNote] = useState("");
 
   if (!isOpen) return null;
 
   const handleAddToWishlist = () => {
     onAddToWishlist({
       name: itemName,
+      description: itemDescription,
       photo: itemPhoto,
+      key: null,
       price: itemPrice,
       quantity: quantity,
+      priority: priority,
+      note: note,
+      retailer: EBAY_ID,
     });
   };
 
@@ -47,10 +56,10 @@ export default function AddToWishlistModal({
         <h2 className={modalStyles.modalTitleAdd}>Add to Wishlist</h2>
         <div className={modalStyles.product}>
           <img
-              src={itemPhoto}
-              alt={itemName}
-              className={modalStyles.modalImage}
-            />
+            src={itemPhoto}
+            alt={itemName}
+            className={modalStyles.modalImage}
+          />
 
           <div className={modalStyles.productInfo}>
             <h3 className={modalStyles.modalItemName}>{itemName}</h3>
@@ -60,16 +69,49 @@ export default function AddToWishlistModal({
                 {itemDescription}
               </p>
             )}
-            <div>
-            <label htmlFor="quantity" className={modalStyles.quantityLabel}>
-              Quantity:
-            </label>
-            <input type="number" id="quantity"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className={modalStyles.quantityInput}
+
+            <div className={modalStyles.plannerInputs}>
+              <label htmlFor="note" className={modalStyles.noteLabel}>
+                Add a note for your guests:
+              </label>
+              <input
+                type="string"
+                id="note"
+                value={note}
+                onChange={(e) => setNote(String(e.target.value))}
+                className={modalStyles.noteInput}
               />
+
+              <div className={modalStyles.plannerInputsEz}>
+                <label htmlFor="quantity" className={modalStyles.quantityLabel}>
+                  Quantity:
+                </label>
+                <input
+                  type="number"
+                  id="quantity"
+                  min="1"
+                  max="5"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className={modalStyles.quantityInput}
+                />
+
+                <label htmlFor="priority" className={modalStyles.priorityLabel}>
+                  Priority:
+                </label>
+                <select
+                  id="priority"
+                  value={priority}
+                  onChange={(e) =>
+                    setPriority(Number(e.target.value) as PriorityTypeEnum)
+                  }
+                  className={modalStyles.priorityInput}
+                >
+                  <option value={PriorityTypeEnum.LOW}>Low</option>
+                  <option value={PriorityTypeEnum.MEDIUM}>Medium</option>
+                  <option value={PriorityTypeEnum.HIGH}>High</option>
+                </select>
+              </div>
             </div>
             <div className={modalStyles.modalButtons}>
               <button
@@ -79,7 +121,7 @@ export default function AddToWishlistModal({
                 Cancel
               </button>
               <button
-                className={`${styles.button} ${styles["button-secondary"]}`}
+                className={`${styles.button} ${styles["button-primary"]}`}
                 onClick={handleAddToWishlist}
               >
                 Add to Wishlist

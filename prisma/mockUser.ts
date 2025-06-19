@@ -8,6 +8,7 @@ export const mockUser: Omit<User, "createdAt" | "updatedAt"> = {
   password: "supersecret123",
   stripeConnectId: "DE89370400440532013000",
   pictureUrl: "UserImages/default_pfp.svg",
+  pictureKey: "secretKeyNoOneKnowsAboutIt",
   emailVerified: null,
   id: null,
   emailToken: null,

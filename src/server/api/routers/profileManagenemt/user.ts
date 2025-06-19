@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "~/server/db";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { utapi } from "~/server/uploadthing";
 
 export const userRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
@@ -56,6 +57,25 @@ export const userRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure.mutation(async ({ ctx }) => {
+    // Send account deletion email BEFORE deleting the user
+    try {
+      const { notifyUserOfAccountDeletion } = await import("@/server/api/routers/inboxEmailNotifier");
+      await notifyUserOfAccountDeletion(ctx.session.user.name!);
+    } catch (emailError) {
+      console.error("Failed to send account deletion email:", emailError);
+      // Continue with deletion even if email fails
+    }
+
+    const user = await db.user.findUnique({
+      where: { username: ctx.session.user.name! },
+      select: { pictureKey: true },
+    });
+
+    if (!user) return { success: false };
+
+    const { pictureKey } = user;
+    if (pictureKey) await utapi.deleteFiles(pictureKey);
+
     await db.user.delete({
       where: {
         username: ctx.session.user.name!,

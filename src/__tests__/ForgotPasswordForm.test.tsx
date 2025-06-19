@@ -11,12 +11,6 @@ jest.mock("next/link", () => {
   return Link;
 });
 
-// Define mutate options type
-type MutateOptions = {
-  onSuccess?: (data: { message: string }) => void;
-  onError?: (err: { message: string }) => void;
-};
-
 // Create mock mutate function (typed)
 const mutateMock = jest.fn<() => void>();
 

@@ -1,6 +1,6 @@
 // formidable.d.ts
-declare module 'formidable' {
-  import * as http from 'http';
+declare module "formidable" {
+  import * as http from "http";
 
   export interface Fields {
     [key: string]: string | string[];
@@ -25,7 +25,7 @@ declare module 'formidable' {
     maxFileSize?: number;
     maxFieldsSize?: number;
     maxFields?: number;
-    hash?: boolean | 'md5' | 'sha1';
+    hash?: boolean | "md5" | "sha1";
     filter?(part: any): boolean;
   }
 
@@ -33,7 +33,7 @@ declare module 'formidable' {
     constructor(options?: IncomingFormOptions);
     parse(
       req: http.IncomingMessage,
-      callback: (err: Error | null, fields: Fields, files: Files) => void
+      callback: (err: Error | null, fields: Fields, files: Files) => void,
     ): void;
   }
 }

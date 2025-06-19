@@ -57,9 +57,7 @@ export default function EditMediaModal({
                   className={styles.image}
                 />
                 {item.caption && (
-                  <div className={styles.caption}>
-                    {item.caption}
-                  </div>
+                  <div className={styles.caption}>{item.caption}</div>
                 )}
               </div>
             ))
