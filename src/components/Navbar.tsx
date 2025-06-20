@@ -185,7 +185,7 @@ const Navbar = () => {
               </Link>
               <div className={styles["dropdown-content"]}>
                 <Link href="/profile#">
-                  <FaUserEdit /> Profile
+                  <FaUserEdit /> View Profile
                 </Link>
                 <Link
                   href="/#"
