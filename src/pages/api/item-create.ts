@@ -34,7 +34,16 @@ export default async function handler(
         description: description,
         imagesUrl: photo,
         imagesKey: key,
-        price: stripCurrency(price),
+        price: (() => {
+                  if (typeof price === "string" && price.trim().endsWith("USD")) {
+                    const numericPart = price.trim().slice(0, -3).trim();
+                    const value = parseFloat(numericPart);
+                    if (!isNaN(value)) {
+                      return value * 4.4;
+                    }
+                  }
+                  return stripCurrency(price);
+                })(),
         retailerId: retailer,
       },
     });
