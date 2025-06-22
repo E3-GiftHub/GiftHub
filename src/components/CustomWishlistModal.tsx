@@ -118,10 +118,10 @@ export default function CustomWishlistModal({
               />
 
               <label htmlFor="price" className={modalStyles.priceLabel}>
-                Price:
+                Price (RON):
               </label>
               <input
-                type="string"
+                type="number"
                 id="price"
                 value={price ?? ""}
                 onChange={(e) => setPrice(String(e.target.value))}
