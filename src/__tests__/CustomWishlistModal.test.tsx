@@ -25,7 +25,7 @@ describe("CustomWishlistModal", () => {
 
     expect(screen.getByLabelText(/Add the name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Add the description/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Price:/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Price \(RON\):/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Add a note/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Quantity:/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Priority:/i)).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe("CustomWishlistModal", () => {
       target: { value: "A useful item" },
     });
 
-    fireEvent.change(screen.getByLabelText(/Price:/i), {
+    fireEvent.change(screen.getByLabelText(/Price \(RON\):/i), {
       target: { value: "49.99" },
     });
 
