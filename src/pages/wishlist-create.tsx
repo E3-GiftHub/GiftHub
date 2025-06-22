@@ -18,7 +18,6 @@ import styles from "../styles/WishlistPage.module.css";
 import buttonStyles from "../styles/Button.module.css";
 import loadingStyles from "../styles/wishlistcomponent.module.css";
 import "./../styles/globals.css";
-import ebayLogo from "./../../public/illustrations/ebay-logo.png";
 
 type ItemCreateResponse = {
   itemId: number;

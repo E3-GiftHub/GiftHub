@@ -318,7 +318,7 @@ const Wishlist: React.FC<WishlistProps> = ({
                         ></div>
                       </div>
                       <div className={styles.contributionAmount}>
-                        ${item.contribution.current} of $
+                        RON{item.contribution.current} of RON
                         {item.contribution.total}
                       </div>
                     </div>
