@@ -1,7 +1,5 @@
 import { app, BrowserWindow, shell } from 'electron';
 
-
-
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 1600,
