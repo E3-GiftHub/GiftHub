@@ -6,7 +6,7 @@ import { db as prisma } from "~/server/db";
 
 // Initialize Stripe with your secret key and the desired API version:
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-05-28.basil",
+  apiVersion: "2025-06-30.basil",
 });
 
 // Define a proper error type for Stripe errors

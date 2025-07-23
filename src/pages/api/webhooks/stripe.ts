@@ -19,7 +19,7 @@ function isStripeError(err: unknown): err is Error & { type: string } {
 
 // 1. Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-05-28.basil",
+  apiVersion: "2025-06-30.basil",
 });
 
 // 2. Grab your webhook signing secret from environment

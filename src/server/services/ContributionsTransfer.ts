@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 // Initialize Stripe client
 // Ensure STRIPE_SECRET_KEY is set in your environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-05-28.basil', // Ensure this is your desired API version
+  apiVersion: '2025-06-30.basil', // Ensure this is your desired API version
 });
 
 /**

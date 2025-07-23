@@ -2,6 +2,22 @@
   "name": "gifthub",
   "version": "0.1.0",
   "private": true,
+  "build": {
+    "appId": "com.e3getmehired.gifthub",
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "appimage",
+        "pacman"
+      ],
+      "category": "Utility",
+      "maintainer": "e3getmehired",
+      "vendor": "e3getmehired"
+    }
+  },
   "scripts": {
     "build": "prisma generate && next build",
     "check": "next lint && tsc --noEmit",
@@ -64,6 +80,9 @@
     "@babel/core": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-typescript": "^7.27.1",
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
     "@testing-library/dom": "^10.4.0",
