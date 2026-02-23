@@ -78,7 +78,7 @@ describe("UpcomingEventsSection", () => {
       isError: false,
     });
     render(<UpcomingEventsSection />);
-    expect(screen.getByText(/2025/i)).toBeInTheDocument();
+    expect(screen.getByText(/2026/i)).toBeInTheDocument();
   });
 
   it("renders up to 2 event rows", () => {
