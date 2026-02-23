@@ -33,7 +33,7 @@
 </p>
    
 <h4>
-    <a href="docs/demo.mp4">View Demo</a>
+    <a href="docs/demo.mp4">View Full Demo</a>
   <span> · </span>
     <a href="https://docs.google.com/document/d/1Yh1Eaa5I0w-tF8_Y4AJZoDLe8aI6ZBTnuGBTjD6-4MU/edit?tab=t.0">Documentation</a>
   <span> · </span>
@@ -77,6 +77,11 @@ This platform provides a centralized digital solution to these problems by enabl
 ### :camera: Screenshots
 
 <div align="center"> 
+  <video alt="demo section" width="600" height="350" controls>
+    <source src="docs/demo-section.mp4" type="video/mp4">
+  Video tag not supported Navigate to docs/demo.mp4 to see the full demo.
+  </video>
+
   <img src="docs/ss/Screenshot from 2026-02-23 19-33-48.png" alt="screenshot" width="600" height="350" />
 
   <img src="docs/ss/Screenshot from 2026-02-23 19-34-08.png" alt="screenshot" width="600" height="350" />
