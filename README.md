@@ -31,7 +31,9 @@
     <img src="https://img.shields.io/github/license/E3-GiftHub/GiftHub.svg" alt="license" />
   </a>
 </p>
-   
+
+https://github.com/user-attachments/assets/94fe2d17-7ebd-485f-8451-ccdf78bd2b10
+
 <h4>
     <a href="docs/demo.mp4">View Full Demo</a>
   <span> · </span>
